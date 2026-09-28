@@ -30,26 +30,28 @@ def test_h0_preserves_harvested_plant_age_and_allows_immediate_reharvest(
     fixed = do_action(
         key, state, Action.DO.value, static_params, RootMutation.FIXED
     )
-    mutant = do_action(
+    mutant_after_action = do_action(
         key,
         state,
         Action.DO.value,
         static_params,
         RootMutation.H0_STALE_PLANT_AGE,
     )
+    assert bool(
+        detect_violation(
+            RootMutation.H0_STALE_PLANT_AGE,
+            state,
+            Action.DO.value,
+            mutant_after_action,
+        )
+    )
     fixed = base.update_plants(fixed, static_params)
-    mutant = base.update_plants(mutant, static_params)
+    mutant = base.update_plants(mutant_after_action, static_params)
 
     assert int(fixed.growing_plants_age[0]) == 1
     assert int(fixed.map[7, 8]) == BlockType.PLANT.value
     assert int(mutant.growing_plants_age[0]) == 601
     assert int(mutant.map[7, 8]) == BlockType.RIPE_PLANT.value
-    assert bool(
-        detect_violation(
-            RootMutation.H0_STALE_PLANT_AGE, state, Action.DO.value, mutant
-        )
-    )
-
     fixed_twice = do_action(
         key, fixed, Action.DO.value, static_params, RootMutation.FIXED
     )
@@ -145,6 +147,11 @@ def test_h2_negative_index_mines_opposite_edge(base_state, static_params):
 
     assert int(fixed.inventory.iron) == 0
     assert int(fixed.map[-1, target_column]) == BlockType.IRON.value
+    assert not bool(
+        detect_violation(
+            RootMutation.H2_MISSING_MAP_BOUNDS, state, Action.DO.value, fixed
+        )
+    )
     assert int(mutant.inventory.iron) == 1
     assert int(mutant.map[-1, target_column]) == BlockType.PATH.value
     assert bool(
@@ -162,4 +169,3 @@ def test_unrelated_action_matches_fixed_kernel(base_state, static_params):
         actual = do_action(key, base_state, Action.NOOP.value, static_params, mutation)
         comparisons = jax.tree_util.tree_map(jnp.array_equal, expected, actual)
         assert all(bool(value) for value in jax.tree_util.tree_leaves(comparisons))
-

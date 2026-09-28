@@ -3,12 +3,16 @@
 from __future__ import annotations
 
 import jax
+import jax.numpy as jnp
 from craftax.craftax_classic.envs.common import compute_score
 from craftax.craftax_classic.envs.craftax_symbolic_env import (
     CraftaxClassicSymbolicEnvNoAutoReset,
+    get_flat_map_obs_shape,
+    get_inventory_obs_shape,
 )
+from craftax.environment_base import spaces
 
-from hackrl.mutations import RootMutation, craftax_step, detect_violation
+from hackrl.mutations import RootMutation, craftax_step_with_violation
 
 
 class HackRLClassicSymbolicEnvNoAutoReset(CraftaxClassicSymbolicEnvNoAutoReset):
@@ -19,7 +23,7 @@ class HackRLClassicSymbolicEnvNoAutoReset(CraftaxClassicSymbolicEnvNoAutoReset):
         self.mutation = RootMutation(mutation)
 
     def step_env(self, rng, state, action, params):
-        next_state, reward = craftax_step(
+        next_state, reward, violation = craftax_step_with_violation(
             rng,
             state,
             action,
@@ -30,10 +34,8 @@ class HackRLClassicSymbolicEnvNoAutoReset(CraftaxClassicSymbolicEnvNoAutoReset):
         done = self.is_terminal(next_state, params)
         info = compute_score(next_state, done)
         info["discount"] = self.discount(next_state, params)
-        info["HackRL/violation"] = detect_violation(
-            self.mutation, state, action, next_state
-        )
-        info["HackRL/goal_success"] = jax.numpy.logical_and(
+        info["HackRL/violation"] = violation
+        info["HackRL/goal_success"] = jnp.logical_and(
             state.inventory.diamond == 0,
             next_state.inventory.diamond > 0,
         )
@@ -48,4 +50,15 @@ class HackRLClassicSymbolicEnvNoAutoReset(CraftaxClassicSymbolicEnvNoAutoReset):
     @property
     def name(self) -> str:
         return f"HackRL-Classic-Symbolic-{self.mutation.value}-NoAutoReset-v0"
+
+    def observation_space(self, params=None) -> spaces.Box:
+        """Declare the shared range including H1's observable iron balance."""
+
+        del params
+        observation_size = get_flat_map_obs_shape() + get_inventory_obs_shape()
+        low = jnp.zeros((observation_size,), dtype=jnp.float32)
+        iron_observation_index = get_flat_map_obs_shape() + 3
+        low = low.at[iron_observation_index].set(-0.1)
+        high = jnp.ones((observation_size,), dtype=jnp.float32)
+        return spaces.Box(low, high, (observation_size,), dtype=jnp.float32)
 

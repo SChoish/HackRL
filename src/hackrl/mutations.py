@@ -113,24 +113,38 @@ def do_crafting(state, action, mutation: RootMutation):
     )
 
 
-def craftax_step(rng, state, action, params, static_params, mutation: RootMutation):
-    """Craftax 1.6.1 step with one selected root mutation.
+def _craftax_step_with_violation(
+    rng, state, action, params, static_params, mutation: RootMutation
+):
+    """Craftax 1.6.1 step plus stage-local contract-violation evidence.
 
-    This mirrors the short upstream orchestration function.  Individual game
+    This mirrors the short upstream orchestration function. Individual game
     systems remain calls into Craftax; only crafting and interaction dispatch
-    through the isolated mutation functions above.
+    through the isolated mutation functions above. Violations are detected
+    before plant growth and survival ticks can create unrelated state changes.
     """
 
     initial_achievements = state.achievements
     initial_health = state.player_health
 
-    action = jax.lax.select(state.is_sleeping, Action.NOOP.value, action)
-    state = do_crafting(state, action, mutation)
+    effective_action = jax.lax.select(state.is_sleeping, Action.NOOP.value, action)
+
+    previous_state = state
+    state = do_crafting(state, effective_action, mutation)
+    crafting_violation = detect_violation(
+        mutation, previous_state, effective_action, state
+    )
 
     rng, action_rng = jax.random.split(rng)
-    state = do_action(action_rng, state, action, static_params, mutation)
-    state = base.place_block(state, action, static_params)
-    state = base.move_player(state, action)
+    previous_state = state
+    state = do_action(action_rng, state, effective_action, static_params, mutation)
+    interaction_violation = detect_violation(
+        mutation, previous_state, effective_action, state
+    )
+    violation = jnp.logical_or(crafting_violation, interaction_violation)
+
+    state = base.place_block(state, effective_action, static_params)
+    state = base.move_player(state, effective_action)
 
     rng, mob_rng = jax.random.split(rng)
     state = base.update_mobs(mob_rng, state, params, static_params)
@@ -138,7 +152,7 @@ def craftax_step(rng, state, action, params, static_params, mutation: RootMutati
     state = base.spawn_mobs(state, spawn_rng, params, static_params)
 
     state = base.update_plants(state, static_params)
-    state = base.update_player_intrinsics(state, action)
+    state = base.update_player_intrinsics(state, effective_action)
     state = base.cap_inventory(state)
     state = base.update_health(state)
 
@@ -155,11 +169,30 @@ def craftax_step(rng, state, action, params, static_params, mutation: RootMutati
         light_level=base.calculate_light_level(state.timestep + 1, params),
         state_rng=state_rng,
     )
-    return state, reward
+    return state, reward, violation
+
+
+def craftax_step(rng, state, action, params, static_params, mutation: RootMutation):
+    """Craftax 1.6.1 step with one selected root mutation."""
+
+    next_state, reward, _ = _craftax_step_with_violation(
+        rng, state, action, params, static_params, mutation
+    )
+    return next_state, reward
+
+
+def craftax_step_with_violation(
+    rng, state, action, params, static_params, mutation: RootMutation
+):
+    """Return the transition and independently detected violation evidence."""
+
+    return _craftax_step_with_violation(
+        rng, state, action, params, static_params, mutation
+    )
 
 
 def detect_violation(mutation: RootMutation, before, action, after):
-    """Detect a contract violation from the transition, not an internal flag."""
+    """Detect a violation in one crafting or interaction transition."""
 
     if mutation is RootMutation.H0_STALE_PLANT_AGE:
         target = before.player_position + DIRECTIONS[before.player_direction]
@@ -172,6 +205,9 @@ def detect_violation(mutation: RootMutation, before, action, after):
         was_ripe = (
             before.map[target[0], target[1]] == BlockType.RIPE_PLANT.value
         )
+        plant_was_harvested = (
+            after.map[target[0], target[1]] == BlockType.PLANT.value
+        )
         age_not_reset = after.growing_plants_age[plant_index] >= 600
         return jnp.logical_and(
             action == Action.DO.value,
@@ -179,7 +215,10 @@ def detect_violation(mutation: RootMutation, before, action, after):
                 target_in_bounds,
                 jnp.logical_and(
                     jnp.any(matching_plants),
-                    jnp.logical_and(was_ripe, age_not_reset),
+                    jnp.logical_and(
+                        was_ripe,
+                        jnp.logical_and(plant_was_harvested, age_not_reset),
+                    ),
                 ),
             ),
         )
@@ -216,13 +255,13 @@ def detect_violation(mutation: RootMutation, before, action, after):
                 ]
             )
         )
-        survival_changed = jnp.logical_or(
+        interaction_resource_changed = jnp.logical_or(
             before.player_food != after.player_food,
             before.player_drink != after.player_drink,
         )
         had_effect = jnp.logical_or(
             target_changed,
-            jnp.logical_or(inventory_changed, survival_changed),
+            jnp.logical_or(inventory_changed, interaction_resource_changed),
         )
         return jnp.logical_and(
             action == Action.DO.value,
@@ -230,4 +269,3 @@ def detect_violation(mutation: RootMutation, before, action, after):
         )
 
     return jnp.asarray(False)
-
