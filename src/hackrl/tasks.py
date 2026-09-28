@@ -60,6 +60,17 @@ class FixtureVersion(str, Enum):
     R_E_REPLENISH = "r_e_replenish"
 
 
+class FixtureDynamics(str, Enum):
+    """Mob-slot dynamics. Layout, goal, reward, and horizon stay the same."""
+
+    LEGACY = "legacy"
+    PATCHED = "patched"
+
+    @property
+    def version(self) -> int:
+        return 1 if self is FixtureDynamics.LEGACY else 2
+
+
 # South-east detour: column 8 stays clear for the 3-step iron path, and
 # (8,7)/(8,9) stay the workshop. Three finite copies of each resource.
 R_E_REPLENISH_TREES = ((9, 10), (10, 10), (11, 10))
@@ -68,7 +79,7 @@ R_E_REPLENISH_COALS = ((9, 12), (10, 12), (11, 12))
 
 # After either craft at (8, 8), DOWN then DO mines this diamond.
 R_M_DIAMOND = (10, 8)
-FIXTURE_DYNAMICS_VERSION = 2
+FIXTURE_DYNAMICS_VERSION = FixtureDynamics.PATCHED.version
 
 
 @dataclass(frozen=True)
@@ -142,10 +153,10 @@ def easy_goal_reached(task: EasyTask | MediumTask | str, state: EnvState):
     raise ValueError(f"Unsupported HackRL task: {task}")
 
 
-def _empty_mobs(count: int) -> Mobs:
+def _empty_mobs(count: int, health: int = 0) -> Mobs:
     return Mobs(
         position=jnp.zeros((count, 2), dtype=jnp.int32),
-        health=jnp.zeros((count,), dtype=jnp.int32),
+        health=jnp.full((count,), health, dtype=jnp.int32),
         mask=jnp.zeros((count,), dtype=bool),
         attack_cooldown=jnp.zeros((count,), dtype=jnp.int32),
     )
@@ -173,12 +184,14 @@ def build_easy_state(
     static_params: StaticEnvParams,
     start_mode: StartMode | str = StartMode.DEFAULT,
     fixture: FixtureVersion | str = FixtureVersion.DEFAULT,
+    dynamics: FixtureDynamics | str = FixtureDynamics.PATCHED,
 ) -> EnvState:
     """Build a 16x16 fixture without invoking Craftax world generation."""
 
     task = parse_task(task)
     start_mode = StartMode(start_mode)
     fixture = FixtureVersion(fixture)
+    dynamics = FixtureDynamics(dynamics)
     if start_mode is StartMode.R_E_POST_IRON and task is not EasyTask.R_E:
         raise ValueError("r_e_post_iron is only defined for R-E")
     if fixture is FixtureVersion.R_E_REPLENISH and task is not EasyTask.R_E:
@@ -267,10 +280,22 @@ def build_easy_state(
         player_thirst=0.0,
         player_fatigue=0.0,
         inventory=inventory,
-        zombies=_empty_mobs(static_params.max_zombies),
-        cows=_empty_mobs(static_params.max_cows),
-        skeletons=_empty_mobs(static_params.max_skeletons),
-        arrows=_empty_mobs(static_params.max_arrows),
+        zombies=_empty_mobs(
+            static_params.max_zombies,
+            params.zombie_health if dynamics is FixtureDynamics.LEGACY else 0,
+        ),
+        cows=_empty_mobs(
+            static_params.max_cows,
+            params.cow_health if dynamics is FixtureDynamics.LEGACY else 0,
+        ),
+        skeletons=_empty_mobs(
+            static_params.max_skeletons,
+            params.skeleton_health if dynamics is FixtureDynamics.LEGACY else 0,
+        ),
+        arrows=_empty_mobs(
+            static_params.max_arrows,
+            1 if dynamics is FixtureDynamics.LEGACY else 0,
+        ),
         arrow_directions=jnp.zeros(
             (static_params.max_arrows, 2), dtype=jnp.int32
         ),
@@ -294,11 +319,13 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         static_env_params: StaticEnvParams | None = None,
         start_mode: StartMode | str = StartMode.DEFAULT,
         fixture: FixtureVersion | str = FixtureVersion.DEFAULT,
+        dynamics: FixtureDynamics | str = FixtureDynamics.PATCHED,
     ):
         self.task = parse_task(task)
         self.spec = EASY_TASK_SPECS[self.task]
         self.start_mode = StartMode(start_mode)
         self.fixture = FixtureVersion(fixture)
+        self.dynamics = FixtureDynamics(dynamics)
         if (
             self.start_mode is StartMode.R_E_POST_IRON
             and self.task is not EasyTask.R_E
@@ -336,6 +363,7 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
             self.static_env_params,
             start_mode=self.start_mode,
             fixture=self.fixture,
+            dynamics=self.dynamics,
         )
         return self.get_obs(state), state
 
@@ -369,7 +397,8 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
             self.mutation,
             contract=self.spec.root_mutation,
         )
-        next_state = _enforce_empty_mobs(next_state, self.static_env_params)
+        if self.dynamics is FixtureDynamics.PATCHED:
+            next_state = _enforce_empty_mobs(next_state, self.static_env_params)
         done, goal, death, timeout = self._termination(next_state)
         goal_achieved = jnp.logical_and(jnp.logical_not(goal_before), goal)
         reward = goal_achieved.astype(jnp.float32)
@@ -411,6 +440,8 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         name = f"HackRL-Classic-{self.task.value}-{variant}-NoAutoReset-v0"
         if self.fixture is not FixtureVersion.DEFAULT:
             name = f"{name}-{self.fixture.value}"
+        if self.dynamics is not FixtureDynamics.PATCHED:
+            name = f"{name}-{self.dynamics.value}"
         if self.start_mode is not StartMode.DEFAULT:
             return f"{name}-{self.start_mode.value}"
         return name

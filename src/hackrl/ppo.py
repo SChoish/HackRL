@@ -29,11 +29,12 @@ from hackrl.run_artifacts import (
     first_success_update,
     repo_git_diff,
     repo_git_sha,
+    write_mid_checkpoint,
     write_run_artifacts,
 )
 from hackrl.tasks import (
     EasyTask,
-    FIXTURE_DYNAMICS_VERSION,
+    FixtureDynamics,
     FixtureVersion,
     HackRLEasySymbolicEnvNoAutoReset,
     MediumTask,
@@ -144,7 +145,9 @@ class PPOConfig:
     eval_episodes: int = 8
     start_mode: str = StartMode.DEFAULT.value
     fixture: str = FixtureVersion.DEFAULT.value
+    dynamics: str = FixtureDynamics.PATCHED.value
     log_dir: str | None = None
+    checkpoint_updates: tuple[int, ...] = ()
 
     @property
     def batch_size(self) -> int:
@@ -180,6 +183,11 @@ class PPOConfig:
             and parse_task(self.task) is not EasyTask.R_E
         ):
             raise ValueError("r_e_replenish is only defined for R-E")
+        FixtureDynamics(self.dynamics)
+        if self.learning_rate <= 0:
+            raise ValueError("learning_rate must be positive")
+        if any(update < 0 or update > self.num_updates for update in self.checkpoint_updates):
+            raise ValueError("checkpoint_updates must lie in [0, num_updates]")
 
 
 def _parameter_norm(parameters):
@@ -573,11 +581,13 @@ def run_ppo_pilot(config: PPOConfig):
     config.validate()
     git_sha = repo_git_sha()
     git_diff = repo_git_diff()
+    dynamics = FixtureDynamics(config.dynamics)
     env = HackRLEasySymbolicEnvNoAutoReset(
         parse_task(config.task),
         mutant=config.mutant,
         start_mode=config.start_mode,
         fixture=config.fixture,
+        dynamics=dynamics,
     )
     vector_env = HackRLBatchEnv(env, config.num_envs)
     network = ActorCritic(
@@ -610,20 +620,85 @@ def run_ppo_pilot(config: PPOConfig):
     )
 
     update = _make_update(vector_env, network, config)
+    chunk = config.num_updates if config.num_updates <= 32 else 32
 
-    def train_all_updates(state):
-        return jax.lax.scan(
-            update, state, None, length=config.num_updates
+    def train_chunk(state):
+        return jax.lax.scan(update, state, None, length=chunk)
+
+    train_chunk = jax.jit(train_chunk)
+    leftover = config.num_updates % chunk
+    train_leftover = None
+    if leftover:
+        def train_leftover_fn(state):
+            return jax.lax.scan(update, state, None, length=leftover)
+
+        train_leftover = jax.jit(train_leftover_fn)
+
+    def _eval_fn(params, key, stochastic):
+        return evaluate_policy(
+            network,
+            params,
+            env,
+            key,
+            config.eval_episodes,
+            stochastic=stochastic,
         )
 
-    runner_state, update_metrics = jax.jit(train_all_updates)(runner_state)
+    eval_mode = jax.jit(lambda params, key: _eval_fn(params, key, False))
+    eval_sample = jax.jit(lambda params, key: _eval_fn(params, key, True))
+
+    def _evaluate_both(eval_rng):
+        eval_rng, mode_rng, sample_rng = jax.random.split(eval_rng, 3)
+        params = runner_state[0].params
+        mode_metrics = {
+            key: float(jax.device_get(value))
+            for key, value in eval_mode(params, mode_rng).items()
+        }
+        sample_metrics = {
+            key.replace("eval_", "eval_sample_", 1): float(jax.device_get(value))
+            for key, value in eval_sample(params, sample_rng).items()
+        }
+        return eval_rng, {**mode_metrics, **sample_metrics}
+
+    save_at = set(config.checkpoint_updates)
+    metric_chunks = []
+    updates_done = 0
+    rng, checkpoint_rng = jax.random.split(rng)
+    if 0 in save_at and config.log_dir is not None:
+        checkpoint_rng, evaluation = _evaluate_both(checkpoint_rng)
+        write_mid_checkpoint(
+            config.log_dir,
+            tag="transitions_0",
+            params=runner_state[0].params,
+            evaluation=evaluation,
+        )
+
+    remaining = config.num_updates
+    while remaining > 0:
+        if remaining >= chunk:
+            runner_state, update_metrics = train_chunk(runner_state)
+            remaining -= chunk
+            updates_done += chunk
+        else:
+            runner_state, update_metrics = train_leftover(runner_state)
+            updates_done += leftover
+            remaining = 0
+        metric_chunks.append(
+            jax.tree.map(lambda value: np.asarray(jax.device_get(value)), update_metrics)
+        )
+        if updates_done in save_at and config.log_dir is not None:
+            checkpoint_rng, evaluation = _evaluate_both(checkpoint_rng)
+            transitions = updates_done * config.batch_size
+            write_mid_checkpoint(
+                config.log_dir,
+                tag=f"transitions_{transitions}",
+                params=runner_state[0].params,
+                evaluation=evaluation,
+            )
+
     train_state, _, _, rng = runner_state
     final_parameter_norm = _parameter_norm(train_state.params)
-
-    host_metrics = jax.tree.map(
-        lambda value: np.asarray(jax.device_get(value)),
-        update_metrics,
-    )
+    host_metrics = jax.tree.map(lambda *xs: np.concatenate(xs, axis=0), *metric_chunks)
     totals = {}
     for key in (
         "transitions",
@@ -691,10 +766,11 @@ def run_ppo_pilot(config: PPOConfig):
         "variant": "mutant" if config.mutant else "fixed",
         "start_mode": StartMode(config.start_mode).value,
         "fixture": FixtureVersion(config.fixture).value,
+        "dynamics": dynamics.value,
         "git_sha": git_sha,
         "working_tree_dirty": bool(git_diff),
         "metrics_schema_version": 2,
-        "fixture_dynamics_version": FIXTURE_DYNAMICS_VERSION,
+        "fixture_dynamics_version": dynamics.version,
         **totals,
         **optimization,
         **evaluation,

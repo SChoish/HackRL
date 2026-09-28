@@ -5,7 +5,7 @@ import argparse
 import json
 
 from hackrl.ppo import PPOConfig, run_ppo_pilot
-from hackrl.tasks import EasyTask, MediumTask, parse_task
+from hackrl.tasks import EasyTask, FixtureDynamics, MediumTask, parse_task
 
 
 def parse_args():
@@ -34,9 +34,26 @@ def parse_args():
     parser.add_argument("--layer-size", type=int, default=64)
     parser.add_argument("--eval-episodes", type=int, default=8)
     parser.add_argument(
+        "--learning-rate",
+        type=float,
+        default=2e-4,
+        help="Adam learning rate. Stage A2 keeps 2e-4 fixed.",
+    )
+    parser.add_argument(
         "--anneal-learning-rate",
         action="store_true",
         help="opt into linear learning-rate annealing (protocol default is fixed)",
+    )
+    parser.add_argument(
+        "--dynamics",
+        choices=[dynamics.value for dynamics in FixtureDynamics],
+        default=FixtureDynamics.PATCHED.value,
+        help="legacy keeps the old mob-slot init; patched wipes empty mobs",
+    )
+    parser.add_argument(
+        "--checkpoint-updates",
+        default="",
+        help="comma-separated update counts to save params+eval, e.g. 0,32,128,512",
     )
     parser.add_argument(
         "--start-mode",
@@ -68,10 +85,15 @@ def make_config(args, task, variant, log_dir=None):
         num_minibatches=args.num_minibatches,
         layer_size=args.layer_size,
         eval_episodes=args.eval_episodes,
+        learning_rate=args.learning_rate,
         anneal_learning_rate=args.anneal_learning_rate,
         start_mode=args.start_mode,
         fixture=args.fixture,
+        dynamics=args.dynamics,
         log_dir=log_dir,
+        checkpoint_updates=tuple(
+            int(item) for item in args.checkpoint_updates.split(",") if item
+        ),
     )
 
 

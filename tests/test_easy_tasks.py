@@ -5,6 +5,7 @@ from craftax.craftax_classic.constants import Action, BlockType
 
 from hackrl import (
     EasyTask,
+    FixtureDynamics,
     HackRLEasySymbolicEnvNoAutoReset,
     MediumTask,
     StartMode,
@@ -70,6 +71,15 @@ def test_no_mob_fixture_is_an_invariant_across_100_do_steps():
             step_key, state, Action.DO.value, params
         )
         _assert_no_mobs(state)
+
+
+def test_legacy_dynamics_keeps_nonzero_placeholder_health():
+    env = HackRLEasySymbolicEnvNoAutoReset(
+        MediumTask.R_M, mutant=False, dynamics=FixtureDynamics.LEGACY
+    )
+    _, state = env.reset(jax.random.PRNGKey(102), env.default_params)
+    assert int(state.zombies.health[0]) == int(env.default_params.zombie_health)
+    assert not bool(state.zombies.mask.any())
 
 
 def test_easy_fixture_contracts():

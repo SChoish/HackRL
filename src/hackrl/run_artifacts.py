@@ -12,7 +12,7 @@ import numpy as np
 from flax.serialization import to_bytes
 
 from hackrl.tasks import (
-    FIXTURE_DYNAMICS_VERSION,
+    FixtureDynamics,
     FixtureVersion,
     StartMode,
     parse_task,
@@ -51,8 +51,10 @@ def config_payload(config) -> dict:
     payload["start_mode"] = StartMode(config.start_mode).value
     payload["fixture"] = FixtureVersion(config.fixture).value
     payload["variant"] = "mutant" if config.mutant else "fixed"
+    payload["dynamics"] = FixtureDynamics(config.dynamics).value
     payload["metrics_schema_version"] = 2
-    payload["fixture_dynamics_version"] = FIXTURE_DYNAMICS_VERSION
+    payload["fixture_dynamics_version"] = FixtureDynamics(config.dynamics).version
+    payload["checkpoint_updates"] = list(config.checkpoint_updates)
     return payload
 
 
@@ -102,5 +104,15 @@ def write_run_artifacts(
 
     (destination / "summary.json").write_text(
         json.dumps(summary, indent=2, sort_keys=True) + "\n"
+    )
+    return destination
+
+
+def write_mid_checkpoint(log_dir, *, tag: str, params, evaluation: dict):
+    destination = Path(log_dir) / "checkpoints" / tag
+    destination.mkdir(parents=True, exist_ok=True)
+    (destination / "params.msgpack").write_bytes(to_bytes(params))
+    (destination / "eval.json").write_text(
+        json.dumps(evaluation, indent=2, sort_keys=True) + "\n"
     )
     return destination

@@ -56,3 +56,26 @@ def test_minimal_official_ppo_training_and_evaluation_flow(tmp_path):
     assert (tmp_path / "config.json").is_file()
     assert (tmp_path / "summary.json").is_file()
     assert (tmp_path / "working_tree.patch").is_file()
+
+
+def test_checkpoint_updates_write_params_and_eval(tmp_path):
+    result = run_ppo_pilot(
+        PPOConfig(
+            task=EasyTask.R_E,
+            mutant=True,
+            seed=0,
+            num_envs=2,
+            num_steps=4,
+            num_updates=1,
+            update_epochs=1,
+            num_minibatches=1,
+            layer_size=16,
+            eval_episodes=2,
+            learning_rate=2e-4,
+            checkpoint_updates=(0, 1),
+            log_dir=str(tmp_path),
+        )
+    )
+    assert result["transitions"] == 8
+    assert (tmp_path / "checkpoints" / "transitions_0" / "params.msgpack").is_file()
+    assert (tmp_path / "checkpoints" / "transitions_8" / "eval.json").is_file()
