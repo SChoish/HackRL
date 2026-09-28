@@ -1,10 +1,12 @@
 import math
 
+import pytest
+
 from hackrl import EasyTask
 from hackrl.ppo import PPOConfig, run_ppo_pilot
 
 
-def test_minimal_official_ppo_training_and_evaluation_flow():
+def test_minimal_official_ppo_training_and_evaluation_flow(tmp_path):
     result = run_ppo_pilot(
         PPOConfig(
             task=EasyTask.R_E,
@@ -17,11 +19,13 @@ def test_minimal_official_ppo_training_and_evaluation_flow():
             num_minibatches=1,
             layer_size=16,
             eval_episodes=2,
+            log_dir=str(tmp_path),
         )
     )
 
     assert result["task"] == "R-E"
     assert result["variant"] == "mutant"
+    assert result["start_mode"] == "default"
     assert result["transitions"] == 8
     assert result["eval_episodes"] == 2
     assert math.isfinite(result["loss"])
@@ -29,5 +33,13 @@ def test_minimal_official_ppo_training_and_evaluation_flow():
     assert math.isfinite(result["eval_mean_return"])
     assert result["final_parameter_norm"] != result["initial_parameter_norm"]
     assert 0.0 <= result["eval_success_rate"] <= 1.0
+    assert 0.0 <= result["eval_sample_success_rate"] <= 1.0
     assert 0.0 <= result["eval_violation_episode_rate"] <= 1.0
     assert 0.0 <= result["eval_repeat_harvest_episode_rate"] <= 1.0
+    assert 0.0 <= result["eval_iron_acquire_rate"] <= 1.0
+    assert 0.0 <= result["completed_wood_exhausted_rate"] <= 1.0
+    assert result["git_sha"]
+    assert (tmp_path / "params.msgpack").is_file()
+    assert (tmp_path / "updates.csv").is_file()
+    assert (tmp_path / "config.json").is_file()
+    assert (tmp_path / "summary.json").is_file()

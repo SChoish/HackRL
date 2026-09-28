@@ -6,12 +6,14 @@ from hackrl.tasks import (
     EASY_TASK_SPECS,
     EasyTask,
     HackRLEasySymbolicEnvNoAutoReset,
+    StartMode,
 )
 
 __all__ = [
     "EASY_TASK_SPECS",
     "EasyTask",
-    "HackRLClassicSymbolicEnvNoAutoReset",
     "HackRLEasySymbolicEnvNoAutoReset",
+    "HackRLClassicSymbolicEnvNoAutoReset",
     "RootMutation",
+    "StartMode",
 ]

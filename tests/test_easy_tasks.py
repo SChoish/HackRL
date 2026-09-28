@@ -3,7 +3,7 @@ import jax.numpy as jnp
 import pytest
 from craftax.craftax_classic.constants import Action, BlockType
 
-from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset
+from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset, StartMode
 from hackrl.scripted_paths import EASY_EXPLOIT_PATHS, EASY_NORMAL_PATHS
 
 
@@ -60,6 +60,22 @@ def test_easy_fixture_contracts():
     assert int(r_state.map[8, 9]) == BlockType.FURNACE.value
     assert int(r_state.map[6, 8]) == BlockType.IRON.value
 
+    post = HackRLEasySymbolicEnvNoAutoReset(
+        EasyTask.R_E,
+        mutant=False,
+        start_mode=StartMode.R_E_POST_IRON,
+    )
+    _, post_state = post.reset(jax.random.PRNGKey(11), post.default_params)
+    assert int(post_state.inventory.wood) == 1
+    assert int(post_state.inventory.stone) == 1
+    assert int(post_state.inventory.coal) == 1
+    assert int(post_state.inventory.iron) == 1
+    assert int(post_state.inventory.wood_pickaxe) == 1
+    assert int(post_state.inventory.stone_pickaxe) == 1
+    assert int(post_state.map[6, 8]) == BlockType.GRASS.value
+    assert int(post_state.map[8, 7]) == BlockType.CRAFTING_TABLE.value
+    assert int(post_state.map[8, 9]) == BlockType.FURNACE.value
+
     b_env = HackRLEasySymbolicEnvNoAutoReset(EasyTask.B_E)
     _, b_state = b_env.reset(jax.random.PRNGKey(12), b_env.default_params)
     assert tuple(map(int, b_state.player_position)) == (0, 8)
@@ -112,6 +128,30 @@ def test_exploit_path_succeeds_only_in_mutant(task):
     assert not bool(fixed_transitions[-1][1])
     assert sum(float(item[0]) for item in fixed_transitions) == 0.0
     assert not any(bool(item[2]["HackRL/violation"]) for item in fixed_transitions)
+
+
+def test_r_e_fixed_post_iron_crafts_in_one_action():
+    env = HackRLEasySymbolicEnvNoAutoReset(
+        EasyTask.R_E,
+        mutant=False,
+        start_mode=StartMode.R_E_POST_IRON,
+    )
+    _, _, transitions = _rollout(
+        env, [Action.MAKE_IRON_PICKAXE.value], seed=41
+    )
+
+    reward, done, info = transitions[0]
+    assert float(reward) == 1.0
+    assert bool(done)
+    assert bool(info["HackRL/goal_success"])
+
+
+def test_post_iron_start_is_rejected_for_other_tasks():
+    with pytest.raises(ValueError, match="r_e_post_iron"):
+        HackRLEasySymbolicEnvNoAutoReset(
+            EasyTask.B_E,
+            start_mode=StartMode.R_E_POST_IRON,
+        )
 
 
 def test_non_goal_achievement_reward_is_log_only():

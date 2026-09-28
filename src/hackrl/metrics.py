@@ -20,6 +20,8 @@ class EpisodeTracker:
     harvest_count: jnp.ndarray
     repeated_harvest_count: jnp.ndarray
     goal_success: jnp.ndarray
+    ever_iron: jnp.ndarray
+    wood_exhausted_before_goal: jnp.ndarray
 
 
 def init_episode_tracker(max_growing_plants: int) -> EpisodeTracker:
@@ -35,6 +37,8 @@ def init_episode_tracker(max_growing_plants: int) -> EpisodeTracker:
         harvest_count=jnp.asarray(0, dtype=jnp.int32),
         repeated_harvest_count=jnp.asarray(0, dtype=jnp.int32),
         goal_success=jnp.asarray(False),
+        ever_iron=jnp.asarray(False),
+        wood_exhausted_before_goal=jnp.asarray(False),
     )
 
 
@@ -43,6 +47,7 @@ def update_episode_tracker(
     reward,
     info,
     timestep,
+    inventory=None,
     normal_regrowth_steps: int = NORMAL_PLANT_REGROWTH_STEPS,
 ):
     """Update one episode and distinguish H0 occurrence from repeated use.
@@ -67,6 +72,18 @@ def update_episode_tracker(
     last_harvest_timestep = tracker.last_harvest_timestep.at[safe_index].set(
         recorded_timestep
     )
+    if inventory is None:
+        ever_iron = tracker.ever_iron
+        wood_exhausted_before_goal = tracker.wood_exhausted_before_goal
+    else:
+        ever_iron = jnp.logical_or(tracker.ever_iron, inventory.iron >= 1)
+        wood_exhausted_before_goal = jnp.logical_or(
+            tracker.wood_exhausted_before_goal,
+            jnp.logical_and(
+                inventory.wood <= 0,
+                jnp.logical_not(info["HackRL/goal_success"]),
+            ),
+        )
     updated = tracker.replace(
         last_harvest_timestep=last_harvest_timestep,
         episode_return=tracker.episode_return + reward,
@@ -79,6 +96,8 @@ def update_episode_tracker(
         goal_success=jnp.logical_or(
             tracker.goal_success, info["HackRL/goal_success"]
         ),
+        ever_iron=ever_iron,
+        wood_exhausted_before_goal=wood_exhausted_before_goal,
     )
     return updated, repeated_harvest
 
@@ -94,4 +113,6 @@ def episode_summary(tracker: EpisodeTracker):
         "repeated_harvest_count": tracker.repeated_harvest_count,
         "goal_success": tracker.goal_success,
         "used_repeat_harvest": tracker.repeated_harvest_count > 0,
+        "ever_iron": tracker.ever_iron,
+        "wood_exhausted_before_goal": tracker.wood_exhausted_before_goal,
     }

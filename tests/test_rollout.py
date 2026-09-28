@@ -60,3 +60,15 @@ def test_batch_adapter_preserves_terminal_and_reset_observations():
     assert bool(
         jnp.all(next_state.tracker.episode_length == 0)
     )
+
+
+def test_post_iron_reset_marks_ever_iron_before_first_step():
+    env = HackRLEasySymbolicEnvNoAutoReset(
+        EasyTask.R_E,
+        mutant=False,
+        start_mode="r_e_post_iron",
+    )
+    vector_env = HackRLBatchEnv(env, num_envs=2)
+    _, state = vector_env.reset(jax.random.PRNGKey(84))
+    assert bool(jnp.all(state.tracker.ever_iron))
+    assert bool(jnp.all(state.env_state.inventory.iron == 1))

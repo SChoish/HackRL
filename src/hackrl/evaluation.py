@@ -20,18 +20,23 @@ class EvaluationEpisodes:
     violation_count: jax.Array
     harvest_count: jax.Array
     repeated_harvest_count: jax.Array
+    ever_iron: jax.Array
+    wood_exhausted_before_goal: jax.Array
 
 
 def _empty_results(num_episodes: int) -> EvaluationEpisodes:
     zeros_i = jnp.zeros((num_episodes,), dtype=jnp.int32)
+    zeros_b = jnp.zeros((num_episodes,), dtype=bool)
     return EvaluationEpisodes(
-        completed=jnp.zeros((num_episodes,), dtype=bool),
+        completed=zeros_b,
         episode_return=jnp.zeros((num_episodes,), dtype=jnp.float32),
         episode_length=zeros_i,
-        goal_success=jnp.zeros((num_episodes,), dtype=bool),
+        goal_success=zeros_b,
         violation_count=zeros_i,
         harvest_count=zeros_i,
         repeated_harvest_count=zeros_i,
+        ever_iron=zeros_b,
+        wood_exhausted_before_goal=zeros_b,
     )
 
 
@@ -58,6 +63,14 @@ def _record_first(results, record, newly_completed):
             record.repeated_harvest_count,
             results.repeated_harvest_count,
         ),
+        ever_iron=jnp.where(
+            newly_completed, record.ever_iron, results.ever_iron
+        ),
+        wood_exhausted_before_goal=jnp.where(
+            newly_completed,
+            record.wood_exhausted_before_goal,
+            results.wood_exhausted_before_goal,
+        ),
     )
 
 
@@ -67,8 +80,9 @@ def evaluate_policy(
     env,
     rng,
     num_episodes: int,
+    stochastic: bool = False,
 ):
-    """Evaluate a categorical policy by mode without exposing metric inputs."""
+    """Evaluate a categorical policy by mode or sample."""
 
     if num_episodes <= 0:
         raise ValueError("num_episodes must be positive")
@@ -79,9 +93,13 @@ def evaluate_policy(
 
     def evaluation_step(carry, _):
         observations, vector_state, results, rng = carry
+        rng, action_rng, step_rng = jax.random.split(rng, 3)
         policy, _ = network.apply(parameters, observations)
-        actions = policy.mode().astype(jnp.int32)
-        rng, step_rng = jax.random.split(rng)
+        actions = jnp.where(
+            stochastic,
+            policy.sample(seed=action_rng).astype(jnp.int32),
+            policy.mode().astype(jnp.int32),
+        )
         (
             policy_observations,
             vector_state,
@@ -116,6 +134,12 @@ def evaluate_policy(
         ),
         "eval_repeat_harvest_episode_rate": jnp.mean(
             (results.repeated_harvest_count > 0).astype(jnp.float32)
+        ),
+        "eval_iron_acquire_rate": jnp.mean(
+            results.ever_iron.astype(jnp.float32)
+        ),
+        "eval_wood_exhausted_before_goal_rate": jnp.mean(
+            results.wood_exhausted_before_goal.astype(jnp.float32)
         ),
         "eval_mean_return": jnp.mean(results.episode_return),
         "eval_mean_length": jnp.mean(

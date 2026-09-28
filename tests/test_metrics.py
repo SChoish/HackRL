@@ -1,5 +1,7 @@
 import jax
 
+from craftax.craftax_classic.envs.craftax_state import Inventory
+
 from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset
 from hackrl.metrics import (
     episode_summary,
@@ -85,3 +87,28 @@ def test_first_late_harvest_is_not_mislabeled_as_repeat():
 
     assert not bool(repeated)
     assert int(tracker.last_harvest_timestep[0]) == 700
+
+
+def test_tracker_records_iron_and_wood_exhaustion():
+    tracker = init_episode_tracker(10)
+    info = {
+        "HackRL/plant_harvested": jax.numpy.asarray(False),
+        "HackRL/harvested_plant_index": jax.numpy.asarray(-1),
+        "HackRL/violation": jax.numpy.asarray(False),
+        "HackRL/goal_success": jax.numpy.asarray(False),
+    }
+    inventory = Inventory().replace(iron=1, wood=0)
+
+    tracker, _ = update_episode_tracker(
+        tracker,
+        jax.numpy.asarray(0.0),
+        info,
+        jax.numpy.asarray(1),
+        inventory,
+    )
+    summary = episode_summary(tracker)
+
+    assert bool(tracker.ever_iron)
+    assert bool(tracker.wood_exhausted_before_goal)
+    assert bool(summary["ever_iron"])
+    assert bool(summary["wood_exhausted_before_goal"])

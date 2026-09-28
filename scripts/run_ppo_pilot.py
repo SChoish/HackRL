@@ -33,10 +33,20 @@ def parse_args():
     parser.add_argument("--num-minibatches", type=int, default=2)
     parser.add_argument("--layer-size", type=int, default=64)
     parser.add_argument("--eval-episodes", type=int, default=8)
+    parser.add_argument(
+        "--start-mode",
+        choices=["default", "r_e_post_iron"],
+        default="default",
+    )
+    parser.add_argument(
+        "--log-dir",
+        default=None,
+        help="write config, SHA, per-update CSV, and params checkpoint",
+    )
     return parser.parse_args()
 
 
-def make_config(args, task, variant):
+def make_config(args, task, variant, log_dir=None):
     return PPOConfig(
         task=task,
         mutant=variant == "mutant",
@@ -48,6 +58,8 @@ def make_config(args, task, variant):
         num_minibatches=args.num_minibatches,
         layer_size=args.layer_size,
         eval_episodes=args.eval_episodes,
+        start_mode=args.start_mode,
+        log_dir=log_dir,
     )
 
 
@@ -60,12 +72,23 @@ def main():
             for variant in ("fixed", "mutant")
         ]
         result = [
-            run_ppo_pilot(make_config(args, task, variant))
+            run_ppo_pilot(
+                make_config(
+                    args,
+                    task,
+                    variant,
+                    None
+                    if args.log_dir is None
+                    else f"{args.log_dir}/{task.value}_{variant}",
+                )
+            )
             for task, variant in selections
         ]
     else:
         result = run_ppo_pilot(
-            make_config(args, EasyTask(args.task), args.variant)
+            make_config(
+                args, EasyTask(args.task), args.variant, args.log_dir
+            )
         )
     print(json.dumps(result, indent=2, sort_keys=True))
 

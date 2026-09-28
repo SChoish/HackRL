@@ -34,6 +34,8 @@ class EpisodeRecord:
     violation_count: jax.Array
     harvest_count: jax.Array
     repeated_harvest_count: jax.Array
+    ever_iron: jax.Array
+    wood_exhausted_before_goal: jax.Array
 
 
 @struct.dataclass
@@ -56,12 +58,19 @@ class BatchTransition:
     repeated_harvest: jax.Array
 
 
-def _batch_tracker(max_growing_plants: int, batch_size: int) -> EpisodeTracker:
+def _batch_tracker(
+    max_growing_plants: int,
+    batch_size: int,
+    inventory=None,
+) -> EpisodeTracker:
     tracker = init_episode_tracker(max_growing_plants)
-    return jax.tree.map(
+    batched = jax.tree.map(
         lambda value: jnp.broadcast_to(value, (batch_size,) + value.shape),
         tracker,
     )
+    if inventory is None:
+        return batched
+    return batched.replace(ever_iron=inventory.iron >= 1)
 
 
 def select_batched(mask, true_tree, false_tree):
@@ -98,6 +107,7 @@ class HackRLBatchEnv:
         trackers = _batch_tracker(
             self.env.static_env_params.max_growing_plants,
             self.num_envs,
+            env_state.inventory,
         )
         return observations, VectorEnvState(env_state, trackers)
 
@@ -121,6 +131,7 @@ class HackRLBatchEnv:
             rewards,
             infos,
             stepped_states.timestep,
+            stepped_states.inventory,
         )
         episode = EpisodeRecord(
             completed=dones,
@@ -130,6 +141,8 @@ class HackRLBatchEnv:
             violation_count=updated_trackers.violation_count,
             harvest_count=updated_trackers.harvest_count,
             repeated_harvest_count=updated_trackers.repeated_harvest_count,
+            ever_iron=updated_trackers.ever_iron,
+            wood_exhausted_before_goal=updated_trackers.wood_exhausted_before_goal,
         )
 
         # Reset candidates are intentionally independent per worker. The Easy
@@ -139,6 +152,7 @@ class HackRLBatchEnv:
         empty_trackers = _batch_tracker(
             self.env.static_env_params.max_growing_plants,
             self.num_envs,
+            reset_states.inventory,
         )
         policy_observations = jnp.where(
             dones[:, None], reset_observations, terminal_observations

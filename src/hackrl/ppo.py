@@ -25,7 +25,12 @@ from flax.training.train_state import TrainState
 
 from hackrl.evaluation import evaluate_policy
 from hackrl.rollout import HackRLBatchEnv
-from hackrl.tasks import EasyTask, HackRLEasySymbolicEnvNoAutoReset
+from hackrl.run_artifacts import (
+    first_success_update,
+    repo_git_sha,
+    write_run_artifacts,
+)
+from hackrl.tasks import EasyTask, HackRLEasySymbolicEnvNoAutoReset, StartMode
 
 
 class ActorCritic(nn.Module):
@@ -84,6 +89,8 @@ class Transition(NamedTuple):
     episode_success: jax.Array
     episode_violation: jax.Array
     episode_repeat_harvest: jax.Array
+    episode_ever_iron: jax.Array
+    episode_wood_exhausted: jax.Array
     violation_event: jax.Array
     repeat_harvest_event: jax.Array
 
@@ -117,6 +124,8 @@ class PPOConfig:
     activation: str = "tanh"
     anneal_learning_rate: bool = True
     eval_episodes: int = 8
+    start_mode: str = StartMode.DEFAULT.value
+    log_dir: str | None = None
 
     @property
     def batch_size(self) -> int:
@@ -140,6 +149,12 @@ class PPOConfig:
             raise ValueError("layer_size and eval_episodes must be positive")
         if self.activation not in {"tanh", "relu"}:
             raise ValueError("activation must be 'tanh' or 'relu'")
+        start_mode = StartMode(self.start_mode)
+        if (
+            start_mode is StartMode.R_E_POST_IRON
+            and EasyTask(self.task) is not EasyTask.R_E
+        ):
+            raise ValueError("r_e_post_iron is only defined for R-E")
 
 
 def _parameter_norm(parameters):
@@ -202,6 +217,8 @@ def _make_update(vector_env, network, config: PPOConfig):
             episode_success=episode.goal_success,
             episode_violation=episode.violation_count > 0,
             episode_repeat_harvest=episode.repeated_harvest_count > 0,
+            episode_ever_iron=episode.ever_iron,
+            episode_wood_exhausted=episode.wood_exhausted_before_goal,
             violation_event=env_transition.info["HackRL/violation"],
             repeat_harvest_event=env_transition.repeated_harvest,
         )
@@ -379,6 +396,14 @@ def _make_update(vector_env, network, config: PPOConfig):
                     completed, trajectory.episode_repeat_harvest
                 )
             ),
+            "iron_acquired_episodes": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_ever_iron)
+            ),
+            "wood_exhausted_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed, trajectory.episode_wood_exhausted
+                )
+            ),
             "violation_events": jnp.sum(trajectory.violation_event),
             "repeat_harvest_events": jnp.sum(
                 trajectory.repeat_harvest_event
@@ -406,7 +431,9 @@ def run_ppo_pilot(config: PPOConfig):
 
     config.validate()
     env = HackRLEasySymbolicEnvNoAutoReset(
-        EasyTask(config.task), mutant=config.mutant
+        EasyTask(config.task),
+        mutant=config.mutant,
+        start_mode=config.start_mode,
     )
     vector_env = HackRLBatchEnv(env, config.num_envs)
     network = ActorCritic(
@@ -449,6 +476,10 @@ def run_ppo_pilot(config: PPOConfig):
     train_state, _, _, rng = runner_state
     final_parameter_norm = _parameter_norm(train_state.params)
 
+    host_metrics = jax.tree.map(
+        lambda value: np.asarray(jax.device_get(value)),
+        update_metrics,
+    )
     totals = {}
     for key in (
         "transitions",
@@ -456,41 +487,57 @@ def run_ppo_pilot(config: PPOConfig):
         "successful_episodes",
         "violation_episodes",
         "repeat_harvest_episodes",
+        "iron_acquired_episodes",
+        "wood_exhausted_episodes",
         "violation_events",
         "repeat_harvest_events",
         "completed_return_sum",
         "completed_length_sum",
     ):
-        totals[key] = float(
-            jax.device_get(jnp.sum(update_metrics[key]))
-        )
+        totals[key] = float(np.sum(host_metrics[key]))
     optimization = {
-        key: float(jax.device_get(update_metrics[key][-1]))
+        key: float(host_metrics[key][-1])
         for key in ("loss", "policy_loss", "value_loss", "entropy")
     }
+    first_success = first_success_update(host_metrics["successful_episodes"])
 
-    rng, evaluation_rng = jax.random.split(rng)
-    evaluation = jax.jit(
-        lambda key: evaluate_policy(
+    rng, mode_rng, sample_rng = jax.random.split(rng, 3)
+
+    def _evaluate(key, stochastic):
+        return evaluate_policy(
             network,
             train_state.params,
             env,
             key,
             config.eval_episodes,
+            stochastic=stochastic,
         )
-    )(evaluation_rng)
+
     evaluation = {
         key: float(jax.device_get(value))
-        for key, value in evaluation.items()
+        for key, value in jax.jit(lambda key: _evaluate(key, False))(
+            mode_rng
+        ).items()
+    }
+    sample_evaluation = {
+        key.replace("eval_", "eval_sample_", 1): float(jax.device_get(value))
+        for key, value in jax.jit(lambda key: _evaluate(key, True))(
+            sample_rng
+        ).items()
     }
 
     completed = totals["completed_episodes"]
-    return {
+    git_sha = repo_git_sha()
+    result = {
         "task": EasyTask(config.task).value,
         "variant": "mutant" if config.mutant else "fixed",
+        "start_mode": StartMode(config.start_mode).value,
+        "git_sha": git_sha,
         **totals,
         **optimization,
         **evaluation,
+        **sample_evaluation,
+        "first_success_update": first_success,
         "completed_success_rate": (
             totals["successful_episodes"] / completed if completed else 0.0
         ),
@@ -502,6 +549,12 @@ def run_ppo_pilot(config: PPOConfig):
             if completed
             else 0.0
         ),
+        "completed_iron_acquire_rate": (
+            totals["iron_acquired_episodes"] / completed if completed else 0.0
+        ),
+        "completed_wood_exhausted_rate": (
+            totals["wood_exhausted_episodes"] / completed if completed else 0.0
+        ),
         "initial_parameter_norm": float(
             jax.device_get(initial_parameter_norm)
         ),
@@ -509,3 +562,14 @@ def run_ppo_pilot(config: PPOConfig):
             jax.device_get(final_parameter_norm)
         ),
     }
+    if config.log_dir is not None:
+        write_run_artifacts(
+            config.log_dir,
+            config=config,
+            git_sha=git_sha,
+            train_state=train_state,
+            update_metrics=host_metrics,
+            summary=result,
+        )
+        result["log_dir"] = config.log_dir
+    return result

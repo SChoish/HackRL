@@ -30,6 +30,13 @@ class EasyTask(str, Enum):
     L_E = "L-E"
 
 
+class StartMode(str, Enum):
+    """Reset variants used to isolate exploration bottlenecks."""
+
+    DEFAULT = "default"
+    R_E_POST_IRON = "r_e_post_iron"
+
+
 @dataclass(frozen=True)
 class EasyTaskSpec:
     task_id: EasyTask
@@ -102,10 +109,14 @@ def build_easy_state(
     rng: jax.Array,
     params: EnvParams,
     static_params: StaticEnvParams,
+    start_mode: StartMode | str = StartMode.DEFAULT,
 ) -> EnvState:
     """Build a 16x16 fixture without invoking Craftax world generation."""
 
     task = EasyTask(task)
+    start_mode = StartMode(start_mode)
+    if start_mode is StartMode.R_E_POST_IRON and task is not EasyTask.R_E:
+        raise ValueError("r_e_post_iron is only defined for R-E")
     if tuple(static_params.map_size) != (16, 16):
         raise ValueError("Easy fixtures require static map_size=(16, 16)")
     if static_params.max_growing_plants < 2:
@@ -140,6 +151,9 @@ def build_easy_state(
             wood_pickaxe=1,
             stone_pickaxe=1,
         )
+        if start_mode is StartMode.R_E_POST_IRON:
+            world = world.at[6, 8].set(BlockType.GRASS.value)
+            inventory = inventory.replace(iron=1)
     elif task is EasyTask.B_E:
         player_position = jnp.array([0, 8], dtype=jnp.int32)
         world = world.at[-1, 8].set(BlockType.IRON.value)
@@ -203,9 +217,16 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         task: EasyTask,
         mutant: bool = False,
         static_env_params: StaticEnvParams | None = None,
+        start_mode: StartMode | str = StartMode.DEFAULT,
     ):
         self.task = EasyTask(task)
         self.spec = EASY_TASK_SPECS[self.task]
+        self.start_mode = StartMode(start_mode)
+        if (
+            self.start_mode is StartMode.R_E_POST_IRON
+            and self.task is not EasyTask.R_E
+        ):
+            raise ValueError("r_e_post_iron is only defined for R-E")
         mutation = self.spec.root_mutation if mutant else RootMutation.FIXED
         if static_env_params is None:
             static_env_params = self.default_static_params()
@@ -226,7 +247,13 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         )
 
     def reset_env(self, rng, params):
-        state = build_easy_state(self.task, rng, params, self.static_env_params)
+        state = build_easy_state(
+            self.task,
+            rng,
+            params,
+            self.static_env_params,
+            start_mode=self.start_mode,
+        )
         return self.get_obs(state), state
 
     def goal_reached(self, state):
@@ -288,4 +315,7 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
     @property
     def name(self) -> str:
         variant = "mutant" if self.mutation is not RootMutation.FIXED else "fixed"
-        return f"HackRL-Classic-{self.task.value}-{variant}-NoAutoReset-v0"
+        name = f"HackRL-Classic-{self.task.value}-{variant}-NoAutoReset-v0"
+        if self.start_mode is not StartMode.DEFAULT:
+            return f"{name}-{self.start_mode.value}"
+        return name
