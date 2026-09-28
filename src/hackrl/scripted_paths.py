@@ -38,3 +38,17 @@ R_E_WOOD_WASTE_RECOVERY_PATH = (
     Action.DO.value,
     Action.MAKE_IRON_PICKAXE.value,
 )
+
+# Shared post-craft diamond segment. Both paths craft at (8, 8), then
+# DOWN, DO mines the diamond at (10, 8).
+R_M_DIAMOND_SEGMENT = (
+    Action.DOWN.value,
+    Action.DO.value,
+)
+R_M_NORMAL_PATH = (
+    Action.UP.value,
+    Action.DO.value,
+    Action.DOWN.value,
+    Action.MAKE_IRON_PICKAXE.value,
+) + R_M_DIAMOND_SEGMENT
+R_M_EXPLOIT_PATH = (Action.MAKE_IRON_PICKAXE.value,) + R_M_DIAMOND_SEGMENT

@@ -34,7 +34,9 @@ from hackrl.tasks import (
     EasyTask,
     FixtureVersion,
     HackRLEasySymbolicEnvNoAutoReset,
+    MediumTask,
     StartMode,
+    parse_task,
 )
 
 
@@ -111,7 +113,7 @@ class TrainingBatch(NamedTuple):
 class PPOConfig:
     """Craftax PPO settings plus a bounded HackRL task selection."""
 
-    task: EasyTask = EasyTask.R_E
+    task: EasyTask | MediumTask | str = EasyTask.R_E
     mutant: bool = True
     seed: int = 0
     num_envs: int = 8
@@ -159,13 +161,13 @@ class PPOConfig:
         start_mode = StartMode(self.start_mode)
         if (
             start_mode is StartMode.R_E_POST_IRON
-            and EasyTask(self.task) is not EasyTask.R_E
+            and parse_task(self.task) is not EasyTask.R_E
         ):
             raise ValueError("r_e_post_iron is only defined for R-E")
         fixture = FixtureVersion(self.fixture)
         if (
             fixture is FixtureVersion.R_E_REPLENISH
-            and EasyTask(self.task) is not EasyTask.R_E
+            and parse_task(self.task) is not EasyTask.R_E
         ):
             raise ValueError("r_e_replenish is only defined for R-E")
 
@@ -451,7 +453,7 @@ def run_ppo_pilot(config: PPOConfig):
 
     config.validate()
     env = HackRLEasySymbolicEnvNoAutoReset(
-        EasyTask(config.task),
+        parse_task(config.task),
         mutant=config.mutant,
         start_mode=config.start_mode,
         fixture=config.fixture,
@@ -551,7 +553,7 @@ def run_ppo_pilot(config: PPOConfig):
     completed = totals["completed_episodes"]
     git_sha = repo_git_sha()
     result = {
-        "task": EasyTask(config.task).value,
+        "task": parse_task(config.task).value,
         "variant": "mutant" if config.mutant else "fixed",
         "start_mode": StartMode(config.start_mode).value,
         "fixture": FixtureVersion(config.fixture).value,

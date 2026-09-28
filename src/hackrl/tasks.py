@@ -30,6 +30,22 @@ class EasyTask(str, Enum):
     L_E = "L-E"
 
 
+class MediumTask(str, Enum):
+    """Provisional Medium tasks. R-M is the next research unit after Easy R-E."""
+
+    R_M = "R-M"
+
+
+def parse_task(task) -> EasyTask | MediumTask:
+    value = getattr(task, "value", task)
+    for enum in (EasyTask, MediumTask):
+        try:
+            return enum(value)
+        except ValueError:
+            continue
+    raise ValueError(f"Unsupported HackRL task: {task}")
+
+
 class StartMode(str, Enum):
     """Reset variants used to isolate exploration bottlenecks."""
 
@@ -50,10 +66,13 @@ R_E_REPLENISH_TREES = ((9, 10), (10, 10), (11, 10))
 R_E_REPLENISH_STONES = ((9, 11), (10, 11), (11, 11))
 R_E_REPLENISH_COALS = ((9, 12), (10, 12), (11, 12))
 
+# After either craft at (8, 8), DOWN then DO mines this diamond.
+R_M_DIAMOND = (10, 8)
+
 
 @dataclass(frozen=True)
 class EasyTaskSpec:
-    task_id: EasyTask
+    task_id: EasyTask | MediumTask
     root_mutation: RootMutation
     horizon: int
     goal_description: str
@@ -93,20 +112,33 @@ EASY_TASK_SPECS = {
         source_category="Game Logic",
         mechanism_family="lifecycle_update",
     ),
+    MediumTask.R_M: EasyTaskSpec(
+        task_id=MediumTask.R_M,
+        root_mutation=RootMutation.H1_IRON_LOWER_BOUND,
+        horizon=512,
+        goal_description="obtain one diamond",
+        source_case="GBGallery TowerDefense Bug 5",
+        source_category="Game Logic",
+        mechanism_family="resource_precondition",
+        provisional_tier="medium",
+        calibration_status="script_validated",
+    ),
 }
 
 
-def easy_goal_reached(task: EasyTask, state: EnvState):
+def easy_goal_reached(task: EasyTask | MediumTask | str, state: EnvState):
     """Return the task goal predicate as a scalar JAX boolean."""
 
-    task = EasyTask(task)
+    task = parse_task(task)
     if task is EasyTask.R_E:
         return state.inventory.iron_pickaxe >= 1
     if task is EasyTask.B_E:
         return state.inventory.iron >= 1
     if task is EasyTask.L_E:
         return state.player_food >= 9
-    raise ValueError(f"Unsupported Easy task: {task}")
+    if task is MediumTask.R_M:
+        return state.inventory.diamond >= 1
+    raise ValueError(f"Unsupported HackRL task: {task}")
 
 
 def _empty_mobs(count: int, health: int) -> Mobs:
@@ -119,7 +151,7 @@ def _empty_mobs(count: int, health: int) -> Mobs:
 
 
 def build_easy_state(
-    task: EasyTask,
+    task: EasyTask | MediumTask | str,
     rng: jax.Array,
     params: EnvParams,
     static_params: StaticEnvParams,
@@ -128,7 +160,7 @@ def build_easy_state(
 ) -> EnvState:
     """Build a 16x16 fixture without invoking Craftax world generation."""
 
-    task = EasyTask(task)
+    task = parse_task(task)
     start_mode = StartMode(start_mode)
     fixture = FixtureVersion(fixture)
     if start_mode is StartMode.R_E_POST_IRON and task is not EasyTask.R_E:
@@ -152,7 +184,7 @@ def build_easy_state(
     plant_ages = jnp.zeros((static_params.max_growing_plants,), dtype=jnp.int32)
     plant_mask = jnp.zeros((static_params.max_growing_plants,), dtype=bool)
 
-    if task is EasyTask.R_E:
+    if task is EasyTask.R_E or task is MediumTask.R_M:
         world = (
             world.at[8, 7]
             .set(BlockType.CRAFTING_TABLE.value)
@@ -179,6 +211,10 @@ def build_easy_state(
                 world = world.at[row, col].set(BlockType.STONE.value)
             for row, col in R_E_REPLENISH_COALS:
                 world = world.at[row, col].set(BlockType.COAL.value)
+        if task is MediumTask.R_M:
+            world = world.at[R_M_DIAMOND[0], R_M_DIAMOND[1]].set(
+                BlockType.DIAMOND.value
+            )
     elif task is EasyTask.B_E:
         player_position = jnp.array([0, 8], dtype=jnp.int32)
         world = world.at[-1, 8].set(BlockType.IRON.value)
@@ -239,13 +275,13 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
 
     def __init__(
         self,
-        task: EasyTask,
+        task: EasyTask | MediumTask | str,
         mutant: bool = False,
         static_env_params: StaticEnvParams | None = None,
         start_mode: StartMode | str = StartMode.DEFAULT,
         fixture: FixtureVersion | str = FixtureVersion.DEFAULT,
     ):
-        self.task = EasyTask(task)
+        self.task = parse_task(task)
         self.spec = EASY_TASK_SPECS[self.task]
         self.start_mode = StartMode(start_mode)
         self.fixture = FixtureVersion(fixture)

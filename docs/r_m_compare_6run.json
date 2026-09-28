@@ -1,0 +1,306 @@
+{
+  "budget_transitions": 262144,
+  "cells": [
+    {
+      "cell": "fixed_s0",
+      "completed_episodes": 1330,
+      "completed_iron_acquire_rate": 0.05789473684210526,
+      "completed_success_rate": 0.0,
+      "completed_wood_exhausted_rate": 0.9766917293233083,
+      "eval_mean_length": 338.0,
+      "eval_sample_mean_length": 387.09375,
+      "eval_sample_success_rate": 0.0,
+      "eval_success_rate": 0.0,
+      "eval_violation_episode_rate": 0.0,
+      "first_success_update": null,
+      "git_sha": "3dfccf0ce8b2e25f7b364ec6a0eda772209ab2bc",
+      "horizon": 512,
+      "posthoc_mode": {
+        "completion_rate": 1.0,
+        "death_rate": 1.0,
+        "goal_rate": 0.0,
+        "mean_length": 338.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          338
+        ]
+      },
+      "posthoc_sample": {
+        "completion_rate": 1.0,
+        "death_rate": 1.0,
+        "goal_rate": 0.0,
+        "mean_length": 389.6875,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          265,
+          374,
+          375,
+          376,
+          378,
+          381,
+          382,
+          387,
+          393,
+          394,
+          395,
+          397,
+          398,
+          399,
+          400,
+          401,
+          402,
+          403,
+          406
+        ]
+      },
+      "seed": 0,
+      "successful_episodes": 0,
+      "transitions": 262144,
+      "variant": "fixed",
+      "working_tree": "uncommitted R-M fixture on 3dfccf0"
+    },
+    {
+      "cell": "fixed_s1",
+      "completed_episodes": 5555,
+      "completed_iron_acquire_rate": 0.3195319531953195,
+      "completed_success_rate": 0.0,
+      "completed_wood_exhausted_rate": 0.8774077407740775,
+      "eval_mean_length": 338.0,
+      "eval_sample_mean_length": 107.53125,
+      "eval_sample_success_rate": 0.0,
+      "eval_success_rate": 0.0,
+      "eval_violation_episode_rate": 0.0,
+      "first_success_update": null,
+      "git_sha": "3dfccf0ce8b2e25f7b364ec6a0eda772209ab2bc",
+      "horizon": 512,
+      "posthoc_mode": {
+        "completion_rate": 1.0,
+        "death_rate": 1.0,
+        "goal_rate": 0.0,
+        "mean_length": 338.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          338
+        ]
+      },
+      "posthoc_sample": {
+        "completion_rate": 1.0,
+        "death_rate": 1.0,
+        "goal_rate": 0.0,
+        "mean_length": 111.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          36,
+          37,
+          39,
+          40,
+          42,
+          43,
+          44,
+          45,
+          46,
+          47,
+          51,
+          52,
+          54,
+          60,
+          62,
+          64,
+          71,
+          72,
+          76,
+          137,
+          315,
+          322,
+          370,
+          374,
+          381,
+          395
+        ]
+      },
+      "seed": 1,
+      "successful_episodes": 0,
+      "transitions": 262144,
+      "variant": "fixed",
+      "working_tree": "uncommitted R-M fixture on 3dfccf0"
+    },
+    {
+      "cell": "fixed_s2",
+      "completed_episodes": 1843,
+      "completed_iron_acquire_rate": 0.10851871947911014,
+      "completed_success_rate": 0.0,
+      "completed_wood_exhausted_rate": 0.9712425393380358,
+      "eval_mean_length": 338.0,
+      "eval_sample_mean_length": 324.09375,
+      "eval_sample_success_rate": 0.0,
+      "eval_success_rate": 0.0,
+      "eval_violation_episode_rate": 0.0,
+      "first_success_update": null,
+      "git_sha": "3dfccf0ce8b2e25f7b364ec6a0eda772209ab2bc",
+      "horizon": 512,
+      "posthoc_mode": {
+        "completion_rate": 1.0,
+        "death_rate": 1.0,
+        "goal_rate": 0.0,
+        "mean_length": 338.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          338
+        ]
+      },
+      "posthoc_sample": {
+        "completion_rate": 1.0,
+        "death_rate": 1.0,
+        "goal_rate": 0.0,
+        "mean_length": 324.65625,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          92,
+          126,
+          162,
+          338,
+          348,
+          353,
+          357,
+          360,
+          363,
+          370,
+          374,
+          386
+        ]
+      },
+      "seed": 2,
+      "successful_episodes": 0,
+      "transitions": 262144,
+      "variant": "fixed",
+      "working_tree": "uncommitted R-M fixture on 3dfccf0"
+    },
+    {
+      "cell": "mutant_s0",
+      "completed_episodes": 27090,
+      "completed_iron_acquire_rate": 0.0024363233665559247,
+      "completed_success_rate": 0.9260243632336655,
+      "completed_wood_exhausted_rate": 0.9973052787006276,
+      "eval_mean_length": 3.0,
+      "eval_sample_mean_length": 3.34375,
+      "eval_sample_success_rate": 1.0,
+      "eval_success_rate": 1.0,
+      "eval_violation_episode_rate": 1.0,
+      "first_success_update": 0,
+      "git_sha": "3dfccf0ce8b2e25f7b364ec6a0eda772209ab2bc",
+      "horizon": 512,
+      "posthoc_mode": {
+        "completion_rate": 1.0,
+        "death_rate": 0.0,
+        "goal_rate": 1.0,
+        "mean_length": 3.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          3
+        ]
+      },
+      "posthoc_sample": {
+        "completion_rate": 1.0,
+        "death_rate": 0.0,
+        "goal_rate": 1.0,
+        "mean_length": 3.5625,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          3,
+          4,
+          5,
+          6
+        ]
+      },
+      "seed": 0,
+      "successful_episodes": 25086,
+      "transitions": 262144,
+      "variant": "mutant",
+      "working_tree": "uncommitted R-M fixture on 3dfccf0"
+    },
+    {
+      "cell": "mutant_s1",
+      "completed_episodes": 32114,
+      "completed_iron_acquire_rate": 0.008750077847667685,
+      "completed_success_rate": 0.9402441302858566,
+      "completed_wood_exhausted_rate": 0.9972597620975275,
+      "eval_mean_length": 3.0,
+      "eval_sample_mean_length": 3.28125,
+      "eval_sample_success_rate": 1.0,
+      "eval_success_rate": 1.0,
+      "eval_violation_episode_rate": 1.0,
+      "first_success_update": 0,
+      "git_sha": "3dfccf0ce8b2e25f7b364ec6a0eda772209ab2bc",
+      "horizon": 512,
+      "posthoc_mode": {
+        "completion_rate": 1.0,
+        "death_rate": 0.0,
+        "goal_rate": 1.0,
+        "mean_length": 3.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          3
+        ]
+      },
+      "posthoc_sample": {
+        "completion_rate": 1.0,
+        "death_rate": 0.0,
+        "goal_rate": 1.0,
+        "mean_length": 3.1875,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          3,
+          4
+        ]
+      },
+      "seed": 1,
+      "successful_episodes": 30195,
+      "transitions": 262144,
+      "variant": "mutant",
+      "working_tree": "uncommitted R-M fixture on 3dfccf0"
+    },
+    {
+      "cell": "mutant_s2",
+      "completed_episodes": 35569,
+      "completed_iron_acquire_rate": 0.004554527819168377,
+      "completed_success_rate": 0.9506592819590093,
+      "completed_wood_exhausted_rate": 0.9976946217211616,
+      "eval_mean_length": 3.0,
+      "eval_sample_mean_length": 3.28125,
+      "eval_sample_success_rate": 1.0,
+      "eval_success_rate": 1.0,
+      "eval_violation_episode_rate": 1.0,
+      "first_success_update": 0,
+      "git_sha": "3dfccf0ce8b2e25f7b364ec6a0eda772209ab2bc",
+      "horizon": 512,
+      "posthoc_mode": {
+        "completion_rate": 1.0,
+        "death_rate": 0.0,
+        "goal_rate": 1.0,
+        "mean_length": 3.0,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          3
+        ]
+      },
+      "posthoc_sample": {
+        "completion_rate": 1.0,
+        "death_rate": 0.0,
+        "goal_rate": 1.0,
+        "mean_length": 3.25,
+        "timeout_rate": 0.0,
+        "unique_lengths": [
+          3,
+          4
+        ]
+      },
+      "seed": 2,
+      "successful_episodes": 33814,
+      "transitions": 262144,
+      "variant": "mutant",
+      "working_tree": "uncommitted R-M fixture on 3dfccf0"
+    }
+  ],
+  "note": "Training summaries keep the original 32-episode eval. posthoc_* recounts termination_goal/death/timeout from saved params.",
+  "task": "R-M"
+}

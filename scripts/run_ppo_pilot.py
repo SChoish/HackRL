@@ -5,14 +5,14 @@ import argparse
 import json
 
 from hackrl.ppo import PPOConfig, run_ppo_pilot
-from hackrl.tasks import EasyTask
+from hackrl.tasks import EasyTask, MediumTask, parse_task
 
 
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument(
         "--task",
-        choices=[task.value for task in EasyTask],
+        choices=[task.value for task in (*EasyTask, *MediumTask)],
         default=EasyTask.R_E.value,
     )
     parser.add_argument(
@@ -93,7 +93,7 @@ def main():
     else:
         result = run_ppo_pilot(
             make_config(
-                args, EasyTask(args.task), args.variant, args.log_dir
+                args, parse_task(args.task), args.variant, args.log_dir
             )
         )
     print(json.dumps(result, indent=2, sort_keys=True))

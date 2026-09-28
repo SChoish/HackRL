@@ -7,7 +7,9 @@ from hackrl.tasks import (
     EasyTask,
     FixtureVersion,
     HackRLEasySymbolicEnvNoAutoReset,
+    MediumTask,
     StartMode,
+    parse_task,
 )
 
 __all__ = [
@@ -16,6 +18,8 @@ __all__ = [
     "FixtureVersion",
     "HackRLEasySymbolicEnvNoAutoReset",
     "HackRLClassicSymbolicEnvNoAutoReset",
+    "MediumTask",
     "RootMutation",
     "StartMode",
+    "parse_task",
 ]
