@@ -12,7 +12,7 @@
 - 구현 순서: 세 결함의 회귀 검사 → Easy 3개 → 활용 이득이 검증된 Medium → Hard. 생존·수확의 중간/어려움 후보는 특히 실행 가능성 검증이 필요합니다.
 - 초기 비교: 온라인 PPO/PPO+RND → PPO 크기 비교와 PQN-FF → 필요한 경우 기억·적응 진단
 
-현재 세 root mutation의 실행 계층과 최소 회귀 검사가 구현되어 있습니다. 과제 fixture, 학습 코드와 실험 결과는 아직 없습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
+현재 세 root mutation과 Easy 3개 과제의 개발 fixture가 구현되어 있습니다. Medium/Hard 과제, 학습 코드와 실험 결과는 아직 없습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
 
 ## 구현 상태
 
@@ -23,7 +23,10 @@ Craftax 1.6.1을 기반으로 세 root mutation과 독립 전이 판정기를 �
 - `h1`: 철 0개에서 철 곡괭이 제작 허용
 - `h2`: 상호작용 대상의 지도 경계 검사 누락
 
-현재 코드는 세 결함의 최소 회귀 검사와 다음 환경 구현을 위한 기반입니다.
+Easy 과제는 월드 생성기를 사용하지 않는 16×16 fixture, 목표 전용 보상,
+목표·사망·128스텝 종료 조건을 사용합니다. 정상 경로는 fixed/mutant 모두에서,
+짧은 활용 경로는 mutant에서만 성공하도록 회귀 검사합니다. 원본 업적·체력
+보상은 학습 보상에서 제외하고 `info["HackRL/original_reward"]`에 기록합니다.
 
 ### `offrl` 환경에서 실행
 
@@ -36,9 +39,10 @@ JAX_PLATFORMS=cpu python -m pytest -q
 환경 생성 예시:
 
 ```python
-from hackrl import HackRLClassicSymbolicEnvNoAutoReset, RootMutation
+from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset
 
-env = HackRLClassicSymbolicEnvNoAutoReset(RootMutation.H1_IRON_LOWER_BOUND)
+fixed_env = HackRLEasySymbolicEnvNoAutoReset(EasyTask.R_E, mutant=False)
+mutant_env = HackRLEasySymbolicEnvNoAutoReset(EasyTask.R_E, mutant=True)
 ```
 
 변형 ID와 위반 플래그는 정책 관측에 추가하지 않습니다. 판정 결과는
