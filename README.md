@@ -12,7 +12,7 @@
 - 구현 순서: 세 결함의 회귀 검사 → Easy 3개 → 활용 이득이 검증된 Medium → Hard. 생존·수확의 중간/어려움 후보는 특히 실행 가능성 검증이 필요합니다.
 - 초기 비교: 온라인 PPO/PPO+RND → PPO 크기 비교와 PQN-FF → 필요한 경우 기억·적응 진단
 
-현재 세 root mutation과 Easy 3개 과제의 개발 fixture가 구현되어 있습니다. Medium/Hard 과제, 학습 코드와 실험 결과는 아직 없습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
+현재 세 root mutation과 Easy 3개 과제의 개발 fixture, PPO 파일럿 학습·평가 흐름이 구현되어 있습니다. Medium/Hard 과제와 본 실험 결과는 아직 없습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
 
 ## 구현 상태
 
@@ -27,6 +27,29 @@ Easy 과제는 월드 생성기를 사용하지 않는 16×16 fixture, 목표 �
 목표·사망·128스텝 종료 조건을 사용합니다. 정상 경로는 fixed/mutant 모두에서,
 짧은 활용 경로는 mutant에서만 성공하도록 회귀 검사합니다. 원본 업적·체력
 보상은 학습 보상에서 제외하고 `info["HackRL/original_reward"]`에 기록합니다.
+
+### PPO 파일럿
+
+PPO의 네트워크·GAE·손실·optimizer는
+`Craftax_Baselines@7ce36fa`에서 이식했습니다. 정확한 출처와 MIT 라이선스,
+HackRL 변경 범위는 [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md)에
+기록되어 있습니다.
+
+공통 벡터 래퍼는 worker별 독립 reset을 사용하고, 전이의
+`terminal_observation`과 정책이 다음에 받는 reset 관측을 분리합니다.
+정책 입력은 1,345차원 관측뿐이며 목표 성공·위반·반복 수확은 평가 정보로만
+집계합니다. 정상 규칙 기반 action mask는 사용하지 않습니다.
+
+아래 명령은 Easy 3개 × fixed/mutant의 학습·평가 배선 확인용 짧은
+파일럿입니다. 작은 고정 fixture와 매우 적은 업데이트를 사용하므로 성능
+비교 결과로 해석하면 안 됩니다.
+
+```bash
+JAX_PLATFORMS=cpu python scripts/run_ppo_pilot.py \
+  --all-pairs --num-envs 2 --num-steps 4 --num-updates 1 \
+  --update-epochs 1 --num-minibatches 1 --layer-size 16 \
+  --eval-episodes 2
+```
 
 ### `offrl` 환경에서 실행
 

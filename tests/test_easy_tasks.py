@@ -120,7 +120,7 @@ def test_non_goal_achievement_reward_is_log_only():
         env, EASY_NORMAL_PATHS[EasyTask.R_E], seed=40
     )
 
-    mining_reward, mining_done, mining_info = transitions[2]
+    mining_reward, mining_done, mining_info = transitions[1]
     assert float(mining_reward) == 0.0
     assert not bool(mining_done)
     assert float(mining_info["HackRL/original_reward"]) == 1.0

@@ -19,7 +19,7 @@ from craftax.craftax_classic.envs.craftax_state import (
 )
 
 from hackrl.envs import HackRLClassicSymbolicEnvNoAutoReset
-from hackrl.mutations import RootMutation, craftax_step_with_violation
+from hackrl.mutations import RootMutation, craftax_step_with_events
 
 
 class EasyTask(str, Enum):
@@ -250,7 +250,7 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
 
     def step_env(self, rng, state, action, params):
         goal_before = self.goal_reached(state)
-        next_state, original_reward, violation = craftax_step_with_violation(
+        next_state, original_reward, events = craftax_step_with_events(
             rng,
             state,
             action,
@@ -264,7 +264,9 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
 
         info = compute_score(next_state, done)
         info["discount"] = jnp.where(done, 0.0, 1.0)
-        info["HackRL/violation"] = violation
+        info["HackRL/violation"] = events["violation"]
+        info["HackRL/plant_harvested"] = events["plant_harvested"]
+        info["HackRL/harvested_plant_index"] = events["harvested_plant_index"]
         info["HackRL/goal_success"] = goal
         info["HackRL/goal_achieved"] = goal_achieved
         info["HackRL/original_reward"] = original_reward

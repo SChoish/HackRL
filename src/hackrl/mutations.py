@@ -113,16 +113,35 @@ def do_crafting(state, action, mutation: RootMutation):
     )
 
 
-def _craftax_step_with_violation(
+def detect_plant_harvest(before, action, after):
+    """Detect an actual registered-plant harvest in the interaction stage."""
+
+    target = before.player_position + DIRECTIONS[before.player_direction]
+    target_in_bounds = base.in_bounds(before, target)
+    matching_plants = jnp.logical_and(
+        jnp.all(before.growing_plants_positions == target, axis=1),
+        before.growing_plants_mask,
+    )
+    plant_index = jnp.argmax(matching_plants)
+    was_ripe = before.map[target[0], target[1]] == BlockType.RIPE_PLANT.value
+    became_unripe = after.map[target[0], target[1]] == BlockType.PLANT.value
+    harvested = jnp.logical_and(
+        action == Action.DO.value,
+        jnp.logical_and(
+            target_in_bounds,
+            jnp.logical_and(
+                jnp.any(matching_plants),
+                jnp.logical_and(was_ripe, became_unripe),
+            ),
+        ),
+    )
+    return harvested, jnp.where(harvested, plant_index, -1)
+
+
+def _craftax_step_with_events(
     rng, state, action, params, static_params, mutation: RootMutation
 ):
-    """Craftax 1.6.1 step plus stage-local contract-violation evidence.
-
-    This mirrors the short upstream orchestration function. Individual game
-    systems remain calls into Craftax; only crafting and interaction dispatch
-    through the isolated mutation functions above. Violations are detected
-    before plant growth and survival ticks can create unrelated state changes.
-    """
+    """Craftax step plus stage-local contract and interaction evidence."""
 
     initial_achievements = state.achievements
     initial_health = state.player_health
@@ -141,7 +160,16 @@ def _craftax_step_with_violation(
     interaction_violation = detect_violation(
         mutation, previous_state, effective_action, state
     )
-    violation = jnp.logical_or(crafting_violation, interaction_violation)
+    plant_harvested, harvested_plant_index = detect_plant_harvest(
+        previous_state, effective_action, state
+    )
+    events = {
+        "violation": jnp.logical_or(
+            crafting_violation, interaction_violation
+        ),
+        "plant_harvested": plant_harvested,
+        "harvested_plant_index": harvested_plant_index,
+    }
 
     state = base.place_block(state, effective_action, static_params)
     state = base.move_player(state, effective_action)
@@ -169,16 +197,26 @@ def _craftax_step_with_violation(
         light_level=base.calculate_light_level(state.timestep + 1, params),
         state_rng=state_rng,
     )
-    return state, reward, violation
+    return state, reward, events
 
 
 def craftax_step(rng, state, action, params, static_params, mutation: RootMutation):
     """Craftax 1.6.1 step with one selected root mutation."""
 
-    next_state, reward, _ = _craftax_step_with_violation(
+    next_state, reward, _ = _craftax_step_with_events(
         rng, state, action, params, static_params, mutation
     )
     return next_state, reward
+
+
+def craftax_step_with_events(
+    rng, state, action, params, static_params, mutation: RootMutation
+):
+    """Return the transition and stage-local event evidence."""
+
+    return _craftax_step_with_events(
+        rng, state, action, params, static_params, mutation
+    )
 
 
 def craftax_step_with_violation(
@@ -186,9 +224,10 @@ def craftax_step_with_violation(
 ):
     """Return the transition and independently detected violation evidence."""
 
-    return _craftax_step_with_violation(
+    next_state, reward, events = _craftax_step_with_events(
         rng, state, action, params, static_params, mutation
     )
+    return next_state, reward, events["violation"]
 
 
 def detect_violation(mutation: RootMutation, before, action, after):

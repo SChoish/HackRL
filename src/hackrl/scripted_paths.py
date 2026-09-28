@@ -8,9 +8,7 @@ from hackrl.tasks import EasyTask
 EASY_NORMAL_PATHS = {
     EasyTask.R_E: (
         Action.UP.value,
-        Action.UP.value,
         Action.DO.value,
-        Action.DOWN.value,
         Action.MAKE_IRON_PICKAXE.value,
     ),
     EasyTask.B_E: (Action.DOWN.value,) * 15 + (Action.DO.value,),
