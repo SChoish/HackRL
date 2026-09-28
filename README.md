@@ -12,4 +12,34 @@
 - 구현 순서: 세 결함의 회귀 검사 → Easy 3개 → 활용 이득이 검증된 Medium → Hard. 생존·수확의 중간/어려움 후보는 특히 실행 가능성 검증이 필요합니다.
 - 초기 비교: 온라인 PPO/PPO+RND → PPO 크기 비교와 PQN-FF → 필요한 경우 기억·적응 진단
 
-현재는 **계획 단계**입니다. 버그 변형, 학습 코드, 실험 결과는 아직 없습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
+현재 세 root mutation의 실행 계층과 최소 회귀 검사가 구현되어 있습니다. 과제 fixture, 학습 코드와 실험 결과는 아직 없습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
+
+## 구현 상태
+
+Craftax 1.6.1을 기반으로 세 root mutation과 독립 전이 판정기를 구현했습니다.
+
+- `fixed`: 원본 Craftax-Classic 전이
+- `h0`: 식물 수확 후 성장 나이 초기화 누락
+- `h1`: 철 0개에서 철 곡괭이 제작 허용
+- `h2`: 상호작용 대상의 지도 경계 검사 누락
+
+현재 코드는 세 결함의 최소 회귀 검사와 다음 환경 구현을 위한 기반입니다.
+
+### `offrl` 환경에서 실행
+
+```bash
+conda activate offrl
+python -m pip install -e '.[dev]'
+JAX_PLATFORMS=cpu python -m pytest -q
+```
+
+환경 생성 예시:
+
+```python
+from hackrl import HackRLClassicSymbolicEnvNoAutoReset, RootMutation
+
+env = HackRLClassicSymbolicEnvNoAutoReset(RootMutation.H1_IRON_LOWER_BOUND)
+```
+
+변형 ID와 위반 플래그는 정책 관측에 추가하지 않습니다. 판정 결과는
+`info["HackRL/violation"]`에만 기록됩니다.
