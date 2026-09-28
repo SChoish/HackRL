@@ -1,6 +1,5 @@
 import jax
-
-from craftax.craftax_classic.envs.craftax_state import Inventory
+import jax.numpy as jnp
 
 from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset
 from hackrl.metrics import (
@@ -29,6 +28,26 @@ def _tracked_rollout(mutant, actions):
         repeated_events.append(bool(repeated))
 
     return tracker, episode_summary(tracker), repeated_events
+
+
+def _event_info(**overrides):
+    info = {
+        "HackRL/plant_harvested": jnp.asarray(False),
+        "HackRL/harvested_plant_index": jnp.asarray(-1),
+        "HackRL/violation": jnp.asarray(False),
+        "HackRL/goal_success": jnp.asarray(False),
+        "HackRL/iron_acquired": jnp.asarray(False),
+        "HackRL/iron_pickaxe_crafted": jnp.asarray(False),
+        "HackRL/diamond_acquired": jnp.asarray(False),
+        "HackRL/wood_depleted": jnp.asarray(False),
+        "HackRL/wood_replenished": jnp.asarray(False),
+        "HackRL/damage_taken": jnp.asarray(0, dtype=jnp.int32),
+        "HackRL/termination_goal": jnp.asarray(False),
+        "HackRL/termination_death": jnp.asarray(False),
+        "HackRL/termination_timeout": jnp.asarray(False),
+    }
+    info.update(overrides)
+    return info
 
 
 def test_l_e_violation_is_distinct_from_repeat_harvest_use():
@@ -71,44 +90,68 @@ def test_l_e_fixed_normal_path_has_harvests_without_violations_or_repeats():
 
 def test_first_late_harvest_is_not_mislabeled_as_repeat():
     tracker = init_episode_tracker(10)
-    info = {
-        "HackRL/plant_harvested": jax.numpy.asarray(True),
-        "HackRL/harvested_plant_index": jax.numpy.asarray(0),
-        "HackRL/violation": jax.numpy.asarray(True),
-        "HackRL/goal_success": jax.numpy.asarray(False),
-    }
+    info = _event_info(
+        **{
+            "HackRL/plant_harvested": jnp.asarray(True),
+            "HackRL/harvested_plant_index": jnp.asarray(0),
+            "HackRL/violation": jnp.asarray(True),
+        }
+    )
 
     tracker, repeated = jax.jit(update_episode_tracker)(
         tracker,
-        jax.numpy.asarray(0.0),
+        jnp.asarray(0.0),
         info,
-        jax.numpy.asarray(700),
+        jnp.asarray(700),
     )
 
     assert not bool(repeated)
     assert int(tracker.last_harvest_timestep[0]) == 700
 
 
-def test_tracker_records_iron_and_wood_exhaustion():
+def test_tracker_records_events_timestamps_damage_and_termination():
     tracker = init_episode_tracker(10)
-    info = {
-        "HackRL/plant_harvested": jax.numpy.asarray(False),
-        "HackRL/harvested_plant_index": jax.numpy.asarray(-1),
-        "HackRL/violation": jax.numpy.asarray(False),
-        "HackRL/goal_success": jax.numpy.asarray(False),
-    }
-    inventory = Inventory().replace(iron=1, wood=0)
+    info = _event_info(
+        **{
+            "HackRL/iron_acquired": jnp.asarray(True),
+            "HackRL/wood_depleted": jnp.asarray(True),
+            "HackRL/damage_taken": jnp.asarray(2, dtype=jnp.int32),
+            "HackRL/termination_death": jnp.asarray(True),
+        }
+    )
 
     tracker, _ = update_episode_tracker(
         tracker,
-        jax.numpy.asarray(0.0),
+        jnp.asarray(0.0),
         info,
-        jax.numpy.asarray(1),
-        inventory,
+        jnp.asarray(7),
     )
     summary = episode_summary(tracker)
 
-    assert bool(tracker.ever_iron)
-    assert bool(tracker.wood_exhausted_before_goal)
-    assert bool(summary["ever_iron"])
-    assert bool(summary["wood_exhausted_before_goal"])
+    assert int(tracker.iron_acquired_count) == 1
+    assert int(tracker.first_iron_acquired_timestep) == 7
+    assert bool(tracker.wood_depleted_before_pickaxe)
+    assert int(tracker.damage_event_count) == 1
+    assert int(tracker.damage_taken) == 2
+    assert bool(summary["termination_death"])
+
+
+def test_normal_pickaxe_craft_is_not_wood_depletion_before_pickaxe():
+    tracker = init_episode_tracker(10)
+    info = _event_info(
+        **{
+            "HackRL/iron_pickaxe_crafted": jnp.asarray(True),
+            "HackRL/wood_depleted": jnp.asarray(True),
+        }
+    )
+
+    tracker, _ = update_episode_tracker(
+        tracker,
+        jnp.asarray(0.0),
+        info,
+        jnp.asarray(3),
+    )
+
+    assert int(tracker.wood_depletion_count) == 1
+    assert int(tracker.iron_pickaxe_crafted_count) == 1
+    assert not bool(tracker.wood_depleted_before_pickaxe)

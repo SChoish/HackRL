@@ -6,6 +6,10 @@ from hackrl import EasyTask
 from hackrl.ppo import PPOConfig, run_ppo_pilot
 
 
+def test_protocol_default_keeps_learning_rate_fixed():
+    assert not PPOConfig().anneal_learning_rate
+
+
 def test_minimal_official_ppo_training_and_evaluation_flow(tmp_path):
     result = run_ppo_pilot(
         PPOConfig(
@@ -36,12 +40,19 @@ def test_minimal_official_ppo_training_and_evaluation_flow(tmp_path):
     assert 0.0 <= result["eval_sample_success_rate"] <= 1.0
     assert 0.0 <= result["eval_violation_episode_rate"] <= 1.0
     assert 0.0 <= result["eval_repeat_harvest_episode_rate"] <= 1.0
-    assert 0.0 <= result["eval_iron_acquire_rate"] <= 1.0
-    assert 0.0 <= result["completed_wood_exhausted_rate"] <= 1.0
-    assert 0.0 <= result["completed_recovery_rate"] <= 1.0
+    assert 0.0 <= result["eval_iron_acquisition_episode_rate"] <= 1.0
+    assert 0.0 <= result["eval_iron_pickaxe_craft_episode_rate"] <= 1.0
+    assert 0.0 <= result["completed_wood_depletion_rate"] <= 1.0
+    assert 0.0 <= result["completed_damage_episode_rate"] <= 1.0
+    assert 0.0 <= result["completed_timeout_termination_rate"] <= 1.0
+    assert 0.0 <= result["eval_death_before_iron_rate"] <= 1.0
+    assert 0.0 <= result["eval_timeout_before_iron_rate"] <= 1.0
+    assert result["metrics_schema_version"] == 2
+    assert result["fixture_dynamics_version"] == 2
     assert result["fixture"] == "default"
     assert result["git_sha"]
     assert (tmp_path / "params.msgpack").is_file()
     assert (tmp_path / "updates.csv").is_file()
     assert (tmp_path / "config.json").is_file()
     assert (tmp_path / "summary.json").is_file()
+    assert (tmp_path / "working_tree.patch").is_file()

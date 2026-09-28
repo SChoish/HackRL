@@ -34,9 +34,21 @@ class EpisodeRecord:
     violation_count: jax.Array
     harvest_count: jax.Array
     repeated_harvest_count: jax.Array
-    ever_iron: jax.Array
-    wood_exhausted_before_goal: jax.Array
-    wood_replenished_after_exhaustion: jax.Array
+    iron_acquired_count: jax.Array
+    iron_pickaxe_crafted_count: jax.Array
+    diamond_acquired_count: jax.Array
+    wood_depletion_count: jax.Array
+    wood_replenishment_count: jax.Array
+    wood_depleted_before_pickaxe: jax.Array
+    wood_replenished_after_depletion: jax.Array
+    damage_event_count: jax.Array
+    damage_taken: jax.Array
+    first_iron_acquired_timestep: jax.Array
+    first_iron_pickaxe_crafted_timestep: jax.Array
+    first_diamond_acquired_timestep: jax.Array
+    termination_goal: jax.Array
+    termination_death: jax.Array
+    termination_timeout: jax.Array
 
 
 @struct.dataclass
@@ -62,16 +74,12 @@ class BatchTransition:
 def _batch_tracker(
     max_growing_plants: int,
     batch_size: int,
-    inventory=None,
 ) -> EpisodeTracker:
     tracker = init_episode_tracker(max_growing_plants)
-    batched = jax.tree.map(
+    return jax.tree.map(
         lambda value: jnp.broadcast_to(value, (batch_size,) + value.shape),
         tracker,
     )
-    if inventory is None:
-        return batched
-    return batched.replace(ever_iron=inventory.iron >= 1)
 
 
 def select_batched(mask, true_tree, false_tree):
@@ -108,7 +116,6 @@ class HackRLBatchEnv:
         trackers = _batch_tracker(
             self.env.static_env_params.max_growing_plants,
             self.num_envs,
-            env_state.inventory,
         )
         return observations, VectorEnvState(env_state, trackers)
 
@@ -132,7 +139,6 @@ class HackRLBatchEnv:
             rewards,
             infos,
             stepped_states.timestep,
-            stepped_states.inventory,
         )
         episode = EpisodeRecord(
             completed=dones,
@@ -142,11 +148,35 @@ class HackRLBatchEnv:
             violation_count=updated_trackers.violation_count,
             harvest_count=updated_trackers.harvest_count,
             repeated_harvest_count=updated_trackers.repeated_harvest_count,
-            ever_iron=updated_trackers.ever_iron,
-            wood_exhausted_before_goal=updated_trackers.wood_exhausted_before_goal,
-            wood_replenished_after_exhaustion=(
-                updated_trackers.wood_replenished_after_exhaustion
+            iron_acquired_count=updated_trackers.iron_acquired_count,
+            iron_pickaxe_crafted_count=(
+                updated_trackers.iron_pickaxe_crafted_count
             ),
+            diamond_acquired_count=updated_trackers.diamond_acquired_count,
+            wood_depletion_count=updated_trackers.wood_depletion_count,
+            wood_replenishment_count=(
+                updated_trackers.wood_replenishment_count
+            ),
+            wood_depleted_before_pickaxe=(
+                updated_trackers.wood_depleted_before_pickaxe
+            ),
+            wood_replenished_after_depletion=(
+                updated_trackers.wood_replenished_after_depletion
+            ),
+            damage_event_count=updated_trackers.damage_event_count,
+            damage_taken=updated_trackers.damage_taken,
+            first_iron_acquired_timestep=(
+                updated_trackers.first_iron_acquired_timestep
+            ),
+            first_iron_pickaxe_crafted_timestep=(
+                updated_trackers.first_iron_pickaxe_crafted_timestep
+            ),
+            first_diamond_acquired_timestep=(
+                updated_trackers.first_diamond_acquired_timestep
+            ),
+            termination_goal=updated_trackers.termination_goal,
+            termination_death=updated_trackers.termination_death,
+            termination_timeout=updated_trackers.termination_timeout,
         )
 
         # Reset candidates are intentionally independent per worker. The Easy
@@ -156,7 +186,6 @@ class HackRLBatchEnv:
         empty_trackers = _batch_tracker(
             self.env.static_env_params.max_growing_plants,
             self.num_envs,
-            reset_states.inventory,
         )
         policy_observations = jnp.where(
             dones[:, None], reset_observations, terminal_observations

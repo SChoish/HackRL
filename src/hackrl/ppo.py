@@ -27,11 +27,13 @@ from hackrl.evaluation import evaluate_policy
 from hackrl.rollout import HackRLBatchEnv
 from hackrl.run_artifacts import (
     first_success_update,
+    repo_git_diff,
     repo_git_sha,
     write_run_artifacts,
 )
 from hackrl.tasks import (
     EasyTask,
+    FIXTURE_DYNAMICS_VERSION,
     FixtureVersion,
     HackRLEasySymbolicEnvNoAutoReset,
     MediumTask,
@@ -96,9 +98,17 @@ class Transition(NamedTuple):
     episode_success: jax.Array
     episode_violation: jax.Array
     episode_repeat_harvest: jax.Array
-    episode_ever_iron: jax.Array
-    episode_wood_exhausted: jax.Array
-    episode_recovered: jax.Array
+    episode_iron_acquired: jax.Array
+    episode_iron_pickaxe_crafted: jax.Array
+    episode_diamond_acquired: jax.Array
+    episode_wood_depleted: jax.Array
+    episode_wood_depleted_before_pickaxe: jax.Array
+    episode_wood_replenished_after_depletion: jax.Array
+    episode_damage: jax.Array
+    episode_damage_taken: jax.Array
+    episode_termination_goal: jax.Array
+    episode_termination_death: jax.Array
+    episode_termination_timeout: jax.Array
     violation_event: jax.Array
     repeat_harvest_event: jax.Array
 
@@ -130,7 +140,7 @@ class PPOConfig:
     value_coefficient: float = 0.5
     max_grad_norm: float = 1.0
     activation: str = "tanh"
-    anneal_learning_rate: bool = True
+    anneal_learning_rate: bool = False
     eval_episodes: int = 8
     start_mode: str = StartMode.DEFAULT.value
     fixture: str = FixtureVersion.DEFAULT.value
@@ -232,12 +242,23 @@ def _make_update(vector_env, network, config: PPOConfig):
             episode_success=episode.goal_success,
             episode_violation=episode.violation_count > 0,
             episode_repeat_harvest=episode.repeated_harvest_count > 0,
-            episode_ever_iron=episode.ever_iron,
-            episode_wood_exhausted=episode.wood_exhausted_before_goal,
-            episode_recovered=jnp.logical_and(
-                episode.goal_success,
-                episode.wood_replenished_after_exhaustion,
+            episode_iron_acquired=episode.iron_acquired_count > 0,
+            episode_iron_pickaxe_crafted=(
+                episode.iron_pickaxe_crafted_count > 0
             ),
+            episode_diamond_acquired=episode.diamond_acquired_count > 0,
+            episode_wood_depleted=episode.wood_depletion_count > 0,
+            episode_wood_depleted_before_pickaxe=(
+                episode.wood_depleted_before_pickaxe
+            ),
+            episode_wood_replenished_after_depletion=(
+                episode.wood_replenished_after_depletion
+            ),
+            episode_damage=episode.damage_event_count > 0,
+            episode_damage_taken=episode.damage_taken,
+            episode_termination_goal=episode.termination_goal,
+            episode_termination_death=episode.termination_death,
+            episode_termination_timeout=episode.termination_timeout,
             violation_event=env_transition.info["HackRL/violation"],
             repeat_harvest_event=env_transition.repeated_harvest,
         )
@@ -398,6 +419,21 @@ def _make_update(vector_env, network, config: PPOConfig):
         train_state, _, _, _, rng = update_state
         losses = jax.tree.map(jnp.mean, loss_metrics)
         completed = trajectory.completed_episode
+        terminated_before_iron = jnp.logical_and(
+            ~trajectory.episode_iron_acquired,
+            jnp.logical_and(
+                ~trajectory.episode_iron_pickaxe_crafted,
+                ~trajectory.episode_diamond_acquired,
+            ),
+        )
+        terminated_after_iron_before_pickaxe = jnp.logical_and(
+            trajectory.episode_iron_acquired,
+            ~trajectory.episode_iron_pickaxe_crafted,
+        )
+        terminated_after_pickaxe_before_diamond = jnp.logical_and(
+            trajectory.episode_iron_pickaxe_crafted,
+            ~trajectory.episode_diamond_acquired,
+        )
         metrics = {
             **losses,
             "transitions": jnp.asarray(
@@ -415,16 +451,99 @@ def _make_update(vector_env, network, config: PPOConfig):
                     completed, trajectory.episode_repeat_harvest
                 )
             ),
-            "iron_acquired_episodes": jnp.sum(
-                jnp.logical_and(completed, trajectory.episode_ever_iron)
+            "iron_acquisition_episodes": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_iron_acquired)
             ),
-            "wood_exhausted_episodes": jnp.sum(
+            "iron_pickaxe_craft_episodes": jnp.sum(
                 jnp.logical_and(
-                    completed, trajectory.episode_wood_exhausted
+                    completed, trajectory.episode_iron_pickaxe_crafted
                 )
             ),
-            "recovered_episodes": jnp.sum(
-                jnp.logical_and(completed, trajectory.episode_recovered)
+            "diamond_acquisition_episodes": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_diamond_acquired)
+            ),
+            "wood_depletion_episodes": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_wood_depleted)
+            ),
+            "wood_depleted_before_pickaxe_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed, trajectory.episode_wood_depleted_before_pickaxe
+                )
+            ),
+            "wood_replenished_after_depletion_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    trajectory.episode_wood_replenished_after_depletion,
+                )
+            ),
+            "damage_episodes": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_damage)
+            ),
+            "completed_damage_sum": jnp.sum(
+                jnp.where(completed, trajectory.episode_damage_taken, 0)
+            ),
+            "goal_terminations": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_termination_goal)
+            ),
+            "death_terminations": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_termination_death)
+            ),
+            "timeout_terminations": jnp.sum(
+                jnp.logical_and(completed, trajectory.episode_termination_timeout)
+            ),
+            "death_before_iron_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    jnp.logical_and(
+                        terminated_before_iron,
+                        trajectory.episode_termination_death,
+                    ),
+                )
+            ),
+            "timeout_before_iron_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    jnp.logical_and(
+                        terminated_before_iron,
+                        trajectory.episode_termination_timeout,
+                    ),
+                )
+            ),
+            "death_after_iron_before_pickaxe_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    jnp.logical_and(
+                        terminated_after_iron_before_pickaxe,
+                        trajectory.episode_termination_death,
+                    ),
+                )
+            ),
+            "timeout_after_iron_before_pickaxe_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    jnp.logical_and(
+                        terminated_after_iron_before_pickaxe,
+                        trajectory.episode_termination_timeout,
+                    ),
+                )
+            ),
+            "death_after_pickaxe_before_diamond_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    jnp.logical_and(
+                        terminated_after_pickaxe_before_diamond,
+                        trajectory.episode_termination_death,
+                    ),
+                )
+            ),
+            "timeout_after_pickaxe_before_diamond_episodes": jnp.sum(
+                jnp.logical_and(
+                    completed,
+                    jnp.logical_and(
+                        terminated_after_pickaxe_before_diamond,
+                        trajectory.episode_termination_timeout,
+                    ),
+                )
             ),
             "violation_events": jnp.sum(trajectory.violation_event),
             "repeat_harvest_events": jnp.sum(
@@ -452,6 +571,8 @@ def run_ppo_pilot(config: PPOConfig):
     """Train and evaluate one bounded Easy-task PPO pilot."""
 
     config.validate()
+    git_sha = repo_git_sha()
+    git_diff = repo_git_diff()
     env = HackRLEasySymbolicEnvNoAutoReset(
         parse_task(config.task),
         mutant=config.mutant,
@@ -510,9 +631,23 @@ def run_ppo_pilot(config: PPOConfig):
         "successful_episodes",
         "violation_episodes",
         "repeat_harvest_episodes",
-        "iron_acquired_episodes",
-        "wood_exhausted_episodes",
-        "recovered_episodes",
+        "iron_acquisition_episodes",
+        "iron_pickaxe_craft_episodes",
+        "diamond_acquisition_episodes",
+        "wood_depletion_episodes",
+        "wood_depleted_before_pickaxe_episodes",
+        "wood_replenished_after_depletion_episodes",
+        "damage_episodes",
+        "completed_damage_sum",
+        "goal_terminations",
+        "death_terminations",
+        "timeout_terminations",
+        "death_before_iron_episodes",
+        "timeout_before_iron_episodes",
+        "death_after_iron_before_pickaxe_episodes",
+        "timeout_after_iron_before_pickaxe_episodes",
+        "death_after_pickaxe_before_diamond_episodes",
+        "timeout_after_pickaxe_before_diamond_episodes",
         "violation_events",
         "repeat_harvest_events",
         "completed_return_sum",
@@ -551,13 +686,15 @@ def run_ppo_pilot(config: PPOConfig):
     }
 
     completed = totals["completed_episodes"]
-    git_sha = repo_git_sha()
     result = {
         "task": parse_task(config.task).value,
         "variant": "mutant" if config.mutant else "fixed",
         "start_mode": StartMode(config.start_mode).value,
         "fixture": FixtureVersion(config.fixture).value,
         "git_sha": git_sha,
+        "working_tree_dirty": bool(git_diff),
+        "metrics_schema_version": 2,
+        "fixture_dynamics_version": FIXTURE_DYNAMICS_VERSION,
         **totals,
         **optimization,
         **evaluation,
@@ -574,14 +711,80 @@ def run_ppo_pilot(config: PPOConfig):
             if completed
             else 0.0
         ),
-        "completed_iron_acquire_rate": (
-            totals["iron_acquired_episodes"] / completed if completed else 0.0
+        "completed_iron_acquisition_rate": (
+            totals["iron_acquisition_episodes"] / completed
+            if completed
+            else 0.0
         ),
-        "completed_wood_exhausted_rate": (
-            totals["wood_exhausted_episodes"] / completed if completed else 0.0
+        "completed_iron_pickaxe_craft_rate": (
+            totals["iron_pickaxe_craft_episodes"] / completed
+            if completed
+            else 0.0
         ),
-        "completed_recovery_rate": (
-            totals["recovered_episodes"] / completed if completed else 0.0
+        "completed_diamond_acquisition_rate": (
+            totals["diamond_acquisition_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_wood_depletion_rate": (
+            totals["wood_depletion_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_wood_depleted_before_pickaxe_rate": (
+            totals["wood_depleted_before_pickaxe_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_wood_replenished_after_depletion_rate": (
+            totals["wood_replenished_after_depletion_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_damage_episode_rate": (
+            totals["damage_episodes"] / completed if completed else 0.0
+        ),
+        "completed_mean_damage_taken": (
+            totals["completed_damage_sum"] / completed if completed else 0.0
+        ),
+        "completed_goal_termination_rate": (
+            totals["goal_terminations"] / completed if completed else 0.0
+        ),
+        "completed_death_termination_rate": (
+            totals["death_terminations"] / completed if completed else 0.0
+        ),
+        "completed_timeout_termination_rate": (
+            totals["timeout_terminations"] / completed if completed else 0.0
+        ),
+        "completed_death_before_iron_rate": (
+            totals["death_before_iron_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_timeout_before_iron_rate": (
+            totals["timeout_before_iron_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_death_after_iron_before_pickaxe_rate": (
+            totals["death_after_iron_before_pickaxe_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_timeout_after_iron_before_pickaxe_rate": (
+            totals["timeout_after_iron_before_pickaxe_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_death_after_pickaxe_before_diamond_rate": (
+            totals["death_after_pickaxe_before_diamond_episodes"] / completed
+            if completed
+            else 0.0
+        ),
+        "completed_timeout_after_pickaxe_before_diamond_rate": (
+            totals["timeout_after_pickaxe_before_diamond_episodes"] / completed
+            if completed
+            else 0.0
         ),
         "initial_parameter_norm": float(
             jax.device_get(initial_parameter_norm)
@@ -595,6 +798,7 @@ def run_ppo_pilot(config: PPOConfig):
             config.log_dir,
             config=config,
             git_sha=git_sha,
+            git_diff=git_diff,
             train_state=train_state,
             update_metrics=host_metrics,
             summary=result,

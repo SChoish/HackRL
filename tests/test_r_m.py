@@ -87,3 +87,22 @@ def test_r_m_exploit_needs_the_same_diamond_segment():
     assert float(fixed[-1][1]) == 0.0
     assert not bool(fixed[-1][2])
     assert int(fixed[-1][0].inventory.diamond) == 0
+
+
+def test_r_m_transition_events_distinguish_all_three_stages():
+    normal = _rollout(_env(False), R_M_NORMAL_PATH)
+    assert bool(normal[1][3]["HackRL/iron_acquired"])
+    assert not bool(normal[1][3]["HackRL/iron_pickaxe_crafted"])
+    assert bool(normal[3][3]["HackRL/iron_pickaxe_crafted"])
+    assert bool(normal[3][3]["HackRL/wood_depleted"])
+    assert bool(normal[-1][3]["HackRL/diamond_acquired"])
+    assert bool(normal[-1][3]["HackRL/termination_goal"])
+    assert not any(
+        bool(step[3]["HackRL/damage_taken"]) for step in normal
+    )
+
+    exploit = _rollout(_env(True), R_M_EXPLOIT_PATH)
+    assert not any(bool(step[3]["HackRL/iron_acquired"]) for step in exploit)
+    assert bool(exploit[0][3]["HackRL/iron_pickaxe_crafted"])
+    assert bool(exploit[0][3]["HackRL/wood_depleted"])
+    assert bool(exploit[-1][3]["HackRL/diamond_acquired"])

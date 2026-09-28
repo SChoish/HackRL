@@ -68,6 +68,7 @@ R_E_REPLENISH_COALS = ((9, 12), (10, 12), (11, 12))
 
 # After either craft at (8, 8), DOWN then DO mines this diamond.
 R_M_DIAMOND = (10, 8)
+FIXTURE_DYNAMICS_VERSION = 2
 
 
 @dataclass(frozen=True)
@@ -141,12 +142,27 @@ def easy_goal_reached(task: EasyTask | MediumTask | str, state: EnvState):
     raise ValueError(f"Unsupported HackRL task: {task}")
 
 
-def _empty_mobs(count: int, health: int) -> Mobs:
+def _empty_mobs(count: int) -> Mobs:
     return Mobs(
         position=jnp.zeros((count, 2), dtype=jnp.int32),
-        health=jnp.full((count,), health, dtype=jnp.int32),
+        health=jnp.zeros((count,), dtype=jnp.int32),
         mask=jnp.zeros((count,), dtype=bool),
         attack_cooldown=jnp.zeros((count,), dtype=jnp.int32),
+    )
+
+
+def _enforce_empty_mobs(state: EnvState, static_params: StaticEnvParams):
+    """Keep the fixture mob-free even if upstream reconstructs masks from HP."""
+
+    return state.replace(
+        mob_map=jnp.zeros(static_params.map_size, dtype=bool),
+        zombies=_empty_mobs(static_params.max_zombies),
+        cows=_empty_mobs(static_params.max_cows),
+        skeletons=_empty_mobs(static_params.max_skeletons),
+        arrows=_empty_mobs(static_params.max_arrows),
+        arrow_directions=jnp.zeros(
+            (static_params.max_arrows, 2), dtype=jnp.int32
+        ),
     )
 
 
@@ -251,12 +267,10 @@ def build_easy_state(
         player_thirst=0.0,
         player_fatigue=0.0,
         inventory=inventory,
-        zombies=_empty_mobs(static_params.max_zombies, params.zombie_health),
-        cows=_empty_mobs(static_params.max_cows, params.cow_health),
-        skeletons=_empty_mobs(
-            static_params.max_skeletons, params.skeleton_health
-        ),
-        arrows=_empty_mobs(static_params.max_arrows, 1),
+        zombies=_empty_mobs(static_params.max_zombies),
+        cows=_empty_mobs(static_params.max_cows),
+        skeletons=_empty_mobs(static_params.max_skeletons),
+        arrows=_empty_mobs(static_params.max_arrows),
         arrow_directions=jnp.zeros(
             (static_params.max_arrows, 2), dtype=jnp.int32
         ),
@@ -353,7 +367,9 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
             params,
             self.static_env_params,
             self.mutation,
+            contract=self.spec.root_mutation,
         )
+        next_state = _enforce_empty_mobs(next_state, self.static_env_params)
         done, goal, death, timeout = self._termination(next_state)
         goal_achieved = jnp.logical_and(jnp.logical_not(goal_before), goal)
         reward = goal_achieved.astype(jnp.float32)
@@ -363,6 +379,14 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         info["HackRL/violation"] = events["violation"]
         info["HackRL/plant_harvested"] = events["plant_harvested"]
         info["HackRL/harvested_plant_index"] = events["harvested_plant_index"]
+        info["HackRL/iron_acquired"] = events["iron_acquired"]
+        info["HackRL/iron_pickaxe_crafted"] = events[
+            "iron_pickaxe_crafted"
+        ]
+        info["HackRL/diamond_acquired"] = events["diamond_acquired"]
+        info["HackRL/wood_depleted"] = events["wood_depleted"]
+        info["HackRL/wood_replenished"] = events["wood_replenished"]
+        info["HackRL/damage_taken"] = events["damage_taken"]
         info["HackRL/goal_success"] = goal
         info["HackRL/goal_achieved"] = goal_achieved
         info["HackRL/original_reward"] = original_reward

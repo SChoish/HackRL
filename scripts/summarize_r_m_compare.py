@@ -136,12 +136,20 @@ def main():
                 "eval_sample_success_rate": summary["eval_sample_success_rate"],
                 "eval_mean_length": summary["eval_mean_length"],
                 "eval_sample_mean_length": summary["eval_sample_mean_length"],
-                "completed_iron_acquire_rate": summary[
-                    "completed_iron_acquire_rate"
-                ],
-                "completed_wood_exhausted_rate": summary[
-                    "completed_wood_exhausted_rate"
-                ],
+                "completed_iron_acquisition_rate": summary.get(
+                    "completed_iron_acquisition_rate",
+                    summary.get("completed_iron_acquire_rate"),
+                ),
+                "metrics_schema_version": summary.get(
+                    "metrics_schema_version", 1
+                ),
+                "fixture_dynamics_version": summary.get(
+                    "fixture_dynamics_version", 1
+                ),
+                "completed_wood_depletion_rate": summary.get(
+                    "completed_wood_depletion_rate",
+                    summary.get("completed_wood_exhausted_rate"),
+                ),
                 "eval_violation_episode_rate": summary[
                     "eval_violation_episode_rate"
                 ],

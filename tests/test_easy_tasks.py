@@ -3,7 +3,12 @@ import jax.numpy as jnp
 import pytest
 from craftax.craftax_classic.constants import Action, BlockType
 
-from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset, StartMode
+from hackrl import (
+    EasyTask,
+    HackRLEasySymbolicEnvNoAutoReset,
+    MediumTask,
+    StartMode,
+)
 from hackrl.scripted_paths import EASY_EXPLOIT_PATHS, EASY_NORMAL_PATHS
 
 
@@ -26,6 +31,13 @@ def _rollout(env, actions, seed=0):
     return observation, state, transitions
 
 
+def _assert_no_mobs(state):
+    assert not bool(state.mob_map.any())
+    for mobs in (state.zombies, state.cows, state.skeletons, state.arrows):
+        assert not bool(mobs.mask.any())
+        assert bool(jnp.all(mobs.health == 0))
+
+
 @pytest.mark.parametrize("task", list(EasyTask))
 def test_fixed_and_mutant_reset_to_identical_16x16_fixture(task):
     fixed = HackRLEasySymbolicEnvNoAutoReset(task, mutant=False)
@@ -41,10 +53,23 @@ def test_fixed_and_mutant_reset_to_identical_16x16_fixture(task):
     assert fixed_state.map.shape == (16, 16)
     assert fixed_obs.shape == (1345,)
     assert bool(fixed.observation_space(fixed.default_params).contains(fixed_obs))
-    assert not bool(fixed_state.zombies.mask.any())
-    assert not bool(fixed_state.cows.mask.any())
-    assert not bool(fixed_state.skeletons.mask.any())
-    assert not bool(fixed_state.arrows.mask.any())
+    _assert_no_mobs(fixed_state)
+
+
+def test_no_mob_fixture_is_an_invariant_across_100_do_steps():
+    env = HackRLEasySymbolicEnvNoAutoReset(MediumTask.R_M, mutant=False)
+    params = env.default_params
+    key = jax.random.PRNGKey(101)
+    key, reset_key = jax.random.split(key)
+    _, state = env.reset(reset_key, params)
+    _assert_no_mobs(state)
+
+    for _ in range(100):
+        key, step_key = jax.random.split(key)
+        _, state, _, _, _ = env.step(
+            step_key, state, Action.DO.value, params
+        )
+        _assert_no_mobs(state)
 
 
 def test_easy_fixture_contracts():

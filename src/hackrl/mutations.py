@@ -139,10 +139,18 @@ def detect_plant_harvest(before, action, after):
 
 
 def _craftax_step_with_events(
-    rng, state, action, params, static_params, mutation: RootMutation
+    rng,
+    state,
+    action,
+    params,
+    static_params,
+    mutation: RootMutation,
+    contract: RootMutation | None = None,
 ):
     """Craftax step plus stage-local contract and interaction evidence."""
 
+    contract = mutation if contract is None else contract
+    initial_state = state
     initial_achievements = state.achievements
     initial_health = state.player_health
 
@@ -151,14 +159,14 @@ def _craftax_step_with_events(
     previous_state = state
     state = do_crafting(state, effective_action, mutation)
     crafting_violation = detect_violation(
-        mutation, previous_state, effective_action, state
+        contract, previous_state, effective_action, state
     )
 
     rng, action_rng = jax.random.split(rng)
     previous_state = state
     state = do_action(action_rng, state, effective_action, static_params, mutation)
     interaction_violation = detect_violation(
-        mutation, previous_state, effective_action, state
+        contract, previous_state, effective_action, state
     )
     plant_harvested, harvested_plant_index = detect_plant_harvest(
         previous_state, effective_action, state
@@ -183,6 +191,30 @@ def _craftax_step_with_events(
     state = base.update_player_intrinsics(state, effective_action)
     state = base.cap_inventory(state)
     state = base.update_health(state)
+
+    events.update(
+        {
+            "iron_acquired": state.inventory.iron > initial_state.inventory.iron,
+            "iron_pickaxe_crafted": (
+                state.inventory.iron_pickaxe
+                > initial_state.inventory.iron_pickaxe
+            ),
+            "diamond_acquired": (
+                state.inventory.diamond > initial_state.inventory.diamond
+            ),
+            "wood_depleted": jnp.logical_and(
+                initial_state.inventory.wood > 0,
+                state.inventory.wood <= 0,
+            ),
+            "wood_replenished": (
+                state.inventory.wood > initial_state.inventory.wood
+            ),
+            "damage_taken": jnp.maximum(
+                initial_health - state.player_health,
+                0,
+            ),
+        }
+    )
 
     achievement_reward = (
         state.achievements.astype(jnp.float32).sum()
@@ -210,22 +242,34 @@ def craftax_step(rng, state, action, params, static_params, mutation: RootMutati
 
 
 def craftax_step_with_events(
-    rng, state, action, params, static_params, mutation: RootMutation
+    rng,
+    state,
+    action,
+    params,
+    static_params,
+    mutation: RootMutation,
+    contract: RootMutation | None = None,
 ):
-    """Return the transition and stage-local event evidence."""
+    """Return transition events checked against an independent contract."""
 
     return _craftax_step_with_events(
-        rng, state, action, params, static_params, mutation
+        rng, state, action, params, static_params, mutation, contract
     )
 
 
 def craftax_step_with_violation(
-    rng, state, action, params, static_params, mutation: RootMutation
+    rng,
+    state,
+    action,
+    params,
+    static_params,
+    mutation: RootMutation,
+    contract: RootMutation | None = None,
 ):
     """Return the transition and independently detected violation evidence."""
 
     next_state, reward, events = _craftax_step_with_events(
-        rng, state, action, params, static_params, mutation
+        rng, state, action, params, static_params, mutation, contract
     )
     return next_state, reward, events["violation"]
 

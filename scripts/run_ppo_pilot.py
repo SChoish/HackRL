@@ -34,6 +34,11 @@ def parse_args():
     parser.add_argument("--layer-size", type=int, default=64)
     parser.add_argument("--eval-episodes", type=int, default=8)
     parser.add_argument(
+        "--anneal-learning-rate",
+        action="store_true",
+        help="opt into linear learning-rate annealing (protocol default is fixed)",
+    )
+    parser.add_argument(
         "--start-mode",
         choices=["default", "r_e_post_iron"],
         default="default",
@@ -63,6 +68,7 @@ def make_config(args, task, variant, log_dir=None):
         num_minibatches=args.num_minibatches,
         layer_size=args.layer_size,
         eval_episodes=args.eval_episodes,
+        anneal_learning_rate=args.anneal_learning_rate,
         start_mode=args.start_mode,
         fixture=args.fixture,
         log_dir=log_dir,

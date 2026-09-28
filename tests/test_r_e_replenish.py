@@ -30,7 +30,7 @@ def _rollout(env, actions, seed=0):
             step_key, state, action, params
         )
         tracker, _ = update_episode_tracker(
-            tracker, reward, info, state.timestep, state.inventory
+            tracker, reward, info, state.timestep
         )
         transitions.append((reward, done, info, state))
         if bool(done):
@@ -126,8 +126,8 @@ def test_replenish_recovers_after_wasted_wood_on_fixed():
     assert float(transitions[-1][0]) == 1.0
     assert bool(transitions[-1][1])
     assert int(state.inventory.iron_pickaxe) >= 1
-    assert bool(tracker.wood_exhausted_before_goal)
-    assert bool(tracker.wood_replenished_after_exhaustion)
+    assert bool(tracker.wood_depleted_before_pickaxe)
+    assert bool(tracker.wood_replenished_after_depletion)
     assert bool(tracker.goal_success)
 
 

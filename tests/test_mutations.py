@@ -2,9 +2,11 @@ import jax
 import jax.numpy as jnp
 from craftax.craftax_classic import game_logic as base
 from craftax.craftax_classic.constants import Action, BlockType
+from craftax.craftax_classic.envs.craftax_state import EnvParams
 
 from hackrl.mutations import (
     RootMutation,
+    craftax_step_with_events,
     detect_violation,
     do_action,
     do_crafting,
@@ -169,3 +171,58 @@ def test_unrelated_action_matches_fixed_kernel(base_state, static_params):
         actual = do_action(key, base_state, Action.NOOP.value, static_params, mutation)
         comparisons = jax.tree_util.tree_map(jnp.array_equal, expected, actual)
         assert all(bool(value) for value in jax.tree_util.tree_leaves(comparisons))
+
+
+def test_transition_kernel_and_contract_are_selected_independently(
+    base_state, static_params
+):
+    state = base_state.replace(
+        map=base_state.map.at[8, 7]
+        .set(BlockType.CRAFTING_TABLE.value)
+        .at[8, 9]
+        .set(BlockType.FURNACE.value),
+        inventory=base_state.inventory.replace(wood=1, stone=1, coal=1, iron=0),
+        zombies=base_state.zombies.replace(
+            health=jnp.zeros_like(base_state.zombies.health)
+        ),
+        cows=base_state.cows.replace(
+            health=jnp.zeros_like(base_state.cows.health)
+        ),
+        skeletons=base_state.skeletons.replace(
+            health=jnp.zeros_like(base_state.skeletons.health)
+        ),
+        arrows=base_state.arrows.replace(
+            health=jnp.zeros_like(base_state.arrows.health)
+        ),
+    )
+    params = EnvParams(
+        spawn_cow_chance=0.0,
+        spawn_zombie_base_chance=0.0,
+        spawn_zombie_night_chance=0.0,
+        spawn_skeleton_chance=0.0,
+    )
+    key = jax.random.PRNGKey(4)
+
+    fixed, _, fixed_events = craftax_step_with_events(
+        key,
+        state,
+        Action.MAKE_IRON_PICKAXE.value,
+        params,
+        static_params,
+        RootMutation.FIXED,
+        contract=RootMutation.H1_IRON_LOWER_BOUND,
+    )
+    mutant, _, mutant_events = craftax_step_with_events(
+        key,
+        state,
+        Action.MAKE_IRON_PICKAXE.value,
+        params,
+        static_params,
+        RootMutation.H1_IRON_LOWER_BOUND,
+        contract=RootMutation.H1_IRON_LOWER_BOUND,
+    )
+
+    assert int(fixed.inventory.iron_pickaxe) == 0
+    assert not bool(fixed_events["violation"])
+    assert int(mutant.inventory.iron_pickaxe) == 1
+    assert bool(mutant_events["violation"])

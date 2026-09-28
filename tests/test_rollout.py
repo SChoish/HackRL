@@ -62,7 +62,7 @@ def test_batch_adapter_preserves_terminal_and_reset_observations():
     )
 
 
-def test_post_iron_reset_marks_ever_iron_before_first_step():
+def test_post_iron_reset_does_not_count_initial_inventory_as_acquisition():
     env = HackRLEasySymbolicEnvNoAutoReset(
         EasyTask.R_E,
         mutant=False,
@@ -70,5 +70,5 @@ def test_post_iron_reset_marks_ever_iron_before_first_step():
     )
     vector_env = HackRLBatchEnv(env, num_envs=2)
     _, state = vector_env.reset(jax.random.PRNGKey(84))
-    assert bool(jnp.all(state.tracker.ever_iron))
+    assert bool(jnp.all(state.tracker.iron_acquired_count == 0))
     assert bool(jnp.all(state.env_state.inventory.iron == 1))

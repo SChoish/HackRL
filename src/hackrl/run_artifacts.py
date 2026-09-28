@@ -11,7 +11,12 @@ from pathlib import Path
 import numpy as np
 from flax.serialization import to_bytes
 
-from hackrl.tasks import FixtureVersion, StartMode, parse_task
+from hackrl.tasks import (
+    FIXTURE_DYNAMICS_VERSION,
+    FixtureVersion,
+    StartMode,
+    parse_task,
+)
 
 
 def repo_git_sha(repo_root: Path | None = None) -> str:
@@ -27,12 +32,27 @@ def repo_git_sha(repo_root: Path | None = None) -> str:
         return "unknown"
 
 
+def repo_git_diff(repo_root: Path | None = None) -> str:
+    root = repo_root or Path(__file__).resolve().parents[2]
+    try:
+        return subprocess.check_output(
+            ["git", "diff", "--binary", "HEAD"],
+            cwd=root,
+            text=True,
+            stderr=subprocess.DEVNULL,
+        )
+    except (OSError, subprocess.CalledProcessError):
+        return ""
+
+
 def config_payload(config) -> dict:
     payload = asdict(config)
     payload["task"] = parse_task(config.task).value
     payload["start_mode"] = StartMode(config.start_mode).value
     payload["fixture"] = FixtureVersion(config.fixture).value
     payload["variant"] = "mutant" if config.mutant else "fixed"
+    payload["metrics_schema_version"] = 2
+    payload["fixture_dynamics_version"] = FIXTURE_DYNAMICS_VERSION
     return payload
 
 
@@ -49,6 +69,7 @@ def write_run_artifacts(
     *,
     config,
     git_sha: str,
+    git_diff: str,
     train_state,
     update_metrics,
     summary: dict,
@@ -59,6 +80,7 @@ def write_run_artifacts(
         json.dumps(config_payload(config), indent=2, sort_keys=True) + "\n"
     )
     (destination / "git_sha.txt").write_text(f"{git_sha}\n")
+    (destination / "working_tree.patch").write_text(git_diff)
     (destination / "params.msgpack").write_bytes(to_bytes(train_state.params))
 
     metrics = {
