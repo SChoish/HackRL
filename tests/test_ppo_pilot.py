@@ -38,6 +38,8 @@ def test_minimal_official_ppo_training_and_evaluation_flow(tmp_path):
     assert 0.0 <= result["eval_repeat_harvest_episode_rate"] <= 1.0
     assert 0.0 <= result["eval_iron_acquire_rate"] <= 1.0
     assert 0.0 <= result["completed_wood_exhausted_rate"] <= 1.0
+    assert 0.0 <= result["completed_recovery_rate"] <= 1.0
+    assert result["fixture"] == "default"
     assert result["git_sha"]
     assert (tmp_path / "params.msgpack").is_file()
     assert (tmp_path / "updates.csv").is_file()

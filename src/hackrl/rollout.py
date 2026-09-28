@@ -36,6 +36,7 @@ class EpisodeRecord:
     repeated_harvest_count: jax.Array
     ever_iron: jax.Array
     wood_exhausted_before_goal: jax.Array
+    wood_replenished_after_exhaustion: jax.Array
 
 
 @struct.dataclass
@@ -143,6 +144,9 @@ class HackRLBatchEnv:
             repeated_harvest_count=updated_trackers.repeated_harvest_count,
             ever_iron=updated_trackers.ever_iron,
             wood_exhausted_before_goal=updated_trackers.wood_exhausted_before_goal,
+            wood_replenished_after_exhaustion=(
+                updated_trackers.wood_replenished_after_exhaustion
+            ),
         )
 
         # Reset candidates are intentionally independent per worker. The Easy

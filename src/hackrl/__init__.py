@@ -5,6 +5,7 @@ from hackrl.mutations import RootMutation
 from hackrl.tasks import (
     EASY_TASK_SPECS,
     EasyTask,
+    FixtureVersion,
     HackRLEasySymbolicEnvNoAutoReset,
     StartMode,
 )
@@ -12,6 +13,7 @@ from hackrl.tasks import (
 __all__ = [
     "EASY_TASK_SPECS",
     "EasyTask",
+    "FixtureVersion",
     "HackRLEasySymbolicEnvNoAutoReset",
     "HackRLClassicSymbolicEnvNoAutoReset",
     "RootMutation",

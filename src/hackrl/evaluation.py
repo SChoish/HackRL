@@ -22,6 +22,7 @@ class EvaluationEpisodes:
     repeated_harvest_count: jax.Array
     ever_iron: jax.Array
     wood_exhausted_before_goal: jax.Array
+    wood_replenished_after_exhaustion: jax.Array
 
 
 def _empty_results(num_episodes: int) -> EvaluationEpisodes:
@@ -37,6 +38,7 @@ def _empty_results(num_episodes: int) -> EvaluationEpisodes:
         repeated_harvest_count=zeros_i,
         ever_iron=zeros_b,
         wood_exhausted_before_goal=zeros_b,
+        wood_replenished_after_exhaustion=zeros_b,
     )
 
 
@@ -70,6 +72,11 @@ def _record_first(results, record, newly_completed):
             newly_completed,
             record.wood_exhausted_before_goal,
             results.wood_exhausted_before_goal,
+        ),
+        wood_replenished_after_exhaustion=jnp.where(
+            newly_completed,
+            record.wood_replenished_after_exhaustion,
+            results.wood_replenished_after_exhaustion,
         ),
     )
 
@@ -140,6 +147,12 @@ def evaluate_policy(
         ),
         "eval_wood_exhausted_before_goal_rate": jnp.mean(
             results.wood_exhausted_before_goal.astype(jnp.float32)
+        ),
+        "eval_recovery_episode_rate": jnp.mean(
+            jnp.logical_and(
+                results.goal_success,
+                results.wood_replenished_after_exhaustion,
+            ).astype(jnp.float32)
         ),
         "eval_mean_return": jnp.mean(results.episode_return),
         "eval_mean_length": jnp.mean(

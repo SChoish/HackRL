@@ -39,6 +39,11 @@ def parse_args():
         default="default",
     )
     parser.add_argument(
+        "--fixture",
+        choices=["default", "r_e_replenish"],
+        default="default",
+    )
+    parser.add_argument(
         "--log-dir",
         default=None,
         help="write config, SHA, per-update CSV, and params checkpoint",
@@ -59,6 +64,7 @@ def make_config(args, task, variant, log_dir=None):
         layer_size=args.layer_size,
         eval_episodes=args.eval_episodes,
         start_mode=args.start_mode,
+        fixture=args.fixture,
         log_dir=log_dir,
     )
 

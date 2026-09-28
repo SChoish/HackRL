@@ -37,6 +37,20 @@ class StartMode(str, Enum):
     R_E_POST_IRON = "r_e_post_iron"
 
 
+class FixtureVersion(str, Enum):
+    """World-layout versions. Default R-E stays the original 16x16 fixture."""
+
+    DEFAULT = "default"
+    R_E_REPLENISH = "r_e_replenish"
+
+
+# South-east detour: column 8 stays clear for the 3-step iron path, and
+# (8,7)/(8,9) stay the workshop. Three finite copies of each resource.
+R_E_REPLENISH_TREES = ((9, 10), (10, 10), (11, 10))
+R_E_REPLENISH_STONES = ((9, 11), (10, 11), (11, 11))
+R_E_REPLENISH_COALS = ((9, 12), (10, 12), (11, 12))
+
+
 @dataclass(frozen=True)
 class EasyTaskSpec:
     task_id: EasyTask
@@ -110,13 +124,17 @@ def build_easy_state(
     params: EnvParams,
     static_params: StaticEnvParams,
     start_mode: StartMode | str = StartMode.DEFAULT,
+    fixture: FixtureVersion | str = FixtureVersion.DEFAULT,
 ) -> EnvState:
     """Build a 16x16 fixture without invoking Craftax world generation."""
 
     task = EasyTask(task)
     start_mode = StartMode(start_mode)
+    fixture = FixtureVersion(fixture)
     if start_mode is StartMode.R_E_POST_IRON and task is not EasyTask.R_E:
         raise ValueError("r_e_post_iron is only defined for R-E")
+    if fixture is FixtureVersion.R_E_REPLENISH and task is not EasyTask.R_E:
+        raise ValueError("r_e_replenish is only defined for R-E")
     if tuple(static_params.map_size) != (16, 16):
         raise ValueError("Easy fixtures require static map_size=(16, 16)")
     if static_params.max_growing_plants < 2:
@@ -154,6 +172,13 @@ def build_easy_state(
         if start_mode is StartMode.R_E_POST_IRON:
             world = world.at[6, 8].set(BlockType.GRASS.value)
             inventory = inventory.replace(iron=1)
+        if fixture is FixtureVersion.R_E_REPLENISH:
+            for row, col in R_E_REPLENISH_TREES:
+                world = world.at[row, col].set(BlockType.TREE.value)
+            for row, col in R_E_REPLENISH_STONES:
+                world = world.at[row, col].set(BlockType.STONE.value)
+            for row, col in R_E_REPLENISH_COALS:
+                world = world.at[row, col].set(BlockType.COAL.value)
     elif task is EasyTask.B_E:
         player_position = jnp.array([0, 8], dtype=jnp.int32)
         world = world.at[-1, 8].set(BlockType.IRON.value)
@@ -218,15 +243,22 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         mutant: bool = False,
         static_env_params: StaticEnvParams | None = None,
         start_mode: StartMode | str = StartMode.DEFAULT,
+        fixture: FixtureVersion | str = FixtureVersion.DEFAULT,
     ):
         self.task = EasyTask(task)
         self.spec = EASY_TASK_SPECS[self.task]
         self.start_mode = StartMode(start_mode)
+        self.fixture = FixtureVersion(fixture)
         if (
             self.start_mode is StartMode.R_E_POST_IRON
             and self.task is not EasyTask.R_E
         ):
             raise ValueError("r_e_post_iron is only defined for R-E")
+        if (
+            self.fixture is FixtureVersion.R_E_REPLENISH
+            and self.task is not EasyTask.R_E
+        ):
+            raise ValueError("r_e_replenish is only defined for R-E")
         mutation = self.spec.root_mutation if mutant else RootMutation.FIXED
         if static_env_params is None:
             static_env_params = self.default_static_params()
@@ -253,6 +285,7 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
             params,
             self.static_env_params,
             start_mode=self.start_mode,
+            fixture=self.fixture,
         )
         return self.get_obs(state), state
 
@@ -316,6 +349,8 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
     def name(self) -> str:
         variant = "mutant" if self.mutation is not RootMutation.FIXED else "fixed"
         name = f"HackRL-Classic-{self.task.value}-{variant}-NoAutoReset-v0"
+        if self.fixture is not FixtureVersion.DEFAULT:
+            name = f"{name}-{self.fixture.value}"
         if self.start_mode is not StartMode.DEFAULT:
             return f"{name}-{self.start_mode.value}"
         return name

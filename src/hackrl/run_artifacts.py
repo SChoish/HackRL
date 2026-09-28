@@ -11,7 +11,7 @@ from pathlib import Path
 import numpy as np
 from flax.serialization import to_bytes
 
-from hackrl.tasks import EasyTask, StartMode
+from hackrl.tasks import EasyTask, FixtureVersion, StartMode
 
 
 def repo_git_sha(repo_root: Path | None = None) -> str:
@@ -31,6 +31,7 @@ def config_payload(config) -> dict:
     payload = asdict(config)
     payload["task"] = EasyTask(config.task).value
     payload["start_mode"] = StartMode(config.start_mode).value
+    payload["fixture"] = FixtureVersion(config.fixture).value
     payload["variant"] = "mutant" if config.mutant else "fixed"
     return payload
 

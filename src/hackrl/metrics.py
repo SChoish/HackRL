@@ -22,6 +22,7 @@ class EpisodeTracker:
     goal_success: jnp.ndarray
     ever_iron: jnp.ndarray
     wood_exhausted_before_goal: jnp.ndarray
+    wood_replenished_after_exhaustion: jnp.ndarray
 
 
 def init_episode_tracker(max_growing_plants: int) -> EpisodeTracker:
@@ -39,6 +40,7 @@ def init_episode_tracker(max_growing_plants: int) -> EpisodeTracker:
         goal_success=jnp.asarray(False),
         ever_iron=jnp.asarray(False),
         wood_exhausted_before_goal=jnp.asarray(False),
+        wood_replenished_after_exhaustion=jnp.asarray(False),
     )
 
 
@@ -75,6 +77,9 @@ def update_episode_tracker(
     if inventory is None:
         ever_iron = tracker.ever_iron
         wood_exhausted_before_goal = tracker.wood_exhausted_before_goal
+        wood_replenished_after_exhaustion = (
+            tracker.wood_replenished_after_exhaustion
+        )
     else:
         ever_iron = jnp.logical_or(tracker.ever_iron, inventory.iron >= 1)
         wood_exhausted_before_goal = jnp.logical_or(
@@ -82,6 +87,13 @@ def update_episode_tracker(
             jnp.logical_and(
                 inventory.wood <= 0,
                 jnp.logical_not(info["HackRL/goal_success"]),
+            ),
+        )
+        wood_replenished_after_exhaustion = jnp.logical_or(
+            tracker.wood_replenished_after_exhaustion,
+            jnp.logical_and(
+                wood_exhausted_before_goal,
+                inventory.wood >= 1,
             ),
         )
     updated = tracker.replace(
@@ -98,6 +110,7 @@ def update_episode_tracker(
         ),
         ever_iron=ever_iron,
         wood_exhausted_before_goal=wood_exhausted_before_goal,
+        wood_replenished_after_exhaustion=wood_replenished_after_exhaustion,
     )
     return updated, repeated_harvest
 
@@ -115,4 +128,11 @@ def episode_summary(tracker: EpisodeTracker):
         "used_repeat_harvest": tracker.repeated_harvest_count > 0,
         "ever_iron": tracker.ever_iron,
         "wood_exhausted_before_goal": tracker.wood_exhausted_before_goal,
+        "wood_replenished_after_exhaustion": (
+            tracker.wood_replenished_after_exhaustion
+        ),
+        "recovered_after_wood_exhaustion": jnp.logical_and(
+            tracker.goal_success,
+            tracker.wood_replenished_after_exhaustion,
+        ),
     }
