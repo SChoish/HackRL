@@ -8,6 +8,7 @@
 - [GBGallery 분류·9개 과제 후보](docs/benchmark_catalog_ko.md): 공식 분류, 오류 계열 × 잠정 난이도, 첨부 사례의 시사점
 - [버그·과제 명세](docs/bug_specifications_ko.md): 코드 변경 지점, 정상/예외 경로, 독립 판정기
 - [실험 프로토콜](docs/experiment_protocol_ko.md): 온라인 설정·스윕 예산·평가와 오프라인 확장
+- [R-E Easy 진단·12런 비교](docs/r_e_easy_diagnosis.md): 목표 성공과 재료 소진 후 복구 성공을 구분한 수치. 보충 fixture 튜닝은 여기서 멈춘다.
 - 과제 구성: 자원 전제 조건·공간 범위·상태 갱신의 3개 계열 × Easy/Medium/Hard, 난이도당 3개씩 총 9개 후보입니다. 같은 결함을 다른 맥락에서 평가하며 난이도는 파일럿으로 검증합니다.
 - 구현 순서: 세 결함의 회귀 검사 → Easy 3개 → 활용 이득이 검증된 Medium → Hard. 생존·수확의 중간/어려움 후보는 특히 실행 가능성 검증이 필요합니다.
 - 초기 비교: 온라인 PPO/PPO+RND → PPO 크기 비교와 PQN-FF → 필요한 경우 기억·적응 진단
