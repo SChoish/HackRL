@@ -1,0 +1,150 @@
+{
+  "schema_version": "hackrl_gc_calibration_manifest_v1",
+  "manifest_id": "tick_claim_gc_pilot_v1",
+  "candidate_id": "TICK-CLAIM",
+  "fixture_id": "tick_claim_workshop_v1",
+  "learner": "GC-PPO",
+  "profile": "hackrl_gc_v1",
+  "status": "frozen_before_results",
+  "purpose": "learner wiring calibration; not a powered model comparison or a general bug-discovery claim",
+  "design_manifest": "tick_claim_v1.json",
+  "training_standard": "../gc_training_sweep_ko.md",
+  "resolution": "tick_claim_gc_v1_resolved.json records the committed code revision, hashes of this manifest and its implementation sources, runtime versions, device platform, and gate result before any cell starts",
+  "goal": {
+    "mode": "deliver_3",
+    "canonical_id": "delivery/count_ge_3",
+    "index": 11,
+    "reward": "1 exactly on the first action transition that makes the predicate true; otherwise 0",
+    "after_success": "do not reset the world; cut bootstrap and GAE, then advance its clock and normal dynamics with loss-masked NOOP transitions until the world horizon reset because delivered_total is monotone within a world"
+  },
+  "cells": [
+    {"variant": "fixed", "learner_seed": 0},
+    {"variant": "mutant", "learner_seed": 0},
+    {"variant": "fixed", "learner_seed": 1},
+    {"variant": "mutant", "learner_seed": 1},
+    {"variant": "fixed", "learner_seed": 2},
+    {"variant": "mutant", "learner_seed": 2}
+  ],
+  "pairing": "fixed and mutant for the same learner_seed start from identical model parameters, worker states, learner RNG, sampler RNG, and seen-goal state; trajectories may diverge after kernel-dependent transitions",
+  "rng_initialization": "jax.random.PRNGKey(learner_seed) is split once into model initialization, action, environment, and sampler streams; per-worker environment and sampler keys are then split by worker index; later reset keys evolve independently per worker",
+  "budget": {
+    "workers": 512,
+    "rollout_steps": 64,
+    "transitions_per_update": 32768,
+    "updates_per_cell": 32,
+    "transitions_per_cell": 1048576,
+    "cell_count": 6,
+    "total_transitions": 6291456
+  },
+  "budget_accounting": "all physical environment transitions, including post-success loss-masked NOOPs, count toward the raw transition budget; valid_transitions is reported separately and only valid transitions contribute to PPO losses",
+  "model": {
+    "map_encoder": "32-channel 3x3 SAME convolution, LeCun-normal, ReLU",
+    "shared": "one 512-unit dense layer, orthogonal sqrt(2), ReLU",
+    "actor": "two 512-unit dense hidden layers, ReLU, then 20-logit output with orthogonal 0.01",
+    "critic": "four 512-unit dense hidden layers, ReLU, then sigmoid scalar output with orthogonal 1.0",
+    "goal_representation": "12-dimensional canonical one-hot",
+    "action_mask": "none",
+    "input_normalization": "none",
+    "parameter_count_gate": 2640181
+  },
+  "optimization": {
+    "epochs": 1,
+    "minibatch_size": 1024,
+    "minibatches_per_update": 32,
+    "optimizer": "Adam",
+    "adam_epsilon": 0.00001,
+    "learning_rate": 0.0002,
+    "learning_rate_schedule": "fixed",
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "clip_epsilon": 0.2,
+    "entropy_coefficient": 0.005,
+    "value_coefficient": 0.5,
+    "max_gradient_norm": 1.0
+  },
+  "termination": {
+    "goal_done": "cuts value bootstrap and GAE but never resets the world",
+    "world_done": "tick reaches 128; resets the world exactly once",
+    "simultaneous_goal_and_world_done": "record goal reward from terminal observation, cut value flow, then reset exactly once",
+    "rollout_boundary": "not a termination; bootstrap from the continuing command when active"
+  },
+  "evaluation": {
+    "split": "validation",
+    "goal": "delivery/count_ge_3",
+    "stop": "first goal success or world horizon",
+    "starts": {
+      "natural_reset": "16 layouts x 2 phases; tick 0",
+      "common_setup": "the exact four-action fixed prefix from natural reset, retaining tick, crop age, inventory, and world state; 16 layouts x 2 phases"
+    },
+    "state_count": 64,
+    "state_index": "zero-based within each start family: index=2*layout_index+phase_index in 0..31; matching natural_reset and common_setup states share the same state_index and action-RNG seed",
+    "checkpoint": "the final learner state immediately after update 32",
+    "mode": {
+      "action_rule": "argmax",
+      "repeats_per_state": 1,
+      "episodes": 64
+    },
+    "sample": {
+      "action_rule": "categorical policy sample",
+      "repeats_per_state": 4,
+      "episodes": 256,
+      "rng_rule": "20000 + 1000*learner_seed + 4*state_index + repeat_index"
+    },
+    "frozen_state": "the serialized learner state is byte-identical before and after evaluation; episodes use disposable state clones and evaluation-local action RNGs",
+    "metrics": [
+      "goal success",
+      "time to success or horizon",
+      "opportunity exposure",
+      "first independent-oracle violation",
+      "two or more distinct duplicate-payout events in one world",
+      "violation-created grain delivered",
+      "delivered total",
+      "termination completion"
+    ]
+  },
+  "metric_definitions": {
+    "opportunity_exposure": "before an active action, a ripe live crop has a matching reservation due at the current tick and the player faces that crop from the manual-harvest pose",
+    "violation_event": "the independent conservation oracle observes newly created payout above one unit for an object/generation/cycle; a persistent violated cycle without new excess creation is not another event",
+    "repeated_violation": "a second or later distinct violation_event before the same world reset",
+    "violation_grain_delivered": "excess-created grain is added to a world-local physical balance and a valid transfer-all DELIVER decrements and reports that balance; reset discards any undelivered balance",
+    "time_to_success": "number of active environment action transitions from command start through the successful terminal action, inclusive",
+    "termination_completion": "evaluation stopped because deliver_3 succeeded or the world reached tick 128; an action from tick 127 advances to the terminal tick"
+  },
+  "training_metrics": [
+    "valid and loss-masked transitions",
+    "goal successes and time to success",
+    "reservation creation",
+    "opportunity exposure",
+    "first duplicate-payout event",
+    "first repeated duplicate-payout event",
+    "first violation-grain delivery",
+    "violation-created grain delivered",
+    "world resets",
+    "sampler failures"
+  ],
+  "checkpoint": {
+    "contents": "model, optimizer, learner RNG, worker states and RNGs, current goals and command progress, oracle/provenance state, sampler RNG, seen goals, counters, rollout cursor, no-op normalization state, schedule position, and full config",
+    "resume_gate": "serialized round-trip must preserve policy logits and produce bit-identical next metrics and next train state"
+  },
+  "pre_run_gates": [
+    "all focused and full repository tests pass",
+    "goal_done/world_done boundary tests pass",
+    "complete checkpoint next-update equivalence passes",
+    "frozen evaluation byte-immutability passes",
+    "parameter count is 2640181 for both variants",
+    "one full-shape JIT update records compile and steady-state throughput"
+  ],
+  "aggregation": {
+    "primary_unit": "learner_seed",
+    "report": "each seed separately, then arithmetic mean and sample standard deviation across the three seeds; do not pool evaluation episodes as independent learner runs",
+    "paired_contrast": "mutant minus fixed within each learner_seed",
+    "inference": "descriptive calibration only; no significance claim"
+  },
+  "completion_criterion": "all six declared cells finish the exact budget, final checkpoints and frozen evaluations validate, and no runtime or manifest check fails; there is deliberately no performance threshold for this wiring calibration",
+  "scope_limits": [
+    "the 48 layouts are D4, translation, and wall variations of one workshop template, not 48 independent mechanisms",
+    "the oracle is separated from policy input and reward but shares the synthetic fixture's authorship",
+    "success alone is insufficient evidence of exploit adoption because fixed and mutant can both solve deliver_3 normally",
+    "PACK-RESTORE remains deferred until its normal-collection payoff gate is resolved"
+  ]
+}

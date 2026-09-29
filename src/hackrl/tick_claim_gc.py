@@ -931,7 +931,9 @@ def _evaluation_states(split, repeats):
         lambda value: jnp.repeat(value, repeats, axis=0), combined
     )
     labels = jnp.repeat(jnp.asarray(labels, dtype=jnp.int32), repeats)
-    state_indices = jnp.repeat(jnp.arange(64, dtype=jnp.int32), repeats)
+    state_indices = jnp.repeat(
+        jnp.tile(jnp.arange(32, dtype=jnp.int32), 2), repeats
+    )
     repeat_indices = jnp.tile(jnp.arange(repeats, dtype=jnp.int32), 64)
     return combined, labels, state_indices, repeat_indices
 

@@ -48,6 +48,7 @@ SOURCE_PATHS = (
     ROOT / "src" / "hackrl" / "tick_claim_oracle.py",
     ROOT / "src" / "hackrl" / "tick_claim_gc.py",
     ROOT / "scripts" / "run_tick_claim_gc.py",
+    ROOT / "scripts" / "summarize_tick_claim_gc_calibration.py",
     ROOT / "scripts" / "validate_tick_claim_gc.py",
     ROOT / "tests" / "test_tick_claim.py",
     ROOT / "tests" / "test_tick_claim_gc.py",
