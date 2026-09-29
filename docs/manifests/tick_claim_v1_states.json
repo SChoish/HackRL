@@ -1,0 +1,7304 @@
+{
+  "basis_commit": "108ea5378c9f73855e3cc453a8a1dfa3b16d6c88",
+  "candidate_id": "TICK-CLAIM",
+  "schema_version": "tick_claim_materialized_states_v1",
+  "state_count": 192,
+  "states": [
+    {
+      "layout_index": 0,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_00/phase_0",
+      "state_sha256": "ec741be08410b43f696e732c2316addadbce8253380454eb3b36c8e2219e509e",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_00/phase_1",
+      "state_sha256": "032ca228f3583f20ea203262b82eb1861b029ee4c99086e7b2ce0f4d209d0588",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_01/phase_0",
+      "state_sha256": "23b066fc5179646a8afd30a2aa35be493d80c8d57adae36c13421dab804cd943",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_01/phase_1",
+      "state_sha256": "b39f108ff90044e5af8b23fed794e91370ae4d7ee810b2b34ffd9085f80ee376",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_02/phase_0",
+      "state_sha256": "40cf67929cadf91210c713ea1820263302fc99f2505c0a95132916988534bee1",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_02/phase_1",
+      "state_sha256": "3e4d77c2716bca500ca1cebf08ab50f92f3bdcf20961f92bcd7c79a91547eab1",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_03/phase_0",
+      "state_sha256": "8b426093b062e2b3928c604dcd78d94f98a171a60f81a6f14a4b4a8ee6a5b883",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_03/phase_1",
+      "state_sha256": "374757962147fa69a9783e9b564e34371e6e3bcddcd2e7df1b3e3bfd79e71792",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_04/phase_0",
+      "state_sha256": "0ec85e2f469397d1c17566fe0e0fca10753a7575b1110815576e80706e040bed",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_04/phase_1",
+      "state_sha256": "04c1708f2acc2dcfffea24b806aa2752a7840b9082255040a46a6738d25c82c7",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_05/phase_0",
+      "state_sha256": "813f1289bbf48596f93ed2f62d4b165f55a88840d045112ce713ed48e26c67e0",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_05/phase_1",
+      "state_sha256": "6d7653ce411f7e791158dca14a42f26cddeeea3507208c0bee7e22035e16039f",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_06/phase_0",
+      "state_sha256": "7da3549e839a91e1baf5976c50c59c977a70cc7b1724456b52f97d4631fdb3c6",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_06/phase_1",
+      "state_sha256": "b75ba2d53ccecc2ccf546452f90297ad77eea6555bf262153acf27ba136dd9f4",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_07/phase_0",
+      "state_sha256": "7dcc276975334e2fe482bc2169e26ba4d6c68d551b210bf252da9f4358cc5bdd",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_07/phase_1",
+      "state_sha256": "d299d04f5ec11dfd06fef3d2bdf21aabd735dc725549782af491f6fd745b5669",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_08/phase_0",
+      "state_sha256": "94084a148a1150b7608e892d92122d1ac96cf4211a03984900689fa759926ff8",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_08/phase_1",
+      "state_sha256": "6fcd2f85202577240e8d361d67017d8211a6b45b967880ca72e75bd0d2df4a4e",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_09/phase_0",
+      "state_sha256": "721843d26c740110060facd6aa5ab0f2c5b3430d21fba0edf8b23ec912b70e32",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_09/phase_1",
+      "state_sha256": "fe148c2e8deae90d54ed2368ad8c0b0c5329f0fc44fa4679eb4a3f9b8b28fe68",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_10/phase_0",
+      "state_sha256": "dedc9b236484f7a0dc231baae210d4c42f2bde5607f8760299161fdb3b9bb621",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_10/phase_1",
+      "state_sha256": "a7179eff655c32fe57703878c0ee4dde1ead144c2dea3245e6d1d357fd164772",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_11/phase_0",
+      "state_sha256": "2710536ef56c80ca002fdc6c156638302c616cba892b6c4b74b0abc8e58c4770",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_11/phase_1",
+      "state_sha256": "8b30e87e71243ce65586cc9a227c4ee2e48a68a5060ad748adf819c074b7c456",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_12/phase_0",
+      "state_sha256": "a84c63c7f20f71d3a97a1f82bda64999df6d7ac48171312c8a32305552049ee7",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_12/phase_1",
+      "state_sha256": "b9b0cd4222f21ea50f456356a69e0b398d02c0dedcb965ff12d0c84d1b59f6ec",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_13/phase_0",
+      "state_sha256": "7b79e46324708b38ef514b61f8bfee422984cfd93432d7b48026eaa7e4401a2d",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_13/phase_1",
+      "state_sha256": "6ed38621c02591de14605272eca455fd1bdc03b73d0bf76a76e1ea5f0f531516",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_14/phase_0",
+      "state_sha256": "19d010fe3c27cb1501079ff2cc6872142b37f6ba7658124b2b6d6ebf45c4aa73",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          7,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_14/phase_1",
+      "state_sha256": "3d0948be22c4b5d99022f4068fd43790433b311931b48f56f0ed9544ff627295",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "ripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_15/phase_0",
+      "state_sha256": "0dcd35d71d1157943c69dd4e1cafe1ae4b3a3ad5487deadc5596649eab1de37c",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "unripe",
+      "split": "train",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/natural_reset/layout_15/phase_1",
+      "state_sha256": "a28a9cf6eab33bfd2591553b6e3f3312b4ef85af4e5fbaa6602b4a643c65d24e",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_00/phase_0",
+      "state_sha256": "2a2ebe7b48bb1fe1ab897b99495ba76f3bd4c0b676aa6c260b0864c5234938a0",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_00/phase_1",
+      "state_sha256": "5ff930ea09448d8589219345f0368014ed61074eb8fb09943cdbc65e01545080",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_01/phase_0",
+      "state_sha256": "cfdd6ed2b88d91901853ff6216e79e3d7bf3b8453c7aee7ea3b25738d26b7155",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_01/phase_1",
+      "state_sha256": "0b502e0d88ba2b00ddf891351eb5135aa919a6aab55217349919e813d4bab57c",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_02/phase_0",
+      "state_sha256": "765d747fb630b1e07d2728b3b04afeb1d3837f109736050209249ba77a462d88",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_02/phase_1",
+      "state_sha256": "6a436d6d3b447a0a210ead284a584b80bef158182ea3cf3c25141b7a499988c6",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_03/phase_0",
+      "state_sha256": "54fc55a12c50bcb32f13368027b133e01c31a171211426de1d8f7dd8ca184d6d",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_03/phase_1",
+      "state_sha256": "cca4ed417271c0e22b48e27bc1df9d8326c227957cfb856b3a74c5c7023a48e2",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_04/phase_0",
+      "state_sha256": "2859c59a2b9616447028cecff52acafd62d9e1983cbd4b739d71a42bf75d7f48",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_04/phase_1",
+      "state_sha256": "464c9f3bcedd11cdfcd8887174a6d3fcceaa057eb60c30e31a356712b5036e8f",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_05/phase_0",
+      "state_sha256": "406caaee9ae99a2cc17518479f084c2a0174023e86952ac220b6c06079e627db",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_05/phase_1",
+      "state_sha256": "b4b8eedad5707dd84f7b2b323a5252992058e459044994c2a5bf67919d221a1c",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_06/phase_0",
+      "state_sha256": "351d1fb366501e0cc27f7d6fa46e4c9961d96ea454e53a2ec4130b12053cbb5e",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_06/phase_1",
+      "state_sha256": "1b67427032742e3a7c05295e992fd946fb6cdfb1f5b4838f99c4034db42bec2e",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_07/phase_0",
+      "state_sha256": "e82099d94040594259b1fa52bfccbfea4aab8d6ee75208c687c9e794713b536d",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_07/phase_1",
+      "state_sha256": "64c50e6fa0d54a12f76763c8664abaec92af777620550d10462455b6aa4dc48b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_08/phase_0",
+      "state_sha256": "84abc73dd92e91e14b899fe0a364cdc383da0b0308e465da164ed291bc2c5e8c",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_08/phase_1",
+      "state_sha256": "4185c4b008ad9bf9604530ba535cb4b782b53a3dc09a1ac558b698742c79264b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_09/phase_0",
+      "state_sha256": "360f53100612fbcd82d2d5f51e1973b752a5e027ace9159d8893d2c49cbad282",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_09/phase_1",
+      "state_sha256": "ffb26eb4000e721cd8a4e103797e2ed7daa6ba10e5dc672f1feb08e0af7e364a",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_10/phase_0",
+      "state_sha256": "7c7a0129c2b2b3e255d62d13eee5b5fbc1fd5c7a8e9cdcd6a8d68b1e29a504cb",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_10/phase_1",
+      "state_sha256": "a27da82c5a09861a5b742dc5b565f908ffef830820cd9ff72aa84e432d24f89e",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_11/phase_0",
+      "state_sha256": "4247f725e6291fd6f3d4f97db5afee76a4f4dbd85b865b92825aefdb3bf02033",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_11/phase_1",
+      "state_sha256": "08815ddb4d62686601bd074d6f61cd3f54b8e7c9d1d5976de4cbca8732b6e454",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_12/phase_0",
+      "state_sha256": "94758d5e533737291fd3828f6ebfbcce3548ae2296a01202346fa5cbb09315d0",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          9,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_12/phase_1",
+      "state_sha256": "681c97c49c9211e734261c9159088f4f319f53c11eda55da8d83e3d2f83708c5",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_13/phase_0",
+      "state_sha256": "bc42c20038f4ee9d2d92929564bb9c4be01bd336e3071e1dc5f80c2375ec7f16",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_13/phase_1",
+      "state_sha256": "c478053ebbfb954a8a90bc2e1644673b2d06801b609c7051d161953d2a023f70",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_14/phase_0",
+      "state_sha256": "fd5b25455b4971cb13d248571eff5cb75fc65b6f0e6b42b0cd0d2278ae9a184b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_14/phase_1",
+      "state_sha256": "57eb8765bb351bbe8aaf45dab9325884a33c16220758ccf3282e6fb01f6afac5",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "ripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_15/phase_0",
+      "state_sha256": "a32eb873453553ecfd8a8ba67fab9c98f5d9b3c22fdb2e4862160eef4c6e8326",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "unripe",
+      "split": "train",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "train/common_setup/layout_15/phase_1",
+      "state_sha256": "81fd82950e137fd9d081981879bfbd4216b9e9e6cc8ae6db8ffe4fad264eca0b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_00/phase_0",
+      "state_sha256": "b688fa4aad8ee17677050aa1e06c95287d6d7b52e7c73da8e133b61e0f79071d",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_00/phase_1",
+      "state_sha256": "9644e01e8ce9632107ca8b7149b00cde9e7cb97cefd16d2dddfca50187f6bc1f",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_01/phase_0",
+      "state_sha256": "cc9f48063a7eb1834b32eef867d4c215719f065b994e31ec470d5b2a05af9a26",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_01/phase_1",
+      "state_sha256": "5bd972ebbf8b689e4f9e97066dbd34be7e2d9142c04450132d5ff7e0f578ba96",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_02/phase_0",
+      "state_sha256": "e96588cd7b465cbdbd6df39a112daad260789156d6b7c3d1263606c38418ab5e",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_02/phase_1",
+      "state_sha256": "4982ec6568f68c1cc2c4e1b21df5f24effb3e05a8fdfc8dd222d2095799db525",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          6,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_03/phase_0",
+      "state_sha256": "d363b3dbdf39e2291cb478b41acdb197c91df529a266a7818a4fc14eba6b24b8",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          6,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_03/phase_1",
+      "state_sha256": "a92dd9365fd5c346ff1e8847e23c52d64335efc1572f1c0eae15dd97a03963f5",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_04/phase_0",
+      "state_sha256": "647bb6a8557336dc83e667092502a36a047c495c9fca48b1dd5000de9c2016ef",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_04/phase_1",
+      "state_sha256": "85d44971d68d99801151503d132fc0c496aa4b111d9cda37e40a00415e059e55",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          6,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_05/phase_0",
+      "state_sha256": "c7eab72e7ed3139fd249c961e2385d36ff973994f2a87d9d9362afb50c3648f7",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          6,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_05/phase_1",
+      "state_sha256": "da58e3bcadc6fa764fe60400b35e7b314e893e4abceb13607c6d46f211dd1ccf",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_06/phase_0",
+      "state_sha256": "0e28a7acaa251869ce8871e0a4d3adf0ce29a5fccae9ff76dadd0ed0a6bbc8bd",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_06/phase_1",
+      "state_sha256": "af6ec47f90ed6058a41e445856faa91a44b61cf9f53fc5be1374a54799a29e14",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_07/phase_0",
+      "state_sha256": "add362c14cf6d42a36ceb6047d33a97c465a199f133058b3c6f2fdc4210f6327",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_07/phase_1",
+      "state_sha256": "1dccd4ccf5c6f469ffd5f47e53b4492292dec89ccc1a9722e15926c86480d4d6",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_08/phase_0",
+      "state_sha256": "2de341e804f2baa345d9a4b8d9db14a048ce02c3c1a1b35a1fc42e0111e35075",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_08/phase_1",
+      "state_sha256": "2fc3a91cee290794bf24dc60bf41fc4189de4a4e1443fb9bd9190c762416e2c8",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_09/phase_0",
+      "state_sha256": "56651c900fc8d97d739a8320bde9819fff586297e2603b1f807032f6842e747a",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_09/phase_1",
+      "state_sha256": "94446c04f3445a11d0665feb63c066d51b2dff17df7a3910af0b04fc04cfb5f6",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_10/phase_0",
+      "state_sha256": "9a20f961cb1c014754c4cebeb00c6b6f496b280b5d1909ac52e0ed82491ac9c1",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_10/phase_1",
+      "state_sha256": "47222ae1f5cd72efbc8dc9b0b98bd6111aa178346b06df327618fae1b8eedefc",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          6,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_11/phase_0",
+      "state_sha256": "add6d55b9d8006676bf470aabccbcfb9850e76b804e658ea62a4468bf0692247",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          6,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_11/phase_1",
+      "state_sha256": "a14cac1aa4866275f5e76b4cb6f7a6242efd7977c6721cfdeaa8f62a7809b137",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_12/phase_0",
+      "state_sha256": "5edf73489871dde546d4e87d80295f9ece797d0a1a101d70ad89196a528a4e43",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_12/phase_1",
+      "state_sha256": "34b75a95e8a7f117c37be1c74e94c3315b088d66fcec08261efb75272ec96cd1",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          6,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_13/phase_0",
+      "state_sha256": "5fc6b0c0935db865d275e602ed1ae7222cfffacdc64477ab5b8252ed27c633fb",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          6,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_13/phase_1",
+      "state_sha256": "128840539d156725331a1d29a349cd325c641371c8b1f7b577241f7598fe9974",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_14/phase_0",
+      "state_sha256": "df1dda78f13a8a9febd610cc8960a0fb7de3b79501e67c11a766d0a4067ca376",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          6,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_14/phase_1",
+      "state_sha256": "d41a160ba58895732868daa8088c212af5c956f991f8dda54c6fd55e39124641",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_15/phase_0",
+      "state_sha256": "6c2344d165cb3344f40b18afff59472190a2aac81e8e6b0644fa5d0bf7bfa10e",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/natural_reset/layout_15/phase_1",
+      "state_sha256": "d69742669bdbb0f5ff5ce5411616d5661da65cccd3a2a60cb86ca03e9c676fc8",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_00/phase_0",
+      "state_sha256": "93d81e45882be8be5da26c8b3666db43cb1f4ea8795ceaad41b272a232bab5e4",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_00/phase_1",
+      "state_sha256": "eb33b7ae2b9b13f2aee881510b86dc15b93ff09e4cfea4804652862c14e64a04",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_01/phase_0",
+      "state_sha256": "27cdd56cb347419e248778a53b28eaa088d1475d0767faef8e5c08af39755ab7",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_01/phase_1",
+      "state_sha256": "18fe40a8d781887f79c4132b4517d4b73fd9400f4f4214a69b254fee0b16fc9b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_02/phase_0",
+      "state_sha256": "42b73c8667f44db07937e64aaf379d440d7f33d2b9370885e076a2cb0a02e2ce",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_02/phase_1",
+      "state_sha256": "17684eddb656ef15eff4b919c2941b355fe15a1e0c1423b2f53cfbf74ec77a48",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_03/phase_0",
+      "state_sha256": "1c5542f88f59f8dff437c41775fbb9078634363c160447f86101022ae588c465",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_03/phase_1",
+      "state_sha256": "b601f2e789b1f54261eed41a83ca1b23b34d08c5a70658fb64335a58ad90cab9",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_04/phase_0",
+      "state_sha256": "c9261f06c2788742f8097ac3271eb1d8a981200c25d2137f7a32812818c3ab37",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_04/phase_1",
+      "state_sha256": "7455d26317becd7cd73b62d35d72f8dd8c6690c9d252651d784ce02232e3869d",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_05/phase_0",
+      "state_sha256": "75c9da5741f5f807a5fba9cd0f1f5eed8c325f12c038189bf57c26ca0a11eec2",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_05/phase_1",
+      "state_sha256": "63d69bc877c3fafdbcbe9a7f17578e15cd64dc4d8695f276928dc868fc8a3fbf",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_06/phase_0",
+      "state_sha256": "f50b792ad7d20983e8fd929fa0778b02953d5972c3b53c0ff13e0aa7d883a393",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_06/phase_1",
+      "state_sha256": "8c23e16817d2bfe1494fe3a441ea575991a247c1d1d2c3eee3320db7005be51c",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_07/phase_0",
+      "state_sha256": "067c4f0bc068e57b3b055348c0649d3e64d0839dd2474467fcb44f57a7580b38",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_07/phase_1",
+      "state_sha256": "15c57391715082eaa502e4ba2cf11cb91e9b888cf2c5961ae4006e50deec4f96",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_08/phase_0",
+      "state_sha256": "37ef65e79869a7dbb80e1d60f2c0445715736a73ae4de529a3eeb1821b18b415",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_08/phase_1",
+      "state_sha256": "ddce7c97b9cf145997e1837d54a71f8840d811a80a67d9cbf683ace53d1e2ad7",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_09/phase_0",
+      "state_sha256": "ee6b1358f24d714769f565ef4b9c147d1d2d6fb2e66e436124f0fd9509af2c5d",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_09/phase_1",
+      "state_sha256": "591bf9fe14705e84fbe45796d77dc45c09fcab299721a8704342c8ef27b0b496",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_10/phase_0",
+      "state_sha256": "8882bc44ce7d88507c1745665853d25657cc999af017453a644caec9ab2fd77e",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_10/phase_1",
+      "state_sha256": "c78949dc851b33db1a5cb51356e9b2d61d61bcbc2e65a2e8379dcbe460906089",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_11/phase_0",
+      "state_sha256": "05d855a0df12239530e267754a82862da1e0a1628ac5226b4836267fca204134",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_11/phase_1",
+      "state_sha256": "39bac683b6cda4d86d1c82d818a5cb7658300d86262c1536fd6f5fabdb49a09d",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_12/phase_0",
+      "state_sha256": "6e2e0f95b66b48ec27daccb51d97120555b112dea3ff6ce0783f274f787432a6",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_12/phase_1",
+      "state_sha256": "b61b0ddc3211f6e179165e2f8487438cfc84becafd185d26342b2561e10fb322",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_13/phase_0",
+      "state_sha256": "4cb2ae33adec727f5d29880fba60eb5d61341203d5f559583de8bc116d7bc3e6",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_13/phase_1",
+      "state_sha256": "d7cc7f89fd42e467706becfe19754c230a247dffbb26a37b55c79460305ad4d5",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_14/phase_0",
+      "state_sha256": "5c005be4ba074c72811c679e1f3a0e8950c2b20a887f0ac4979e9e2ff35f0d4c",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_14/phase_1",
+      "state_sha256": "75c6b24c98e0aa87280c2dc029f744a944b1b3118262caa9e91f2b5fdd584c61",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "ripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_15/phase_0",
+      "state_sha256": "5231f8cd435f1375edfaab9b92f8e2b002de9c1fee2479277442a1576f0e89bf",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "unripe",
+      "split": "validation",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          7,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "validation/common_setup/layout_15/phase_1",
+      "state_sha256": "b62a544335b67e6d44ff153315ef135e5314762a5fb4163598ec9526607625e4",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_00/phase_0",
+      "state_sha256": "bf9d3c1f3fc994b4de1f90a6c01c08cab10d754b978b87a85209b5fa2313097e",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_00/phase_1",
+      "state_sha256": "799f16092dbaf315f32459a65db5d971554474f2e0a16aaeaf2dce5e580d5033",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          12,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_01/phase_0",
+      "state_sha256": "c59f592f743b2ffd19700a58a4c20e8c030d5614fe47f16ff769a027d2d5408a",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          12,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_01/phase_1",
+      "state_sha256": "027e2608fbc0ac19784954cc7c7bf13964a2f169451d14c9b3879d58b4708d2f",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_02/phase_0",
+      "state_sha256": "c08a63c3ec65e049a2b9eac569ed14806e083e5a82766b1b49734c4fc5aae266",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_02/phase_1",
+      "state_sha256": "3926d94368165640e882d5cda5cf55bddb6aaa0aa6d19cbce7f15177efb914e0",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_03/phase_0",
+      "state_sha256": "746257382dfbf462ad1bb53714ec68017e2e6332f54a89210a865d1fe35fea98",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_03/phase_1",
+      "state_sha256": "34e67db6106c752be3aca1bce7c3bc6b3a599e1dd29cbded886454ac25485040",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_04/phase_0",
+      "state_sha256": "2f7574d0968d4d97bfc34cc9f050fcf17e108514eb0fa9b3746005fe087588bd",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_04/phase_1",
+      "state_sha256": "1e75a36e55719b9cfd14e8b9df3aa197c8d6beeeab60d7246ff883e337e3b0a5",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_05/phase_0",
+      "state_sha256": "2c681296f3382a66af20384cba67d74c979bcfb9f3c30b8940094cdf3d1d56ee",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_05/phase_1",
+      "state_sha256": "b9e6fae789a0c1954334ca1767417bc27b207c3c4c14abb4061987f0fef9e86f",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_06/phase_0",
+      "state_sha256": "eb3ad16f5c781027a9ff862d68d55a86aab035591931ca8273ce0ba4f56cec17",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_06/phase_1",
+      "state_sha256": "072898c5ac56d76b41a3ca5771a340b8b36c858902b1653e293a5c207ded5ec8",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          12,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_07/phase_0",
+      "state_sha256": "9664b5d47dd52627abc639dc468ae64dfb322399129d0315b5db56fc79bcac0c",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          12,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_07/phase_1",
+      "state_sha256": "c226a0021478aa7791ebe0b0d69b1a1694b2b2da345dfa7f7dd5632a6126bc78",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_08/phase_0",
+      "state_sha256": "f8d16bb858f9ff7ca915f7dda10f0eea5bce2cb3ac793dbe7d023ff8ae96eab3",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_08/phase_1",
+      "state_sha256": "5aee45a7f641a7c765014ca48e9dcda0b4b1d754240140811c49ded8dfd98083",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          12,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_09/phase_0",
+      "state_sha256": "cb5f5aea314a2f1ab3f894dfd84d1f551cac1f1a997ab0cd5681b7faf9df106f",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          12,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_09/phase_1",
+      "state_sha256": "81d7d992457d7c2270ae331e29c5db7887fb17d60bf22196a83ac55283dab41d",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_10/phase_0",
+      "state_sha256": "86b31088ddf546a7eb9fe2949b03d4a9a726dd1faa72aa310e475c307524ef31",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_10/phase_1",
+      "state_sha256": "0fb0689a148b27f9a81ea76755c59a09a9a85891f1c6bdd25384d7607a41c12b",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_11/phase_0",
+      "state_sha256": "1595becd12a4e8116bf22f3b94e11b5f57a9e8f97eda26e8cd2b5d9c26e986dd",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_11/phase_1",
+      "state_sha256": "13c9f6c4e477b5e0940e04630d36479bde3b5fb915c7c77052369addd3ff5982",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_12/phase_0",
+      "state_sha256": "d20f891376b65f7e0658af4baa1f1dbd5709f13ca501e3674f7c571b8a0b8117",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          12,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_12/phase_1",
+      "state_sha256": "66c3e95a4ccfb94e1132af138ba7292483b392c9518ef44cff41b38060a5d209",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_13/phase_0",
+      "state_sha256": "3ddae08e4769ab409a10d7ff25818a5a6a626eacc6cdab0e6089879979786519",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          8,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_13/phase_1",
+      "state_sha256": "bdbe19fd239a64c2f5ebb1e0d88c4ea00ff5d5884cea7e8b478ced5dade40977",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_14/phase_0",
+      "state_sha256": "a2b25632f59d230c05a876e7f64f377d3ef2ef9b77ece5c36ab139ac04217a59",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          8,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_14/phase_1",
+      "state_sha256": "57296d0bfc37fda982e39e91503af20ae090b7666c942349539b0dfd75c1abe9",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "ripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          12,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_15/phase_0",
+      "state_sha256": "0479d79a25f0baa61c573346c5f3b96136c51834f901a3bb5ca31535e469870f",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "unripe",
+      "split": "test",
+      "start": "natural_reset",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          12,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/natural_reset/layout_15/phase_1",
+      "state_sha256": "2903d131ce965c1d94172dc17923c2176202b33cf59239f4d9bd622995cf2c72",
+      "true_goal_ids": [
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_00/phase_0",
+      "state_sha256": "533255063ee67db3bd34807c9a8d8e49025ca310ff412c151e45861acf0f371c",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 0,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_00/phase_1",
+      "state_sha256": "49d733a4f5bafdc0930bdce4fd6d22f9e0d83dddf619defe92dd9dd4d50dcfff",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_01/phase_0",
+      "state_sha256": "044259d4fca67c101b5802edcd0ae643c86f457f129deb0ca7ce658e8d4b3fc6",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 1,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_01/phase_1",
+      "state_sha256": "4d3560fb1c2d1af663db6d029c23210bf795648c9d1cae42271fc2a60b7776fa",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_02/phase_0",
+      "state_sha256": "de72f126221b4674496bf7ad6a7fc205069ebbb6af15204de67a6e871378ce83",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 2,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_02/phase_1",
+      "state_sha256": "6c8d8ebc0457ab470484b71827c7f0cd268b8a2453a127ef9721fc5806b5b5ad",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_03/phase_0",
+      "state_sha256": "61a989401914034e3642b4c51fa4de8f2dbb3fbaf61d4df2ccce817171b6101b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 3,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_03/phase_1",
+      "state_sha256": "d7c4282ae73a421a43f0628d2275bf15d3b775dd0254d281f9be2ae3c9503843",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_04/phase_0",
+      "state_sha256": "4902d09036105223fce1505f8ea0f995f5aa8863f21912129a11695fe913a191",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 4,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_04/phase_1",
+      "state_sha256": "9149df160fc4856b1e4618b6e63fb1424b1ff96e33e25090bda669330f031338",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_05/phase_0",
+      "state_sha256": "2dd38bb15599f560f9a1efcbe3f96784da3354eb814bab72e2ed378a88d5360f",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 5,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_05/phase_1",
+      "state_sha256": "bc813d1a184ed635e8714ac0f19fdd65779eaca939ef79fb1591568868cfc0fa",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_06/phase_0",
+      "state_sha256": "5809fb26c5edc38bafd2d1c6277dfef6c373eef42548e8135d73eafee1238ad7",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 6,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          8
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_06/phase_1",
+      "state_sha256": "79f097df3591725d6673896fec767f8dffba620a841fde6ce0d9909bd975743e",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_07/phase_0",
+      "state_sha256": "050bc6a18605fc25bb4e65826161a4650ca2e98f094407c41f84959e7dfd6b7f",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 7,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_07/phase_1",
+      "state_sha256": "09edf0023ee94910cb1cd72ec3deefbc5a9dca573608f5c75ff652906b2e91a0",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_08/phase_0",
+      "state_sha256": "03fad5a34d43749dbe7af9baa7d11f99c5fb94edc0512ff40d4899e68608983d",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 8,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_08/phase_1",
+      "state_sha256": "e24ba9c81cbc9b09a38329fe0a809ab891cfd8736152e6d4ec940d3d8ce2c047",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_09/phase_0",
+      "state_sha256": "2b1b772ce44cfc1fd40f39c007e294e2d7a0c8151ce1b76570bf82679ea568b8",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 9,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_09/phase_1",
+      "state_sha256": "4f3f74b26913b505d64ffab056ec259f3d66db11ee7d680b6c1ef8519a68b80b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_10/phase_0",
+      "state_sha256": "32ecbd6ab7331598555e945a7fefe4869623123c47f066a32e7c296617546ac0",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 10,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_10/phase_1",
+      "state_sha256": "184990a706f0a55d4e5e809bd0ebf0fe256a8ed5d896abc4dd99f3a1b8c77669",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_11/phase_0",
+      "state_sha256": "b0b323decca78dce57f89345598480ab651db0c16bab7b6e08085af2fb9cc403",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 11,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_11/phase_1",
+      "state_sha256": "1da74731df576fa5326b07c85a50557ae74bab23c0916c35b436eb532222c9c7",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_12/phase_0",
+      "state_sha256": "61f7d123ae382b50bfbdf7c7bd01cd9ef2f9a1a65f414c0679a8eaa12a90d0aa",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 12,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 3,
+        "player_position": [
+          10,
+          11
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_12/phase_1",
+      "state_sha256": "200eee191cd23b17543984593695aa90529622e01034a713bc39b9d9abe236a8",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_13/phase_0",
+      "state_sha256": "9ae3dfa472323c39e12f1bf5f1b360358362842c5d572821da9ba778f7143c4b",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 13,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 2,
+        "player_position": [
+          11,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 3,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_13/phase_1",
+      "state_sha256": "e0b135252b27c2ae1cd855617138c500b1038b803793c180b28dca9a322800aa",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_14/phase_0",
+      "state_sha256": "8a2fe7817aa7efebc63b01b22be346dc9b04593fa81a71f9a78313949153671f",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 14,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 4,
+        "player_position": [
+          10,
+          9
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 4,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_14/phase_1",
+      "state_sha256": "52bcc273077cd5e71afaf0377ac14ca44ab7278e422e21bdd0fca05d323dcae8",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "ripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 8,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": true
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_15/phase_0",
+      "state_sha256": "d81cf6a00e0ba97f4c501d96e6342931aff20b07f252b901dcc3ca35b9a41116",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_ripe"
+      ]
+    },
+    {
+      "layout_index": 15,
+      "phase": "unripe",
+      "split": "test",
+      "start": "common_setup",
+      "state": {
+        "crop": {
+          "age": 0,
+          "cycle_id": 0,
+          "generation": 0,
+          "object_id": 1,
+          "ripe": false
+        },
+        "delivered_total": 0,
+        "grain": 0,
+        "player_direction": 1,
+        "player_position": [
+          9,
+          10
+        ],
+        "reservation": {
+          "cycle_id": -1,
+          "delay": 2,
+          "due_tick": -1,
+          "generation": -1,
+          "object_id": -1,
+          "present": false
+        },
+        "tick": 0
+      },
+      "state_id": "test/common_setup/layout_15/phase_1",
+      "state_sha256": "73f734c6c8e8cad8f250f906f222893100b94b4cd3f4d978ef036cf4a1dde0f2",
+      "true_goal_ids": [
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "facility/reservation_absent",
+        "visible/crop_unripe"
+      ]
+    }
+  ]
+}
