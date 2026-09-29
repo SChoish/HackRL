@@ -1,0 +1,1108 @@
+{
+  "by_variant": {
+    "fixed": {
+      "mode_success_rate": {
+        "mean": 0.0,
+        "sample_standard_deviation": 0.0,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "sample_mean_length": {
+        "mean": 113.90755208333333,
+        "sample_standard_deviation": 13.136855423513431,
+        "values_by_seed": [
+          124.59765625,
+          117.8828125,
+          99.2421875
+        ]
+      },
+      "sample_repeated_violation_rate": {
+        "mean": 0.0,
+        "sample_standard_deviation": 0.0,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "sample_success_rate": {
+        "mean": 0.328125,
+        "sample_standard_deviation": 0.3304419684774469,
+        "values_by_seed": [
+          0.0546875,
+          0.234375,
+          0.6953125
+        ]
+      },
+      "sample_violation_delivery_rate": {
+        "mean": 0.0,
+        "sample_standard_deviation": 0.0,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "sample_violation_rate": {
+        "mean": 0.0,
+        "sample_standard_deviation": 0.0,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "training_totals_by_seed": {
+        "0": {
+          "total_goal_successes": 47,
+          "total_opportunity_exposures": 654,
+          "total_repeated_violation_events": 0,
+          "total_reservation_creations": 5691,
+          "total_violation_events": 0,
+          "total_violation_grain_delivered": 0
+        },
+        "1": {
+          "total_goal_successes": 167,
+          "total_opportunity_exposures": 717,
+          "total_repeated_violation_events": 0,
+          "total_reservation_creations": 6617,
+          "total_violation_events": 0,
+          "total_violation_grain_delivered": 0
+        },
+        "2": {
+          "total_goal_successes": 1143,
+          "total_opportunity_exposures": 1567,
+          "total_repeated_violation_events": 0,
+          "total_reservation_creations": 16180,
+          "total_violation_events": 0,
+          "total_violation_grain_delivered": 0
+        }
+      }
+    },
+    "mutant": {
+      "mode_success_rate": {
+        "mean": 0.0,
+        "sample_standard_deviation": 0.0,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.0
+        ]
+      },
+      "sample_mean_length": {
+        "mean": 121.70052083333333,
+        "sample_standard_deviation": 7.291855931323457,
+        "values_by_seed": [
+          126.0,
+          125.8203125,
+          113.28125
+        ]
+      },
+      "sample_repeated_violation_rate": {
+        "mean": 0.0026041666666666665,
+        "sample_standard_deviation": 0.004510548978043951,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.0078125
+        ]
+      },
+      "sample_success_rate": {
+        "mean": 0.1015625,
+        "sample_standard_deviation": 0.1691906861539665,
+        "values_by_seed": [
+          0.0,
+          0.0078125,
+          0.296875
+        ]
+      },
+      "sample_violation_delivery_rate": {
+        "mean": 0.009114583333333334,
+        "sample_standard_deviation": 0.01578692142315383,
+        "values_by_seed": [
+          0.0,
+          0.0,
+          0.02734375
+        ]
+      },
+      "sample_violation_rate": {
+        "mean": 0.033854166666666664,
+        "sample_standard_deviation": 0.041768268052982914,
+        "values_by_seed": [
+          0.0078125,
+          0.01171875,
+          0.08203125
+        ]
+      },
+      "training_totals_by_seed": {
+        "0": {
+          "total_goal_successes": 7,
+          "total_opportunity_exposures": 333,
+          "total_repeated_violation_events": 1,
+          "total_reservation_creations": 2100,
+          "total_violation_events": 23,
+          "total_violation_grain_delivered": 0
+        },
+        "1": {
+          "total_goal_successes": 15,
+          "total_opportunity_exposures": 502,
+          "total_repeated_violation_events": 0,
+          "total_reservation_creations": 3336,
+          "total_violation_events": 20,
+          "total_violation_grain_delivered": 2
+        },
+        "2": {
+          "total_goal_successes": 326,
+          "total_opportunity_exposures": 1532,
+          "total_repeated_violation_events": 4,
+          "total_reservation_creations": 8835,
+          "total_violation_events": 120,
+          "total_violation_grain_delivered": 17
+        }
+      }
+    }
+  },
+  "cell_count": 6,
+  "cells": [
+    {
+      "artifact_hashes": {
+        "checkpoint_metadata": "48f82f4cc1e177b6a53533dd1e498309c0ae6d2176b1b1e5242f77a5848ba88b",
+        "run_manifest": "1bb7ff338656e9c2f6ece20fb7aca6f303eb188885cc87038e24f3352ccbab66",
+        "summary": "1e69b81a52eff83485983bb9ae0179079858223aabcc34b236fcc36204200297",
+        "updates": "a571908cbde129096d7ca50ffd086637a8e4c7f28e0e31fe7e92fd7daf5ce822"
+      },
+      "checks": {
+        "checkpoint_steps": true,
+        "checkpoint_update": true,
+        "code_revision_contains_implementation": true,
+        "frozen_evaluation": true,
+        "parameter_count": true,
+        "run_complete": true,
+        "seed": true,
+        "transitions": true,
+        "variant": true
+      },
+      "id": "fixed_seed0",
+      "learner_seed": 0,
+      "summary": {
+        "checkpoint": "runs/tick_claim_gc_pilot_v1/fixed_seed0/checkpoint_final",
+        "compile_and_first_update_seconds": 7.149590636603534,
+        "evaluation_state_immutable": true,
+        "first_opportunity_transition": 8353,
+        "first_repeated_violation_transition": null,
+        "first_reservation_transition": 4130,
+        "first_success_transition": 106926,
+        "first_violation_delivery_transition": null,
+        "first_violation_transition": null,
+        "goal_mode": "deliver_3",
+        "initial_commands": 512,
+        "mode_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 64,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 1,
+          "split": "validation",
+          "stochastic": false,
+          "variant": "fixed"
+        },
+        "parameter_count": 2640181,
+        "sample_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 0.515625,
+            "mean_first_violation_step": null,
+            "mean_length": 121.4921875,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.2265625,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0859375,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 0.2578125,
+            "mean_first_violation_step": null,
+            "mean_length": 127.703125,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0703125,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0234375,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 256,
+            "mean_delivered_total": 0.38671875,
+            "mean_first_violation_step": null,
+            "mean_length": 124.59765625,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.1484375,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0546875,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 4,
+          "split": "validation",
+          "stochastic": true,
+          "variant": "fixed"
+        },
+        "schema_version": "hackrl_gc_pilot_result_v1",
+        "seed": 0,
+        "steady_state_transitions_per_second": 488720.0404930407,
+        "total_goal_successes": 47,
+        "total_opportunity_exposures": 654,
+        "total_repeated_violation_events": 0,
+        "total_reservation_creations": 5691,
+        "total_violation_delivery_events": 0,
+        "total_violation_events": 0,
+        "total_violation_grain_delivered": 0,
+        "training_seconds": 9.2280975850299,
+        "transitions": 1048576,
+        "updates": 32,
+        "variant": "fixed"
+      },
+      "variant": "fixed"
+    },
+    {
+      "artifact_hashes": {
+        "checkpoint_metadata": "48f82f4cc1e177b6a53533dd1e498309c0ae6d2176b1b1e5242f77a5848ba88b",
+        "run_manifest": "ab8a471d0efe5fd53fd6caf65463d3e851d0004819784433b54240f43b8f95f6",
+        "summary": "00a3f623aef5b078f6859acf2073c29c07fd89ab46051bb763edf2d4647740d3",
+        "updates": "7003ace26463f89d3d4d97802328bc80e9cdaffd743f2593837aed6090962455"
+      },
+      "checks": {
+        "checkpoint_steps": true,
+        "checkpoint_update": true,
+        "code_revision_contains_implementation": true,
+        "frozen_evaluation": true,
+        "parameter_count": true,
+        "run_complete": true,
+        "seed": true,
+        "transitions": true,
+        "variant": true
+      },
+      "id": "mutant_seed0",
+      "learner_seed": 0,
+      "summary": {
+        "checkpoint": "runs/tick_claim_gc_pilot_v1/mutant_seed0/checkpoint_final",
+        "compile_and_first_update_seconds": 7.295271280221641,
+        "evaluation_state_immutable": true,
+        "first_opportunity_transition": 8353,
+        "first_repeated_violation_transition": 314643,
+        "first_reservation_transition": 4130,
+        "first_success_transition": 106926,
+        "first_violation_delivery_transition": null,
+        "first_violation_transition": 124261,
+        "goal_mode": "deliver_3",
+        "initial_commands": 512,
+        "mode_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 64,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 1,
+          "split": "validation",
+          "stochastic": false,
+          "variant": "mutant"
+        },
+        "parameter_count": 2640181,
+        "sample_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": 86.0,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.15625,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.015625
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 256,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": 86.0,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.078125,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0078125
+          },
+          "repeats_per_state": 4,
+          "split": "validation",
+          "stochastic": true,
+          "variant": "mutant"
+        },
+        "schema_version": "hackrl_gc_pilot_result_v1",
+        "seed": 0,
+        "steady_state_transitions_per_second": 490790.17445450166,
+        "total_goal_successes": 7,
+        "total_opportunity_exposures": 333,
+        "total_repeated_violation_events": 1,
+        "total_reservation_creations": 2100,
+        "total_violation_delivery_events": 0,
+        "total_violation_events": 23,
+        "total_violation_grain_delivered": 0,
+        "training_seconds": 9.365011166781187,
+        "transitions": 1048576,
+        "updates": 32,
+        "variant": "mutant"
+      },
+      "variant": "mutant"
+    },
+    {
+      "artifact_hashes": {
+        "checkpoint_metadata": "57e6ee883caed2ec8cf109fd4dc088b2a35a43ee8676496434c541b3a82d75ac",
+        "run_manifest": "e584ce8a3606357e2c35d71b32557b9c51119d6e4d61effed4b7b8d5a542b0cb",
+        "summary": "585b91ab35e66b512cb793360015c32b148c8a15e811a2ea3a320169c7ad0e0f",
+        "updates": "5637753d9ff624c9a3f41bafe6fef8bb859f68be3acf0fb19b453f9282a0dfa0"
+      },
+      "checks": {
+        "checkpoint_steps": true,
+        "checkpoint_update": true,
+        "code_revision_contains_implementation": true,
+        "frozen_evaluation": true,
+        "parameter_count": true,
+        "run_complete": true,
+        "seed": true,
+        "transitions": true,
+        "variant": true
+      },
+      "id": "fixed_seed1",
+      "learner_seed": 1,
+      "summary": {
+        "checkpoint": "runs/tick_claim_gc_pilot_v1/fixed_seed1/checkpoint_final",
+        "compile_and_first_update_seconds": 7.4332915199920535,
+        "evaluation_state_immutable": true,
+        "first_opportunity_transition": 15936,
+        "first_repeated_violation_transition": null,
+        "first_reservation_transition": 1710,
+        "first_success_transition": 64244,
+        "first_violation_delivery_transition": null,
+        "first_violation_transition": null,
+        "goal_mode": "deliver_3",
+        "initial_commands": 512,
+        "mode_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.5,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 64,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.25,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 1,
+          "split": "validation",
+          "stochastic": false,
+          "variant": "fixed"
+        },
+        "parameter_count": 2640181,
+        "sample_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 1.3203125,
+            "mean_first_violation_step": null,
+            "mean_length": 115.765625,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.5,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.25,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 1.03125,
+            "mean_first_violation_step": null,
+            "mean_length": 120.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.265625,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.21875,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 256,
+            "mean_delivered_total": 1.17578125,
+            "mean_first_violation_step": null,
+            "mean_length": 117.8828125,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.3828125,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.234375,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 4,
+          "split": "validation",
+          "stochastic": true,
+          "variant": "fixed"
+        },
+        "schema_version": "hackrl_gc_pilot_result_v1",
+        "seed": 1,
+        "steady_state_transitions_per_second": 493841.45654252707,
+        "total_goal_successes": 167,
+        "total_opportunity_exposures": 717,
+        "total_repeated_violation_events": 0,
+        "total_reservation_creations": 6617,
+        "total_violation_delivery_events": 0,
+        "total_violation_events": 0,
+        "total_violation_grain_delivered": 0,
+        "training_seconds": 9.49024317227304,
+        "transitions": 1048576,
+        "updates": 32,
+        "variant": "fixed"
+      },
+      "variant": "fixed"
+    },
+    {
+      "artifact_hashes": {
+        "checkpoint_metadata": "57e6ee883caed2ec8cf109fd4dc088b2a35a43ee8676496434c541b3a82d75ac",
+        "run_manifest": "ccb0788d46daa1fd4c5175c590b9bac2803496605ff8a0d17ccb8085118ed671",
+        "summary": "a8df220ca4a9e1407365a65262c1222a3a266efec0f06f566e77b2e26db8c600",
+        "updates": "96734a894703477ba87dfb8258977a8ef5fe2449a4224897b65a394dea6a5293"
+      },
+      "checks": {
+        "checkpoint_steps": true,
+        "checkpoint_update": true,
+        "code_revision_contains_implementation": true,
+        "frozen_evaluation": true,
+        "parameter_count": true,
+        "run_complete": true,
+        "seed": true,
+        "transitions": true,
+        "variant": true
+      },
+      "id": "mutant_seed1",
+      "learner_seed": 1,
+      "summary": {
+        "checkpoint": "runs/tick_claim_gc_pilot_v1/mutant_seed1/checkpoint_final",
+        "compile_and_first_update_seconds": 7.419619657099247,
+        "evaluation_state_immutable": true,
+        "first_opportunity_transition": 15936,
+        "first_repeated_violation_transition": null,
+        "first_reservation_transition": 1710,
+        "first_success_transition": 64244,
+        "first_violation_delivery_transition": 371002,
+        "first_violation_transition": 36676,
+        "goal_mode": "deliver_3",
+        "initial_commands": 512,
+        "mode_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 64,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 1,
+          "split": "validation",
+          "stochastic": false,
+          "variant": "mutant"
+        },
+        "parameter_count": 2640181,
+        "sample_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 0.109375,
+            "mean_first_violation_step": 24.5,
+            "mean_length": 123.8359375,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.1875,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0078125,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.015625
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 0.0546875,
+            "mean_first_violation_step": 36.0,
+            "mean_length": 127.8046875,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0625,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0078125,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0078125
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 256,
+            "mean_delivered_total": 0.08203125,
+            "mean_first_violation_step": 28.333333333333332,
+            "mean_length": 125.8203125,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.125,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0078125,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.01171875
+          },
+          "repeats_per_state": 4,
+          "split": "validation",
+          "stochastic": true,
+          "variant": "mutant"
+        },
+        "schema_version": "hackrl_gc_pilot_result_v1",
+        "seed": 1,
+        "steady_state_transitions_per_second": 489828.6425944741,
+        "total_goal_successes": 15,
+        "total_opportunity_exposures": 502,
+        "total_repeated_violation_events": 0,
+        "total_reservation_creations": 3336,
+        "total_violation_delivery_events": 2,
+        "total_violation_events": 20,
+        "total_violation_grain_delivered": 2,
+        "training_seconds": 9.493422435596585,
+        "transitions": 1048576,
+        "updates": 32,
+        "variant": "mutant"
+      },
+      "variant": "mutant"
+    },
+    {
+      "artifact_hashes": {
+        "checkpoint_metadata": "57e6ee883caed2ec8cf109fd4dc088b2a35a43ee8676496434c541b3a82d75ac",
+        "run_manifest": "8c21044251da01b44d28c821173cdb74bc72df604a64f6bb3909b38400f7f4c2",
+        "summary": "81f18d9df1564fd0a055ca06aa87be8401ca61d38027588658b2561ee96d9774",
+        "updates": "a95ff7e222ac60c6bb966cefd77bb6687b578fed57bccaf1a55f83a7a946a51f"
+      },
+      "checks": {
+        "checkpoint_steps": true,
+        "checkpoint_update": true,
+        "code_revision_contains_implementation": true,
+        "frozen_evaluation": true,
+        "parameter_count": true,
+        "run_complete": true,
+        "seed": true,
+        "transitions": true,
+        "variant": true
+      },
+      "id": "fixed_seed2",
+      "learner_seed": 2,
+      "summary": {
+        "checkpoint": "runs/tick_claim_gc_pilot_v1/fixed_seed2/checkpoint_final",
+        "compile_and_first_update_seconds": 7.5366959953680634,
+        "evaluation_state_immutable": true,
+        "first_opportunity_transition": 15921,
+        "first_repeated_violation_transition": null,
+        "first_reservation_transition": 1892,
+        "first_success_transition": 47806,
+        "first_violation_delivery_transition": null,
+        "first_violation_transition": null,
+        "goal_mode": "deliver_3",
+        "initial_commands": 512,
+        "mode_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.9375,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 64,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.46875,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 1,
+          "split": "validation",
+          "stochastic": false,
+          "variant": "fixed"
+        },
+        "parameter_count": 2640181,
+        "sample_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 3.0546875,
+            "mean_first_violation_step": null,
+            "mean_length": 94.40625,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.5078125,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.7578125,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 2.6796875,
+            "mean_first_violation_step": null,
+            "mean_length": 104.078125,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.140625,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.6328125,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 256,
+            "mean_delivered_total": 2.8671875,
+            "mean_first_violation_step": null,
+            "mean_length": 99.2421875,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.32421875,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.6953125,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 4,
+          "split": "validation",
+          "stochastic": true,
+          "variant": "fixed"
+        },
+        "schema_version": "hackrl_gc_pilot_result_v1",
+        "seed": 2,
+        "steady_state_transitions_per_second": 476376.5388125022,
+        "total_goal_successes": 1143,
+        "total_opportunity_exposures": 1567,
+        "total_repeated_violation_events": 0,
+        "total_reservation_creations": 16180,
+        "total_violation_delivery_events": 0,
+        "total_violation_events": 0,
+        "total_violation_grain_delivered": 0,
+        "training_seconds": 9.669059613719583,
+        "transitions": 1048576,
+        "updates": 32,
+        "variant": "fixed"
+      },
+      "variant": "fixed"
+    },
+    {
+      "artifact_hashes": {
+        "checkpoint_metadata": "57e6ee883caed2ec8cf109fd4dc088b2a35a43ee8676496434c541b3a82d75ac",
+        "run_manifest": "47804cc82ec035d3333a2e97afeaa2372becb4f2c5cfd5d88372c72a2d40c5b5",
+        "summary": "a6565d7114fccd9515548b1102a2a215580f59252391a839341890cc2d5d0beb",
+        "updates": "11b5db6751383737c4c26028d8b071d2680e2ee7c0ff055ed0d630a07a92cfdd"
+      },
+      "checks": {
+        "checkpoint_steps": true,
+        "checkpoint_update": true,
+        "code_revision_contains_implementation": true,
+        "frozen_evaluation": true,
+        "parameter_count": true,
+        "run_complete": true,
+        "seed": true,
+        "transitions": true,
+        "variant": true
+      },
+      "id": "mutant_seed2",
+      "learner_seed": 2,
+      "summary": {
+        "checkpoint": "runs/tick_claim_gc_pilot_v1/mutant_seed2/checkpoint_final",
+        "compile_and_first_update_seconds": 7.173921133391559,
+        "evaluation_state_immutable": true,
+        "first_opportunity_transition": 15921,
+        "first_repeated_violation_transition": 115320,
+        "first_reservation_transition": 1892,
+        "first_success_transition": 47806,
+        "first_violation_delivery_transition": 128581,
+        "first_violation_transition": 33341,
+        "goal_mode": "deliver_3",
+        "initial_commands": 512,
+        "mode_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 124.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.375,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 32,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 128.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.0,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 64,
+            "mean_delivered_total": 0.0,
+            "mean_first_violation_step": null,
+            "mean_length": 126.0,
+            "mean_violation_grain_delivered": 0.0,
+            "opportunity_exposure_rate": 0.1875,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.0,
+            "violation_delivery_rate": 0.0,
+            "violation_rate": 0.0
+          },
+          "repeats_per_state": 1,
+          "split": "validation",
+          "stochastic": false,
+          "variant": "mutant"
+        },
+        "parameter_count": 2640181,
+        "sample_evaluation": {
+          "common_setup": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 1.46875,
+            "mean_first_violation_step": 55.45454545454545,
+            "mean_length": 108.9296875,
+            "mean_violation_grain_delivered": 0.0234375,
+            "opportunity_exposure_rate": 0.640625,
+            "repeated_violation_rate": 0.015625,
+            "success_rate": 0.3203125,
+            "violation_delivery_rate": 0.015625,
+            "violation_rate": 0.0859375
+          },
+          "natural_reset": {
+            "completed_rate": 1.0,
+            "episodes": 128,
+            "mean_delivered_total": 1.265625,
+            "mean_first_violation_step": 75.4,
+            "mean_length": 117.6328125,
+            "mean_violation_grain_delivered": 0.0390625,
+            "opportunity_exposure_rate": 0.3359375,
+            "repeated_violation_rate": 0.0,
+            "success_rate": 0.2734375,
+            "violation_delivery_rate": 0.0390625,
+            "violation_rate": 0.078125
+          },
+          "overall": {
+            "completed_rate": 1.0,
+            "episodes": 256,
+            "mean_delivered_total": 1.3671875,
+            "mean_first_violation_step": 64.95238095238095,
+            "mean_length": 113.28125,
+            "mean_violation_grain_delivered": 0.03125,
+            "opportunity_exposure_rate": 0.48828125,
+            "repeated_violation_rate": 0.0078125,
+            "success_rate": 0.296875,
+            "violation_delivery_rate": 0.02734375,
+            "violation_rate": 0.08203125
+          },
+          "repeats_per_state": 4,
+          "split": "validation",
+          "stochastic": true,
+          "variant": "mutant"
+        },
+        "schema_version": "hackrl_gc_pilot_result_v1",
+        "seed": 2,
+        "steady_state_transitions_per_second": 484356.9136590505,
+        "total_goal_successes": 326,
+        "total_opportunity_exposures": 1532,
+        "total_repeated_violation_events": 4,
+        "total_reservation_creations": 8835,
+        "total_violation_delivery_events": 17,
+        "total_violation_events": 120,
+        "total_violation_grain_delivered": 17,
+        "training_seconds": 9.271151443012059,
+        "transitions": 1048576,
+        "updates": 32,
+        "variant": "mutant"
+      },
+      "variant": "mutant"
+    }
+  ],
+  "errors": [],
+  "implementation_code_sha": "e92f85e4cd9b9c5a468dbade9536f2538cc915e8",
+  "interpretation_limit": "descriptive wiring calibration on one synthetic mechanism and related D4/layout variants; not evidence of general bug discovery",
+  "manifest": "docs/manifests/tick_claim_gc_pilot_v1.json",
+  "manifest_sha256": "170250602f84a99c8c4f29866df0702371be287c6a01aed344621c745618f75d",
+  "paired_mutant_minus_fixed": {
+    "mode_success_rate": {
+      "mean": 0.0,
+      "mutant_minus_fixed_by_seed": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.0
+      },
+      "sample_standard_deviation": 0.0,
+      "values_by_seed": [
+        0.0,
+        0.0,
+        0.0
+      ]
+    },
+    "sample_mean_length": {
+      "mean": 7.79296875,
+      "mutant_minus_fixed_by_seed": {
+        "0": 1.40234375,
+        "1": 7.9375,
+        "2": 14.0390625
+      },
+      "sample_standard_deviation": 6.31959905004426,
+      "values_by_seed": [
+        1.40234375,
+        7.9375,
+        14.0390625
+      ]
+    },
+    "sample_repeated_violation_rate": {
+      "mean": 0.0026041666666666665,
+      "mutant_minus_fixed_by_seed": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.0078125
+      },
+      "sample_standard_deviation": 0.004510548978043951,
+      "values_by_seed": [
+        0.0,
+        0.0,
+        0.0078125
+      ]
+    },
+    "sample_success_rate": {
+      "mean": -0.2265625,
+      "mutant_minus_fixed_by_seed": {
+        "0": -0.0546875,
+        "1": -0.2265625,
+        "2": -0.3984375
+      },
+      "sample_standard_deviation": 0.171875,
+      "values_by_seed": [
+        -0.0546875,
+        -0.2265625,
+        -0.3984375
+      ]
+    },
+    "sample_violation_delivery_rate": {
+      "mean": 0.009114583333333334,
+      "mutant_minus_fixed_by_seed": {
+        "0": 0.0,
+        "1": 0.0,
+        "2": 0.02734375
+      },
+      "sample_standard_deviation": 0.01578692142315383,
+      "values_by_seed": [
+        0.0,
+        0.0,
+        0.02734375
+      ]
+    },
+    "sample_violation_rate": {
+      "mean": 0.033854166666666664,
+      "mutant_minus_fixed_by_seed": {
+        "0": 0.0078125,
+        "1": 0.01171875,
+        "2": 0.08203125
+      },
+      "sample_standard_deviation": 0.041768268052982914,
+      "values_by_seed": [
+        0.0078125,
+        0.01171875,
+        0.08203125
+      ]
+    }
+  },
+  "resolved": "docs/manifests/tick_claim_gc_v1_resolved.json",
+  "resolved_sha256": "72c3c37b69b26ea4388294aa013fb27a8592dddf24020b9c13e0f3dcd918281d",
+  "resolved_source_hashes_match": true,
+  "schema_version": "tick_claim_gc_calibration_aggregate_v1",
+  "status": "passed",
+  "transitions": 6291456
+}
