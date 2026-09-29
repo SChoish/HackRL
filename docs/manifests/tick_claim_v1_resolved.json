@@ -12,7 +12,7 @@
   "artifacts": {
     "exploit_traces": {
       "path": "tick_claim_v1_exploit_traces.json",
-      "sha256": "9e0947a8c13448f1b9e557db4fccf9fe6b597c1cfd0f00545022c5441b750bbf"
+      "sha256": "e7260bfa0ef410f3649459d4b845e85413ae131105b259b93e1c0c039278ff1c"
     },
     "layouts": {
       "path": "tick_claim_v1_layouts.json",
@@ -20,22 +20,22 @@
     },
     "normal_traces": {
       "path": "tick_claim_v1_normal_traces.json",
-      "sha256": "ae813bc507aaeb1eccad301c009f7720e4cae544a5d94e6ff09f49bc2a28e7c1"
+      "sha256": "b0c679f012698a7bbdcf906aa42936d9c42567875bdbd35b3ed4743777150381"
     },
     "states": {
       "path": "tick_claim_v1_states.json",
-      "sha256": "53fdd7a8f82d987a3c95ec660d44a49a25c65a8708aa91923955c1ba3be4d616"
+      "sha256": "51c94c989e41ca52e78669d6ce1edcc1d10ff0e8910130cee05f344646e1bcf5"
     },
     "validation": {
       "path": "tick_claim_v1_validation.json",
-      "sha256": "e58a572597886d983a0a7ecaa801853984c043d38d20ec090cb53c20a39cb96d"
+      "sha256": "5365ed66f673b419adfdfd76efce74c7767ba40e382350f6138a5ea86ec4b6af"
     }
   },
   "attested_files": {
-    "scripts/validate_tick_claim.py": "2dc6768dbeb290a35628fad8c3a2ef0d57aadae808a041149cfb187864563f6e",
-    "src/hackrl/tick_claim.py": "e0ae4790db82b1799bb163efac5c52ed79730519af4c6b5976e3ed2135051107",
-    "src/hackrl/tick_claim_oracle.py": "80d1255b69dd3c423bd09c10702113803b7f776c7aa59f38b11d00898952456f",
-    "tests/test_tick_claim.py": "611a8b21d7fa5401b7665ca9def472998e9dcf07bd71e952636ee4c7473d0842"
+    "scripts/validate_tick_claim.py": "68ce7f7a1e5ddee1d32897b2bfb49d734d4238261d63f6f0212250afb794707a",
+    "src/hackrl/tick_claim.py": "5150ecb61d45d77928443eedffb8e130ccc3c4cff01c8841003e27708a7a45ef",
+    "src/hackrl/tick_claim_oracle.py": "ffd4cd487d1d8dd950dd3827535337953bbf71542e98d9095a65e72d6b3b4aa0",
+    "tests/test_tick_claim.py": "8c896c9a752c15654a574c7cffb06e1a887a10039edb413ba5bae7c4e6b20f3d"
   },
   "basis_commit": "108ea5378c9f73855e3cc453a8a1dfa3b16d6c88",
   "basis_commit_kind": "user-selected document/manifest handoff baseline",
@@ -44,26 +44,30 @@
   "design_manifest_status_preserved": "design_only",
   "fixture_id": "tick_claim_workshop_v1",
   "goal_schema_hash": "adb575081a7682695d8a32edfdfe743c3ffac14cdd41083ddc48f3270b5c2e3d",
-  "implementation_code_sha": "758a7f1e5a9fed6c886713013b02fd3a3b7bc31c",
-  "implementation_tree_hash": "d57f2bf19031d61d84f162097b90838c6cea40236487efb61d770330995db7c3",
-  "kernel_hash": "e0ae4790db82b1799bb163efac5c52ed79730519af4c6b5976e3ed2135051107",
+  "implementation_code_sha": "61b3a720efbc1ab5df74e3c14c35e6c18cb9ec4e",
+  "implementation_tree_hash": "4119be1c30764b26e66bb6b1d65b32980eb1cfe9c78fbb79b29bcb984457b548",
+  "kernel_hash": "5150ecb61d45d77928443eedffb8e130ccc3c4cff01c8841003e27708a7a45ef",
   "kernel_stage": {
-    "cpu_jit_vmap_validation": "passed",
-    "independent_oracle_validation": "passed_with_same_author_scope_disclosed",
-    "normal_and_exploit_traces": "passed",
-    "payoff_validation": "passed",
+    "common_setup_fixed_prefix_materialization": "passed_96_states",
+    "cpu_jit_vmap_validation": "passed_512_actual_trigger_workers",
+    "independent_oracle_validation": "passed_with_analysis_snapshot_and_same_author_scope_disclosed",
+    "normal_and_exploit_path_replays": 384,
+    "payoff_validation": "passed_constructive_paths_no_optimality_claim",
     "scope": "synthetic kernel through transition-level evaluation; GC learner remains unwired",
-    "status": "validated"
+    "settlement_delivery_phase_oracle": "passed",
+    "status": "validated_after_scientific_review"
   },
   "observation_schema_hash": "06d8097a381f7ffc5d67c10d128c3b57bb4ae5e642322a11d9fd191228b7c9d5",
-  "oracle_hash": "80d1255b69dd3c423bd09c10702113803b7f776c7aa59f38b11d00898952456f",
+  "oracle_hash": "ffd4cd487d1d8dd950dd3827535337953bbf71542e98d9095a65e72d6b3b4aa0",
   "pack_restore_status": "deferred_pending_payoff_gate",
   "public_input_domains": {
     "action": "integer 0..19",
+    "evaluation_start": "natural_reset or common_setup",
     "goal_index": "integer 0..11",
     "layout_index": "integer 0..15",
     "phase": "0 ripe or 1 unripe",
-    "post_world_done_step": "unsupported; caller must stop or reset"
+    "post_world_done_step": "unsupported; caller must stop or reset",
+    "synthetic_test_start": "synthetic_path_check; excluded from evaluation manifests"
   },
   "queue_gate": "closed",
   "remaining_before_gc_training": [
@@ -80,7 +84,7 @@
     "numpy": "2.5.0",
     "python": "3.12.13"
   },
-  "schema_version": "hackrl_candidate_resolved_v1",
+  "schema_version": "hackrl_candidate_resolved_v2",
   "schemas": {
     "action": {
       "actions": [
