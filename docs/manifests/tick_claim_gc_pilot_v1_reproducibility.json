@@ -1,0 +1,79 @@
+{
+  "schema_version": "hackrl_gc_cross_process_reproducibility_v1",
+  "manifest": "tick_claim_gc_pilot_v1.json",
+  "manifest_sha256": "170250602f84a99c8c4f29866df0702371be287c6a01aed344621c745618f75d",
+  "resolved_runtime": "tick_claim_gc_v1_resolved.json",
+  "resolved_runtime_sha256": "bde56ebc0885a5a183253a66b19c2ad18aeaea8ad50f911638d5d315789fd3bb",
+  "implementation_code_sha": "50c985cf11bffe4ca81f89cd23482a685aa3e62b",
+  "execution_code_sha": "f16828c8226043678959ad88ac5b3fc1ff02656d",
+  "revision_relation": "execution_code_sha is a descendant of implementation_code_sha; the intervening commit changes only the resolved and validation JSON artifacts, while the resolved source hashes match the executed learner files",
+  "cell": {
+    "variant": "fixed",
+    "learner_seed": 0,
+    "transitions": 1048576
+  },
+  "invocation": "JAX_PLATFORMS=cpu PYTHONPATH=src python scripts/run_tick_claim_gc.py --variant fixed --seed 0 --log-dir RUN_DIRECTORY",
+  "run_precondition": "each RUN_DIRECTORY did not exist; the runner rejects a nonempty destination, so neither invocation resumed from or overwrote the other run",
+  "runs": {
+    "matrix_cell": {
+      "path": "runs/tick_claim_gc_pilot_v1_synced/fixed_seed0",
+      "run_manifest_sha256": "94ab7f20182e5539b349c9f1427857f1718d1e40aa5df21cb3619fe133bd26a8",
+      "config_sha256": "d692c99e20bcea5868983a1b42dc21469da329188d68aa70e0c6220ab516b6e4",
+      "updates_sha256": "4d9f395d21bc2843e774bbe27cf32dcff8e564136e85762bc8f64d264c2cc617",
+      "updates_bytes": 42809,
+      "checkpoint_state_sha256": "028be44abb159a801cbccebea2448da48871a454d3cd51eed26bae0eb30f6375",
+      "checkpoint_state_bytes": 31891723
+    },
+    "fresh_process_repeat": {
+      "path": "runs/tick_claim_gc_pilot_v1_repro/fixed_seed0",
+      "run_manifest_sha256": "94ab7f20182e5539b349c9f1427857f1718d1e40aa5df21cb3619fe133bd26a8",
+      "config_sha256": "d692c99e20bcea5868983a1b42dc21469da329188d68aa70e0c6220ab516b6e4",
+      "updates_sha256": "4d9f395d21bc2843e774bbe27cf32dcff8e564136e85762bc8f64d264c2cc617",
+      "updates_bytes": 42809,
+      "checkpoint_state_sha256": "028be44abb159a801cbccebea2448da48871a454d3cd51eed26bae0eb30f6375",
+      "checkpoint_state_bytes": 31891723
+    }
+  },
+  "excluded_preliminary_run_root": {
+    "path": "runs/tick_claim_gc_pilot_v1",
+    "reason": "it did not synchronize full optimizer parameter completion for timing and its policy output did not reproduce under the final fresh-process execution path; the causal source of the policy mismatch was not established, so the entire preliminary root is superseded rather than selectively reused"
+  },
+  "checks": {
+    "fresh_python_processes": true,
+    "update_metrics_byte_identical": true,
+    "full_checkpoint_state_byte_identical": true,
+    "timing_excluded_policy_and_evaluation_summary_byte_identical": true
+  },
+  "summary_projection": {
+    "included_fields": [
+      "variant",
+      "seed",
+      "transitions",
+      "parameter_count",
+      "total_goal_successes",
+      "total_violation_events",
+      "mode_evaluation",
+      "sample_evaluation"
+    ],
+    "excluded_fields": "checkpoint path, compile/update timing, throughput, and other fields not listed above",
+    "comparison": "the same jq object projection was serialized for each summary, hashed separately, then compared with cmp"
+  },
+  "sha256": {
+    "updates_json_both": "4d9f395d21bc2843e774bbe27cf32dcff8e564136e85762bc8f64d264c2cc617",
+    "checkpoint_state_msgpack_both": "028be44abb159a801cbccebea2448da48871a454d3cd51eed26bae0eb30f6375",
+    "timing_excluded_policy_and_evaluation_summary_both": "a4be00a600b41c5f80a80e54a4feb52278d043b67f6c1d04fd1408946c05dfd6"
+  },
+  "runtime_scope": {
+    "platform": "JAX cpu",
+    "cpu": "Intel Xeon Platinum 8480C, x86_64, 224 logical CPUs",
+    "software_versions": "recorded in tick_claim_gc_v1_resolved.json",
+    "thread_settings": "no additional thread-count or affinity setting was pinned by this check"
+  },
+  "verifier": {
+    "hash_tool": "sha256sum",
+    "byte_comparison_tool": "cmp -s",
+    "result": "both updates.json files and both state.msgpack files had equal sizes, equal SHA-256 digests, and cmp exit status 0"
+  },
+  "scope": "one fresh-process repeat of the fixed seed-0 cell on one recorded CPU/software runtime; this verifies this final execution path only and is not a claim across seeds, variants, hardware, or runtime versions",
+  "passed": true
+}
