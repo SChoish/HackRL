@@ -3,7 +3,7 @@
   "candidate_id": "TICK-CLAIM",
   "design_manifest_status_preserved": "design_only_and_runnable_false",
   "dirty_source_paths": [],
-  "implementation_code_sha": "8a509681f7744bcbb57f2eafdb4f781fb732d907",
+  "implementation_code_sha": "e92f85e4cd9b9c5a468dbade9536f2538cc915e8",
   "pack_restore_status": "deferred_pending_payoff_gate",
   "pilot_manifest": "tick_claim_gc_pilot_v1.json",
   "pilot_manifest_sha256": "170250602f84a99c8c4f29866df0702371be287c6a01aed344621c745618f75d",
@@ -23,7 +23,7 @@
   "source_hashes": {
     "docs/manifests/tick_claim_gc_pilot_v1.json": "170250602f84a99c8c4f29866df0702371be287c6a01aed344621c745618f75d",
     "scripts/run_tick_claim_gc.py": "4446ece244d6532ae28f3525dc80bf6b64e159300e63f4d2a898e499403d1145",
-    "scripts/summarize_tick_claim_gc_calibration.py": "19f9b304efba178b9f97e00d59af00d3f26a5b3d605bf64b43fd9b971f19e208",
+    "scripts/summarize_tick_claim_gc_calibration.py": "6fb55de518bd37a0fa2ef2655797d611e909cf7b93334c8f1b360e62c517adb2",
     "scripts/validate_tick_claim_gc.py": "593ca25c7ff18732c5f13828546bb78ce31de530910f92bf79967123e995a6d1",
     "src/hackrl/tick_claim.py": "5150ecb61d45d77928443eedffb8e130ccc3c4cff01c8841003e27708a7a45ef",
     "src/hackrl/tick_claim_gc.py": "d33284992c28bd01e63ce95e2020c58298fceacdc5f5cb6a34eb4a9c2ae065f9",
@@ -33,5 +33,5 @@
   },
   "source_paths_clean_at_validation": true,
   "validation": "tick_claim_gc_v1_validation.json",
-  "validation_sha256": "5c62600d4469aa4a3b4c0a1dce70da1c18d74c1ed3788ca894d3d87e3010d42a"
+  "validation_sha256": "28490738b5a0aa681825d9de37a4b7b8a8f42c999a86cba9ce42494588ec0b07"
 }
