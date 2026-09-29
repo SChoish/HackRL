@@ -1,0 +1,43 @@
+{
+  "checkpoint_resume": {
+    "environment_restored": true,
+    "next_metrics_equal": true,
+    "next_train_state_equal": true,
+    "optimizer_step_restored": true,
+    "policy_logits_equal": true,
+    "rng_restored": true,
+    "sampler_restored": true,
+    "schedule_restored": true
+  },
+  "checks": {
+    "checkpoint_resume_all_equal": true,
+    "every_initial_worker_has_false_seen_goal": true,
+    "fixed_mutant_initial_environment_equal": true,
+    "fixed_mutant_initial_parameters_equal": true,
+    "frozen_evaluation_state_count_matches": true,
+    "frozen_evaluation_state_immutable": true,
+    "full_shape_two_updates_completed": true,
+    "goal_done_preserves_world": true,
+    "initial_seen_goal_count": 3,
+    "parameter_count_matches_manifest": true,
+    "simultaneous_goal_world_records_reward_then_resets": true,
+    "world_done_resets_exactly_once": true
+  },
+  "frozen_evaluation": {
+    "episodes": 64,
+    "expected_episodes": 64,
+    "learner_state_byte_identical": true
+  },
+  "full_shape_throughput": {
+    "batch_size": 32768,
+    "compile_and_first_update_seconds": 8.568053113296628,
+    "device_platform": "cpu",
+    "final_environment_steps": 65536,
+    "steady_second_update_seconds": 6.8015484139323235,
+    "steady_transitions_per_second": 4817.726494878412,
+    "updates_executed": 2
+  },
+  "parameter_count": 2640181,
+  "passed": true,
+  "schema_version": "hackrl_gc_validation_v1"
+}

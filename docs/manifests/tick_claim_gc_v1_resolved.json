@@ -1,0 +1,37 @@
+{
+  "actual_parameter_count": 2640181,
+  "candidate_id": "TICK-CLAIM",
+  "design_manifest_status_preserved": "design_only_and_runnable_false",
+  "dirty_source_paths": [],
+  "implementation_code_sha": "8a509681f7744bcbb57f2eafdb4f781fb732d907",
+  "pack_restore_status": "deferred_pending_payoff_gate",
+  "pilot_manifest": "tick_claim_gc_pilot_v1.json",
+  "pilot_manifest_sha256": "170250602f84a99c8c4f29866df0702371be287c6a01aed344621c745618f75d",
+  "profile": "hackrl_gc_v1",
+  "queue_gate": "open_for_frozen_six_cell_calibration",
+  "runnable": true,
+  "runtime": {
+    "craftax": "1.6.1",
+    "device_platform": "cpu",
+    "distrax": "0.1.9",
+    "flax": "0.12.7",
+    "jax": "0.10.2",
+    "optax": "0.2.8",
+    "python": "3.12.13"
+  },
+  "schema_version": "hackrl_gc_resolved_v1",
+  "source_hashes": {
+    "docs/manifests/tick_claim_gc_pilot_v1.json": "170250602f84a99c8c4f29866df0702371be287c6a01aed344621c745618f75d",
+    "scripts/run_tick_claim_gc.py": "4446ece244d6532ae28f3525dc80bf6b64e159300e63f4d2a898e499403d1145",
+    "scripts/summarize_tick_claim_gc_calibration.py": "19f9b304efba178b9f97e00d59af00d3f26a5b3d605bf64b43fd9b971f19e208",
+    "scripts/validate_tick_claim_gc.py": "593ca25c7ff18732c5f13828546bb78ce31de530910f92bf79967123e995a6d1",
+    "src/hackrl/tick_claim.py": "5150ecb61d45d77928443eedffb8e130ccc3c4cff01c8841003e27708a7a45ef",
+    "src/hackrl/tick_claim_gc.py": "d33284992c28bd01e63ce95e2020c58298fceacdc5f5cb6a34eb4a9c2ae065f9",
+    "src/hackrl/tick_claim_oracle.py": "ffd4cd487d1d8dd950dd3827535337953bbf71542e98d9095a65e72d6b3b4aa0",
+    "tests/test_tick_claim.py": "8c896c9a752c15654a574c7cffb06e1a887a10039edb413ba5bae7c4e6b20f3d",
+    "tests/test_tick_claim_gc.py": "a322344e36d419500280182ed718dcd1951ce1d5a920e4f73302a6f2386a42bb"
+  },
+  "source_paths_clean_at_validation": true,
+  "validation": "tick_claim_gc_v1_validation.json",
+  "validation_sha256": "5c62600d4469aa4a3b4c0a1dce70da1c18d74c1ed3788ca894d3d87e3010d42a"
+}
