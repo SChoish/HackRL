@@ -1,0 +1,256 @@
+{
+  "action_schema_hash": "303b9a5da3a6cd2f4cb403a826da24bd33f8ccfbea55dd005dfcf8426b5242dc",
+  "actual_parameter_counts": {
+    "action_count": 20,
+    "gc_policy_parameters": null,
+    "goal_count": 12,
+    "kernel_trainable_parameters": 0,
+    "map_channel_count": 24,
+    "model_observation_size": 1527,
+    "oracle_trainable_parameters": 0
+  },
+  "artifacts": {
+    "exploit_traces": {
+      "path": "tick_claim_v1_exploit_traces.json",
+      "sha256": "9e0947a8c13448f1b9e557db4fccf9fe6b597c1cfd0f00545022c5441b750bbf"
+    },
+    "layouts": {
+      "path": "tick_claim_v1_layouts.json",
+      "sha256": "3395986709c4babd3e7477a43170d9215b13f5b00a03a0b8b9dcc92016b7d984"
+    },
+    "normal_traces": {
+      "path": "tick_claim_v1_normal_traces.json",
+      "sha256": "ae813bc507aaeb1eccad301c009f7720e4cae544a5d94e6ff09f49bc2a28e7c1"
+    },
+    "states": {
+      "path": "tick_claim_v1_states.json",
+      "sha256": "53fdd7a8f82d987a3c95ec660d44a49a25c65a8708aa91923955c1ba3be4d616"
+    },
+    "validation": {
+      "path": "tick_claim_v1_validation.json",
+      "sha256": "e58a572597886d983a0a7ecaa801853984c043d38d20ec090cb53c20a39cb96d"
+    }
+  },
+  "attested_files": {
+    "scripts/validate_tick_claim.py": "2dc6768dbeb290a35628fad8c3a2ef0d57aadae808a041149cfb187864563f6e",
+    "src/hackrl/tick_claim.py": "e0ae4790db82b1799bb163efac5c52ed79730519af4c6b5976e3ed2135051107",
+    "src/hackrl/tick_claim_oracle.py": "80d1255b69dd3c423bd09c10702113803b7f776c7aa59f38b11d00898952456f",
+    "tests/test_tick_claim.py": "611a8b21d7fa5401b7665ca9def472998e9dcf07bd71e952636ee4c7473d0842"
+  },
+  "basis_commit": "108ea5378c9f73855e3cc453a8a1dfa3b16d6c88",
+  "basis_commit_kind": "user-selected document/manifest handoff baseline",
+  "candidate_id": "TICK-CLAIM",
+  "design_manifest": "tick_claim_v1.json",
+  "design_manifest_status_preserved": "design_only",
+  "fixture_id": "tick_claim_workshop_v1",
+  "goal_schema_hash": "adb575081a7682695d8a32edfdfe743c3ffac14cdd41083ddc48f3270b5c2e3d",
+  "implementation_code_sha": "758a7f1e5a9fed6c886713013b02fd3a3b7bc31c",
+  "implementation_tree_hash": "d57f2bf19031d61d84f162097b90838c6cea40236487efb61d770330995db7c3",
+  "kernel_hash": "e0ae4790db82b1799bb163efac5c52ed79730519af4c6b5976e3ed2135051107",
+  "kernel_stage": {
+    "cpu_jit_vmap_validation": "passed",
+    "independent_oracle_validation": "passed_with_same_author_scope_disclosed",
+    "normal_and_exploit_traces": "passed",
+    "payoff_validation": "passed",
+    "scope": "synthetic kernel through transition-level evaluation; GC learner remains unwired",
+    "status": "validated"
+  },
+  "observation_schema_hash": "06d8097a381f7ffc5d67c10d128c3b57bb4ae5e642322a11d9fd191228b7c9d5",
+  "oracle_hash": "80d1255b69dd3c423bd09c10702113803b7f776c7aa59f38b11d00898952456f",
+  "pack_restore_status": "deferred_pending_payoff_gate",
+  "public_input_domains": {
+    "action": "integer 0..19",
+    "goal_index": "integer 0..11",
+    "layout_index": "integer 0..15",
+    "phase": "0 ripe or 1 unripe",
+    "post_world_done_step": "unsupported; caller must stop or reset"
+  },
+  "queue_gate": "closed",
+  "remaining_before_gc_training": [
+    "wire structured observation and workshop12 goals into GC-PPO",
+    "record GC policy parameter count",
+    "validate complete checkpoint resume",
+    "validate frozen evaluation does not mutate learner state"
+  ],
+  "runnable": false,
+  "runtime": {
+    "craftax": "1.6.1",
+    "flax": "0.12.7",
+    "jax": "0.10.2",
+    "numpy": "2.5.0",
+    "python": "3.12.13"
+  },
+  "schema_version": "hackrl_candidate_resolved_v1",
+  "schemas": {
+    "action": {
+      "actions": [
+        {
+          "name": "NOOP",
+          "value": 0
+        },
+        {
+          "name": "LEFT",
+          "value": 1
+        },
+        {
+          "name": "RIGHT",
+          "value": 2
+        },
+        {
+          "name": "UP",
+          "value": 3
+        },
+        {
+          "name": "DOWN",
+          "value": 4
+        },
+        {
+          "name": "DO",
+          "value": 5
+        },
+        {
+          "name": "SLEEP",
+          "value": 6
+        },
+        {
+          "name": "PLACE_STONE",
+          "value": 7
+        },
+        {
+          "name": "PLACE_TABLE",
+          "value": 8
+        },
+        {
+          "name": "PLACE_FURNACE",
+          "value": 9
+        },
+        {
+          "name": "PLACE_PLANT",
+          "value": 10
+        },
+        {
+          "name": "MAKE_WOOD_PICKAXE",
+          "value": 11
+        },
+        {
+          "name": "MAKE_STONE_PICKAXE",
+          "value": 12
+        },
+        {
+          "name": "MAKE_IRON_PICKAXE",
+          "value": 13
+        },
+        {
+          "name": "MAKE_WOOD_SWORD",
+          "value": 14
+        },
+        {
+          "name": "MAKE_STONE_SWORD",
+          "value": 15
+        },
+        {
+          "name": "MAKE_IRON_SWORD",
+          "value": 16
+        },
+        {
+          "name": "ARM_HARVEST",
+          "value": 17
+        },
+        {
+          "name": "CANCEL_HARVEST",
+          "value": 18
+        },
+        {
+          "name": "DELIVER",
+          "value": 19
+        }
+      ],
+      "base_enum": "Craftax-Classic.Action 0..16",
+      "invalid_action_behavior": "unsupported public input",
+      "valid_action_range_inclusive": [
+        0,
+        19
+      ]
+    },
+    "goal": {
+      "achieved_goal_vector": "12-dimensional multi-hot Boolean predicate vector",
+      "command_goal_representation": "12-dimensional one-hot; GC wrapper not yet implemented",
+      "goal_ids": [
+        "inventory/raw_material_ge_1",
+        "inventory/raw_material_ge_2",
+        "inventory/raw_material_ge_3",
+        "adjacent/raw_source",
+        "adjacent/reservation_device",
+        "adjacent/delivery_point",
+        "facility/reservation_present",
+        "facility/reservation_absent",
+        "visible/crop_ripe",
+        "visible/crop_unripe",
+        "delivery/count_ge_1",
+        "delivery/count_ge_3"
+      ],
+      "valid_goal_indices": [
+        0,
+        11
+      ]
+    },
+    "observation": {
+      "count_transform": "x/(1+abs(x))",
+      "hidden_facility_values": "zero with visible=false",
+      "map_channels": [
+        "classic/block/invalid",
+        "classic/block/out_of_bounds",
+        "classic/block/grass",
+        "classic/block/water",
+        "classic/block/stone",
+        "classic/block/tree",
+        "classic/block/wood",
+        "classic/block/path",
+        "classic/block/coal",
+        "classic/block/iron",
+        "classic/block/diamond",
+        "classic/block/crafting_table",
+        "classic/block/furnace",
+        "classic/block/sand",
+        "classic/block/lava",
+        "classic/block/plant",
+        "classic/block/ripe_plant",
+        "classic/mob/zombie",
+        "classic/mob/cow",
+        "classic/mob/skeleton",
+        "classic/mob/arrow",
+        "candidate/role/raw_source",
+        "candidate/role/reservation_device",
+        "candidate/role/delivery_point"
+      ],
+      "map_encoding": "public Classic tile ids plus candidate role masks; 24-channel one-hot/mask tensor for model",
+      "model_feature_order": [
+        "direction_left",
+        "direction_right",
+        "direction_up",
+        "direction_down",
+        "remaining_world_fraction",
+        "grain_signed",
+        "delivered_total_signed",
+        "facility_visible",
+        "facility_exists",
+        "reservation_present",
+        "reservation_remaining_ticks_signed",
+        "reservation_delay_signed",
+        "crop_visible",
+        "crop_ripe",
+        "crop_unripe"
+      ],
+      "model_vector_size": 1527,
+      "public_map_shape": [
+        7,
+        9
+      ]
+    }
+  },
+  "verification_commands": {
+    "artifacts": "JAX_PLATFORMS=cpu PYTHONPATH=src python scripts/validate_tick_claim.py",
+    "focused_tests": "JAX_PLATFORMS=cpu PYTHONPATH=src python -m pytest -q tests/test_tick_claim.py",
+    "full_tests": "JAX_PLATFORMS=cpu PYTHONPATH=src python -m pytest -q"
+  }
+}
