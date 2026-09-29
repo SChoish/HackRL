@@ -1360,7 +1360,7 @@ def run_tick_claim_gc_pilot(config, log_dir):
     for update_index in range(config.num_updates):
         update_started = time.perf_counter()
         runner, metrics = update(runner)
-        jax.block_until_ready(runner.env_steps)
+        jax.block_until_ready(runner.train_state.params)
         elapsed = time.perf_counter() - update_started
         if update_index == 0:
             compile_seconds = elapsed

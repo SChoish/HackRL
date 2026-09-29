@@ -184,7 +184,7 @@ def _full_shape_throughput():
     for _ in range(2):
         started = time.perf_counter()
         runner, metrics = update(runner)
-        jax.block_until_ready(metrics["loss"])
+        jax.block_until_ready(runner.train_state.params)
         durations.append(time.perf_counter() - started)
     return {
         "device_platform": jax.devices()[0].platform,
