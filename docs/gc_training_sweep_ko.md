@@ -4,9 +4,9 @@
 
 ## 0. 범위와 선행 의존성
 
-이 문서는 결함을 새로 정의하거나 기존 결함을 바꾸지 않는다. 현재 저장소에 있는 R/B/L 계열은 [버그와 과제 명세](bug_specifications_ko.md)와 [9개 과제 후보](benchmark_catalog_ko.md)를 계속 따른다.
+이 문서는 목표·훈련·평가의 기준이다. 기존 R/B/L의 구현과 실행 이력은 [버그와 과제 명세](bug_specifications_ko.md)와 [기존 9개 과제 후보](benchmark_catalog_ko.md)에 보존한다. 기존 E/M/H를 발견·활용 난도의 검증된 등급으로 사용하지 않는다.
 
-제안 원문이 참조한 `exploit_benchmark_redesign_ko.md`는 현재 작업 트리와 Git 기록에 없다. 따라서 아래의 `TICK-CLAIM`과 `PACK-RESTORE`는 **목표·훈련 인터페이스 후보**로만 고정한다. 두 후보를 구현하거나 학습 큐에 넣기 전에는 각각의 결함 커널, fixed/mutant 전이, reset, 정상·예외 경로와 manifest를 별도 기준 문서에 먼저 커밋해야 한다. 이 문서만으로 두 후보를 기존 H0/H1/H2 또는 R/B/L 과제에 임의 대응하지 않는다.
+새 후보의 결함 커널, fixed/mutant 전이와 정상·예외 경로는 [발견·활용 결함 명세](exploit_benchmark_redesign_ko.md)를 따른다. [TICK-CLAIM](manifests/tick_claim_v1.json)과 [PACK-RESTORE](manifests/pack_restore_v1.json)의 설계 manifest는 `design_only`, `runnable=false`다. 명세 인계는 완료했지만 환경 구현과 경로·독립 oracle·payoff 검증은 아직 하지 않았다. 후보별 구현 검증과 resolved manifest 동결을 마친 뒤에만 학습 큐에 넣는다. 두 후보를 기존 H0/H1/H2 또는 R/B/L에 대응시키지 않는다.
 
 버전 경계는 다음과 같다.
 
@@ -85,8 +85,10 @@ $$
 3. rollout에서 새로 관측된 기본 목표는 update 경계에서 seed별 집합에 합친다. 같은 rollout 안에서는 재선택 후보가 되지 않는다. 목표 선택과 0-step 성공은 환경 transition이 아니다.
 4. 실제 명령 목표에 행동을 한 뒤 `o_{t+1}^{terminal}`에서 predicate와 세계 종료를 함께 계산한다. 목표를 달성하면 `+1`, 그 외에는 `0`이다. 원본 업적·체력 보상, 계약 위반 보상과 내재 보상은 외재 목표 critic에 합산하지 않는다. 단일 명령 구간의 return 범위는 `[0,1]`이다.
 5. `goal_done=True, world_done=False`이면 해당 명령의 value bootstrap과 GAE 연결을 끊고 `o_{t+1}^{terminal}`의 세계 상태를 그대로 다음 명령 시작 상태로 쓴다. `world_done=True`이면 목표 성공 보상을 먼저 기록한 뒤 환경을 정확히 한 번 reset하고 reset 관측에서 다음 목표를 뽑는다. 두 값이 동시에 참이어도 terminal 상태에서 새 목표를 뽑지 않는다. rollout 경계는 이 상태 머신을 바꾸지 않는다.
-6. 목표별 방문·명령·0-step 성공·행동 후 성공 횟수와 성공까지 걸린 환경 transition 수를 기록한다. 0-step 성공을 새 기술 습득이나 정책 성공률로 세지 않는다. 이미 참인 목표를 아예 후보에서 제외하는 sampler는 별도 공통 버전으로만 비교한다.
+6. 목표별 방문·명령·0-step 성공·행동 후 성공 횟수와 성공까지 걸린 환경 transition 수를 기록한다. 0-step 성공을 새 기술 습득이나 정책 성공률로 세지 않는다. 현재 규칙의 실제 명령 분포는 false seen 목표에서 균등하다. 처음부터 true 목표를 제외해도 실제 명령 분포는 같지만 0-step 기록은 달라지므로 기록 규칙을 임의로 바꾸지 않는다.
 7. 기본 능력 평가는 각 목표가 시작부터 참이 아닌 사전 정의 유효 상태에서 수행하고, 자연 reset 분포 결과도 별도 보존한다. 최종 활용 평가는 `deliver_3` 하나를 고정하며 중간 목표로 자동 전환하지 않는다. `deliver_3` 성공, 세계 종료 또는 시간 제한에서 평가를 끝낸다.
+
+현재 false seen 목표가 없는 경우를 피하려면 초기 worker 배치에 서로 배타적인 정상 상태가 필요하다. 후보 manifest는 성숙/미성숙 또는 빈/찬 시설을 균형 배정하고 초기 시야에 포함하도록 규정한다. 전역 seen에 두 대립 목표가 들어가며 동시에 참일 수 없으므로 각 worker에는 최소 하나의 false seen 목표가 있다. 실제 reset·관측·predicate에서 이 보장을 검사한다. 이 조건부 재추출과 0-step 기록은 LEO 원본에서 변경한 HackRL 규칙이다.
 
 `seen_goals`는 학습 seed별로 관리한다. 정상 checkpoint를 분기할 때 fixed/mutant에 동일한 seen 상태를 복제한다. 주 적응 실험은 명령 목표를 `deliver_3`으로 고정해 두 커널의 sampler 분포 차이를 제거한다.
 
@@ -190,7 +192,8 @@ ETA는 새 conv/GC 구현의 compile·학습·평가 처리량을 측정한 뒤 
 
 아래 조건을 모두 통과하기 전에는 학습 큐를 생성하지 않는다.
 
-- 큐에 넣을 각 후보의 결함 명세와 manifest가 저장소에 존재한다. TICK-CLAIM만 실행할 때 PACK-RESTORE 명세까지 요구하지 않으며 그 반대도 같다.
+- 큐에 넣을 각 후보의 결함 명세와 검증된 resolved manifest가 저장소에 존재한다. `design_only` 파일만으로 통과하지 않는다. TICK-CLAIM만 실행할 때 PACK-RESTORE 검증까지 요구하지 않으며 그 반대도 같다.
+- 정상·예외 경로를 재생하고 준비 비용을 포함한 활용 이득을 검사한다. 초기 sampler에서 false seen 목표가 없어서 멈추는 worker가 없다.
 - 실행 행렬의 후보, 방법, 단계, seed, budget과 평가 manifest가 결과 생성 전에 고정되어 있다.
 - 모든 12개 목표가 fixed에서 달성 가능하고 관측만으로 판정된다.
 - 독립 effect·violation oracle이 reward predicate와 분리되어 있고 fixed/mutant counterfactual fixture를 통과한다.

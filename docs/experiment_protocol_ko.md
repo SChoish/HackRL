@@ -2,7 +2,7 @@
 
 2026-09-28 · 연구계획 v2, 구현 전 계획. 학습 수치와 예산은 제안이며 측정된 처리량·최적 설정·실험 결과가 아니다. 과제 구성은 [9개 과제 목록](benchmark_catalog_ko.md), 코드 변경·판정기는 [버그 명세](bug_specifications_ko.md)를 따른다.
 
-범위: 이 문서는 기존 고정 목표 v2 트랙을 규정한다. 기본 능력 학습부터 goal conditioning을 사용하는 `hackrl_gc_v1`의 목표·모델·예산·평가는 [GC 기본 목표·훈련·스윕 v1](gc_training_sweep_ko.md)을 따른다. 두 트랙의 실행과 결과는 합치지 않는다.
+범위: 이 문서는 기존 고정 목표 v2 트랙을 규정한다. 기본 능력 학습부터 goal conditioning을 사용하는 `hackrl_gc_v1`의 목표·모델·예산·평가는 [GC 기본 목표·훈련·스윕 v1](gc_training_sweep_ko.md)을 따른다. 두 트랙의 실행과 결과는 합치지 않는다. 아래 E/M/H 목록은 기존 설계 이력이며 새 발견·활용 난도 등급이나 실행 큐를 뜻하지 않는다. 새 후보의 전이·실행 게이트는 [발견·활용 결함 명세](exploit_benchmark_redesign_ko.md)를 따른다.
 
 ## 1. 먼저 고정할 것
 
