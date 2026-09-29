@@ -17,6 +17,7 @@ from hackrl.tick_claim import (
     TickClaimPhase,
     TickClaimSplit,
     TickClaimStart,
+    TickClaimTransitionSnapshot,
     TickClaimVariant,
     encode_tick_claim_observation,
     make_tick_claim_state,
@@ -25,7 +26,9 @@ from hackrl.tick_claim import (
     reset_tick_claim_worker,
     tick_claim_goal,
     tick_claim_goal_vector,
+    tick_claim_setup_prefix,
     tick_claim_step,
+    tick_claim_step_with_snapshot,
     transform_direction,
 )
 from hackrl.tick_claim_oracle import (
@@ -41,12 +44,9 @@ def _transformed_action(layout_index, action):
 
 
 def _setup_prefix(layout_index):
-    canonical = (
-        (TickClaimAction.LEFT,) * 2 + (TickClaimAction.UP,) * 2
-        if layout_index % 2 == 0
-        else (TickClaimAction.UP,) * 2 + (TickClaimAction.LEFT,) * 2
+    return tuple(
+        int(action) for action in np.asarray(tick_claim_setup_prefix(layout_index))
     )
-    return tuple(_transformed_action(layout_index, action) for action in canonical)
 
 
 def _growth_actions(layout_index, relocate_from_alternate_pose=False):
@@ -95,9 +95,12 @@ def _run(state, actions, variant):
     delivery_checks = []
     for action in actions:
         before = state
-        state = tick_claim_step(state, action, variant)
-        audit = audit_tick_claim_transition(oracle, before, action, state)
+        state, snapshot = tick_claim_step_with_snapshot(state, action, variant)
+        audit = audit_tick_claim_transition(
+            oracle, before, action, state, snapshot
+        )
         oracle = audit.oracle_state
+        assert bool(audit.settlement_conserved)
         violations.append(bool(audit.violation))
         delivery_checks.append(bool(audit.delivery_conserved))
     return state, oracle, violations, delivery_checks
@@ -159,6 +162,49 @@ def test_all_materialized_layouts_are_unique_and_normal_prefix_is_traversable():
             )
             assert int(harvested.grain) == 1
             assert bool(armed.reservation_present)
+
+
+def test_common_setup_is_the_exact_fixed_prefix_result_for_every_state():
+    for split in TickClaimSplit:
+        for layout_index in range(16):
+            for phase in TickClaimPhase:
+                natural = make_tick_claim_state(
+                    layout_index,
+                    phase,
+                    split=split,
+                    start=TickClaimStart.NATURAL,
+                )
+                expected, _, _, _ = _run(
+                    natural,
+                    _setup_prefix(layout_index),
+                    TickClaimVariant.FIXED,
+                )
+                common = make_tick_claim_state(
+                    layout_index,
+                    phase,
+                    split=split,
+                    start=TickClaimStart.COMMON_SETUP,
+                )
+                assert jax.tree_util.tree_all(
+                    jax.tree.map(jnp.array_equal, expected, common)
+                )
+                assert int(common.tick) == 4
+                assert int(common.grain) == 0
+                assert not bool(common.reservation_present)
+                expected_age = (
+                    GROWTH_WAIT_TICKS
+                    if phase is TickClaimPhase.RIPE
+                    else len(_setup_prefix(layout_index))
+                )
+                assert int(common.crop_age) == expected_age
+
+    synthetic = make_tick_claim_state(
+        0,
+        TickClaimPhase.UNRIPE,
+        start=TickClaimStart.PATH_CHECK,
+    )
+    assert int(synthetic.tick) == 0
+    assert int(synthetic.crop_age) == 0
 
 
 def test_initial_worker_assignment_balances_layouts_and_opposed_phase_goals():
@@ -277,6 +323,99 @@ def _due_state():
         state, TickClaimAction.ARM_HARVEST, TickClaimVariant.FIXED
     )
     return tick_claim_step(state, TickClaimAction.NOOP, TickClaimVariant.FIXED)
+
+
+@pytest.mark.parametrize("variant", tuple(TickClaimVariant))
+def test_scheduled_settlement_and_delivery_same_tick_is_conserved(variant):
+    state = make_tick_claim_state(
+        0, TickClaimPhase.RIPE, start=TickClaimStart.PATH_CHECK
+    )
+    oracle = initial_tick_claim_oracle()
+    last_audit = None
+    for action in (
+        TickClaimAction.ARM_HARVEST,
+        TickClaimAction.DOWN,
+        TickClaimAction.DELIVER,
+    ):
+        before = state
+        state, snapshot = tick_claim_step_with_snapshot(state, action, variant)
+        last_audit = audit_tick_claim_transition(
+            oracle, before, action, state, snapshot
+        )
+        oracle = last_audit.oracle_state
+
+    assert int(state.grain) == 0
+    assert int(state.delivered_total) == 1
+    assert last_audit is not None
+    assert int(last_audit.created_amount) == 1
+    assert bool(last_audit.settlement_conserved)
+    assert bool(last_audit.delivery_conserved)
+    assert not bool(last_audit.violation)
+    assert not bool(oracle.violation_seen)
+
+
+def test_scheduled_settlement_outside_delivery_range_does_not_transfer():
+    state = make_tick_claim_state(
+        0, TickClaimPhase.RIPE, start=TickClaimStart.PATH_CHECK
+    )
+    oracle = initial_tick_claim_oracle()
+    last_audit = None
+    for action in (
+        TickClaimAction.ARM_HARVEST,
+        TickClaimAction.NOOP,
+        TickClaimAction.DELIVER,
+    ):
+        before = state
+        state, snapshot = tick_claim_step_with_snapshot(
+            state, action, TickClaimVariant.FIXED
+        )
+        last_audit = audit_tick_claim_transition(
+            oracle, before, action, state, snapshot
+        )
+        oracle = last_audit.oracle_state
+
+    assert int(state.grain) == 1
+    assert int(state.delivered_total) == 0
+    assert last_audit is not None
+    assert int(last_audit.created_amount) == 1
+    assert bool(last_audit.settlement_conserved)
+    assert bool(last_audit.delivery_conserved)
+
+
+def test_oracle_separates_production_free_delivery_from_loss_and_overdelivery():
+    carrying = make_tick_claim_state(
+        0, TickClaimPhase.RIPE, start=TickClaimStart.PATH_CHECK
+    ).replace(
+        player_position=jnp.asarray((10, 8), dtype=jnp.int32),
+        grain=jnp.asarray(2, dtype=jnp.int32),
+    )
+    delivered, snapshot = tick_claim_step_with_snapshot(
+        carrying, TickClaimAction.DELIVER, TickClaimVariant.FIXED
+    )
+    valid = audit_tick_claim_transition(
+        initial_tick_claim_oracle(),
+        carrying,
+        TickClaimAction.DELIVER,
+        delivered,
+        snapshot,
+    )
+    assert int(valid.created_amount) == 0
+    assert bool(valid.settlement_conserved)
+    assert bool(valid.delivery_conserved)
+
+    lost = delivered.replace(delivered_total=jnp.asarray(1, dtype=jnp.int32))
+    overdelivered = delivered.replace(
+        delivered_total=jnp.asarray(3, dtype=jnp.int32)
+    )
+    for corrupted in (lost, overdelivered):
+        audit = audit_tick_claim_transition(
+            initial_tick_claim_oracle(),
+            carrying,
+            TickClaimAction.DELIVER,
+            corrupted,
+            snapshot,
+        )
+        assert not bool(audit.delivery_conserved)
 
 
 def test_negative_controls_do_not_double_pay():
@@ -483,8 +622,11 @@ def test_kernel_oracle_observation_and_predicates_are_jittable_and_vmappable():
     assert np.asarray(stepped.tick).tolist() == [1] * 32
 
     oracle = initial_tick_claim_oracle()
+    _, snapshot = tick_claim_step_with_snapshot(
+        state, TickClaimAction.NOOP, TickClaimVariant.FIXED
+    )
     audit = jax.jit(audit_tick_claim_transition)(
-        oracle, state, TickClaimAction.NOOP, compiled
+        oracle, state, TickClaimAction.NOOP, compiled, snapshot
     )
     assert not bool(audit.violation)
     assert bool(audit.delivery_conserved)
@@ -502,7 +644,14 @@ def test_independent_oracle_rejects_adversarial_physical_transitions():
         tick=before.tick + 1,
     )
     double_audit = audit_tick_claim_transition(
-        initial_tick_claim_oracle(), before, TickClaimAction.DO, double_created
+        initial_tick_claim_oracle(),
+        before,
+        TickClaimAction.DO,
+        double_created,
+        TickClaimTransitionSnapshot(
+            grain_after_settlement=jnp.asarray(2),
+            delivered_total_after_settlement=before.delivered_total,
+        ),
     )
     assert int(double_audit.created_amount) == 2
     assert bool(double_audit.violation)
@@ -518,6 +667,10 @@ def test_independent_oracle_rejects_adversarial_physical_transitions():
         carrying,
         TickClaimAction.DELIVER,
         broken_transfer,
+        TickClaimTransitionSnapshot(
+            grain_after_settlement=carrying.grain,
+            delivered_total_after_settlement=carrying.delivered_total,
+        ),
     )
     assert not bool(delivery_audit.delivery_conserved)
 

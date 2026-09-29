@@ -11,7 +11,11 @@ import jax
 import jax.numpy as jnp
 from flax import struct
 
-from hackrl.tick_claim import TickClaimAction, TickClaimState
+from hackrl.tick_claim import (
+    TickClaimAction,
+    TickClaimState,
+    TickClaimTransitionSnapshot,
+)
 
 
 @struct.dataclass
@@ -30,6 +34,7 @@ class TickClaimAudit:
     created_amount: jax.Array
     cycle_payout_total: jax.Array
     violation: jax.Array
+    settlement_conserved: jax.Array
     delivery_conserved: jax.Array
 
 
@@ -65,8 +70,9 @@ def audit_tick_claim_transition(
     before: TickClaimState,
     action: jax.Array,
     after: TickClaimState,
+    snapshot: TickClaimTransitionSnapshot,
 ) -> TickClaimAudit:
-    """Audit one transition using only physical deltas and crop provenance."""
+    """Audit settlement creation and delivery transfer as separate phases."""
 
     same_cycle = jnp.logical_and(
         oracle_state.initialized,
@@ -79,23 +85,43 @@ def audit_tick_claim_transition(
         ),
     )
     prior_payout = jnp.where(same_cycle, oracle_state.payout_total, 0)
-    created_amount = jnp.maximum(_physical_total(after) - _physical_total(before), 0)
+    settled_total = (
+        snapshot.grain_after_settlement
+        + snapshot.delivered_total_after_settlement
+    )
+    created_delta = settled_total - _physical_total(before)
+    created_amount = jnp.maximum(created_delta, 0)
     cycle_payout_total = prior_payout + created_amount
     violation = cycle_payout_total > 1
 
-    removed_from_inventory = before.grain - after.grain
-    added_to_delivery = after.delivered_total - before.delivered_total
-    is_delivery = jnp.asarray(action) == TickClaimAction.DELIVER
+    settlement_conserved = jnp.logical_and(
+        snapshot.delivered_total_after_settlement == before.delivered_total,
+        created_delta >= 0,
+    )
+    removed_from_inventory = snapshot.grain_after_settlement - after.grain
+    added_to_delivery = (
+        after.delivered_total - snapshot.delivered_total_after_settlement
+    )
+    valid_delivery = jnp.logical_and(
+        jnp.asarray(action) == TickClaimAction.DELIVER,
+        jnp.sum(jnp.abs(before.player_position - before.delivery_position)) == 1,
+    )
     delivery_transfer_ok = jnp.logical_and(
-        removed_from_inventory >= 0,
+        after.grain == 0,
         jnp.logical_and(
-            added_to_delivery == removed_from_inventory,
-            _physical_total(after) == _physical_total(before),
+            removed_from_inventory == snapshot.grain_after_settlement,
+            jnp.logical_and(
+                added_to_delivery == snapshot.grain_after_settlement,
+                _physical_total(after) == settled_total,
+            ),
         ),
     )
-    no_unrequested_receipt = added_to_delivery == 0
+    no_transfer = jnp.logical_and(
+        after.grain == snapshot.grain_after_settlement,
+        after.delivered_total == snapshot.delivered_total_after_settlement,
+    )
     delivery_conserved = jnp.where(
-        is_delivery, delivery_transfer_ok, no_unrequested_receipt
+        valid_delivery, delivery_transfer_ok, no_transfer
     )
     next_oracle = TickClaimOracleState(
         initialized=jnp.asarray(True),
@@ -110,6 +136,7 @@ def audit_tick_claim_transition(
         created_amount=created_amount,
         cycle_payout_total=cycle_payout_total,
         violation=violation,
+        settlement_conserved=settlement_conserved,
         delivery_conserved=delivery_conserved,
     )
 

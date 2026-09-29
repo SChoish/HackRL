@@ -92,7 +92,8 @@ class TickClaimSplit(str, Enum):
 
 class TickClaimStart(str, Enum):
     NATURAL = "natural_reset"
-    PATH_CHECK = "common_setup"
+    COMMON_SETUP = "common_setup"
+    PATH_CHECK = "synthetic_path_check"
 
 
 class TickClaimPhase(IntEnum):
@@ -186,6 +187,14 @@ class TickClaimState:
 
 
 @struct.dataclass
+class TickClaimTransitionSnapshot:
+    """Analysis-only physical state after settlement and before delivery."""
+
+    grain_after_settlement: jax.Array
+    delivered_total_after_settlement: jax.Array
+
+
+@struct.dataclass
 class TickClaimObservation:
     map_tiles: jax.Array
     role_channels: jax.Array
@@ -265,6 +274,22 @@ def transform_direction(direction: jax.Array, layout_index: jax.Array) -> jax.Ar
     return jnp.argmax(jnp.all(_CARDINAL_DELTAS == transformed, axis=1)) + 1
 
 
+def tick_claim_setup_prefix(layout_index: jax.Array) -> jax.Array:
+    """Return the four legal fixed actions from natural reset to common setup."""
+
+    layout_index = jnp.asarray(layout_index, dtype=jnp.int32)
+    even = jnp.asarray(
+        (Action.LEFT.value, Action.LEFT.value, Action.UP.value, Action.UP.value),
+        dtype=jnp.int32,
+    )
+    odd = jnp.asarray(
+        (Action.UP.value, Action.UP.value, Action.LEFT.value, Action.LEFT.value),
+        dtype=jnp.int32,
+    )
+    canonical = jnp.where(layout_index % 2 == 0, even, odd)
+    return jax.vmap(lambda action: transform_direction(action, layout_index))(canonical)
+
+
 def materialize_layout(
     layout_index: jax.Array,
     split: TickClaimSplit = TickClaimSplit.TRAIN,
@@ -297,14 +322,15 @@ def make_tick_claim_state(
     walkable, crop_position, device_position, delivery_position = materialize_layout(
         layout_index, split
     )
-    if TickClaimStart(start) is TickClaimStart.PATH_CHECK:
+    start = TickClaimStart(start)
+    if start is TickClaimStart.PATH_CHECK:
         base_player = _BASE_PATH_PLAYER
     else:
         base_player = _BASE_NATURAL_PLAYERS[layout_index % 2]
     player_position = transform_positions(base_player, layout_index, split)
     player_direction = transform_direction(Action.UP.value, layout_index)
     ripe = phase == TickClaimPhase.RIPE
-    return TickClaimState(
+    state = TickClaimState(
         walkable=walkable,
         crop_position=crop_position,
         device_position=device_position,
@@ -329,6 +355,16 @@ def make_tick_claim_state(
         layout_index=layout_index,
         initial_phase=phase,
     )
+    if start is TickClaimStart.COMMON_SETUP:
+        state, _ = jax.lax.scan(
+            lambda current, action: (
+                tick_claim_step(current, action, TickClaimVariant.FIXED),
+                None,
+            ),
+            state,
+            tick_claim_setup_prefix(layout_index),
+        )
+    return state
 
 
 def reset_tick_claim(
@@ -376,12 +412,12 @@ def _position_is_role(state: TickClaimState, position: jax.Array) -> jax.Array:
     )
 
 
-def tick_claim_step(
+def tick_claim_step_with_snapshot(
     state: TickClaimState,
     action: jax.Array,
     variant: TickClaimVariant,
-) -> TickClaimState:
-    """Advance one tick for action 0..19; callers stop once world_done is true."""
+) -> tuple[TickClaimState, TickClaimTransitionSnapshot]:
+    """Advance one tick and expose the settlement/delivery analysis boundary."""
 
     variant = TickClaimVariant(variant)
     action = jnp.asarray(action, dtype=jnp.int32)
@@ -509,6 +545,10 @@ def tick_claim_step(
             consume_reservation, -1, next_state.reservation_cycle_id
         ),
     )
+    transition_snapshot = TickClaimTransitionSnapshot(
+        grain_after_settlement=next_state.grain,
+        delivered_total_after_settlement=next_state.delivered_total,
+    )
 
     # Delivery is a physical transfer, not a reward-only counter update.
     can_deliver = jnp.logical_and(
@@ -535,6 +575,17 @@ def tick_claim_step(
         # 7. World time advances exactly once for every action.
         tick=state.tick + 1,
     )
+    return next_state, transition_snapshot
+
+
+def tick_claim_step(
+    state: TickClaimState,
+    action: jax.Array,
+    variant: TickClaimVariant,
+) -> TickClaimState:
+    """Advance one tick for action 0..19; callers stop once world_done is true."""
+
+    next_state, _ = tick_claim_step_with_snapshot(state, action, variant)
     return next_state
 
 
