@@ -7,6 +7,7 @@ import argparse
 import hashlib
 import json
 import statistics
+import subprocess
 from pathlib import Path
 
 
@@ -41,12 +42,24 @@ def _cell_id(variant, seed):
     return f"{variant}_seed{seed}"
 
 
+def _is_ancestor(ancestor, descendant, repository):
+    return (
+        subprocess.run(
+            ["git", "merge-base", "--is-ancestor", ancestor, descendant],
+            cwd=repository,
+            check=False,
+        ).returncode
+        == 0
+    )
+
+
 def main():
     arguments = _arguments()
     manifest_path = Path(arguments.manifest)
     resolved_path = Path(arguments.resolved)
     manifest = _read(manifest_path)
     resolved = _read(resolved_path)
+    repository = Path(__file__).resolve().parents[1]
     run_root = Path(arguments.run_root)
     expected_transitions = manifest["budget"]["transitions_per_cell"]
     expected_updates = manifest["budget"]["updates_per_cell"]
@@ -83,8 +96,11 @@ def main():
             == expected_transitions,
             "checkpoint_update": checkpoint.get("global_update")
             == expected_updates,
-            "code_revision": checkpoint.get("code_revision")
-            == expected_revision,
+            "code_revision_contains_implementation": _is_ancestor(
+                expected_revision,
+                checkpoint.get("code_revision", ""),
+                repository,
+            ),
         }
         failed = [name for name, passed in checks.items() if not passed]
         if failed:
@@ -172,9 +188,20 @@ def main():
         "resolved": str(resolved_path),
         "resolved_sha256": _sha256(resolved_path),
         "implementation_code_sha": expected_revision,
+        "resolved_source_hashes_match": all(
+            (repository / relative).is_file()
+            and _sha256(repository / relative) == expected_hash
+            for relative, expected_hash in resolved["source_hashes"].items()
+        ),
         "status": (
             "passed"
-            if not errors and len(cells) == manifest["budget"]["cell_count"]
+            if not errors
+            and len(cells) == manifest["budget"]["cell_count"]
+            and all(
+                (repository / relative).is_file()
+                and _sha256(repository / relative) == expected_hash
+                for relative, expected_hash in resolved["source_hashes"].items()
+            )
             else "failed"
         ),
         "errors": errors,
