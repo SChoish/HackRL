@@ -30,11 +30,11 @@
   },
   "full_shape_throughput": {
     "batch_size": 32768,
-    "compile_and_first_update_seconds": 7.189414944499731,
+    "compile_and_first_update_seconds": 6.9565521236509085,
     "device_platform": "cpu",
     "final_environment_steps": 65536,
-    "steady_second_update_seconds": 5.247054247185588,
-    "steady_transitions_per_second": 6245.027868270293,
+    "steady_second_update_seconds": 5.311829442158341,
+    "steady_transitions_per_second": 6168.872769131207,
     "updates_executed": 2
   },
   "parameter_count": 2640181,
