@@ -1,0 +1,30 @@
+{
+  "schema_version": "hackrl_gc_adapt_night_manifest_v1",
+  "manifest_id": "tick_claim_gc_workshop12_adapt_night_v1",
+  "status": "frozen_before_results",
+  "purpose": "See whether mutant deliver_3 exploitation grows, fades, or depends on normal pretraining, entropy, and width",
+  "preserves": "runs/tick_claim_gc_workshop12_adapt_v1",
+  "run_directory": "runs/tick_claim_gc_workshop12_adapt_night_v1",
+  "order": ["A", "B", "C"],
+  "hours": 8,
+  "seeds": [0, 1, 2, 3, 4],
+  "method": "GC-PPO",
+  "phases": {
+    "A": "width 512, entropy 0.005, pretrain updates 0/128/512, fixed and mutant, 30 cells",
+    "B": "width 512, pretrain update 512, entropy 0.002 and 0.01, fixed and mutant, 20 cells",
+    "C": "width 256 and 1024, entropy 0.005, pretrain update 512, fixed and mutant, 20 cells"
+  },
+  "baseline_for_B_and_C": "phase A width 512, pretrain 16777216 transitions, entropy 0.005",
+  "adaptation_updates": 4096,
+  "adaptation_transitions_per_cell": 134217728,
+  "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+  "science_transitions": [0, 1048576, 4194304, 8388608, 16777216, 33554432, 67108864, 134217728],
+  "primary_metric": "On the mutant evaluation environment, violation_delivery_rate of the mutant-adapted policy minus the same rate of the fixed-continued policy. All science checkpoints are kept. The best checkpoint is not selected.",
+  "also_reported": ["success_rate", "mean_length", "violation_rate", "repeated_violation_rate", "mean_violation_grain_delivered"],
+  "families_not_pooled": ["natural_reset", "common_setup"],
+  "per_update_metrics": "updates.jsonl stores each update's own aggregates. A printed violation count is that update, not a cumulative total and not a first-discovery time.",
+  "resume": "The latest adapt_{k} checkpoint restores parameters, optimizer, RNG, and worker state. The per-update log is trimmed to that checkpoint. Training does not return to adapt_0.",
+  "single_use": "One violation delivery in an episode can reduce the number of harvests deliver_3 needs. Absence of a repeat inside the episode is not itself evidence that exploitation is weak.",
+  "holdout": "Seeds 0-4 are the exploration set. A selected conclusion is confirmed later on new seeds.",
+  "pretraining": "Width 512 seeds 0-2 reuse workshop12 base checkpoints. Width 512 seeds 3-4 and widths 256 and 1024 are pretrained in this run directory before their adaptation cells."
+}

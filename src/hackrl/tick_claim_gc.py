@@ -949,6 +949,9 @@ def _evaluation_states(split, repeats):
     return combined, labels, state_indices, repeat_indices
 
 
+_FROZEN_EVAL_CACHE = {}
+
+
 def evaluate_tick_claim_gc_frozen(
     network,
     parameters,
@@ -960,7 +963,11 @@ def evaluate_tick_claim_gc_frozen(
     seed_base,
     learner_seed,
 ):
-    """Evaluate deliver_3 without mutating learner or sampler state."""
+    """Evaluate deliver_3 without mutating learner or sampler state.
+
+    The rollout is compiled once for a network object and eval settings.
+    Later calls with new parameters reuse that compilation.
+    """
 
     variant = TickClaimVariant(variant)
     split = TickClaimSplit(split)
@@ -977,7 +984,7 @@ def evaluate_tick_claim_gc_frozen(
     keys = jax.vmap(jax.random.PRNGKey)(seeds)
     oracle = _broadcast_oracle(episode_count)
 
-    def eval_step(carry, step_index):
+    def eval_step(parameters, carry, step_index):
         (
             state,
             oracle_state,
@@ -1107,13 +1114,28 @@ def evaluate_tick_claim_gc_frozen(
         zeros_int,
         keys,
     )
-    final, _ = jax.jit(
-        lambda carry: jax.lax.scan(
-            eval_step,
-            carry,
+    def rollout(parameters):
+        final_carry, _ = jax.lax.scan(
+            lambda carry, step_index: eval_step(parameters, carry, step_index),
+            initial_carry,
             jnp.arange(128, dtype=jnp.int32),
         )
-    )(initial_carry)
+        return final_carry
+
+    cache_key = (
+        id(network),
+        variant.value,
+        split.value,
+        bool(stochastic),
+        int(repeats_per_state),
+        int(seed_base),
+        int(learner_seed),
+    )
+    compiled = _FROZEN_EVAL_CACHE.get(cache_key)
+    if compiled is None:
+        compiled = jax.jit(rollout)
+        _FROZEN_EVAL_CACHE[cache_key] = compiled
+    final = compiled(parameters)
     (
         _,
         _,
@@ -1300,7 +1322,6 @@ _BRANCH_LOCKED_FIELDS = (
     "gamma",
     "gae_lambda",
     "clip_epsilon",
-    "entropy_coefficient",
     "value_coefficient",
     "max_grad_norm",
     "evaluation_split",
@@ -1321,7 +1342,8 @@ def load_tick_claim_gc_branch(directory, template, branch_config):
     """Load a workshop12 checkpoint for a deliver_3 fixed or mutant branch.
 
     Architecture, seed, and optimization hyperparameters stay locked. The
-    branch may change variant, goal mode, and the adaptation budget.
+    branch may change variant, goal mode, adaptation budget, and the entropy
+    coefficient. Entropy is the exploration intervention, so it is not locked.
     """
 
     source = Path(directory)
