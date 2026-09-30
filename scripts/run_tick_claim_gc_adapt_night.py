@@ -263,7 +263,11 @@ def curve_complete(path, adaptation_update):
             if not set(FAMILIES) <= set(families):
                 return False
             for family in FAMILIES:
-                if "violation_delivery_rate" not in families[family]:
+                if not {
+                    "violation_delivery_rate",
+                    "opportunity_exposure_rate",
+                    "violation_rate_given_opportunity",
+                } <= set(families[family]):
                     return False
     return True
 
@@ -292,6 +296,8 @@ def _evaluate(network, params, *, variant, seed):
                     "violation_delivery_rate",
                     "mean_violation_grain_delivered",
                     "mean_first_violation_step",
+                    "opportunity_exposure_rate",
+                    "violation_rate_given_opportunity",
                 )
             }
             for family in FAMILIES

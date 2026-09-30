@@ -1,6 +1,9 @@
 import json
 from dataclasses import replace
 
+import jax
+import numpy as np
+
 from hackrl.tick_claim_gc import (
     TickClaimGCConfig,
     _BRANCH_LOCKED_FIELDS,
@@ -8,6 +11,7 @@ from hackrl.tick_claim_gc import (
     evaluate_tick_claim_gc_frozen,
     initialize_tick_claim_gc,
     load_tick_claim_gc_branch,
+    make_tick_claim_gc_update,
     save_tick_claim_gc_checkpoint,
 )
 from run_tick_claim_gc_adapt_night import (
@@ -78,7 +82,11 @@ def test_metric_log_keeps_only_updates_through_the_checkpoint(tmp_path):
 def test_curve_file_requires_both_dynamics_and_families(tmp_path):
     path = tmp_path / "adapt_0.json"
     assert curve_complete(path, 0) is False
-    family = {"violation_delivery_rate": 0.0}
+    family = {
+        "violation_delivery_rate": 0.0,
+        "opportunity_exposure_rate": 0.0,
+        "violation_rate_given_opportunity": None,
+    }
     path.write_text(
         json.dumps(
             {
@@ -122,6 +130,41 @@ def test_entropy_can_change_when_branching(tmp_path):
     _branch_network, template = initialize_tick_claim_gc(branch)
     loaded = load_tick_claim_gc_branch(tmp_path, template, branch)
     assert int(loaded.global_update) == 0
+
+
+def test_empty_minibatch_does_not_apply_adam():
+    config = TickClaimGCConfig(
+        num_envs=2,
+        num_steps=2,
+        num_updates=1,
+        minibatch_size=2,
+        hidden_size=8,
+        goal_mode="deliver_3",
+    )
+    network, runner = initialize_tick_claim_gc(config)
+    runner = runner.replace(
+        command_active=jax.numpy.zeros_like(runner.command_active)
+    )
+    update = jax.jit(make_tick_claim_gc_update(network, config))
+    updated, metrics = update(runner)
+    jax.block_until_ready(updated.global_update)
+    assert int(updated.train_state.step) == int(runner.train_state.step)
+
+    def max_abs(left, right):
+        return max(
+            float(np.max(np.abs(np.asarray(a) - np.asarray(b))))
+            for a, b in zip(
+                jax.tree_util.tree_leaves(left),
+                jax.tree_util.tree_leaves(right),
+            )
+        )
+
+    assert max_abs(runner.train_state.params, updated.train_state.params) == 0
+    assert max_abs(runner.train_state.opt_state, updated.train_state.opt_state) == 0
+    assert int(np.asarray(jax.device_get(metrics["valid_transitions"]))) == 0
+    assert int(np.asarray(jax.device_get(metrics["empty_minibatches"]))) == (
+        config.update_epochs * config.num_minibatches
+    )
 
 
 def test_frozen_eval_reuses_compilation():

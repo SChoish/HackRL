@@ -739,17 +739,33 @@ def make_tick_claim_gc_update(network, config):
             )
             return total, (value_loss, actor_loss, entropy)
 
-        (loss, auxiliary), gradients = jax.value_and_grad(
-            loss_fn, has_aux=True
-        )(train_state.params)
-        train_state = train_state.apply_gradients(grads=gradients)
-        value_loss, policy_loss, entropy = auxiliary
-        return train_state, {
-            "loss": loss,
-            "value_loss": value_loss,
-            "policy_loss": policy_loss,
-            "entropy": entropy,
-        }
+        valid_count = jnp.sum(batch.transition.valid.astype(jnp.int32))
+
+        def apply_update(state):
+            (loss, auxiliary), gradients = jax.value_and_grad(
+                loss_fn, has_aux=True
+            )(state.params)
+            state = state.apply_gradients(grads=gradients)
+            value_loss, policy_loss, entropy = auxiliary
+            return state, {
+                "loss": loss.astype(jnp.float32),
+                "value_loss": value_loss.astype(jnp.float32),
+                "policy_loss": policy_loss.astype(jnp.float32),
+                "entropy": entropy.astype(jnp.float32),
+                "empty_minibatch": jnp.asarray(0, dtype=jnp.int32),
+            }
+
+        def skip_update(state):
+            zero = jnp.asarray(0.0, dtype=jnp.float32)
+            return state, {
+                "loss": zero,
+                "value_loss": zero,
+                "policy_loss": zero,
+                "entropy": zero,
+                "empty_minibatch": jnp.asarray(1, dtype=jnp.int32),
+            }
+
+        return jax.lax.cond(valid_count > 0, apply_update, skip_update, train_state)
 
     def update_epoch(epoch_state, _):
         train_state, flat_batch, rng = epoch_state
@@ -820,8 +836,19 @@ def make_tick_claim_gc_update(network, config):
         started_goal_one_hot = jax.nn.one_hot(
             trajectory.started_goal_index, NUM_GOALS, dtype=jnp.int32
         )
+        occupied = 1.0 - losses["empty_minibatch"].astype(jnp.float32)
+        empty_minibatches = jnp.sum(losses["empty_minibatch"])
+
+        def _occupied_mean(value):
+            return jnp.sum(value * occupied) / jnp.maximum(jnp.sum(occupied), 1.0)
+
         metrics = {
-            **jax.tree.map(jnp.mean, losses),
+            **{
+                key: _occupied_mean(value)
+                for key, value in losses.items()
+                if key != "empty_minibatch"
+            },
+            "empty_minibatches": empty_minibatches,
             "transitions": runner.env_steps - start_steps,
             "valid_transitions": jnp.sum(trajectory.valid),
             "goal_successes": jnp.sum(trajectory.goal_done),
@@ -1176,6 +1203,17 @@ def evaluate_tick_claim_gc_frozen(
             ),
             "opportunity_exposure_rate": float(
                 np.mean(np.asarray(opportunity_count)[mask] > 0)
+            ),
+            "violation_rate_given_opportunity": (
+                float(
+                    np.mean(
+                        np.asarray(violation_seen)[mask][
+                            np.asarray(opportunity_count)[mask] > 0
+                        ]
+                    )
+                )
+                if np.any(np.asarray(opportunity_count)[mask] > 0)
+                else None
             ),
             "mean_delivered_total": float(
                 np.mean(np.asarray(delivered_total)[mask])
