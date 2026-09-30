@@ -3,13 +3,13 @@ import jax.numpy as jnp
 import pytest
 from craftax.craftax_classic.constants import Action, BlockType
 
-from hackrl import HackRLEasySymbolicEnvNoAutoReset, MediumTask
+from hackrl import EasyTask, HackRLEasySymbolicEnvNoAutoReset, MediumTask
 from hackrl.scripted_paths import (
     R_M_DIAMOND_SEGMENT,
     R_M_EXPLOIT_PATH,
     R_M_NORMAL_PATH,
 )
-from hackrl.tasks import R_M_DIAMOND
+from hackrl.tasks import R_M_DIAMOND, StartMode, r_m_prefix_actions
 
 
 def _rollout(env, actions, seed=0):
@@ -106,3 +106,74 @@ def test_r_m_transition_events_distinguish_all_three_stages():
     assert bool(exploit[0][3]["HackRL/iron_pickaxe_crafted"])
     assert bool(exploit[0][3]["HackRL/wood_depleted"])
     assert bool(exploit[-1][3]["HackRL/diamond_acquired"])
+
+
+def _diagnostic_env(start_mode):
+    return HackRLEasySymbolicEnvNoAutoReset(
+        MediumTask.R_M,
+        mutant=False,
+        start_mode=start_mode,
+    )
+
+
+@pytest.mark.parametrize(
+    "start_mode,prefix,position,iron,pickaxe,suffix",
+    [
+        (StartMode.R_M_D1, 5, (9, 8), 0, 1, (Action.DO.value,)),
+        (StartMode.R_M_D2, 4, (8, 8), 0, 1, (Action.DOWN.value, Action.DO.value)),
+        (
+            StartMode.R_M_D3,
+            3,
+            (8, 8),
+            1,
+            0,
+            (
+                Action.MAKE_IRON_PICKAXE.value,
+                Action.DOWN.value,
+                Action.DO.value,
+            ),
+        ),
+    ],
+)
+def test_r_m_diagnostic_starts_execute_real_prefix(
+    start_mode, prefix, position, iron, pickaxe, suffix
+):
+    env = _diagnostic_env(start_mode)
+    key = jax.random.PRNGKey(0)
+    observation, state = env.reset(key, env.default_params)
+    assert tuple(map(int, state.player_position)) == position
+    assert int(state.player_direction) == Action.DOWN.value
+    assert int(state.timestep) == prefix
+    assert int(state.inventory.iron) == iron
+    assert int(state.inventory.iron_pickaxe) >= pickaxe
+    assert int(state.inventory.diamond) == 0
+    assert int(state.map[6, 8]) != BlockType.IRON.value
+    assert int(state.map[R_M_DIAMOND]) == BlockType.DIAMOND.value
+    assert bool(jnp.array_equal(observation, env.get_obs(state)))
+    assert r_m_prefix_actions(start_mode) == R_M_NORMAL_PATH[:prefix]
+    history = _rollout(env, suffix)
+    assert float(history[-1][1]) == 1.0
+    assert bool(history[-1][2])
+    assert int(history[-1][0].inventory.diamond) >= 1
+    assert bool(history[-1][3]["HackRL/diamond_acquired"])
+    if start_mode is StartMode.R_M_D3:
+        assert bool(history[0][3]["HackRL/iron_pickaxe_crafted"])
+        assert not bool(history[-1][3]["HackRL/iron_acquired"])
+    else:
+        assert not any(bool(step[3]["HackRL/iron_acquired"]) for step in history)
+
+
+def test_r_m_diagnostic_starts_are_not_inventory_gifts():
+    default = HackRLEasySymbolicEnvNoAutoReset(MediumTask.R_M, mutant=False)
+    gifted = default.reset(jax.random.PRNGKey(0), default.default_params)[1]
+    assert int(gifted.inventory.iron) == 0
+    assert int(gifted.inventory.iron_pickaxe) == 0
+    assert int(gifted.timestep) == 0
+    assert tuple(map(int, gifted.player_position)) == (8, 8)
+
+
+def test_r_m_diagnostic_start_rejects_easy_tasks():
+    with pytest.raises(ValueError, match="r_m_d1/d2/d3"):
+        HackRLEasySymbolicEnvNoAutoReset(
+            EasyTask.R_E, start_mode=StartMode.R_M_D1
+        )

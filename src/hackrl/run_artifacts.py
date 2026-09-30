@@ -16,6 +16,7 @@ from hackrl.tasks import (
     FixtureVersion,
     StartMode,
     parse_task,
+    r_m_prefix_length,
 )
 
 
@@ -55,6 +56,7 @@ def config_payload(config) -> dict:
     payload["metrics_schema_version"] = 2
     payload["fixture_dynamics_version"] = FixtureDynamics(config.dynamics).version
     payload["checkpoint_updates"] = list(config.checkpoint_updates)
+    payload["prefix_length"] = r_m_prefix_length(config.start_mode)
     return payload
 
 

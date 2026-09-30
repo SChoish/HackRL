@@ -56,8 +56,14 @@ def parse_args():
         help="comma-separated update counts to save params+eval, e.g. 0,32,128,512",
     )
     parser.add_argument(
+        "--eval-sample-episodes",
+        type=int,
+        default=None,
+        help="sample-eval episodes; defaults to --eval-episodes",
+    )
+    parser.add_argument(
         "--start-mode",
-        choices=["default", "r_e_post_iron"],
+        choices=["default", "r_e_post_iron", "r_m_d1", "r_m_d2", "r_m_d3"],
         default="default",
     )
     parser.add_argument(
@@ -85,6 +91,7 @@ def make_config(args, task, variant, log_dir=None):
         num_minibatches=args.num_minibatches,
         layer_size=args.layer_size,
         eval_episodes=args.eval_episodes,
+        eval_sample_episodes=args.eval_sample_episodes,
         learning_rate=args.learning_rate,
         anneal_learning_rate=args.anneal_learning_rate,
         start_mode=args.start_mode,

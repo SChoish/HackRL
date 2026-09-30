@@ -51,6 +51,76 @@ class StartMode(str, Enum):
 
     DEFAULT = "default"
     R_E_POST_IRON = "r_e_post_iron"
+    R_M_D1 = "r_m_d1"
+    R_M_D2 = "r_m_d2"
+    R_M_D3 = "r_m_d3"
+
+
+# Prefixes of R_M_NORMAL_PATH executed from the original reset. Inventory is
+# not gifted; remaining time is H minus the prefix length.
+R_M_PREFIX_LENGTHS = {
+    StartMode.R_M_D1: 5,
+    StartMode.R_M_D2: 4,
+    StartMode.R_M_D3: 3,
+}
+
+
+def is_r_m_diagnostic_start(start_mode: StartMode | str) -> bool:
+    return StartMode(start_mode) in R_M_PREFIX_LENGTHS
+
+
+def r_m_prefix_length(start_mode: StartMode | str) -> int:
+    return R_M_PREFIX_LENGTHS.get(StartMode(start_mode), 0)
+
+
+def r_m_prefix_actions(start_mode: StartMode | str) -> tuple[int, ...]:
+    from hackrl.scripted_paths import R_M_NORMAL_PATH
+
+    return R_M_NORMAL_PATH[: r_m_prefix_length(start_mode)]
+
+
+def apply_r_m_scripted_prefix(
+    state,
+    rng,
+    params,
+    static_params,
+    mutation: RootMutation,
+    dynamics: FixtureDynamics | str,
+    actions: tuple[int, ...] | list[int],
+):
+    """Execute a fixed action prefix. These steps are not learning transitions."""
+
+    dynamics = FixtureDynamics(dynamics)
+    action_array = jnp.asarray(actions, dtype=jnp.int32)
+
+    def body(carry, action):
+        state, rng = carry
+        rng, step_rng = jax.random.split(rng)
+        next_state, _, _ = craftax_step_with_events(
+            step_rng,
+            state,
+            action,
+            params,
+            static_params,
+            mutation,
+            contract=mutation,
+        )
+        if dynamics is FixtureDynamics.PATCHED:
+            next_state = _enforce_empty_mobs(next_state, static_params)
+        return (next_state, rng), None
+
+    (state, _), _ = jax.lax.scan(body, (state, rng), action_array)
+    return state
+
+
+def validate_start_mode(start_mode: StartMode | str, task: EasyTask | MediumTask | str):
+    start_mode = StartMode(start_mode)
+    task = parse_task(task)
+    if start_mode is StartMode.R_E_POST_IRON and task is not EasyTask.R_E:
+        raise ValueError("r_e_post_iron is only defined for R-E")
+    if is_r_m_diagnostic_start(start_mode) and task is not MediumTask.R_M:
+        raise ValueError("r_m_d1/d2/d3 are only defined for R-M")
+    return start_mode
 
 
 class FixtureVersion(str, Enum):
@@ -189,11 +259,9 @@ def build_easy_state(
     """Build a 16x16 fixture without invoking Craftax world generation."""
 
     task = parse_task(task)
-    start_mode = StartMode(start_mode)
+    start_mode = validate_start_mode(start_mode, task)
     fixture = FixtureVersion(fixture)
     dynamics = FixtureDynamics(dynamics)
-    if start_mode is StartMode.R_E_POST_IRON and task is not EasyTask.R_E:
-        raise ValueError("r_e_post_iron is only defined for R-E")
     if fixture is FixtureVersion.R_E_REPLENISH and task is not EasyTask.R_E:
         raise ValueError("r_e_replenish is only defined for R-E")
     if tuple(static_params.map_size) != (16, 16):
@@ -326,11 +394,7 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         self.start_mode = StartMode(start_mode)
         self.fixture = FixtureVersion(fixture)
         self.dynamics = FixtureDynamics(dynamics)
-        if (
-            self.start_mode is StartMode.R_E_POST_IRON
-            and self.task is not EasyTask.R_E
-        ):
-            raise ValueError("r_e_post_iron is only defined for R-E")
+        self.start_mode = validate_start_mode(self.start_mode, self.task)
         if (
             self.fixture is FixtureVersion.R_E_REPLENISH
             and self.task is not EasyTask.R_E
@@ -356,15 +420,34 @@ class HackRLEasySymbolicEnvNoAutoReset(HackRLClassicSymbolicEnvNoAutoReset):
         )
 
     def reset_env(self, rng, params):
+        world_mode = (
+            StartMode.DEFAULT
+            if is_r_m_diagnostic_start(self.start_mode)
+            else self.start_mode
+        )
+        if is_r_m_diagnostic_start(self.start_mode):
+            rng, prefix_rng = jax.random.split(rng)
+        else:
+            prefix_rng = rng
         state = build_easy_state(
             self.task,
             rng,
             params,
             self.static_env_params,
-            start_mode=self.start_mode,
+            start_mode=world_mode,
             fixture=self.fixture,
             dynamics=self.dynamics,
         )
+        if is_r_m_diagnostic_start(self.start_mode):
+            state = apply_r_m_scripted_prefix(
+                state,
+                prefix_rng,
+                params,
+                self.static_env_params,
+                self.mutation,
+                self.dynamics,
+                r_m_prefix_actions(self.start_mode),
+            )
         return self.get_obs(state), state
 
     def goal_reached(self, state):

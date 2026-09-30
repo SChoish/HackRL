@@ -39,7 +39,10 @@ from hackrl.tasks import (
     HackRLEasySymbolicEnvNoAutoReset,
     MediumTask,
     StartMode,
+    is_r_m_diagnostic_start,
     parse_task,
+    r_m_prefix_actions,
+    r_m_prefix_length,
 )
 
 
@@ -143,6 +146,7 @@ class PPOConfig:
     activation: str = "tanh"
     anneal_learning_rate: bool = False
     eval_episodes: int = 8
+    eval_sample_episodes: int | None = None
     start_mode: str = StartMode.DEFAULT.value
     fixture: str = FixtureVersion.DEFAULT.value
     dynamics: str = FixtureDynamics.PATCHED.value
@@ -156,6 +160,12 @@ class PPOConfig:
     @property
     def minibatch_size(self) -> int:
         return self.batch_size // self.num_minibatches
+
+    @property
+    def resolved_eval_sample_episodes(self) -> int:
+        if self.eval_sample_episodes is None:
+            return self.eval_episodes
+        return self.eval_sample_episodes
 
     def validate(self):
         if self.num_envs <= 0 or self.num_steps <= 0:
@@ -177,6 +187,10 @@ class PPOConfig:
             and parse_task(self.task) is not EasyTask.R_E
         ):
             raise ValueError("r_e_post_iron is only defined for R-E")
+        if is_r_m_diagnostic_start(start_mode) and parse_task(self.task) is not MediumTask.R_M:
+            raise ValueError("r_m_d1/d2/d3 are only defined for R-M")
+        if self.eval_sample_episodes is not None and self.eval_sample_episodes <= 0:
+            raise ValueError("eval_sample_episodes must be positive")
         fixture = FixtureVersion(self.fixture)
         if (
             fixture is FixtureVersion.R_E_REPLENISH
@@ -634,38 +648,94 @@ def run_ppo_pilot(config: PPOConfig):
 
         train_leftover = jax.jit(train_leftover_fn)
 
-    def _eval_fn(params, key, stochastic):
+    sample_episodes = config.resolved_eval_sample_episodes
+    default_env = None
+    if is_r_m_diagnostic_start(config.start_mode):
+        default_env = HackRLEasySymbolicEnvNoAutoReset(
+            parse_task(config.task),
+            mutant=config.mutant,
+            start_mode=StartMode.DEFAULT,
+            fixture=config.fixture,
+            dynamics=dynamics,
+        )
+
+    def _eval_fn(params, key, stochastic, eval_env, num_episodes):
         return evaluate_policy(
             network,
             params,
-            env,
+            eval_env,
             key,
-            config.eval_episodes,
+            num_episodes,
             stochastic=stochastic,
         )
 
-    eval_mode = jax.jit(lambda params, key: _eval_fn(params, key, False))
-    eval_sample = jax.jit(lambda params, key: _eval_fn(params, key, True))
+    eval_mode = jax.jit(
+        lambda params, key: _eval_fn(
+            params, key, False, env, config.eval_episodes
+        )
+    )
+    eval_sample = jax.jit(
+        lambda params, key: _eval_fn(
+            params, key, True, env, sample_episodes
+        )
+    )
+    eval_default_mode = None
+    eval_default_sample = None
+    if default_env is not None:
+        eval_default_mode = jax.jit(
+            lambda params, key: _eval_fn(
+                params, key, False, default_env, config.eval_episodes
+            )
+        )
+        eval_default_sample = jax.jit(
+            lambda params, key: _eval_fn(
+                params, key, True, default_env, sample_episodes
+            )
+        )
 
-    def _evaluate_both(eval_rng):
+    def _host_metrics(metrics):
+        return {
+            key: float(jax.device_get(value)) for key, value in metrics.items()
+        }
+
+    def _evaluate_both(eval_rng, params):
         eval_rng, mode_rng, sample_rng = jax.random.split(eval_rng, 3)
-        params = runner_state[0].params
-        mode_metrics = {
-            key: float(jax.device_get(value))
-            for key, value in eval_mode(params, mode_rng).items()
-        }
+        mode_metrics = _host_metrics(eval_mode(params, mode_rng))
         sample_metrics = {
-            key.replace("eval_", "eval_sample_", 1): float(jax.device_get(value))
-            for key, value in eval_sample(params, sample_rng).items()
+            key.replace("eval_", "eval_sample_", 1): value
+            for key, value in _host_metrics(eval_sample(params, sample_rng)).items()
         }
-        return eval_rng, {**mode_metrics, **sample_metrics}
+        evaluation = {**mode_metrics, **sample_metrics}
+        if eval_default_mode is not None:
+            eval_rng, default_mode_rng, default_sample_rng = jax.random.split(
+                eval_rng, 3
+            )
+            evaluation.update(
+                {
+                    key.replace("eval_", "eval_default_", 1): value
+                    for key, value in _host_metrics(
+                        eval_default_mode(params, default_mode_rng)
+                    ).items()
+                }
+            )
+            evaluation.update(
+                {
+                    key.replace("eval_", "eval_default_sample_", 1): value
+                    for key, value in _host_metrics(
+                        eval_default_sample(params, default_sample_rng)
+                    ).items()
+                }
+            )
+        return eval_rng, evaluation
 
     save_at = set(config.checkpoint_updates)
     metric_chunks = []
     updates_done = 0
     rng, checkpoint_rng = jax.random.split(rng)
     if 0 in save_at and config.log_dir is not None:
-        checkpoint_rng, evaluation = _evaluate_both(checkpoint_rng)
+        checkpoint_rng, evaluation = _evaluate_both(
+            checkpoint_rng, runner_state[0].params
+        )
         write_mid_checkpoint(
             config.log_dir,
             tag="transitions_0",
@@ -687,7 +757,9 @@ def run_ppo_pilot(config: PPOConfig):
             jax.tree.map(lambda value: np.asarray(jax.device_get(value)), update_metrics)
         )
         if updates_done in save_at and config.log_dir is not None:
-            checkpoint_rng, evaluation = _evaluate_both(checkpoint_rng)
+            checkpoint_rng, evaluation = _evaluate_both(
+                checkpoint_rng, runner_state[0].params
+            )
             transitions = updates_done * config.batch_size
             write_mid_checkpoint(
                 config.log_dir,
@@ -735,36 +807,22 @@ def run_ppo_pilot(config: PPOConfig):
     }
     first_success = first_success_update(host_metrics["successful_episodes"])
 
-    rng, mode_rng, sample_rng = jax.random.split(rng, 3)
-
-    def _evaluate(key, stochastic):
-        return evaluate_policy(
-            network,
-            train_state.params,
-            env,
-            key,
-            config.eval_episodes,
-            stochastic=stochastic,
-        )
-
-    evaluation = {
-        key: float(jax.device_get(value))
-        for key, value in jax.jit(lambda key: _evaluate(key, False))(
-            mode_rng
-        ).items()
-    }
-    sample_evaluation = {
-        key.replace("eval_", "eval_sample_", 1): float(jax.device_get(value))
-        for key, value in jax.jit(lambda key: _evaluate(key, True))(
-            sample_rng
-        ).items()
-    }
+    rng, evaluation = _evaluate_both(rng, train_state.params)
+    _, start_state = env.reset(jax.random.PRNGKey(0), env.default_params)
+    prefix_len = r_m_prefix_length(config.start_mode)
 
     completed = totals["completed_episodes"]
     result = {
         "task": parse_task(config.task).value,
         "variant": "mutant" if config.mutant else "fixed",
         "start_mode": StartMode(config.start_mode).value,
+        "prefix_length": prefix_len,
+        "prefix_actions": list(r_m_prefix_actions(config.start_mode)),
+        "residual_horizon": int(env.spec.horizon - prefix_len),
+        "start_held_iron": int(start_state.inventory.iron),
+        "start_held_iron_pickaxe": int(start_state.inventory.iron_pickaxe),
+        "start_held_diamond": int(start_state.inventory.diamond),
+        "start_timestep": int(start_state.timestep),
         "fixture": FixtureVersion(config.fixture).value,
         "dynamics": dynamics.value,
         "git_sha": git_sha,
@@ -774,7 +832,6 @@ def run_ppo_pilot(config: PPOConfig):
         **totals,
         **optimization,
         **evaluation,
-        **sample_evaluation,
         "first_success_update": first_success,
         "completed_success_rate": (
             totals["successful_episodes"] / completed if completed else 0.0

@@ -2,12 +2,20 @@ import math
 
 import pytest
 
-from hackrl import EasyTask
+from hackrl import EasyTask, MediumTask
 from hackrl.ppo import PPOConfig, run_ppo_pilot
 
 
 def test_protocol_default_keeps_learning_rate_fixed():
     assert not PPOConfig().anneal_learning_rate
+
+
+def test_r_m_diagnostic_start_modes_validate_only_for_r_m():
+    with pytest.raises(ValueError, match="r_m_d1/d2/d3"):
+        PPOConfig(task=EasyTask.R_E, start_mode="r_m_d1").validate()
+    PPOConfig(task=MediumTask.R_M, start_mode="r_m_d1").validate()
+    assert PPOConfig().eval_sample_episodes is None
+    assert PPOConfig(eval_sample_episodes=128).resolved_eval_sample_episodes == 128
 
 
 def test_minimal_official_ppo_training_and_evaluation_flow(tmp_path):
