@@ -1,3 +1,4 @@
+import json
 from typing import NamedTuple
 
 import jax
@@ -20,9 +21,11 @@ from hackrl.tick_claim_gc import (
     NUM_GOALS,
     TickClaimGCConfig,
     calculate_tick_claim_gc_gae,
+    cell_checkpoints_complete,
     evaluate_tick_claim_gc_frozen,
     initialize_tick_claim_gc,
     make_tick_claim_gc_update,
+    run_tick_claim_gc_pilot,
     sample_false_seen_goal,
     step_tick_claim_gc_workers,
     tick_claim_gc_inputs,
@@ -294,3 +297,64 @@ def test_frozen_evaluation_does_not_mutate_learner_state():
     )
     assert result["overall"]["episodes"] == 64
     assert serialization.to_bytes(runner) == before
+
+
+def test_checkpoint_updates_must_lie_inside_the_budget():
+    config = TickClaimGCConfig(
+        num_envs=2,
+        num_steps=2,
+        num_updates=4,
+        minibatch_size=2,
+        checkpoint_updates=(0, 5),
+    )
+    try:
+        config.validate()
+    except ValueError as error:
+        assert "checkpoint_updates" in str(error)
+    else:
+        raise AssertionError("checkpoint past the budget was accepted")
+
+
+def test_scheduled_checkpoints_resume_without_replaying_saved_updates(
+    tmp_path, monkeypatch
+):
+    monkeypatch.setattr(
+        "hackrl.tick_claim_gc.evaluate_tick_claim_gc_frozen",
+        lambda *args, **kwargs: {"overall": {"episodes": 0}, "stub": True},
+    )
+    config = TickClaimGCConfig(
+        num_envs=2,
+        num_steps=2,
+        num_updates=2,
+        minibatch_size=2,
+        hidden_size=8,
+        goal_mode="workshop12",
+        checkpoint_updates=(0, 1, 2),
+        mode_repeats_per_state=1,
+        sample_repeats_per_state=1,
+    )
+    summary = run_tick_claim_gc_pilot(config, tmp_path)
+    assert summary["goal_mode"] == "workshop12"
+    assert summary["updates"] == 2
+    assert summary["resumed_from_update"] == 0
+    for update in (0, 1, 2):
+        meta = json.loads(
+            (
+                tmp_path / "checkpoints" / f"update_{update}" / "metadata.json"
+            ).read_text(encoding="utf-8")
+        )
+        assert meta["global_update"] == update
+    assert cell_checkpoints_complete(tmp_path, config)
+    saved = (tmp_path / "checkpoints" / "update_1" / "state.msgpack").read_bytes()
+
+    (tmp_path / "summary.json").unlink()
+    (tmp_path / "checkpoint_final" / "state.msgpack").unlink()
+    (tmp_path / "checkpoints" / "update_2" / "state.msgpack").unlink()
+    resumed = run_tick_claim_gc_pilot(config, tmp_path)
+    assert resumed["resumed_from_update"] == 1
+    assert resumed["updates"] == 2
+    assert (
+        tmp_path / "checkpoints" / "update_1" / "state.msgpack"
+    ).read_bytes() == saved
+    assert cell_checkpoints_complete(tmp_path, config)
+    assert run_tick_claim_gc_pilot(config, tmp_path)["updates"] == 2

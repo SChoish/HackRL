@@ -7,7 +7,8 @@ import argparse
 import json
 import os
 
-os.environ.setdefault("JAX_PLATFORMS", "cpu")
+if os.environ.get("HACKRL_DEVICE", "cpu") != "cuda":
+    os.environ.setdefault("JAX_PLATFORMS", "cpu")
 
 from hackrl.tick_claim_gc import (
     TickClaimGCConfig,
@@ -27,6 +28,16 @@ def _arguments():
     parser.add_argument("--hidden-size", type=int, default=512)
     parser.add_argument("--mode-repeats", type=int, default=1)
     parser.add_argument("--sample-repeats", type=int, default=4)
+    parser.add_argument(
+        "--goal-mode",
+        choices=("deliver_3", "workshop12"),
+        default="deliver_3",
+    )
+    parser.add_argument(
+        "--checkpoint-updates",
+        default="",
+        help="comma-separated update indices to snapshot, including 0",
+    )
     return parser.parse_args()
 
 
@@ -42,6 +53,12 @@ def main():
         hidden_size=arguments.hidden_size,
         mode_repeats_per_state=arguments.mode_repeats,
         sample_repeats_per_state=arguments.sample_repeats,
+        goal_mode=arguments.goal_mode,
+        checkpoint_updates=tuple(
+            int(item)
+            for item in arguments.checkpoint_updates.split(",")
+            if item
+        ),
     )
     summary = run_tick_claim_gc_calibration_cell(
         config, arguments.log_dir

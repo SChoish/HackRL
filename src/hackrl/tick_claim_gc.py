@@ -79,6 +79,12 @@ class TickClaimGCConfig:
     evaluation_split: str = TickClaimSplit.VALIDATION.value
     mode_repeats_per_state: int = 1
     sample_repeats_per_state: int = 4
+    checkpoint_updates: tuple[int, ...] = ()
+
+    def __post_init__(self):
+        object.__setattr__(
+            self, "checkpoint_updates", tuple(self.checkpoint_updates)
+        )
 
     @property
     def batch_size(self) -> int:
@@ -107,6 +113,11 @@ class TickClaimGCConfig:
             raise ValueError("goal_mode must be 'deliver_3' or 'workshop12'")
         if self.mode_repeats_per_state <= 0 or self.sample_repeats_per_state <= 0:
             raise ValueError("evaluation repeats must be positive")
+        if any(
+            update < 0 or update > self.num_updates
+            for update in self.checkpoint_updates
+        ):
+            raise ValueError("checkpoint_updates must lie in [0, num_updates]")
 
 
 class TickClaimGCActorCritic(nn.Module):
@@ -1167,6 +1178,7 @@ def evaluate_tick_claim_gc_frozen(
 
 def tick_claim_gc_config_payload(config):
     payload = asdict(config)
+    payload["checkpoint_updates"] = list(config.checkpoint_updates)
     payload.update(
         {
             "schema_version": "hackrl_gc_v1",
@@ -1322,21 +1334,108 @@ def validate_tick_claim_gc_checkpoint_resume(directory, config):
     }
 
 
-def run_tick_claim_gc_pilot(config, log_dir):
-    """Run one bounded GC-PPO pilot cell and persist full-state artifacts."""
+def _checkpoint_update_dir(destination, update):
+    return Path(destination) / "checkpoints" / f"update_{update}"
 
-    config.validate()
-    destination = Path(log_dir)
-    if destination.exists() and any(destination.iterdir()):
-        raise FileExistsError(f"run directory is not empty: {destination}")
-    destination.mkdir(parents=True, exist_ok=True)
-    git_sha = _git_sha()
-    (destination / "git_sha.txt").write_text(
-        git_sha + "\n", encoding="utf-8"
+
+def _load_update_metrics(destination, completed_updates):
+    path = Path(destination) / "updates.json"
+    if not path.is_file():
+        return []
+    loaded = json.loads(path.read_text(encoding="utf-8"))
+    prefix = [
+        item
+        for item in loaded
+        if isinstance(item, dict) and int(item.get("update", -1)) <= completed_updates
+    ]
+    prefix.sort(key=lambda item: int(item["update"]))
+    expected = list(range(1, completed_updates + 1))
+    if [int(item["update"]) for item in prefix] != expected:
+        return []
+    return prefix
+
+
+def _write_update_metrics(destination, update_metrics):
+    (Path(destination) / "updates.json").write_text(
+        json.dumps(update_metrics, indent=2, sort_keys=True) + "\n",
+        encoding="utf-8",
     )
-    (destination / "working_tree.patch").write_text(
-        _git_diff(), encoding="utf-8"
+
+
+def cell_checkpoints_complete(destination, config):
+    """True when the declared budget and every scheduled checkpoint exist."""
+
+    destination = Path(destination)
+    summary_path = destination / "summary.json"
+    final_meta = destination / "checkpoint_final" / "metadata.json"
+    if not summary_path.is_file() or not final_meta.is_file():
+        return False
+    summary = json.loads(summary_path.read_text(encoding="utf-8"))
+    final = json.loads(final_meta.read_text(encoding="utf-8"))
+    if int(summary.get("updates", -1)) != config.num_updates:
+        return False
+    if summary.get("goal_mode") != config.goal_mode:
+        return False
+    if summary.get("variant") != config.variant:
+        return False
+    if int(summary.get("seed", -1)) != config.seed:
+        return False
+    if int(final.get("global_update", -1)) != config.num_updates:
+        return False
+    for update in config.checkpoint_updates:
+        meta_path = _checkpoint_update_dir(destination, update) / "metadata.json"
+        if not meta_path.is_file():
+            return False
+        meta = json.loads(meta_path.read_text(encoding="utf-8"))
+        if int(meta.get("global_update", -1)) != update:
+            return False
+    return True
+
+
+def _latest_checkpoint_update(destination, config):
+    best = None
+    root = Path(destination) / "checkpoints"
+    if not root.is_dir():
+        return None
+    for path in root.glob("update_*"):
+        suffix = path.name[len("update_") :]
+        if not suffix.isdigit():
+            continue
+        update = int(suffix)
+        if update > config.num_updates:
+            continue
+        if not (path / "metadata.json").is_file() or not (path / "state.msgpack").is_file():
+            continue
+        meta = json.loads((path / "metadata.json").read_text(encoding="utf-8"))
+        if int(meta.get("global_update", -1)) != update:
+            continue
+        if best is None or update > best:
+            best = update
+    return best
+
+
+def _save_scheduled_checkpoint(destination, update, runner, config):
+    path = save_tick_claim_gc_checkpoint(
+        _checkpoint_update_dir(destination, update), runner, config
     )
+    print(
+        json.dumps(
+            {
+                "event": "checkpoint",
+                "update": int(update),
+                "environment_steps": int(runner.env_steps),
+                "path": str(path),
+            },
+            sort_keys=True,
+        ),
+        flush=True,
+    )
+    return path
+
+
+def _write_started_manifest(destination, git_sha, config):
+    (destination / "git_sha.txt").write_text(git_sha + "\n", encoding="utf-8")
+    (destination / "working_tree.patch").write_text(_git_diff(), encoding="utf-8")
     (destination / "run_manifest.json").write_text(
         json.dumps(
             {
@@ -1351,25 +1450,69 @@ def run_tick_claim_gc_pilot(config, log_dir):
         + "\n",
         encoding="utf-8",
     )
+
+
+def run_tick_claim_gc_pilot(config, log_dir):
+    """Run one bounded GC-PPO pilot cell and persist full-state artifacts."""
+
+    config.validate()
+    destination = Path(log_dir)
+    if cell_checkpoints_complete(destination, config):
+        return json.loads((destination / "summary.json").read_text(encoding="utf-8"))
+    destination.mkdir(parents=True, exist_ok=True)
+    latest = _latest_checkpoint_update(destination, config)
+    if latest is None and any(destination.iterdir()):
+        allowed = {"git_sha.txt", "working_tree.patch", "run_manifest.json"}
+        existing = {path.name for path in destination.iterdir()}
+        if not existing <= allowed:
+            raise FileExistsError(f"run directory is not empty: {destination}")
+    git_sha = _git_sha()
+    if latest is None:
+        _write_started_manifest(destination, git_sha, config)
+    else:
+        (destination / "resume_git_sha.txt").write_text(
+            git_sha + "\n", encoding="utf-8"
+        )
     network, runner = initialize_tick_claim_gc(config)
     update = jax.jit(make_tick_claim_gc_update(network, config))
+    save_at = set(config.checkpoint_updates)
+    if latest is None:
+        completed = 0
+        update_metrics = []
+        if 0 in save_at:
+            _save_scheduled_checkpoint(destination, 0, runner, config)
+    else:
+        runner = load_tick_claim_gc_checkpoint(
+            _checkpoint_update_dir(destination, latest), runner, config
+        )
+        completed = latest
+        update_metrics = _load_update_metrics(destination, completed)
     parameter_count = tick_claim_gc_parameter_count(runner.train_state.params)
-    update_metrics = []
     compile_seconds = None
     started = time.perf_counter()
-    for update_index in range(config.num_updates):
+    first_local_update = True
+    for update_index in range(completed, config.num_updates):
         update_started = time.perf_counter()
         runner, metrics = update(runner)
         jax.block_until_ready(runner.train_state.params)
         elapsed = time.perf_counter() - update_started
-        if update_index == 0:
+        if first_local_update:
             compile_seconds = elapsed
+            first_local_update = False
         host = {
             key: np.asarray(jax.device_get(value)).tolist()
             for key, value in metrics.items()
         }
         host["update"] = update_index + 1
         update_metrics.append(host)
+        finished = update_index + 1
+        if finished in save_at:
+            _write_update_metrics(destination, update_metrics)
+            _save_scheduled_checkpoint(destination, finished, runner, config)
+        print(
+            f"[update] {finished}/{config.num_updates} seconds={elapsed:.2f}",
+            flush=True,
+        )
     training_seconds = time.perf_counter() - started
 
     state_before_eval = serialization.to_bytes(runner)
@@ -1424,15 +1567,17 @@ def run_tick_claim_gc_pilot(config, log_dir):
         "goal_mode": config.goal_mode,
         "transitions": config.transitions,
         "updates": config.num_updates,
+        "resumed_from_update": completed,
+        "checkpoint_updates": list(config.checkpoint_updates),
         "parameter_count": parameter_count,
         "initial_commands": config.num_envs,
         "training_seconds": training_seconds,
         "compile_and_first_update_seconds": compile_seconds,
         "steady_state_transitions_per_second": (
-            (config.transitions - config.batch_size)
+            None
+            if latest is not None or config.num_updates <= 1
+            else (config.transitions - config.batch_size)
             / max(steady_seconds, 1e-9)
-            if config.num_updates > 1
-            else None
         ),
         **first_metrics,
         "total_goal_successes": int(
