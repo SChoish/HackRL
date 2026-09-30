@@ -1,0 +1,16 @@
+{
+  "schema_version": "hackrl_gc_completion_reconciliation_v1",
+  "training_manifest": "tick_claim_gc_workshop12_base_v1.json",
+  "run": "runs/tick_claim_gc_workshop12_base_v1",
+  "code_revision": "c288fd19ff189ae10306e3c5beae09ba984fccc8",
+  "operational_check": [
+    "summary.json records variant, seed, goal_mode, updates, and transitions",
+    "transitions equals updates times 512 workers times 64 steps",
+    "checkpoint_final metadata global_update equals the update budget",
+    "checkpoints/update_{0,32,128,256,512}/metadata.json global_update equals that index"
+  ],
+  "alignment": "the shell queue check and cell_checkpoints_complete both require the transition count. Before this note, only the shell check required it.",
+  "frozen_sentence_extras": "The frozen completion sentence names the five update checkpoints. The operational check also requires summary.json and checkpoint_final. On these three cells, checkpoint_final/state.msgpack is byte-identical to checkpoints/update_512/state.msgpack.",
+  "not_implied": "Passing this check does not score the 12 goals. That table is tick_claim_gc_workshop12_goal_eval_v1.json.",
+  "resume_history": "Each summary records resumed_from_update 0, so the missing-resume-history failure does not apply to this run."
+}

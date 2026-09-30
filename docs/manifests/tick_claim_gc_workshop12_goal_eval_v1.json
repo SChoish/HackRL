@@ -1,0 +1,91 @@
+{
+  "schema_version": "hackrl_gc_goal_eval_manifest_v1",
+  "manifest_id": "tick_claim_gc_workshop12_goal_eval_v1",
+  "status": "frozen_before_results",
+  "purpose": "Score what the fixed workshop12 checkpoints learned, one goal at a time, before any fixed/mutant adaptation branch",
+  "training_manifest": "tick_claim_gc_workshop12_base_v1.json",
+  "training_run": "runs/tick_claim_gc_workshop12_base_v1",
+  "checkpoints": [0, 32, 128, 256, 512],
+  "cells": [
+    {"variant": "fixed", "learner_seed": 0},
+    {"variant": "fixed", "learner_seed": 1},
+    {"variant": "fixed", "learner_seed": 2}
+  ],
+  "dynamics": "fixed",
+  "split": "validation",
+  "horizon_steps": 128,
+  "stop": "first transition that makes the commanded goal true, or world tick 128",
+  "starts": {
+    "natural_reset": "16 validation layouts x 2 phases, tick 0, empty inventory and delivery",
+    "common_setup": "the fixed four-action prefix from that natural reset, same 16 layouts x 2 phases",
+    "state_index": "0..31 = 2*layout_index+phase_index within a family",
+    "state_count_per_family": 32
+  },
+  "commands": "all 12 canonical goals, one command per episode; the policy one-hot is the commanded goal",
+  "initial_truth_on_one_repeat": {
+    "natural_reset_false_count": {
+      "inventory/raw_material_ge_1": 32,
+      "inventory/raw_material_ge_2": 32,
+      "inventory/raw_material_ge_3": 32,
+      "adjacent/raw_source": 32,
+      "adjacent/reservation_device": 32,
+      "adjacent/delivery_point": 32,
+      "facility/reservation_present": 32,
+      "facility/reservation_absent": 0,
+      "visible/crop_ripe": 16,
+      "visible/crop_unripe": 16,
+      "delivery/count_ge_1": 32,
+      "delivery/count_ge_3": 32
+    },
+    "common_setup_false_count": {
+      "inventory/raw_material_ge_1": 32,
+      "inventory/raw_material_ge_2": 32,
+      "inventory/raw_material_ge_3": 32,
+      "adjacent/raw_source": 0,
+      "adjacent/reservation_device": 0,
+      "adjacent/delivery_point": 32,
+      "facility/reservation_present": 32,
+      "facility/reservation_absent": 0,
+      "visible/crop_ripe": 16,
+      "visible/crop_unripe": 16,
+      "delivery/count_ge_1": 32,
+      "delivery/count_ge_3": 32
+    },
+    "note": "facility/reservation_absent is already true on every state of this grid, so this evaluation does not measure it. A zero eligible count is missing data, not a success rate."
+  },
+  "ability_rule": "success_rate_eligible uses only episodes whose commanded goal is false on the observation before the first action. Episodes that already satisfy the goal stay in already_satisfied_rate and in success_rate_all, and out of the ability rate. natural_reset and common_setup are not pooled.",
+  "mode": {
+    "action_rule": "argmax",
+    "repeats_per_state": 1,
+    "episodes_per_goal_per_family": 32
+  },
+  "sample": {
+    "action_rule": "categorical sample",
+    "repeats_per_state": 4,
+    "episodes_per_goal_per_family": 128,
+    "rng": "30000 + 1000000*learner_seed + 10000*goal_index + 1000*start_family + 10*state_index + repeat_index",
+    "start_family": {"natural_reset": 0, "common_setup": 1},
+    "ranges": "learner_seed 0..2, goal_index 0..11, start_family 0..1, state_index 0..31, repeat_index 0..3"
+  },
+  "aggregation": {
+    "primary_unit": "learner_seed",
+    "per_checkpoint": "each seed separately",
+    "across_seeds": "arithmetic mean and sample standard deviation with ddof=1",
+    "group_mean": "unweighted mean of success_rate_eligible over goals in the group whose eligible_episodes is positive",
+    "groups": {
+      "inventory": ["inventory/raw_material_ge_1", "inventory/raw_material_ge_2", "inventory/raw_material_ge_3"],
+      "adjacent": ["adjacent/raw_source", "adjacent/reservation_device", "adjacent/delivery_point"],
+      "facility": ["facility/reservation_present", "facility/reservation_absent"],
+      "visible": ["visible/crop_ripe", "visible/crop_unripe"],
+      "delivery": ["delivery/count_ge_1", "delivery/count_ge_3"]
+    },
+    "inference": "descriptive timing of ability; no significance claim and no curriculum-only claim"
+  },
+  "frozen_state": "evaluation reads parameters only and must leave those parameter bytes unchanged",
+  "restore_gate": "before any goal table is written, every listed checkpoint must load and two copies must produce the same next training update",
+  "completion_criterion": "15 checkpoint files, each with mode and sample for all 12 goals, plus a passing restore record for every checkpoint",
+  "out_of_scope": [
+    "fixed versus mutant adaptation",
+    "reading the training-end deliver_3 probe as this 12-goal table"
+  ]
+}

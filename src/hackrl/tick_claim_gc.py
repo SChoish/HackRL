@@ -1382,6 +1382,8 @@ def cell_checkpoints_complete(destination, config):
         return False
     if int(final.get("global_update", -1)) != config.num_updates:
         return False
+    if int(summary.get("transitions", -1)) != config.transitions:
+        return False
     for update in config.checkpoint_updates:
         meta_path = _checkpoint_update_dir(destination, update) / "metadata.json"
         if not meta_path.is_file():
