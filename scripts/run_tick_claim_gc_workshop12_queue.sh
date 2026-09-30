@@ -39,28 +39,22 @@ import json
 import sys
 from pathlib import Path
 
+from hackrl.tick_claim_gc import (
+    cell_checkpoints_complete,
+    config_from_tick_claim_gc_payload,
+)
+
 root = Path(sys.argv[1])
-summary_path = root / "summary.json"
-final_path = root / "checkpoint_final" / "metadata.json"
-if not summary_path.is_file() or not final_path.is_file():
+config_path = root / "config.json"
+if not config_path.is_file():
     raise SystemExit(1)
-summary = json.loads(summary_path.read_text(encoding="utf-8"))
-final = json.loads(final_path.read_text(encoding="utf-8"))
-if summary.get("goal_mode") != "workshop12" or summary.get("variant") != "fixed":
-    raise SystemExit(1)
-if int(summary.get("updates", -1)) != 512 or int(final.get("global_update", -1)) != 512:
-    raise SystemExit(1)
-if int(summary.get("transitions", -1)) != 16_777_216:
-    raise SystemExit(1)
-for update in (0, 32, 128, 256, 512):
-    meta = json.loads(
-        (root / "checkpoints" / f"update_{update}" / "metadata.json").read_text(
-            encoding="utf-8"
-        )
-    )
-    if int(meta.get("global_update", -1)) != update:
-        raise SystemExit(1)
-raise SystemExit(0)
+recorded = json.loads(config_path.read_text(encoding="utf-8"))
+config = config_from_tick_claim_gc_payload(recorded)
+expected = (0, 32, 128, 256, 512)
+complete = config.checkpoint_updates == expected and cell_checkpoints_complete(
+    root, config
+)
+raise SystemExit(0 if complete else 1)
 PY
 }
 

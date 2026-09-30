@@ -9,7 +9,7 @@ from __future__ import annotations
 import json
 import subprocess
 import time
-from dataclasses import asdict, dataclass
+from dataclasses import asdict, dataclass, fields
 from pathlib import Path
 from typing import NamedTuple
 
@@ -1262,8 +1262,23 @@ def save_tick_claim_gc_checkpoint(directory, runner, config):
     return destination
 
 
+def checkpoint_files_present(directory):
+    """A checkpoint counts only when its parameter state file is on disk."""
+
+    directory = Path(directory)
+    state = directory / "state.msgpack"
+    return (
+        state.is_file()
+        and state.stat().st_size > 0
+        and (directory / "metadata.json").is_file()
+        and (directory / "config.json").is_file()
+    )
+
+
 def load_tick_claim_gc_checkpoint(directory, template, config):
     source = Path(directory)
+    if not checkpoint_files_present(source):
+        raise FileNotFoundError(f"checkpoint state is missing: {source}")
     recorded = json.loads(
         (source / "config.json").read_text(encoding="utf-8")
     )
@@ -1271,6 +1286,75 @@ def load_tick_claim_gc_checkpoint(directory, template, config):
         raise ValueError("checkpoint config does not match requested config")
     return serialization.from_bytes(
         template, (source / "state.msgpack").read_bytes()
+    )
+
+
+_BRANCH_LOCKED_FIELDS = (
+    "seed",
+    "num_envs",
+    "num_steps",
+    "update_epochs",
+    "minibatch_size",
+    "hidden_size",
+    "learning_rate",
+    "gamma",
+    "gae_lambda",
+    "clip_epsilon",
+    "entropy_coefficient",
+    "value_coefficient",
+    "max_grad_norm",
+    "evaluation_split",
+    "mode_repeats_per_state",
+    "sample_repeats_per_state",
+)
+
+
+def config_from_tick_claim_gc_payload(recorded):
+    names = {item.name for item in fields(TickClaimGCConfig)}
+    config = TickClaimGCConfig(**{name: recorded[name] for name in names})
+    if tick_claim_gc_config_payload(config) != recorded:
+        raise ValueError("recorded checkpoint config does not round-trip")
+    return config
+
+
+def load_tick_claim_gc_branch(directory, template, branch_config):
+    """Load a workshop12 checkpoint for a deliver_3 fixed or mutant branch.
+
+    Architecture, seed, and optimization hyperparameters stay locked. The
+    branch may change variant, goal mode, and the adaptation budget.
+    """
+
+    source = Path(directory)
+    if not checkpoint_files_present(source):
+        raise FileNotFoundError(f"checkpoint state is missing: {source}")
+    recorded = json.loads((source / "config.json").read_text(encoding="utf-8"))
+    origin = config_from_tick_claim_gc_payload(recorded)
+    if origin.goal_mode != "workshop12":
+        raise ValueError("adaptation branches only from workshop12 checkpoints")
+    if branch_config.goal_mode != "deliver_3":
+        raise ValueError("adaptation goal_mode must be deliver_3")
+    for name in _BRANCH_LOCKED_FIELDS:
+        if getattr(origin, name) != getattr(branch_config, name):
+            raise ValueError(f"branch changed locked field {name}")
+    branch_config.validate()
+    return serialization.from_bytes(
+        template, (source / "state.msgpack").read_bytes()
+    )
+
+
+def command_deliver_3(runner):
+    """Point every worker at deliver_3 without touching parameters or optimizer."""
+
+    observations = jax.vmap(observe_tick_claim)(runner.env_state)
+    achieved = jax.vmap(tick_claim_goal_vector)(observations)[
+        :, DELIVER_3_GOAL_INDEX
+    ]
+    return runner.replace(
+        current_goal=jnp.full(
+            runner.current_goal.shape, DELIVER_3_GOAL_INDEX, dtype=jnp.int32
+        ),
+        command_active=jnp.logical_not(achieved),
+        goal_steps=jnp.zeros_like(runner.goal_steps),
     )
 
 
@@ -1367,8 +1451,9 @@ def cell_checkpoints_complete(destination, config):
 
     destination = Path(destination)
     summary_path = destination / "summary.json"
-    final_meta = destination / "checkpoint_final" / "metadata.json"
-    if not summary_path.is_file() or not final_meta.is_file():
+    final_dir = destination / "checkpoint_final"
+    final_meta = final_dir / "metadata.json"
+    if not summary_path.is_file() or not checkpoint_files_present(final_dir):
         return False
     summary = json.loads(summary_path.read_text(encoding="utf-8"))
     final = json.loads(final_meta.read_text(encoding="utf-8"))
@@ -1384,12 +1469,28 @@ def cell_checkpoints_complete(destination, config):
         return False
     if int(summary.get("transitions", -1)) != config.transitions:
         return False
+    expected_config = tick_claim_gc_config_payload(config)
+    final_config = json.loads(
+        (final_dir / "config.json").read_text(encoding="utf-8")
+    )
+    if final_config != expected_config:
+        return False
     for update in config.checkpoint_updates:
-        meta_path = _checkpoint_update_dir(destination, update) / "metadata.json"
-        if not meta_path.is_file():
+        checkpoint = _checkpoint_update_dir(destination, update)
+        if not checkpoint_files_present(checkpoint):
             return False
-        meta = json.loads(meta_path.read_text(encoding="utf-8"))
-        if int(meta.get("global_update", -1)) != update:
+        meta = json.loads(
+            (checkpoint / "metadata.json").read_text(encoding="utf-8")
+        )
+        saved_config = json.loads(
+            (checkpoint / "config.json").read_text(encoding="utf-8")
+        )
+        if (
+            int(meta.get("global_update", -1)) != update
+            or int(meta.get("environment_steps", -1))
+            != update * config.batch_size
+            or saved_config != expected_config
+        ):
             return False
     return True
 
@@ -1406,7 +1507,7 @@ def _latest_checkpoint_update(destination, config):
         update = int(suffix)
         if update > config.num_updates:
             continue
-        if not (path / "metadata.json").is_file() or not (path / "state.msgpack").is_file():
+        if not checkpoint_files_present(path):
             continue
         meta = json.loads((path / "metadata.json").read_text(encoding="utf-8"))
         if int(meta.get("global_update", -1)) != update:

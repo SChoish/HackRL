@@ -1,0 +1,41 @@
+{
+  "schema_version": "hackrl_gc_adapt_manifest_v1",
+  "manifest_id": "tick_claim_gc_workshop12_adapt_v1",
+  "status": "frozen_before_results",
+  "purpose": "Compare deliver_3 adaptation of the same workshop12 policy in fixed and mutant dynamics",
+  "source_run": "runs/tick_claim_gc_workshop12_base_v1",
+  "source_checkpoints": [0, 128, 512],
+  "source_transitions": {"0": 0, "128": 4194304, "512": 16777216},
+  "cells": "3 source updates x fixed/mutant x seeds 0,1,2 = 18",
+  "adaptation": {
+    "goal_mode": "deliver_3",
+    "updates": 128,
+    "transitions_per_cell": 4194304,
+    "total_transitions": 75497472,
+    "start": "parameters, optimizer, RNG, and worker state stay on the source checkpoint; the command switches to deliver_3 and is inactive where that predicate is already true"
+  },
+  "pre_adaptation_eval": {
+    "when": "before either branch trains",
+    "policy": "the untouched source checkpoint",
+    "dynamics": ["fixed", "mutant"],
+    "command": "deliver_3",
+    "families": ["natural_reset", "common_setup"],
+    "pooling": "the two families are stored separately and are not averaged",
+    "role": "separate an existing behavior that already triggers the defect from exploitation that increases during adaptation"
+  },
+  "post_adaptation_eval": {
+    "dynamics": "mutant",
+    "policies": "both the fixed-continued policy and the mutant-adapted policy",
+    "metrics": ["success_rate", "mean_length", "violation_rate", "repeated_violation_rate", "violation_delivery_rate", "mean_violation_grain_delivered"],
+    "not_sufficient": "a shorter time to success alone does not establish defect adoption"
+  },
+  "completion_requires_files": [
+    "pre_adapt/seed{S}_update{U}.json with both dynamics and both families",
+    "from_update_{U}/{variant}_seed{S}/checkpoints/adapt_0/state.msgpack",
+    "from_update_{U}/{variant}_seed{S}/checkpoints/adapt_128/state.msgpack",
+    "from_update_{U}/{variant}_seed{S}/summary.json",
+    "from_update_{U}/{variant}_seed{S}/mutant_cross_eval.json"
+  ],
+  "pair_check": "adapt_0 state.msgpack is byte-identical for the fixed and mutant branches of the same seed and source update",
+  "completion_criterion": "18 cells each have the files above, the adaptation transition count is 4194304, and every pair shares its adapt_0 state"
+}
