@@ -7,6 +7,7 @@ import argparse
 import json
 import os
 import subprocess
+from dataclasses import replace
 from pathlib import Path
 
 if os.environ.get("HACKRL_DEVICE", "cpu") != "cuda":
@@ -78,7 +79,8 @@ def _read_config(checkpoint):
 
 
 def _branch_config(origin, variant):
-    return origin.replace(
+    return replace(
+        origin,
         variant=variant,
         goal_mode="deliver_3",
         num_updates=ADAPTATION_UPDATES,
