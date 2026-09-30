@@ -627,24 +627,6 @@ def _release(log_dir, job_id):
     (Path(log_dir) / "claims" / job_id).unlink(missing_ok=True)
 
 
-def _ensure_deadline(log_dir, hours):
-    path = Path(log_dir) / "deadline.json"
-    if path.is_file():
-        return float(json.loads(path.read_text(encoding="utf-8"))["deadline_epoch"])
-    payload = {
-        "started_epoch": time.time(),
-        "deadline_epoch": time.time() + float(hours) * 3600,
-        "hours": float(hours),
-    }
-    try:
-        fd = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o644)
-    except FileExistsError:
-        return float(json.loads(path.read_text(encoding="utf-8"))["deadline_epoch"])
-    os.write(fd, json.dumps(payload, sort_keys=True).encode())
-    os.close(fd)
-    return float(payload["deadline_epoch"])
-
-
 def _next_job(log_dir):
     for job in build_jobs():
         if _job_complete(log_dir, job):
@@ -672,28 +654,12 @@ def main():
     parser = argparse.ArgumentParser()
     parser.add_argument("--log-dir", required=True)
     parser.add_argument("--worker", required=True)
-    parser.add_argument("--hours", type=float, default=8.0)
     args = parser.parse_args()
     log_dir = Path(args.log_dir)
     log_dir.mkdir(parents=True, exist_ok=True)
-    deadline = _ensure_deadline(log_dir, args.hours)
-    print(
-        f"[worker] {args.worker} deadline_epoch={deadline:.0f} jobs={len(build_jobs())}",
-        flush=True,
-    )
+    print(f"[worker] {args.worker} jobs={len(build_jobs())}", flush=True)
     while True:
         _reclaim_stale_claims(log_dir)
-        if time.time() >= deadline:
-            pending = [
-                job["id"]
-                for job in build_jobs()
-                if not _job_complete(log_dir, job)
-            ]
-            print(
-                f"[deadline] {args.worker} stops claiming; pending={len(pending)}",
-                flush=True,
-            )
-            return
         job = _next_job(log_dir)
         if job is None:
             if all(_job_complete(log_dir, item) for item in build_jobs()):

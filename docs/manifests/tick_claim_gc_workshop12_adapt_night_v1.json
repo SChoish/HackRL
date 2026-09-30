@@ -6,7 +6,6 @@
   "preserves": "runs/tick_claim_gc_workshop12_adapt_v1",
   "run_directory": "runs/tick_claim_gc_workshop12_adapt_night_v1",
   "order": ["A", "B", "C"],
-  "hours": 8,
   "seeds": [0, 1, 2, 3, 4],
   "method": "GC-PPO",
   "phases": {

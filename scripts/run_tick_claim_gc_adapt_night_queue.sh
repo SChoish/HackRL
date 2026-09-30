@@ -34,6 +34,5 @@ fi
 echo "[queue] night worker=$WORKER device=${HACKRL_DEVICE:-cpu} sha=$(git -C "$ROOT" rev-parse HEAD)"
 "$PYTHON" "$ROOT/scripts/run_tick_claim_gc_adapt_night.py" \
   --log-dir "$LOG_DIR" \
-  --worker "$WORKER" \
-  --hours "${HACKRL_NIGHT_HOURS:-8}"
+  --worker "$WORKER"
 echo "[queue] night worker=$WORKER stopped $(date -u +%Y-%m-%dT%H:%M:%SZ)"
