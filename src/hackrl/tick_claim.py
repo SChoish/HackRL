@@ -412,6 +412,23 @@ def _position_is_role(state: TickClaimState, position: jax.Array) -> jax.Array:
     )
 
 
+def manual_harvest_requested(state: TickClaimState, action: jax.Array) -> jax.Array:
+    """True when DO faces the ripe crop after movement has been applied.
+
+    This is the harvest choice, not the grain payout. A cycle that is already
+    claimed still counts.
+    """
+
+    action = jnp.asarray(action, dtype=jnp.int32)
+    front = state.player_position + _DIRECTION_DELTAS[
+        jnp.clip(state.player_direction, 0, 4)
+    ]
+    return jnp.logical_and(
+        action == Action.DO.value,
+        jnp.logical_and(jnp.all(front == state.crop_position), state.crop_ripe),
+    )
+
+
 def tick_claim_step_with_snapshot(
     state: TickClaimState,
     action: jax.Array,
@@ -486,11 +503,7 @@ def tick_claim_step_with_snapshot(
     )
 
     # 2. Collect requests against one pre-settlement snapshot.
-    front = player_position + _DIRECTION_DELTAS[jnp.clip(player_direction, 0, 4)]
-    manual_requested = jnp.logical_and(
-        action == Action.DO.value,
-        jnp.logical_and(jnp.all(front == state.crop_position), state.crop_ripe),
-    )
+    manual_requested = manual_harvest_requested(next_state, action)
     reservation_due = jnp.logical_and(
         next_state.reservation_present,
         next_state.reservation_due_tick == state.tick,

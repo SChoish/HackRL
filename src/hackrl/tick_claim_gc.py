@@ -37,6 +37,7 @@ from hackrl.tick_claim import (
     encode_tick_claim_observation,
     make_tick_claim_state,
     observe_tick_claim,
+    manual_harvest_requested,
     reset_tick_claim,
     reset_tick_claim_worker,
     tick_claim_goal_vector,
@@ -251,6 +252,7 @@ class TickClaimGCStepEvent:
     repeated_violation: jax.Array
     opportunity_exposure: jax.Array
     reservation_created: jax.Array
+    manual_harvest_attempt: jax.Array
     violation_delivery: jax.Array
     violation_grain_delivered: jax.Array
     delivered_amount: jax.Array
@@ -279,6 +281,7 @@ class TickClaimGCTransition(NamedTuple):
     repeated_violation: jax.Array
     opportunity_exposure: jax.Array
     reservation_created: jax.Array
+    manual_harvest_attempt: jax.Array
     violation_delivery: jax.Array
     violation_grain_delivered: jax.Array
     delivered_amount: jax.Array
@@ -647,6 +650,7 @@ def step_tick_claim_gc_workers(runner, actions, config):
         jnp.logical_not(before.reservation_present),
         stepped.reservation_present,
     )
+    manual_harvest_attempt = jax.vmap(manual_harvest_requested)(before, actions)
     delivered_amount = stepped.delivered_total - before.delivered_total
     same_cycle = jnp.logical_and(
         runner.oracle_state.initialized,
@@ -729,6 +733,9 @@ def step_tick_claim_gc_workers(runner, actions, config):
         opportunity_exposure=jnp.logical_and(valid_transition, opportunity),
         reservation_created=jnp.logical_and(
             valid_transition, reservation_created
+        ),
+        manual_harvest_attempt=jnp.logical_and(
+            valid_transition, manual_harvest_attempt
         ),
         violation_delivery=jnp.logical_and(valid_transition, violation_delivery),
         violation_grain_delivered=jnp.where(
@@ -813,6 +820,7 @@ def make_tick_claim_gc_update(network, config):
             repeated_violation=event.repeated_violation,
             opportunity_exposure=event.opportunity_exposure,
             reservation_created=event.reservation_created,
+            manual_harvest_attempt=event.manual_harvest_attempt,
             violation_delivery=event.violation_delivery,
             violation_grain_delivered=event.violation_grain_delivered,
             delivered_amount=event.delivered_amount,
@@ -1004,6 +1012,9 @@ def make_tick_claim_gc_update(network, config):
             ),
             "reservation_creations": jnp.sum(
                 trajectory.reservation_created
+            ),
+            "manual_harvest_attempts": jnp.sum(
+                trajectory.manual_harvest_attempt
             ),
             "violation_delivery_events": jnp.sum(
                 trajectory.violation_delivery

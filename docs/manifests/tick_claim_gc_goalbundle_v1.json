@@ -1,0 +1,44 @@
+{
+  "schema_version": "hackrl_gc_goalbundle_manifest_v1",
+  "manifest_id": "tick_claim_gc_goalbundle_v1",
+  "status": "frozen_before_results",
+  "understood_as": "Run a fresh 2x2 of non-reservation goal bundles under the existing masked pretraining and deliver_3 adaptation contract. Log the harvest choice during training. Read the three prepared states and one shared rollout immediately after pretraining, then the existing excess-delivery difference after adaptation. Do not reuse the previous A or B checkpoints, because those logs do not contain the new counter. Do not start an algorithm or width sweep, PACK-RESTORE, or LEO.",
+  "purpose": "Separate whether the inventory-and-unripe bundle, the remaining non-reservation bundle, or only their combination prepares harvest and later exploitation.",
+  "separate_from": [
+    "runs/tick_claim_gc_history_v1",
+    "runs/tick_claim_gc_goalset_v1",
+    "runs/tick_claim_gc_workshop12_adapt_night_v1"
+  ],
+  "run_directory": "runs/tick_claim_gc_goalbundle_v1",
+  "seeds": [10, 11, 12, 13, 14],
+  "hidden_size": 512,
+  "entropy_coefficient": 0.005,
+  "learning_rate": 0.0002,
+  "goal_input": "The 12-dimensional goal encoding is unchanged. Only the allowed-goal mask changes.",
+  "reservation_goals": "facility/reservation_present and facility/reservation_absent are excluded from all four conditions.",
+  "conditions": {
+    "D": "deliver_3 only. Same goal set as the previous condition A, trained again so the harvest counter exists.",
+    "DM": "deliver_3 plus inventory ge1, ge2, ge3 and visible/crop_unripe. M is the harvest-outcome bundle. A reservation settlement can also make these goals true, so M is not a manual-harvest-only bundle.",
+    "DN": "deliver_3 plus adjacent raw source, reservation device, and delivery point, plus visible/crop_ripe and delivery/count_ge_1.",
+    "DMN": "D plus M plus N. Same goal set as the previous condition B, trained again so the harvest counter exists."
+  },
+  "pretrain_contract": "Sample one currently false allowed goal with uniform weight on the allowed set. If none is false, natural-reset and sample again. Success does not deactivate the command. The same rule applies to every condition.",
+  "pretrain_valid_transitions_per_condition_seed": 16777216,
+  "pretrain_runs": 20,
+  "pretrain_dynamics": "fixed",
+  "manual_harvest_attempts": "On a valid transition, DO while the front tile is the ripe crop. This is the harvest choice. A cycle that is already claimed still counts. The count does not enter the reward, the advantage, or the loss. It is recorded on every pretraining and adaptation update.",
+  "pretrain_behavior": "After pretraining, before adaptation: the three legal reservation states under deliver_3, plus a 128-step mode rollout on the shared adaptation-start reset with deliver_3 held active. The rollout counts the same harvest choice.",
+  "adaptation": "After pretraining, Adam is reset for every condition. Worker environments and RNG are reinitialized from the learning seed alone. Each fixed/mutant pair then branches from the same parameters, optimizer, environment, and RNG. Adaptation is deliver_3 for 4096 updates and eight science checkpoints.",
+  "adapt_cells": 40,
+  "adaptation_transitions_per_cell": 134217728,
+  "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+  "primary_metric": "On the mutant evaluation environment, natural_reset mode violation_delivery_rate of the mutant-adapted policy minus the same rate of the fixed-continued policy. All science checkpoints are kept. Failed seeds stay in the mean. First discovery and final maintenance are read separately from the checkpoint series.",
+  "interpretation_forks": {
+    "DM_harvest_and_exploitation": "The candidate bundle is sufficient in this comparison.",
+    "DN_harvest_and_exploitation": "The candidate bundle is not necessary.",
+    "only_DMN": "The combination, or the diversity of visited states, remains.",
+    "harvest_without_exploitation": "The next bottleneck is forming or finding the opportunity and its timing."
+  },
+  "not_evidence": "A goal success of zero means that goal was not the active command when it became true. It is not evidence that the state was unvisited or that the policy cannot produce it. The harvest counter and the frozen same-state actions are the behavioral evidence. Harvest appearing alongside exploitation does not by itself show that the harvest mediated exploitation: the same pretraining also changes movement, visited states, and the critic.",
+  "not_this_experiment": "This is not an algorithm or width sweep, and it does not start PACK-RESTORE or LEO. There is no time limit."
+}
