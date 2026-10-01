@@ -1,0 +1,35 @@
+{
+  "schema_version": "hackrl_gc_goalset_manifest_v1",
+  "manifest_id": "tick_claim_gc_goalset_v1",
+  "status": "frozen_before_results",
+  "purpose": "Compare a reservation-goal bundle with the other workshop goals under one pretraining contract",
+  "separate_from": [
+    "runs/tick_claim_gc_history_v1",
+    "runs/tick_claim_gc_workshop12_adapt_night_v1"
+  ],
+  "run_directory": "runs/tick_claim_gc_goalset_v1",
+  "seeds": [10, 11, 12, 13, 14],
+  "hidden_size": 512,
+  "entropy_coefficient": 0.005,
+  "learning_rate": 0.0002,
+  "goal_input": "The 12-dimensional goal encoding is unchanged. Only the allowed-goal mask changes.",
+  "conditions": {
+    "A": "deliver_3 only",
+    "AR": "deliver_3 plus facility/reservation_present and facility/reservation_absent",
+    "B": "workshop12 without the two reservation goals",
+    "BR": "all twelve workshop goals"
+  },
+  "pretrain_contract": "Sample one currently false allowed goal. If none is false, natural-reset and sample again. The same rule applies to every condition, including the reduced sets. Success does not deactivate the command.",
+  "reservation_sampling_weights": "In AR and BR, each reservation goal has weight 1. When every allowed goal is false, that is probability 1/12, matching one goal of the uniform 12-goal set. The remaining mass stays on the other allowed goals. A and B are uniform on their own allowed goals. Realized command counts and valid transitions are stored in the pretrain summary.",
+  "pretrain_valid_transitions_per_condition_seed": 16777216,
+  "pretrain_runs": 20,
+  "pretrain_dynamics": "fixed",
+  "adaptation": "After pretraining, Adam is reset for every condition. Worker environments and RNG are reinitialized from the learning seed alone. Each fixed/mutant pair then branches from the same parameters, optimizer, environment, and RNG. Adaptation is deliver_3 for 4096 updates and eight science checkpoints.",
+  "adapt_cells": 40,
+  "adaptation_transitions_per_cell": 134217728,
+  "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+  "primary_metric": "On the mutant evaluation environment, natural_reset mode violation_delivery_rate of the mutant-adapted policy minus the same rate of the fixed-continued policy. All science checkpoints are kept. Failed seeds stay in the mean. First discovery and final maintenance are read separately from the checkpoint series.",
+  "auxiliaries": "Opportunity exposure, the frozen reservation-timing probe, same-policy discounted-return difference, and transfer cost after the defect is removed. Families stay separate.",
+  "interpretation": "A high AR with a low B points to the reservation goals. A low AR with a high B points to the broader non-reservation set. Only BR high points to the combination. A also high under this contract points to the earlier goal-only data budget. Goal removal also changes visited states, so the table is not a unique internal mechanism.",
+  "not_this_experiment": "This does not separate goal count itself, and it does not start PACK-RESTORE or LEO."
+}

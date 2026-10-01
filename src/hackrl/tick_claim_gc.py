@@ -1,7 +1,8 @@
 """Goal-conditioned PPO for TICK-CLAIM.
 
-Goal completion is a value-learning pseudo-termination. Only world termination
-resets the workshop.
+Goal completion is a value-learning pseudo-termination. World termination
+resets the workshop. Masked pretraining also resets when every allowed goal
+is already true, so a smaller goal set does not wait out the horizon.
 """
 
 from __future__ import annotations
@@ -76,6 +77,8 @@ class TickClaimGCConfig:
     value_coefficient: float = 0.5
     max_grad_norm: float = 1.0
     goal_mode: str = "deliver_3"
+    allowed_goals: tuple[int, ...] = ()
+    goal_sampling_weights: tuple[float, ...] = ()
     evaluation_split: str = TickClaimSplit.VALIDATION.value
     mode_repeats_per_state: int = 1
     sample_repeats_per_state: int = 4
@@ -84,6 +87,14 @@ class TickClaimGCConfig:
     def __post_init__(self):
         object.__setattr__(
             self, "checkpoint_updates", tuple(self.checkpoint_updates)
+        )
+        object.__setattr__(
+            self, "allowed_goals", tuple(int(goal) for goal in self.allowed_goals)
+        )
+        object.__setattr__(
+            self,
+            "goal_sampling_weights",
+            tuple(float(weight) for weight in self.goal_sampling_weights),
         )
 
     @property
@@ -109,8 +120,27 @@ class TickClaimGCConfig:
             raise ValueError("rollout batch must divide evenly into minibatches")
         if self.hidden_size <= 0 or self.learning_rate <= 0:
             raise ValueError("hidden_size and learning_rate must be positive")
-        if self.goal_mode not in {"deliver_3", "workshop12"}:
-            raise ValueError("goal_mode must be 'deliver_3' or 'workshop12'")
+        if self.goal_mode not in {"deliver_3", "workshop12", "masked"}:
+            raise ValueError(
+                "goal_mode must be 'deliver_3', 'workshop12', or 'masked'"
+            )
+        if self.goal_mode == "masked":
+            allowed = self.allowed_goals
+            weights = self.goal_sampling_weights
+            if not allowed or len(set(allowed)) != len(allowed):
+                raise ValueError("masked mode needs distinct allowed goals")
+            if any(goal < 0 or goal >= NUM_GOALS for goal in allowed):
+                raise ValueError("allowed goals must be workshop goal indices")
+            if len(weights) != NUM_GOALS:
+                raise ValueError("goal sampling weights must cover every goal")
+            allowed_set = set(allowed)
+            for index, weight in enumerate(weights):
+                if index in allowed_set and weight <= 0:
+                    raise ValueError("an allowed goal needs a positive weight")
+                if index not in allowed_set and weight != 0:
+                    raise ValueError("a disallowed goal must have weight zero")
+        elif self.allowed_goals or self.goal_sampling_weights:
+            raise ValueError("goal masks belong only to masked pretraining")
         if self.mode_repeats_per_state <= 0 or self.sample_repeats_per_state <= 0:
             raise ValueError("evaluation repeats must be positive")
         if any(
@@ -341,6 +371,66 @@ def sample_false_seen_goal(key, seen_goals, achieved_goals):
     return candidate, key, zero_steps, jnp.logical_and(valid, accepted)
 
 
+def _fresh_train_state(key):
+    state = reset_tick_claim(
+        key, split=TickClaimSplit.TRAIN, start=TickClaimStart.NATURAL
+    )
+    goals = tick_claim_goal_vector(observe_tick_claim(state))
+    return state, goals
+
+
+def _resample_masked_goal(key, env_state, goals, weights):
+    """Sample a currently false allowed goal, resetting while none is false."""
+
+    def cond(state):
+        attempts, accepted, *_rest = state
+        return jnp.logical_and(jnp.logical_not(accepted), attempts < 8)
+
+    def body(state):
+        attempts, _accepted, loop_key, current, current_goals, goal, resets = state
+        loop_key, draw_key, reset_key = jax.random.split(loop_key, 3)
+        eligible = jnp.logical_and(weights > 0, jnp.logical_not(current_goals))
+        logits = jnp.where(
+            eligible,
+            jnp.log(jnp.maximum(weights, 1e-8)),
+            jnp.asarray(-1e9, dtype=jnp.float32),
+        )
+        candidate = jax.random.categorical(draw_key, logits).astype(jnp.int32)
+        valid = jnp.any(eligible)
+
+        def keep(_unused):
+            return current, current_goals
+
+        def refresh(reset_rng):
+            return _fresh_train_state(reset_rng)
+
+        refreshed, refreshed_goals = jax.lax.cond(valid, keep, refresh, reset_key)
+        return (
+            attempts + 1,
+            valid,
+            loop_key,
+            refreshed,
+            refreshed_goals,
+            jnp.where(valid, candidate, goal),
+            resets + jnp.logical_not(valid).astype(jnp.int32),
+        )
+
+    _attempts, accepted, key, env_state, _goals, goal, resets = jax.lax.while_loop(
+        cond,
+        body,
+        (
+            jnp.asarray(0, dtype=jnp.int32),
+            jnp.asarray(False),
+            key,
+            env_state,
+            goals,
+            jnp.asarray(0, dtype=jnp.int32),
+            jnp.asarray(0, dtype=jnp.int32),
+        ),
+    )
+    return goal, key, env_state, resets, accepted
+
+
 def initialize_tick_claim_gc(config):
     config.validate()
     init_rng, action_rng, env_rng, sampler_rng = jax.random.split(
@@ -362,13 +452,21 @@ def initialize_tick_claim_gc(config):
         current_goal = jnp.full(
             (config.num_envs,), DELIVER_3_GOAL_INDEX, dtype=jnp.int32
         )
-    else:
+    elif config.goal_mode == "workshop12":
         sampled = jax.vmap(sample_false_seen_goal, in_axes=(0, None, 0))(
             sampler_keys, seen_goals, goal_vectors
         )
         current_goal, sampler_keys, _, sampler_valid = sampled
         if not bool(jnp.all(sampler_valid)):
             raise ValueError("initial goal sampler could not find a false goal")
+    else:
+        weights = jnp.asarray(config.goal_sampling_weights, dtype=jnp.float32)
+        current_goal, sampler_keys, env_state, _, sampler_valid = jax.vmap(
+            _resample_masked_goal, in_axes=(0, 0, 0, None)
+        )(sampler_keys, env_state, goal_vectors, weights)
+        if not bool(jnp.all(sampler_valid)):
+            raise ValueError("masked pretraining could not find a false allowed goal")
+        observations = jax.vmap(observe_tick_claim)(env_state)
     model_inputs = jax.vmap(tick_claim_gc_inputs)(
         observations, current_goal
     )
@@ -502,6 +600,36 @@ def step_tick_claim_gc_workers(runner, actions, config):
         command_started = switch
         command_active = jnp.ones_like(runner.command_active)
         sampler_valid = jnp.where(switch, sampler_valid, True)
+        masked_extra_reset = jnp.zeros_like(world_done)
+    elif config.goal_mode == "masked":
+        weights = jnp.asarray(config.goal_sampling_weights, dtype=jnp.float32)
+        continuation_goals = jnp.where(
+            world_done[:, None], reset_goals, terminal_goals
+        )
+        (
+            sampled_goal,
+            sampled_keys,
+            sampled_env,
+            extra_resets,
+            sampled_ok,
+        ) = jax.vmap(_resample_masked_goal, in_axes=(0, 0, 0, None))(
+            runner.sampler_keys, env_state, continuation_goals, weights
+        )
+        current_goal = jnp.where(switch, sampled_goal, runner.current_goal)
+        sampler_keys = jnp.where(
+            switch[:, None], sampled_keys, runner.sampler_keys
+        )
+        env_state = _tree_where(switch, sampled_env, env_state)
+        masked_extra_reset = jnp.logical_and(switch, extra_resets > 0)
+        oracle_state = _tree_where(
+            masked_extra_reset,
+            _broadcast_oracle(config.num_envs),
+            oracle_state,
+        )
+        zero_step_successes = jnp.zeros_like(runner.goal_steps)
+        command_started = jnp.logical_and(switch, sampled_ok)
+        command_active = jnp.where(switch, sampled_ok, runner.command_active)
+        sampler_valid = jnp.where(switch, sampled_ok, True)
     else:
         current_goal = runner.current_goal
         sampler_keys = runner.sampler_keys
@@ -513,6 +641,7 @@ def step_tick_claim_gc_workers(runner, actions, config):
             jnp.where(goal_done, False, runner.command_active),
         )
         sampler_valid = jnp.ones_like(runner.command_active)
+        masked_extra_reset = jnp.zeros_like(world_done)
 
     reservation_created = jnp.logical_and(
         jnp.logical_not(before.reservation_present),
@@ -554,9 +683,13 @@ def step_tick_claim_gc_workers(runner, actions, config):
         violation_grain_before_delivery - violation_grain_delivered
     )
     violation_count = runner.world_violation_count + violation.astype(jnp.int32)
-    violation_count = jnp.where(world_done, 0, violation_count)
+    violation_count = jnp.where(
+        jnp.logical_or(world_done, masked_extra_reset), 0, violation_count
+    )
     violation_grain_balance = jnp.where(
-        world_done, 0, violation_grain_balance
+        jnp.logical_or(world_done, masked_extra_reset),
+        0,
+        violation_grain_balance,
     )
     success_steps = jnp.where(goal_done, runner.goal_steps + 1, 0)
     goal_steps = jnp.where(
@@ -603,7 +736,9 @@ def step_tick_claim_gc_workers(runner, actions, config):
         ),
         delivered_amount=jnp.where(valid_transition, delivered_amount, 0),
         success_steps=success_steps,
-        reset_count=world_done.astype(jnp.int32),
+        reset_count=jnp.logical_or(world_done, masked_extra_reset).astype(
+            jnp.int32
+        ),
     )
     return next_runner, event
 
@@ -883,6 +1018,11 @@ def make_tick_claim_gc_update(network, config):
             "commands_by_goal": jnp.sum(
                 started_goal_one_hot
                 * trajectory.command_started[..., None],
+                axis=(0, 1),
+            ),
+            "valid_by_goal": jnp.sum(
+                goal_one_hot
+                * trajectory.valid[..., None].astype(jnp.int32),
                 axis=(0, 1),
             ),
             "successes_by_goal": jnp.sum(
@@ -1288,6 +1428,8 @@ def evaluate_tick_claim_gc_frozen(
 def tick_claim_gc_config_payload(config):
     payload = asdict(config)
     payload["checkpoint_updates"] = list(config.checkpoint_updates)
+    payload["allowed_goals"] = list(config.allowed_goals)
+    payload["goal_sampling_weights"] = list(config.goal_sampling_weights)
     payload.update(
         {
             "schema_version": "hackrl_gc_v1",
@@ -1384,6 +1526,20 @@ def checkpoint_files_present(directory):
     )
 
 
+def _recorded_config_matches(recorded, config):
+    """Accept a checkpoint that omits fields still at their default values."""
+
+    payload = tick_claim_gc_config_payload(config)
+    if any(payload.get(key) != value for key, value in recorded.items()):
+        return False
+    defaults = tick_claim_gc_config_payload(TickClaimGCConfig())
+    return all(
+        defaults.get(key) == value
+        for key, value in payload.items()
+        if key not in recorded
+    )
+
+
 def load_tick_claim_gc_checkpoint(directory, template, config):
     source = Path(directory)
     if not checkpoint_files_present(source):
@@ -1391,7 +1547,7 @@ def load_tick_claim_gc_checkpoint(directory, template, config):
     recorded = json.loads(
         (source / "config.json").read_text(encoding="utf-8")
     )
-    if recorded != tick_claim_gc_config_payload(config):
+    if not _recorded_config_matches(recorded, config):
         raise ValueError("checkpoint config does not match requested config")
     return serialization.from_bytes(
         template, (source / "state.msgpack").read_bytes()
@@ -1419,8 +1575,10 @@ _BRANCH_LOCKED_FIELDS = (
 
 def config_from_tick_claim_gc_payload(recorded):
     names = {item.name for item in fields(TickClaimGCConfig)}
-    config = TickClaimGCConfig(**{name: recorded[name] for name in names})
-    if tick_claim_gc_config_payload(config) != recorded:
+    config = TickClaimGCConfig(
+        **{name: recorded[name] for name in names if name in recorded}
+    )
+    if not _recorded_config_matches(recorded, config):
         raise ValueError("recorded checkpoint config does not round-trip")
     return config
 
@@ -1474,6 +1632,35 @@ def load_tick_claim_gc_history_branch(directory, template, branch_config):
     branch_config.validate()
     return serialization.from_bytes(
         template, (source / "state.msgpack").read_bytes()
+    )
+
+
+def reinit_tick_claim_gc_adaptation_start(runner, seed):
+    """Replace worker env and RNG from the seed. Parameters and optimizer stay.
+
+    The same seed produces the same environment and RNG for every condition.
+    Worker layouts use the standard index assignment. The learner RNG is a
+    fresh split of that seed, not a continuation of pretraining.
+    """
+
+    action_rng, env_rng, sampler_rng = jax.random.split(
+        jax.random.PRNGKey(int(seed)), 3
+    )
+    num_envs = int(runner.current_goal.shape[0])
+    workers = jnp.arange(num_envs, dtype=jnp.int32) % 512
+    env_state = jax.vmap(reset_tick_claim_worker)(workers)
+    return runner.replace(
+        env_state=env_state,
+        oracle_state=_broadcast_oracle(num_envs),
+        env_keys=jax.random.split(env_rng, num_envs),
+        sampler_keys=jax.random.split(sampler_rng, num_envs),
+        rng=action_rng,
+        goal_steps=jnp.zeros((num_envs,), dtype=jnp.int32),
+        world_violation_count=jnp.zeros((num_envs,), dtype=jnp.int32),
+        violation_grain_balance=jnp.zeros((num_envs,), dtype=jnp.int32),
+        global_update=jnp.asarray(0, dtype=jnp.int32),
+        env_steps=jnp.asarray(0, dtype=jnp.int32),
+        rollout_cursor=jnp.asarray(0, dtype=jnp.int32),
     )
 
 
@@ -1615,11 +1802,10 @@ def cell_checkpoints_complete(destination, config):
         return False
     if int(summary.get("transitions", -1)) != config.transitions:
         return False
-    expected_config = tick_claim_gc_config_payload(config)
     final_config = json.loads(
         (final_dir / "config.json").read_text(encoding="utf-8")
     )
-    if final_config != expected_config:
+    if not _recorded_config_matches(final_config, config):
         return False
     for update in config.checkpoint_updates:
         checkpoint = _checkpoint_update_dir(destination, update)
