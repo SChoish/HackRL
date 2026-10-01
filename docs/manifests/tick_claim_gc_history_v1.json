@@ -1,0 +1,30 @@
+{
+  "schema_version": "hackrl_gc_history_manifest_v1",
+  "manifest_id": "tick_claim_gc_history_v1",
+  "status": "frozen_before_results",
+  "purpose": "Separate extra goal experience, multi-goal history, and Adam state as explanations of later defect specialization",
+  "separate_from": "runs/tick_claim_gc_workshop12_adapt_night_v1",
+  "run_directory": "runs/tick_claim_gc_history_v1",
+  "seeds": [5, 6, 7, 8, 9],
+  "hidden_size": 512,
+  "entropy_coefficient": 0.005,
+  "method": "GC-PPO",
+  "origins": {
+    "none": "workshop12 initialization, zero updates, fresh Adam, then deliver_3",
+    "deliver3": "deliver_3 pretraining for 512 updates, Adam continued",
+    "workshop12": "workshop12 pretraining for 512 updates, then deliver_3, Adam continued",
+    "adam_reset": "same workshop12 parameters, environment, and RNG as workshop12, Adam reinitialized"
+  },
+  "adaptation_updates": 4096,
+  "adaptation_transitions_per_cell": 134217728,
+  "pretrain_cells": 10,
+  "adapt_cells": 40,
+  "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+  "primary_metric": "On the mutant evaluation environment, natural_reset mode violation_delivery_rate of the mutant-adapted policy minus the same rate of the fixed-continued policy. This is the rate of episodes that deliver excess grain. All science checkpoints are kept.",
+  "cross_evaluation": "Every science checkpoint evaluates the same parameters in the fixed and mutant dynamics, for mode and sample.",
+  "episode_records": "Each eval stores family, state_index, layout, phase, repeat, success, length, violation, and excess_grain_delivered. Discounted return is success * 0.995 ** (length - 1) when length is at least 1. It is computed from those fields and is not a stored substitute.",
+  "length_effects": "Pair files also store same-policy length difference, between-policy length difference, and transfer cost. Families stay separate.",
+  "per_update_metrics": "updates.jsonl stores each update, including valid_transitions and empty_minibatches. An empty minibatch does not call Adam.",
+  "statistical_unit": "A learning seed is the independent repeat. Episode count is not the sample size for comparing conditions.",
+  "holdout": "Seeds 5-9 were not used in the 70-cell exploration."
+}

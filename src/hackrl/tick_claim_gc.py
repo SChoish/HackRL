@@ -979,6 +979,43 @@ def _evaluation_states(split, repeats):
 _FROZEN_EVAL_CACHE = {}
 
 
+def _episode_records(
+    start_labels, state_indices, repeat_indices, success, length, violation_seen, grain
+):
+    """One row per eval episode so return and state effects can be recomputed.
+
+    Discounted return is not stored. With a unit reward on the success step it is
+    success * gamma ** (length - 1) when length is at least 1.
+    """
+
+    labels = np.asarray(start_labels)
+    states = np.asarray(state_indices)
+    repeats = np.asarray(repeat_indices)
+    success = np.asarray(success)
+    length = np.asarray(length)
+    violation = np.asarray(violation_seen)
+    grain = np.asarray(grain)
+    records = []
+    for index in range(int(labels.shape[0])):
+        state_index = int(states[index])
+        records.append(
+            {
+                "family": (
+                    "natural_reset" if int(labels[index]) == 0 else "common_setup"
+                ),
+                "state_index": state_index,
+                "layout": state_index % 16,
+                "phase": state_index // 16,
+                "repeat": int(repeats[index]),
+                "success": bool(success[index]),
+                "length": int(length[index]),
+                "violation": bool(violation[index]),
+                "excess_grain_delivered": int(grain[index]),
+            }
+        )
+    return records
+
+
 def evaluate_tick_claim_gc_frozen(
     network,
     parameters,
@@ -989,6 +1026,7 @@ def evaluate_tick_claim_gc_frozen(
     repeats_per_state,
     seed_base,
     learner_seed,
+    record_episodes=False,
 ):
     """Evaluate deliver_3 without mutating learner or sampler state.
 
@@ -1225,7 +1263,7 @@ def evaluate_tick_claim_gc_frozen(
         }
 
     labels = np.asarray(start_labels)
-    return {
+    result = {
         "variant": variant.value,
         "split": split.value,
         "stochastic": stochastic,
@@ -1234,6 +1272,17 @@ def evaluate_tick_claim_gc_frozen(
         "natural_reset": aggregate(labels == 0),
         "common_setup": aggregate(labels == 1),
     }
+    if record_episodes:
+        result["episode_records"] = _episode_records(
+            start_labels,
+            state_indices,
+            repeat_indices,
+            success,
+            length,
+            violation_seen,
+            violation_grain_delivered_total,
+        )
+    return result
 
 
 def tick_claim_gc_config_payload(config):
@@ -1400,6 +1449,43 @@ def load_tick_claim_gc_branch(directory, template, branch_config):
     return serialization.from_bytes(
         template, (source / "state.msgpack").read_bytes()
     )
+
+
+def load_tick_claim_gc_history_branch(directory, template, branch_config):
+    """Continue a workshop12 or deliver_3 checkpoint into deliver_3 adaptation.
+
+    A workshop12 origin still has its goal switched by command_deliver_3.
+    A deliver_3 origin keeps the goal mode and the worker state. Locked
+    hyperparameters match the workshop12 branch.
+    """
+
+    source = Path(directory)
+    if not checkpoint_files_present(source):
+        raise FileNotFoundError(f"checkpoint state is missing: {source}")
+    recorded = json.loads((source / "config.json").read_text(encoding="utf-8"))
+    origin = config_from_tick_claim_gc_payload(recorded)
+    if origin.goal_mode not in {"workshop12", "deliver_3"}:
+        raise ValueError("history branches from workshop12 or deliver_3")
+    if branch_config.goal_mode != "deliver_3":
+        raise ValueError("adaptation goal_mode must be deliver_3")
+    for name in _BRANCH_LOCKED_FIELDS:
+        if getattr(origin, name) != getattr(branch_config, name):
+            raise ValueError(f"branch changed locked field {name}")
+    branch_config.validate()
+    return serialization.from_bytes(
+        template, (source / "state.msgpack").read_bytes()
+    )
+
+
+def reset_tick_claim_gc_optimizer(runner, config):
+    """Replace Adam moments and the step counter. Parameters and RNG stay."""
+
+    fresh = TrainState.create(
+        apply_fn=TickClaimGCActorCritic(hidden_size=config.hidden_size).apply,
+        params=runner.train_state.params,
+        tx=_optimizer(config),
+    )
+    return runner.replace(train_state=fresh)
 
 
 def command_deliver_3(runner):
