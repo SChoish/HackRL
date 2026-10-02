@@ -1,0 +1,544 @@
+{
+  "schema_version": "hackrl_reported_results_summary_v1",
+  "as_of": "2026-10-02",
+  "timezone": "Asia/Seoul",
+  "report_document": "hackrl_results_report_20261002_ko.md",
+  "provenance": {
+    "evidence_type": "repository_docs_and_user_run_reports",
+    "recent_raw_artifacts_read": false,
+    "new_training_executed_by_report_author": false,
+    "repository_basis_sha": "53f6b2291a9b8f1d61de07e1efcca83a8bb797eb",
+    "user_reported_execution_shas": {
+      "night70": "121ad80",
+      "goalset40": "cb2ce4b",
+      "history40": null,
+      "mn40": null
+    },
+    "fraction_reconstruction": "For the two seed-10-to-14 tables, positive episode counts are reconstructed from reported rounded percentages on the reported 32-episode grid, not copied from raw artifacts."
+  },
+  "primary_metric": {
+    "name": "excess_grain_delivery_episode_rate_difference",
+    "expression": "rate(mutant_adapted_policy evaluated on mutant) - rate(fixed_continued_policy evaluated on mutant)",
+    "start_family": "natural_reset",
+    "action_selection": "mode",
+    "adaptation_update": 4096,
+    "include_failed_seeds": true
+  },
+  "budget": {
+    "transitions_per_update": 32768,
+    "pretraining_updates": 512,
+    "pretraining_transitions_per_run": 16777216,
+    "long_adaptation_updates": 4096,
+    "long_adaptation_physical_transitions_per_cell": 134217728,
+    "adaptation_checkpoints": [
+      0,
+      32,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096
+    ]
+  },
+  "night70": {
+    "seeds": [
+      0,
+      1,
+      2,
+      3,
+      4
+    ],
+    "adaptation_cells": 70,
+    "reported_metric": "violation_rate_difference",
+    "total_adaptation_physical_transitions": 9395240960,
+    "conditions": {
+      "pre0": {
+        "natural_difference": 0.025,
+        "positive_seeds": 1,
+        "common_difference": 0.037
+      },
+      "pre128": {
+        "natural_difference": 0.681,
+        "positive_seeds": 4,
+        "common_difference": 0.7
+      },
+      "pre512": {
+        "natural_difference": 0.65,
+        "positive_seeds": 4,
+        "common_difference": 0.575
+      },
+      "entropy_0.002": {
+        "natural_difference": 0.494,
+        "positive_seeds": 3,
+        "common_difference": 0.475
+      },
+      "entropy_0.01": {
+        "natural_difference": 0.775,
+        "positive_seeds": 5,
+        "common_difference": 0.606
+      },
+      "width256": {
+        "natural_difference": 0.725,
+        "positive_seeds": 5,
+        "common_difference": 0.55
+      },
+      "width1024": {
+        "natural_difference": 0.969,
+        "positive_seeds": 5,
+        "common_difference": 0.981
+      }
+    },
+    "same_pre512_mutant_policy_kernel_comparison": {
+      "mean_length_mutant": [
+        27.69,
+        22.12,
+        23.78,
+        23.19,
+        28.78
+      ],
+      "mean_length_fixed": [
+        31.31,
+        35.53,
+        34.62,
+        33.94,
+        28.78
+      ],
+      "mean_fixed_minus_mutant_steps": 7.724,
+      "exact_episode_discounted_returns_available": false
+    }
+  },
+  "history40": {
+    "seeds": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "adaptation_cells": 40,
+    "conditions": {
+      "none": {
+        "natural_difference": 0.075,
+        "positive_seeds": 1,
+        "reported_natural_success": 0.6
+      },
+      "deliver3": {
+        "natural_difference": 0.05,
+        "positive_seeds": 1,
+        "reported_natural_success": 0.91
+      },
+      "workshop12": {
+        "natural_difference": 0.875,
+        "positive_seeds": 5,
+        "reported_natural_success": 1.0
+      },
+      "reset_adam": {
+        "natural_difference": 0.812,
+        "positive_seeds": 5,
+        "reported_natural_success": 1.0
+      }
+    },
+    "workshop_same_policy": {
+      "mutant_length_advantage_steps": 10.0,
+      "fixed_kernel_cost_vs_fixed_continued_steps": 4.3,
+      "episode_discounted_return_mutant": 0.897,
+      "episode_discounted_return_fixed": 0.853,
+      "relative_discounted_return_gain": 0.05158264947245028
+    },
+    "reset_adam_preserved": [
+      "network_parameters",
+      "environment_state",
+      "rng"
+    ]
+  },
+  "timing_probe_history": {
+    "policies_evaluated": 120,
+    "seeds": [
+      5,
+      6,
+      7,
+      8,
+      9
+    ],
+    "state_families": [
+      "expiry_tick",
+      "one_tick_early",
+      "no_reservation"
+    ],
+    "states_used_in_training_resets": false,
+    "final_mode_do_seed_counts": {
+      "none": [
+        1,
+        0,
+        0
+      ],
+      "deliver3": [
+        1,
+        1,
+        1
+      ],
+      "workshop12": [
+        5,
+        0,
+        1
+      ],
+      "reset_adam": [
+        5,
+        1,
+        1
+      ]
+    },
+    "workshop_preadapt_mode_do_seed_counts": [
+      5,
+      5,
+      5
+    ],
+    "workshop_preadapt_natural_excess_delivery_rate": 0
+  },
+  "goalset40": {
+    "seeds": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "completed_adaptation_cells": 40,
+    "completed_pairs": 20,
+    "all_fixed_continued_final_natural_rates_zero": true,
+    "goal_indices": {
+      "A": [
+        11
+      ],
+      "A+R": [
+        6,
+        7,
+        11
+      ],
+      "B": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        10,
+        11
+      ],
+      "B+R": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "conditions": {
+      "A": {
+        "reconstructed_positive_episodes_per_32": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rate_by_seed": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_rate": 0.0,
+        "positive_seeds": 0
+      },
+      "A+R": {
+        "reconstructed_positive_episodes_per_32": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rate_by_seed": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_rate": 0.0,
+        "positive_seeds": 0
+      },
+      "B": {
+        "reconstructed_positive_episodes_per_32": [
+          28,
+          0,
+          0,
+          32,
+          32
+        ],
+        "rate_by_seed": [
+          0.875,
+          0.0,
+          0.0,
+          1.0,
+          1.0
+        ],
+        "mean_rate": 0.575,
+        "positive_seeds": 3
+      },
+      "B+R": {
+        "reconstructed_positive_episodes_per_32": [
+          28,
+          14,
+          24,
+          22,
+          20
+        ],
+        "rate_by_seed": [
+          0.875,
+          0.4375,
+          0.75,
+          0.6875,
+          0.625
+        ],
+        "mean_rate": 0.675,
+        "positive_seeds": 5
+      }
+    },
+    "all_20_pretraining_valid_equals_physical": true,
+    "reservation_goal_transition_fraction": {
+      "A+R": 0.686,
+      "B+R": 0.199
+    },
+    "frozen_rollout_manual_harvest_counts": {
+      "decisions_per_seed": 65536,
+      "goal_reenabled_after_success": true,
+      "A": [
+        0,
+        0,
+        0,
+        1600,
+        0
+      ],
+      "A+R": [
+        0,
+        0,
+        0,
+        0,
+        0
+      ],
+      "B": [
+        1984,
+        3456,
+        2256,
+        4032,
+        3632
+      ],
+      "B+R": [
+        960,
+        1600,
+        2208,
+        560,
+        1296
+      ]
+    },
+    "pretrain_expiry_mode_do_seed_counts": {
+      "A": 0,
+      "A+R": 0,
+      "B": 5,
+      "B+R": 5
+    },
+    "completed_at_kst": "2026-10-01T23:14"
+  },
+  "mn40": {
+    "seeds": [
+      10,
+      11,
+      12,
+      13,
+      14
+    ],
+    "completed_at_kst": "2026-10-02T10:26",
+    "completed_adaptation_cells": 40,
+    "all_fixed_continued_final_natural_rates_zero": true,
+    "goal_indices": {
+      "D": [
+        11
+      ],
+      "D+M": [
+        0,
+        1,
+        2,
+        9,
+        11
+      ],
+      "D+N": [
+        3,
+        4,
+        5,
+        8,
+        10,
+        11
+      ],
+      "D+M+N": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        8,
+        9,
+        10,
+        11
+      ]
+    },
+    "conditions": {
+      "D": {
+        "reconstructed_positive_episodes_per_32": [
+          4,
+          0,
+          8,
+          0,
+          0
+        ],
+        "rate_by_seed": [
+          0.125,
+          0.0,
+          0.25,
+          0.0,
+          0.0
+        ],
+        "mean_rate": 0.075,
+        "positive_seeds": 2
+      },
+      "D+M": {
+        "reconstructed_positive_episodes_per_32": [
+          12,
+          0,
+          12,
+          0,
+          0
+        ],
+        "rate_by_seed": [
+          0.375,
+          0.0,
+          0.375,
+          0.0,
+          0.0
+        ],
+        "mean_rate": 0.15,
+        "positive_seeds": 2
+      },
+      "D+N": {
+        "reconstructed_positive_episodes_per_32": [
+          0,
+          0,
+          0,
+          0,
+          0
+        ],
+        "rate_by_seed": [
+          0.0,
+          0.0,
+          0.0,
+          0.0,
+          0.0
+        ],
+        "mean_rate": 0.0,
+        "positive_seeds": 0
+      },
+      "D+M+N": {
+        "reconstructed_positive_episodes_per_32": [
+          0,
+          31,
+          28,
+          28,
+          32
+        ],
+        "rate_by_seed": [
+          0.0,
+          0.96875,
+          0.875,
+          0.875,
+          1.0
+        ],
+        "mean_rate": 0.74375,
+        "positive_seeds": 4
+      }
+    },
+    "interaction_rate_by_seed": [
+      -0.25,
+      0.96875,
+      0.75,
+      0.875,
+      1.0
+    ],
+    "mean_interaction_rate": 0.66875,
+    "pretrain_expiry_mode_do_seed_counts": {
+      "D": 1,
+      "D+M": 2,
+      "D+N": 0,
+      "D+M+N": 5
+    },
+    "all_20_pretraining_valid_transitions": 16777216,
+    "all_20_pretraining_empty_minibatches": 0,
+    "same_contract_as_prior_B": "confirmed_by_user",
+    "latest_combined_seed10_final_goal_success": 0,
+    "latest_combined_other_seeds_final_goal_success": 1,
+    "do_probe_is_not_a_necessary_or_sufficient_predictor": true
+  },
+  "collapse_mn_seed10": {
+    "branch": "mutant_adaptation",
+    "fixed_continued_collapse_observed": false,
+    "pretraining_natural_success": "32/32",
+    "last_saved_intact_update": 1792,
+    "first_saved_complete_failure_update": 2048,
+    "training_success_drop_interval": [
+      2001,
+      2003
+    ],
+    "update2001": {
+      "goal_successes": 511,
+      "manual_harvests": 931
+    },
+    "update2006_goal_successes": 8,
+    "no_later_training_goal_successes_through_update": 4096,
+    "update2048": {
+      "mode_success": "0/32",
+      "sample_success": "0/32",
+      "both_kernels_fail": true,
+      "manual_harvests": 0,
+      "reservations_created": 0,
+      "deliveries": 0,
+      "approx_movement_steps": 124,
+      "approx_arm_actions": 3.8
+    },
+    "update4096": {
+      "both_kernels_fail": true,
+      "movement_steps": 128,
+      "arm_actions": 0
+    },
+    "mechanism_identified": false,
+    "included_in_primary_mean": true
+  },
+  "research_decision": {
+    "tick_claim_fine_ablations": "stop",
+    "collapse_mechanism_training": "not_a_prerequisite",
+    "next_unit": "PACK-RESTORE kernel, legal path, exploit path, independent oracle and payoff validation",
+    "pack_restore_runnable": false,
+    "later": "replicate history contrast on independent bug before broad algorithm/budget/parameter sweeps"
+  }
+}
