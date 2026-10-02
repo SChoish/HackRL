@@ -1,0 +1,34 @@
+{
+  "schema_version": "hackrl_candidate_validation_v1",
+  "candidate_id": "PACK-RESTORE",
+  "fixture_id": "pack_restore_workshop_v2_source_growth",
+  "parent_design": "pack_restore_v1.json",
+  "status": "kernel_validated",
+  "runnable": false,
+  "training_queued": false,
+  "understood_as": "The 20-step path is the normal reference, not a proven optimum. The source-growth fixture is the one used for the history comparison.",
+  "change_from_v1": "source_growth_period 8 on both variants. The source starts unripe and each harvest resets the age. Period 0 remains the v1 close-source kernel.",
+  "reference_pose": "layout 0 path-check: player (9,8) facing UP",
+  "measured": {
+    "fixed_normal_loaded_steps": 20,
+    "fixed_normal_empty_steps": 20,
+    "fixed_normal_delivered": 3,
+    "fixed_normal_violations": 0,
+    "mutant_duplicate_loaded_steps": 12,
+    "mutant_duplicate_empty_steps": 13,
+    "mutant_duplicate_delivered": 3,
+    "mutant_rebuild_violations": 3,
+    "same_actions_fixed_delivered": 0,
+    "earliest_fixed_delivery_steps": 20,
+    "wording": "normal_reference_path"
+  },
+  "payoff_gate": "passed on the reference pose against the 20-step normal reference path, not as a proof that 20 is the optimal lower bound. Duplication delivers 3 in 12 loaded steps or 13 empty steps.",
+  "measured_wording": "20 steps is the normal reference path. The report should say shortening relative to that reference.",
+  "v1_close_source": "unchanged and still slower for the bug path (9 steps) than normal collection (6 steps)",
+  "still_required_before_training": [
+    "goal-conditioned training contract",
+    "resolved code and schema hashes",
+    "materialized layout files",
+    "checkpoint resume and eval immutability"
+  ]
+}

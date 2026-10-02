@@ -1,0 +1,35 @@
+{
+  "schema_version": "hackrl_pack_restore_gc_history_manifest_v1",
+  "manifest_id": "pack_restore_gc_history_v1",
+  "status": "frozen_before_results",
+  "fixture_id": "pack_restore_workshop_v2_source_growth",
+  "run_directory": "runs/pack_restore_gc_history_v1",
+  "seeds": [0, 1, 2],
+  "seed_role": "development seeds from pack_restore_v1.json; confirmation seeds 100-104 are unused",
+  "hidden_size": 512,
+  "entropy_coefficient": 0.005,
+  "learning_rate": 0.0002,
+  "source_growth_period": 8,
+  "method": "GC-PPO",
+  "origins": {
+    "none": "workshop12 initialization, zero updates, fresh Adam, then deliver_3",
+    "deliver3": "deliver_3 pretraining for 512 updates on the fixed kernel, Adam continued",
+    "workshop12": "workshop12 pretraining for 512 updates on the fixed kernel, then deliver_3, Adam continued"
+  },
+  "excluded": ["adam_reset", "goal_bundle_decomposition", "width_sweep"],
+  "adaptation_updates": 4096,
+  "pretrain_updates": 512,
+  "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+  "primary_metric": "On the mutant evaluation environment, natural_reset mode violation_delivery_rate of the mutant-adapted policy minus the fixed-continued policy.",
+  "recorded_metrics": [
+    "success_rate",
+    "violation_rate",
+    "violation_delivery_rate",
+    "mean_length",
+    "mean_discounted_return"
+  ],
+  "cross_evaluation": "Every science checkpoint evaluates the same parameters in the fixed and mutant dynamics, for mode and sample.",
+  "discounted_return": "success * 0.995 ** (length - 1) when length is at least 1",
+  "reference_path_wording": "The 20-step fixed collection is a normal reference path. Shortening is relative to that reference, not a claim that 20 is optimal.",
+  "close_source_v1": "preserved: with source_growth_period 0 the bug path is 9 steps and the normal path is 6"
+}
