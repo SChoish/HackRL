@@ -237,3 +237,71 @@ def test_checkpoint_restores_policy_teacher_optimizer_and_schedule_position():
     with tempfile.TemporaryDirectory() as directory:
         _round_trip("tick", Path(directory) / "tick")
         _round_trip("pack", Path(directory) / "pack")
+
+
+def test_split_arms_freeze_stats_and_keep_the_teacher_shuffle():
+    config = TickClaimGCConfig(
+        seed=21,
+        num_envs=2,
+        num_steps=4,
+        num_updates=1,
+        update_epochs=1,
+        minibatch_size=8,
+        hidden_size=32,
+        goal_mode="workshop12",
+    )
+    network, runner = initialize_tick_claim_gc(config)
+    inputs = tick_inputs(runner.env_state, runner.current_goal)
+    teacher, leo, minibatch = init_dual_leo_teacher(
+        config, inputs[0], inputs[1], TICK_GOALS, TICK_ACTIONS
+    )
+    arms = {}
+    for learn, imitate in ((True, True), (True, False), (False, True)):
+        update = jax.jit(
+            make_dual_leo_update(
+                network,
+                teacher,
+                config,
+                _tick_outcome,
+                tick_inputs,
+                minibatch,
+                learn_teacher=learn,
+                imitate_teacher=imitate,
+            )
+        )
+        arms[(learn, imitate)] = update(runner, leo)
+    full_runner, full_leo, full_metrics = arms[(True, True)]
+    quiet_runner, quiet_leo, quiet_metrics = arms[(True, False)]
+    frozen_runner, frozen_leo, frozen_metrics = arms[(False, True)]
+    assert _trees_equal(full_runner.rng, quiet_runner.rng)
+    assert _trees_equal(full_runner.rng, frozen_runner.rng)
+    assert not _trees_equal(full_runner.rng, runner.rng)
+    assert _trees_equal(frozen_leo.params, leo.params)
+    assert _trees_equal(frozen_leo.batch_stats, leo.batch_stats)
+    assert _trees_equal(frozen_leo.opt_state, leo.opt_state)
+    assert int(frozen_leo.step) == 0
+    assert int(frozen_metrics["teacher_applied_minibatches"]) == 0
+    assert int(frozen_metrics["teacher_scheduled_minibatches"]) > 0
+    assert not _trees_equal(quiet_leo.batch_stats, leo.batch_stats)
+    assert int(quiet_leo.step) == 2
+    assert _trees_equal(frozen_runner.train_state.params, full_runner.train_state.params)
+    assert not _trees_equal(quiet_runner.train_state.params, full_runner.train_state.params)
+    np.testing.assert_allclose(float(quiet_metrics["bc_policy_coef"]), 0.0)
+    np.testing.assert_allclose(float(frozen_metrics["bc_policy_coef"]), 0.1)
+    np.testing.assert_allclose(float(full_metrics["bc_policy_coef"]), 0.1)
+
+
+def test_teacher_imitation_queue_adds_sixty_jobs_from_pretraining():
+    import sys
+    root = Path(__file__).resolve().parents[1]
+    sys.path.insert(0, str(root / "scripts"))
+    from run_teacher_imitation_split import build_jobs
+
+    jobs = build_jobs()
+    assert len(jobs) == 60
+    assert sum(job["kind"] == "pretrain" for job in jobs) == 20
+    assert sum(job["kind"] == "adapt" for job in jobs) == 40
+    assert {job["method"] for job in jobs} == {"teacher_only", "frozen_imitation"}
+    assert all(job["learn_teacher"] and not job["imitate_teacher"] for job in jobs if job["method"] == "teacher_only")
+    assert all(not job["learn_teacher"] and job["imitate_teacher"] for job in jobs if job["method"] == "frozen_imitation")
+    assert all(job["kind"] == "pretrain" or "pretrain" in job["depends_on"][0] for job in jobs)

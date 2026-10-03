@@ -202,11 +202,26 @@ def teacher_parameter_count(leo_state) -> int:
     return int(sum(np.asarray(value).size for value in jax.tree.leaves(leo_state.params)))
 
 
-def make_dual_leo_update(ppo_network, teacher_network, config, step_outcome, batch_inputs, minibatch_size):
+def make_dual_leo_update(
+    ppo_network,
+    teacher_network,
+    config,
+    step_outcome,
+    batch_inputs,
+    minibatch_size,
+    *,
+    learn_teacher=True,
+    imitate_teacher=True,
+):
     """One PPO update plus the all-goal teacher update.
 
     step_outcome(runner, actions, config) returns
     runner, done, valid, reward, terminal_goals, world_done, goal_done.
+
+    learn_teacher=False keeps the teacher parameters, Adam state, and input
+    BatchRenorm statistics at their current values. The teacher shuffle still
+    consumes gc_runner.rng, so turning learning off does not change the policy
+    random stream. imitate_teacher=False multiplies the policy BC term by 0.
     """
 
     num_goals = teacher_network.num_goals
@@ -275,6 +290,8 @@ def make_dual_leo_update(ppo_network, teacher_network, config, step_outcome, bat
             trajectory.terminal_goals, max_next_q, trajectory.world_done, config.gamma
         )
         bc_coef = bc_policy_coefficient(gc_runner.global_update)
+        if not imitate_teacher:
+            bc_coef = jnp.asarray(0.0, dtype=jnp.float32)
 
         def update_minibatch(train_state, batch):
             def loss_fn(parameters):
@@ -404,6 +421,10 @@ def make_dual_leo_update(ppo_network, teacher_network, config, step_outcome, bat
         )
 
         def teacher_minibatch(leo, batch):
+            if not learn_teacher:
+                del batch
+                zero = jnp.asarray(0.0, dtype=jnp.float32)
+                return leo, (zero, jnp.asarray(0, dtype=jnp.int32), jnp.asarray(0, dtype=jnp.int32))
             sample, target = batch
 
             def loss_fn(params):
@@ -503,6 +524,8 @@ def make_dual_leo_update(ppo_network, teacher_network, config, step_outcome, bat
                 "teacher_scheduled_grad_steps": (
                     gc_runner.global_update * teacher_scheduled
                 ).astype(jnp.int32),
+                "learn_teacher": jnp.asarray(int(learn_teacher), dtype=jnp.int32),
+                "imitate_teacher": jnp.asarray(int(imitate_teacher), dtype=jnp.int32),
             }
         )
         return gc_runner, leo_state, metrics

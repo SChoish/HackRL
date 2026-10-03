@@ -1,0 +1,39 @@
+{
+  "schema_version": "hackrl_teacher_imitation_split_v1",
+  "status": "frozen_before_launch",
+  "parent_contract": "9155a0d922bbf4a2d335c8bca5cc33a5ce0ff948",
+  "preserved_corners": "runs/dual_leo_compare_v1",
+  "run_directory": "runs/teacher_imitation_split_v1",
+  "environments": ["tick_claim", "pack_restore"],
+  "seeds": [20, 21, 22, 23, 24],
+  "pretrain": {"goal_mode": "workshop12", "variant": "fixed", "updates": 512, "applies_from": "pretrain"},
+  "adapt": {"goal_mode": "deliver_3", "variants": ["fixed", "mutant"], "updates": 4096},
+  "jobs": 60,
+  "pretrain_jobs": 20,
+  "adapt_jobs": 40,
+  "transitions": 5704253440,
+  "arms": {
+    "teacher_only": {
+      "learn_teacher": true,
+      "imitate_teacher": false,
+      "meaning": "The teacher learns, including its parameters and BatchRenorm statistics, and the policy BC coefficient is 0."
+    },
+    "frozen_imitation": {
+      "learn_teacher": false,
+      "imitate_teacher": true,
+      "meaning": "The policy imitates the initialized teacher's argmax. This injects an unlearned action preference."
+    }
+  },
+  "corners_not_rerun": ["gc_ppo", "full_dual"],
+  "freeze": {
+    "parameters": true,
+    "adam_state": true,
+    "batch_renorm_statistics": true,
+    "note": "A frozen teacher does not update BatchRenorm statistics. Updating them would change the teacher output for the same observation."
+  },
+  "rng": "The teacher shuffle still consumes gc_runner.rng when learning is off. teacher_only is not expected to match GC-PPO byte for byte.",
+  "bc_schedule": "0.1 * max(0, 1 - global_update / 4608) when imitate_teacher is true; 0 when it is false. The schedule is not restarted at adaptation.",
+  "not_separated": "This 2x2 does not separate a special effect of multi-goal Q learning from the learned teacher signal.",
+  "reading": "If full Dual exploits more than frozen imitation, that supports the learned teacher signal. Also report how much frozen imitation hurts relative to no imitation.",
+  "not_included": ["new_environments", "fixture_retune", "goal_bundle_splits", "compute_matched_control"]
+}

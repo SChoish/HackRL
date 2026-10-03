@@ -320,10 +320,40 @@ def _start_teacher(spec, config, runner):
     return init_dual_leo_teacher(config, inputs[0], inputs[1], spec["goals"], spec["actions"])
 
 
-def _dual_update(spec, network, teacher, config, minibatch):
+def _arm(job):
+    if job["method"] == "gc":
+        return None
+    return {
+        "learn_teacher": bool(job.get("learn_teacher", True)),
+        "imitate_teacher": bool(job.get("imitate_teacher", True)),
+    }
+
+
+def _check_arm(directory, arm):
+    if arm is None:
+        return
+    path = Path(directory) / "arm.json"
+    if not path.is_file():
+        if arm == {"learn_teacher": True, "imitate_teacher": True}:
+            return
+        raise RuntimeError(f"checkpoint has no arm record: {directory}")
+    recorded = json.loads(path.read_text(encoding="utf-8"))
+    if recorded != arm:
+        raise RuntimeError(f"checkpoint arm {recorded} does not match {arm}")
+
+
+def _dual_update(spec, network, teacher, config, minibatch, arm):
+    flags = arm or {"learn_teacher": True, "imitate_teacher": True}
     return jax.jit(
         make_dual_leo_update(
-            network, teacher, config, spec["outcome"], spec["inputs"], minibatch
+            network,
+            teacher,
+            config,
+            spec["outcome"],
+            spec["inputs"],
+            minibatch,
+            learn_teacher=flags["learn_teacher"],
+            imitate_teacher=flags["imitate_teacher"],
         )
     )
 
@@ -348,6 +378,7 @@ def _load_adapt_start(log_dir, job, template, branch):
     else:
         _, leo_template, _ = _start_teacher(spec, branch, template)
         runner, leo = load_dual_checkpoint(source, template, leo_template)
+        _check_arm(source, _arm(job))
     if int(runner.global_update) != PRETRAIN_UPDATES:
         raise RuntimeError(f"pretrain loaded at update {int(runner.global_update)}")
     before = tuple(np.asarray(jax.device_get(leaf)).tobytes() for leaf in jax.tree.leaves(runner.train_state.params))
@@ -374,16 +405,19 @@ def _latest_adapt(cell):
     return best
 
 
-def _save_state(spec, method, directory, runner, leo, config):
+def _save_state(spec, method, directory, runner, leo, config, arm=None):
     if method == "gc":
         spec["save"](directory, runner, config)
     else:
         save_dual_checkpoint(directory, runner, leo, spec["payload"](config))
+        if arm is not None:
+            _write_json(Path(directory) / "arm.json", arm)
 
 
-def _load_state(spec, method, directory, template, leo_template, config):
+def _load_state(spec, method, directory, template, leo_template, config, arm=None):
     if method == "gc":
         return spec["load"](directory, template, config), None
+    _check_arm(directory, arm)
     return load_dual_checkpoint(directory, template, leo_template)
 
 
@@ -410,28 +444,29 @@ def run_pretrain(log_dir, job):
     network, runner = spec["initialize"](config)
     leo = None
     teacher_count = 0
+    arm = _arm(job)
     if job["method"] == "gc":
         update = jax.jit(spec["gc_update"](network, config))
     else:
         teacher, leo, minibatch = _start_teacher(spec, config, runner)
         teacher_count = teacher_parameter_count(leo)
-        update = _dual_update(spec, network, teacher, config, minibatch)
+        update = _dual_update(spec, network, teacher, config, minibatch, arm)
     latest = None
     for update_index in (0, 256, PRETRAIN_UPDATES):
         path = destination / "checkpoints" / f"update_{update_index}"
         if _meta_update(path) == update_index:
             latest = update_index
     if latest is None:
-        _save_state(spec, job["method"], destination / "checkpoints" / "update_0", runner, leo, config)
+        _save_state(spec, job["method"], destination / "checkpoints" / "update_0", runner, leo, config, arm)
         latest = 0
     elif latest:
         template_network, template = spec["initialize"](config)
         del template_network
         leo_template = None
-        if job["method"] == "dual":
+        if arm is not None:
             _, leo_template, _ = _start_teacher(spec, config, template)
         runner, leo = _load_state(
-            spec, job["method"], destination / "checkpoints" / f"update_{latest}", template, leo_template, config
+            spec, job["method"], destination / "checkpoints" / f"update_{latest}", template, leo_template, config, arm
         )
     ppo_count = spec["parameters"](runner.train_state.params)
     started = time.perf_counter()
@@ -441,7 +476,7 @@ def run_pretrain(log_dir, job):
         finished = int(current.global_update)
         step_seconds.append(seconds)
         if finished in (256, PRETRAIN_UPDATES):
-            _save_state(spec, job["method"], destination / "checkpoints" / f"update_{finished}", current, current_leo, config)
+            _save_state(spec, job["method"], destination / "checkpoints" / f"update_{finished}", current, current_leo, config, arm)
         if finished % 32 == 0:
             host = _host_metrics(metrics, finished)
             print(
@@ -464,6 +499,8 @@ def run_pretrain(log_dir, job):
         * config.update_epochs,
         "seconds": time.perf_counter() - started,
         "seconds_per_update": float(np.mean(step_seconds)) if step_seconds else None,
+        "learn_teacher": None if arm is None else arm["learn_teacher"],
+        "imitate_teacher": None if arm is None else arm["imitate_teacher"],
     }
     if leo is not None:
         teacher_per_update = (config.batch_size // LEO_MINIBATCH_SIZE) * LEO_EPOCHS
@@ -483,19 +520,20 @@ def run_adapt(log_dir, job):
     update = None
     leo_template = None
     teacher_count = 0
-    if job["method"] == "dual":
+    arm = _arm(job)
+    if arm is not None:
         teacher, leo_template, minibatch = _start_teacher(spec, branch, template)
         teacher_count = teacher_parameter_count(leo_template)
-        update = _dual_update(spec, network, teacher, branch, minibatch)
+        update = _dual_update(spec, network, teacher, branch, minibatch, arm)
     else:
         update = jax.jit(spec["gc_update"](network, branch))
     saved = _latest_adapt(cell)
     if saved is None:
         runner, leo = _load_adapt_start(log_dir, job, template, branch)
-        _save_state(spec, job["method"], _adapt_ckpt(cell, 0), runner, leo, branch)
+        _save_state(spec, job["method"], _adapt_ckpt(cell, 0), runner, leo, branch, arm)
         saved = 0
     else:
-        runner, leo = _load_state(spec, job["method"], _adapt_ckpt(cell, saved), template, leo_template, branch)
+        runner, leo = _load_state(spec, job["method"], _adapt_ckpt(cell, saved), template, leo_template, branch, arm)
     if saved in SCIENCE_UPDATES:
         _write_curve(cell, job, runner, saved, network)
     ppo_count = spec["parameters"](runner.train_state.params)
@@ -507,13 +545,13 @@ def run_adapt(log_dir, job):
         step_seconds.append(seconds)
         _append(cell / "updates.jsonl", _host_metrics(metrics, finished) | {"seconds": seconds})
         if finished in SAVE_UPDATES:
-            _save_state(spec, job["method"], _adapt_ckpt(cell, finished), current, current_leo, branch)
+            _save_state(spec, job["method"], _adapt_ckpt(cell, finished), current, current_leo, branch, arm)
         if finished in SCIENCE_UPDATES:
             _write_curve(cell, job, current, finished, network)
         if finished in SCIENCE_UPDATES or finished % 32 == 0:
             host = _host_metrics(metrics, finished)
             extra = ""
-            if job["method"] == "dual":
+            if arm is not None:
                 extra = (
                     f" bc={host.get('bc_policy_coef')} teacher_loss={host.get('teacher_td_loss')} "
                     f"teacher_steps={host.get('teacher_grad_steps')}"
@@ -541,6 +579,8 @@ def run_adapt(log_dir, job):
         "adaptation_updates": ADAPT_UPDATES,
         "seconds_this_process": time.perf_counter() - started,
         "seconds_per_update_this_process": float(np.mean(step_seconds)) if step_seconds else None,
+        "learn_teacher": None if arm is None else arm["learn_teacher"],
+        "imitate_teacher": None if arm is None else arm["imitate_teacher"],
     }
     if leo is not None:
         teacher_per_update = (branch.batch_size // LEO_MINIBATCH_SIZE) * LEO_EPOCHS
@@ -609,7 +649,7 @@ def measure(env, updates):
     config = _config(env, seed=20, goal_mode="workshop12", variant="fixed", updates=updates)
     network, runner = spec["initialize"](config)
     teacher, leo, minibatch = _start_teacher(spec, config, runner)
-    update = _dual_update(spec, network, teacher, config, minibatch)
+    update = _dual_update(spec, network, teacher, config, minibatch, None)
     samples = []
     for _ in range(int(updates)):
         started = time.perf_counter()
