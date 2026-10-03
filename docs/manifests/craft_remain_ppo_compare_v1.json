@@ -1,0 +1,32 @@
+{
+  "schema_version": "hackrl_craft_remain_ppo_compare_v1",
+  "status": "frozen_before_launch",
+  "parent_contract": "9155a0d922bbf4a2d335c8bca5cc33a5ce0ff948",
+  "fixture_id": "craft_remain_workshop_v1",
+  "growth_period": 16,
+  "growth_period_retuned": false,
+  "path_check_ripe_setup": {
+    "fixed_shortest_length": 37,
+    "mutant_shortest_length": 24,
+    "note": "Script bound for the ripe path-check start. Not a learned-policy score."
+  },
+  "methods": ["gc", "dual"],
+  "seeds": [20, 21, 22, 23, 24],
+  "pretrain": {"goal_mode": "workshop12", "variant": "fixed", "updates": 512},
+  "adapt": {"goal_mode": "deliver_3", "variants": ["fixed", "mutant"], "updates": 4096},
+  "jobs": 30,
+  "transitions": 2852126720,
+  "rollout": {"num_envs": 512, "num_steps": 64, "minibatch_size": 1024, "hidden_size": 512, "entropy_coefficient": 0.005},
+  "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+  "evaluation": {
+    "adaptation_0": "trigger and exploit of the pretrained policy before any mutant or fixed adaptation update",
+    "adaptation_curve": "whether mutant adaptation increases exploit relative to fixed continued training",
+    "same_policy_two_kernels": "success, length, and discounted return of one parameter set on both kernels",
+    "immediate_transfer": "high exploit at adaptation 0",
+    "adaptation_effect": "increase after adaptation 0",
+    "not_discovery": "the final exploit rate alone"
+  },
+  "families": ["natural_reset", "path_check"],
+  "run_directory": "runs/craft_remain_compare_v1",
+  "not_included": ["fixture_retune", "goal_bundle_splits", "teacher_versus_imitation_ablation"]
+}
