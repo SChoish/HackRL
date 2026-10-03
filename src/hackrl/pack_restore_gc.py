@@ -219,6 +219,7 @@ class PackRestoreGCTransition(struct.PyTreeNode):
     reset_count: jax.Array
     observed_goals: jax.Array
     absolute_transition: jax.Array
+    terminal_goals: jax.Array
 
 
 class PackRestoreGCTrainingBatch(struct.PyTreeNode):
@@ -501,6 +502,7 @@ def step_pack_restore_gc_workers(runner, actions, config):
         reset_count=world_done.astype(jnp.int32),
         observed_goals=observed_goals,
         absolute_transition=jnp.zeros_like(runner.goal_steps),
+        terminal_goals=terminal_goals,
     )
     return next_runner, event
 

@@ -258,6 +258,7 @@ class TickClaimGCStepEvent:
     delivered_amount: jax.Array
     success_steps: jax.Array
     reset_count: jax.Array
+    terminal_goals: jax.Array
 
 
 class TickClaimGCTransition(NamedTuple):
@@ -746,6 +747,7 @@ def step_tick_claim_gc_workers(runner, actions, config):
         reset_count=jnp.logical_or(world_done, masked_extra_reset).astype(
             jnp.int32
         ),
+        terminal_goals=terminal_goals,
     )
     return next_runner, event
 
