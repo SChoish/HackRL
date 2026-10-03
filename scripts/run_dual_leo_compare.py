@@ -370,7 +370,10 @@ def _check_branch(spec, source, branch):
 
 def _load_adapt_start(log_dir, job, template, branch):
     spec = ENVS[job["env"]]
-    source = _pretrain_dir(log_dir, job) / "checkpoints" / f"update_{PRETRAIN_UPDATES}"
+    if job.get("pretrain_checkpoint"):
+        source = Path(job["pretrain_checkpoint"])
+    else:
+        source = _pretrain_dir(log_dir, job) / "checkpoints" / f"update_{PRETRAIN_UPDATES}"
     _check_branch(spec, source, branch)
     if job["method"] == "gc":
         runner = spec["branch"](source, template, branch)
@@ -378,7 +381,7 @@ def _load_adapt_start(log_dir, job, template, branch):
     else:
         _, leo_template, _ = _start_teacher(spec, branch, template)
         runner, leo = load_dual_checkpoint(source, template, leo_template)
-        _check_arm(source, _arm(job))
+        _check_arm(source, job.get("origin_arm", _arm(job)))
     if int(runner.global_update) != PRETRAIN_UPDATES:
         raise RuntimeError(f"pretrain loaded at update {int(runner.global_update)}")
     before = tuple(np.asarray(jax.device_get(leaf)).tobytes() for leaf in jax.tree.leaves(runner.train_state.params))

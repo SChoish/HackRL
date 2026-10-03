@@ -291,6 +291,33 @@ def test_split_arms_freeze_stats_and_keep_the_teacher_shuffle():
     np.testing.assert_allclose(float(full_metrics["bc_policy_coef"]), 0.1)
 
 
+def test_adapt_bc_off_branches_from_full_dual_pretraining():
+    import sys
+    root = Path(__file__).resolve().parents[1]
+    sys.path.insert(0, str(root / "scripts"))
+    from run_dual_adapt_bc_off import ORIGIN_ARM, build_jobs
+    from run_dual_leo_compare import _check_arm
+
+    jobs = build_jobs()
+    assert len(jobs) == 20
+    assert {job["env"] for job in jobs} == {"tick", "pack"}
+    assert {job["variant"] for job in jobs} == {"fixed", "mutant"}
+    assert {job["seed"] for job in jobs} == {20, 21, 22, 23, 24}
+    for job in jobs:
+        assert job["learn_teacher"] is True
+        assert job["imitate_teacher"] is False
+        assert job["origin_arm"] == ORIGIN_ARM
+        source = Path(job["pretrain_checkpoint"])
+        assert (source / "state.msgpack").is_file()
+        _check_arm(source, job["origin_arm"])
+        try:
+            _check_arm(source, {"learn_teacher": True, "imitate_teacher": False})
+        except RuntimeError:
+            pass
+        else:
+            raise AssertionError("a full Dual pretrain must not be treated as the BC-off branch")
+
+
 def test_teacher_imitation_queue_adds_sixty_jobs_from_pretraining():
     import sys
     root = Path(__file__).resolve().parents[1]

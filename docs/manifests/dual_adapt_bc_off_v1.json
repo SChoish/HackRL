@@ -1,0 +1,25 @@
+{
+  "schema_version": "hackrl_dual_adapt_bc_off_v1",
+  "status": "frozen_before_launch",
+  "parent_contract": "9155a0d922bbf4a2d335c8bca5cc33a5ce0ff948",
+  "parent_pretraining": "runs/dual_leo_compare_v1/{tick,pack}/dual/pretrain/seed{20-24}/checkpoints/update_512",
+  "bc_on_control": "runs/dual_leo_compare_v1 adaptation branches, not rerun",
+  "run_directory": "runs/dual_adapt_bc_off_v1",
+  "paper_statement": "정상 목표 학습에서 얻은 교사의 행동 지도를 정책에 전달하면, 이후 결함 환경 적응에서 자원 보존 위반의 활용이 촉진될 수 있다. PACK-RESTORE에서는 학습된 교사를 모방한 조건에서만 활용이 관측됐으며, 교사 학습만 수행하거나 초기 교사를 모방한 조건에서는 관측되지 않았다.",
+  "question": "Whether exploitation depends on teacher guidance during adaptation, given a fixed full-Dual pretraining history.",
+  "not_separated_by_the_previous_ablation": "The removal run changed both pretraining and adaptation, so it does not separate history formed in pretraining from guidance received during adaptation.",
+  "not_claimed": "The teacher directly taught the defect behavior.",
+  "branch": {
+    "learn_teacher": true,
+    "imitate_teacher": false,
+    "teacher_shuffle_rng": "still consumes gc_runner.rng",
+    "bc_schedule": "forced to 0 during adaptation; not restarted and not left at the pretrain value 0.0889"
+  },
+  "environments": ["tick_claim", "pack_restore"],
+  "seeds": [20, 21, 22, 23, 24],
+  "variants": ["fixed", "mutant"],
+  "adapt_updates": 4096,
+  "jobs": 20,
+  "pretrain_jobs": 0,
+  "comparison": "same pretrain checkpoint, existing full Dual adaptation with BC left on"
+}
