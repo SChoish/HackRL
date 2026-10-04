@@ -1834,7 +1834,7 @@ def cell_checkpoints_complete(destination, config):
             int(meta.get("global_update", -1)) != update
             or int(meta.get("environment_steps", -1))
             != update * config.batch_size
-            or saved_config != expected_config
+            or not _recorded_config_matches(saved_config, config)
         ):
             return False
     return True

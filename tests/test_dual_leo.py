@@ -86,7 +86,12 @@ def _terminal_reset(kind):
         )(stepped.env_state)
         return event, stepped.env_state.delivered_total, stepped.env_state.tick, reset_goals
     config = PackRestoreGCConfig(
-        seed=20, num_envs=2, num_steps=4, num_updates=1, minibatch_size=8, hidden_size=32
+        seed=20,
+        num_envs=2,
+        num_steps=4,
+        num_updates=1,
+        minibatch_size=8,
+        policy_hidden_size=32,
     )
     _, runner = initialize_pack_restore_gc(config)
     runner = runner.replace(
@@ -173,7 +178,7 @@ def _round_trip(kind, directory):
             num_updates=2,
             update_epochs=1,
             minibatch_size=8,
-            hidden_size=32,
+            policy_hidden_size=32,
             goal_mode="workshop12",
         )
         network, runner = initialize_pack_restore_gc(config)

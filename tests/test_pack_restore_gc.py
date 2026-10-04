@@ -38,7 +38,7 @@ def test_rebuild_violation_is_recorded_only_for_the_mutant_kernel():
             num_steps=4,
             minibatch_size=8,
             num_updates=1,
-            hidden_size=32,
+            policy_hidden_size=32,
             goal_mode="deliver_3",
         )
     )
@@ -68,7 +68,7 @@ def test_update_and_checkpoint_round_trip(tmp_path):
         num_steps=4,
         minibatch_size=8,
         num_updates=1,
-        hidden_size=32,
+        policy_hidden_size=32,
         goal_mode="workshop12",
         seed=0,
     )

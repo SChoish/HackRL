@@ -1,0 +1,285 @@
+{
+  "schema_version": "hackrl_pack_restore_scale_bc_v1",
+  "manifest_id": "pack_restore_scale_bc_v1",
+  "manifest_path": "docs/manifests/pack_restore_scale_bc_v1.json",
+  "status": "authorized_ready_to_launch",
+  "implementation_scope": "Implement, validate, commit, and execute the complete 240-job PACK-RESTORE PPO-capacity by adaptation-time teacher-guidance main experiment without time-based or interim-result pruning.",
+  "execution_authorization": {
+    "date": "2026-10-04",
+    "understood_as": "After M and L pass real 512-by-64 Dual one-update GPU smoke tests, the expected_config regression is fixed, provenance is recorded, storage is checked, and the execution code plus manifest are committed, launch all 240 jobs without time-based or interim-result pruning."
+  },
+  "parent_architecture": {
+    "git_commit": "9155a0d922bbf4a2d335c8bca5cc33a5ce0ff948",
+    "role": "source of the unchanged CNN, shared layer, two actor layers, and four critic layers"
+  },
+  "run_directory": "runs/pack_restore_scale_bc_v1",
+  "path_base": "repository root at the committed execution_code_sha recorded in run_manifest.json",
+  "environment": {
+    "fixture_id": "pack_restore_workshop_v2_source_growth",
+    "source_growth_period": 8,
+    "pretraining_kernel": "fixed",
+    "adaptation_kernels": ["fixed", "mutant"],
+    "training_split": "train",
+    "evaluation_split": "validation"
+  },
+  "questions": [
+    "Does increasing GC-PPO actor-critic capacity produce PACK-RESTORE exploitation?",
+    "Does adaptation-time teacher imitation remain useful for larger policies?",
+    "Do differences appear in final level, experience-to-exploitation, or retention stability?"
+  ],
+  "fixed_environment_contract": [
+    "fixture",
+    "reward",
+    "observation",
+    "source_growth_period"
+  ],
+  "model_sizes": {
+    "S": {
+      "policy_hidden_size": 512,
+      "ppo_actor_critic_parameters": 2644057
+    },
+    "M": {
+      "policy_hidden_size": 1024,
+      "ppo_actor_critic_parameters": 8426585
+    },
+    "L": {
+      "policy_hidden_size": 2048,
+      "ppo_actor_critic_parameters": 29428825
+    }
+  },
+  "ppo_architecture": {
+    "conv": "unchanged PACK-RESTORE CNN",
+    "shared_dense_layers": 1,
+    "actor_hidden_layers": 2,
+    "critic_hidden_layers": 4,
+    "capacity_claim": "joint actor-and-critic PPO model capacity"
+  },
+  "teacher": {
+    "hidden_size": 512,
+    "parameters": 1469366,
+    "architecture": "unchanged Dual LEO teacher with input BatchRenorm",
+    "training": "learned separately from each Dual policy's visited data",
+    "width_is_fixed_across_policy_sizes": true
+  },
+  "conditions": {
+    "G": {
+      "pretraining": "GC-PPO",
+      "adaptation_teacher_learning": false,
+      "adaptation_bc": false
+    },
+    "D-on": {
+      "pretraining": "full Dual",
+      "adaptation_teacher_learning": true,
+      "adaptation_bc": "existing global schedule"
+    },
+    "D-off": {
+      "pretraining": "same full-Dual checkpoint as D-on",
+      "adaptation_teacher_learning": true,
+      "adaptation_bc": 0,
+      "teacher_shuffle_rng": "consumed exactly as in D-on"
+    }
+  },
+  "run_graph": {
+    "per_size_and_seed": [
+      "one G pretraining job followed by fixed and mutant G adaptation",
+      "one full-Dual pretraining job loaded independently by fixed and mutant D-on adaptation",
+      "the same full-Dual checkpoint loaded independently by fixed and mutant D-off adaptation"
+    ],
+    "pretraining_jobs_per_size_and_seed": 2,
+    "adaptation_jobs_per_size_and_seed": 6,
+    "dependency_rule": "No adaptation job is eligible until its own pretraining checkpoint at update 512 is complete."
+  },
+  "branch_identity": {
+    "D-on_and_D-off_share_before_adaptation": [
+      "policy parameters",
+      "critic parameters",
+      "PPO Adam state",
+      "teacher parameters",
+      "teacher Adam state",
+      "BatchRenorm state",
+      "environment state",
+      "all RNG state",
+      "global update, environment-step, and rollout-cursor counters"
+    ],
+    "only_adaptation_arm_difference": "D-off still computes the teacher forward pass and BC loss but multiplies the policy BC term by zero. Teacher learning and RNG-consuming operations remain enabled.",
+    "post_start_divergence": "Once the policy updates differ, later on-policy visits and therefore learned teacher states may also differ; only the adaptation start is required to be identical.",
+    "G_vs_D-on_interpretation": "whole learning method from pretraining onward"
+  },
+  "seeds": [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
+  "seed_note": "Ten seeds are an operational response to prior seed variance, not a power guarantee.",
+  "schedule": {
+    "pretraining_updates": 512,
+    "adaptation_updates": 4096,
+    "science_evaluations": [0, 32, 128, 256, 512, 1024, 2048, 4096],
+    "experience_at_science_evaluations": [
+      0,
+      1048576,
+      4194304,
+      8388608,
+      16777216,
+      33554432,
+      67108864,
+      134217728
+    ],
+    "adaptation_update_0": "the loaded pretraining state after switching the commanded goal, before any adaptation optimizer update",
+    "global_update_at_adaptation_end": 4608,
+    "job_order": "seed-major; S, M, and L are interleaved within each seed bundle"
+  },
+  "optimization": {
+    "num_envs": 512,
+    "num_steps": 64,
+    "ppo_learning_rate": 0.0002,
+    "ppo_learning_rate_schedule": "constant",
+    "ppo_epochs": 1,
+    "ppo_minibatch_size": 1024,
+    "entropy_coefficient": 0.005,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "teacher_input_normalization": "BatchRenorm with its existing running-state contract",
+    "teacher_hidden_normalization": "LayerNorm",
+    "teacher_learning_rate_start": 0.0002,
+    "teacher_learning_rate_schedule": "linear to 1e-20 over 4608 updates times 64 minibatches times 2 epochs",
+    "teacher_epochs": 2,
+    "teacher_minibatch_size": 512,
+    "bc_schedule": "0.1 * max(0, 1 - global_update / 4608); never restarted",
+    "D-on_bc_at_adaptation_start": 0.08888888888888889,
+    "D-on_bc_at_adaptation_end": 0,
+    "D-off_bc_during_adaptation": 0
+  },
+  "budget": {
+    "pretraining_jobs": 60,
+    "G_adaptation_jobs": 60,
+    "Dual_adaptation_jobs": 120,
+    "total_jobs": 240,
+    "transitions_per_pretraining_job": 16777216,
+    "transitions_per_adaptation_job": 134217728,
+    "total_transitions": 25165824000
+  },
+  "checkpoint_storage": {
+    "measured_serialized_bytes": {
+      "S_G": 31931285,
+      "S_Dual": 49566803,
+      "M_G": 101321633,
+      "M_Dual": 118957151,
+      "L_G": 353348513,
+      "L_Dual": 370984031
+    },
+    "projected_all_final_pretraining_states_bytes": 10261094160,
+    "projected_all_final_adaptation_states_bytes": 31312348020,
+    "projected_all_final_states_bytes": 41573442180,
+    "projected_all_final_states_gib": 38.718,
+    "projected_legacy_multi_checkpoint_retention_gib": 582.745,
+    "observed_free_bytes_before_launch": 62600802304,
+    "retention": "Retain every science-evaluation JSON and the final state of every job. During a running job retain one rolling resumable state; remove its predecessor only after the successor state and any science curve at that update are written.",
+    "maximum_single_job_predecessor_plus_successor_bytes": 741968062,
+    "prelaunch_margin_bytes": 8589934592,
+    "margin_scope": "The margin covers one serialized worker's temporary predecessor-plus-successor overlap and non-checkpoint artifacts; the queue must run with concurrency 1."
+  },
+  "evaluation": {
+    "primary_view": {
+      "policy": "mode",
+      "start_family": "natural_reset"
+    },
+    "reported_view_grid": {
+      "policies": ["mode", "sample"],
+      "start_families": ["natural_reset", "common_setup"],
+      "report_each_combination_separately": true
+    },
+    "mode_definition": "categorical policy mode",
+    "sample_definition": "four stochastic repeats per validation state",
+    "episodes_per_kernel": {"mode": 64, "sample": 256},
+    "episode_horizon": 128,
+    "frozen_policy": true,
+    "validation_states_per_start_family": 64,
+    "cross_evaluation": "Every science-evaluation adaptation checkpoint is evaluated under fixed and mutant kernels.",
+    "E_normal_performance": [
+      "success_rate",
+      "mean_length",
+      "mean_discounted_return"
+    ],
+    "D_discovery_and_use": [
+      "violation_delivery_rate",
+      "first science checkpoint with nonzero use",
+      "retention or disappearance at later checkpoints"
+    ],
+    "violation_delivery_rate": "fraction of evaluation episodes that deliver grain attributed to a conservation-violating creation event",
+    "V_realized_gain": "For the same mutant-adapted policy, mutant-kernel minus fixed-kernel success rate, return, and length; interpret the sign of length together with success and return.",
+    "primary_metric": "Within the same size, condition, seed, checkpoint, policy view, and start family: U = mutant-kernel violation_delivery_rate of the mutant-adapted policy minus that of the fixed-continued policy.",
+    "primary_contrast": "Delta_BC(width) = U_D-on(width) - U_D-off(width)"
+  },
+  "statistics": {
+    "independent_unit": "learner seed",
+    "episode_count_is_not_a_replication_unit": true,
+    "report": [
+      "every seed point",
+      "paired D-on minus D-off contrasts",
+      "20,000-resample learner-seed bootstrap 95% percentile intervals for means"
+    ],
+    "bootstrap_rng_seed": 20261003,
+    "learning_failures": "retain every completed seed regardless of performance",
+    "technical_failures": "do not impute missing or corrupt jobs; resume from declared checkpoints and keep the aggregate status incomplete until all expected artifacts pass validation"
+  },
+  "preregistered_extension": {
+    "status": "preregistered_only_not_implemented_or_scheduled",
+    "adaptation_updates": 8192,
+    "scope": "continue every adaptation branch from 4096",
+    "bc_after_4096": 0,
+    "question": "Does the post-guidance difference persist, or do delayed learners catch up?",
+    "total_experiment_transitions_if_run": 49325015040
+  },
+  "excluded_from_main_experiment": [
+    "fixture changes",
+    "reward changes",
+    "observation changes",
+    "learning-rate retuning by size",
+    "Transformer comparison"
+  ],
+  "implementation": {
+    "runner": "scripts/run_pack_restore_scale_bc.py",
+    "queue_launcher": "scripts/run_pack_restore_scale_bc_queue.sh",
+    "aggregator": "scripts/summarize_pack_restore_scale_bc.py",
+    "parameter_gate": "scripts/run_pack_restore_scale_bc.py --validate-contract",
+    "execution_command": "From the repository root: HACKRL_DEVICE=cuda bash scripts/run_pack_restore_scale_bc_queue.sh",
+    "queue_concurrency": 1,
+    "job_failure_behavior": "A technical exception stops the single worker without marking the job complete. Relaunch the same command after resolving the cause; the queue resumes from the newest retained state and never removes a seed or condition.",
+    "execution_sources": [
+      "docs/manifests/pack_restore_scale_bc_v1.json",
+      "scripts/run_pack_restore_scale_bc.py",
+      "scripts/run_pack_restore_scale_bc_queue.sh",
+      "scripts/summarize_pack_restore_scale_bc.py",
+      "scripts/run_dual_leo_compare.py",
+      "src/hackrl/pack_restore.py",
+      "src/hackrl/pack_restore_gc.py",
+      "src/hackrl/dual_leo.py",
+      "src/hackrl/batch_renorm.py",
+      "src/hackrl/tick_claim.py",
+      "src/hackrl/tick_claim_gc.py",
+      "src/hackrl/tick_claim_oracle.py"
+    ],
+    "code_lock": "Queue startup refuses uncommitted changes in execution sources and writes the exact Git SHA, manifest SHA-256, and execution-source SHA-256 values to run_manifest.json.",
+    "checkpoint_provenance": "Every final pretraining checkpoint has a SHA-256 content fingerprint over state.msgpack, config.json, metadata.json, and arm.json when present. The combined digest hashes sorted file names, a NUL separator, each lowercase file digest, and a newline. Every adaptation cell records that origin; aggregation rehashes each retained source and requires the four D-on/D-off fixed/mutant branches for each size and seed to share one fingerprint.",
+    "queue_preparation_note": "Authorized for full execution after all launch gates pass."
+  },
+  "validation_evidence": {
+    "real_update_shape": "512 environments by 64 steps, full Dual update",
+    "S_compile_and_first_update_seconds": 15.296,
+    "M_compile_and_first_update_seconds": 14.6505946051,
+    "L_compile_and_first_update_seconds": 14.5469519999,
+    "M_ppo_parameters": 8426585,
+    "L_ppo_parameters": 29428825,
+    "M_and_L_teacher_parameters": 1469366,
+    "all_S_M_L_real_update_smokes_passed": true,
+    "expected_config_regression": "tests/test_tick_claim_gc.py::test_scheduled_checkpoints_resume_without_replaying_saved_updates passed"
+  },
+  "interpretation_limit": "This experiment supports claims about the encoded PACK-RESTORE mechanism and tested optimization contract, not general real-world exploit discovery.",
+  "launch_gates": [
+    "all initialized parameter counts match this manifest",
+    "D-on and D-off resolve to the same full-Dual pretraining checkpoint",
+    "BC-off keeps teacher learning and teacher-shuffle RNG consumption",
+    "legacy PACK-RESTORE checkpoints still deserialize as policy width 512 and teacher width 512",
+    "focused tests and real 512-by-64 Dual one-update GPU smoke runs for S, M, and L pass",
+    "the scheduled-checkpoint expected_config regression test passes",
+    "execution sources and this manifest are committed before queue startup",
+    "measured final-state retention plus an 8 GiB margin fits available storage"
+  ]
+}

@@ -152,7 +152,12 @@ def _gae(trajectory, last_value, gamma, gae_lambda):
 def init_dual_leo_teacher(config, map_example, numeric_example, num_goals, num_actions):
     """Initialize the teacher without consuming the PPO initialization RNG."""
 
-    network = DualLeoQ(num_goals=num_goals, num_actions=num_actions, hidden_size=config.hidden_size)
+    teacher_hidden_size = int(getattr(config, "teacher_hidden_size", LEO_HIDDEN_SIZE))
+    network = DualLeoQ(
+        num_goals=num_goals,
+        num_actions=num_actions,
+        hidden_size=teacher_hidden_size,
+    )
     variables = network.init(
         jax.random.fold_in(jax.random.PRNGKey(int(config.seed)), 17),
         map_example[:1],

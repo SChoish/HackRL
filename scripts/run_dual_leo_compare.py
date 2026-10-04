@@ -9,8 +9,10 @@ its parameters, Adam steps, and wall clock are recorded apart from PPO.
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
+import shutil
 import time
 from pathlib import Path
 
@@ -181,7 +183,24 @@ def build_jobs():
     return jobs
 
 
-def _config(env, *, seed, goal_mode, variant, updates):
+def _config(
+    env,
+    *,
+    seed,
+    goal_mode,
+    variant,
+    updates,
+    policy_hidden_size=512,
+    teacher_hidden_size=512,
+):
+    width_fields = (
+        {
+            "policy_hidden_size": int(policy_hidden_size),
+            "teacher_hidden_size": int(teacher_hidden_size),
+        }
+        if env == "pack"
+        else {"hidden_size": int(policy_hidden_size)}
+    )
     return ENVS[env]["config"](
         variant=variant,
         seed=int(seed),
@@ -189,10 +208,28 @@ def _config(env, *, seed, goal_mode, variant, updates):
         num_steps=64,
         num_updates=int(updates),
         minibatch_size=1024,
-        hidden_size=512,
         entropy_coefficient=0.005,
         goal_mode=goal_mode,
         checkpoint_updates=(),
+        **width_fields,
+    )
+
+
+def _job_widths(job):
+    return {
+        "policy_hidden_size": int(job.get("policy_hidden_size", 512)),
+        "teacher_hidden_size": int(job.get("teacher_hidden_size", 512)),
+    }
+
+
+def _job_config(job, *, goal_mode, variant, updates):
+    return _config(
+        job["env"],
+        seed=job["seed"],
+        goal_mode=goal_mode,
+        variant=variant,
+        updates=updates,
+        **_job_widths(job),
     )
 
 
@@ -200,6 +237,48 @@ def _write_json(path, value):
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
     path.write_text(json.dumps(value, indent=2, sort_keys=True) + "\n", encoding="utf-8")
+
+
+def _sha256_file(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for block in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(block)
+    return digest.hexdigest()
+
+
+def _checkpoint_fingerprint(directory):
+    """Fingerprint every file needed to reproduce a checkpoint load."""
+
+    directory = Path(directory)
+    names = ["state.msgpack", "config.json", "metadata.json"]
+    if (directory / "arm.json").is_file():
+        names.append("arm.json")
+    files = {name: _sha256_file(directory / name) for name in names}
+    combined = hashlib.sha256()
+    for name, digest in sorted(files.items()):
+        combined.update(name.encode("utf-8"))
+        combined.update(b"\0")
+        combined.update(digest.encode("ascii"))
+        combined.update(b"\n")
+    return {
+        "schema_version": "hackrl_checkpoint_fingerprint_v1",
+        "sha256": combined.hexdigest(),
+        "files": files,
+    }
+
+
+def _ensure_checkpoint_fingerprint(directory):
+    directory = Path(directory)
+    current = _checkpoint_fingerprint(directory)
+    path = directory / "fingerprint.json"
+    if path.is_file():
+        recorded = json.loads(path.read_text(encoding="utf-8"))
+        if recorded != current:
+            raise RuntimeError(f"checkpoint fingerprint mismatch: {directory}")
+    else:
+        _write_json(path, current)
+    return current
 
 
 def _host_metrics(metrics, adaptation_update):
@@ -224,12 +303,20 @@ def _meta_update(path):
     return int(meta.get("global_update", -1))
 
 
+def _job_root(log_dir, job):
+    root = Path(log_dir)
+    if job.get("size"):
+        root = root / f"size_{str(job['size']).lower()}"
+    return root
+
+
 def _pretrain_dir(log_dir, job):
-    return Path(log_dir) / job["env"] / job["method"] / "pretrain" / f"seed{job['seed']}"
+    method = job.get("pretrain_method", job["method"])
+    return _job_root(log_dir, job) / job["env"] / method / "pretrain" / f"seed{job['seed']}"
 
 
 def _cell_dir(log_dir, job):
-    return Path(log_dir) / job["env"] / job["method"] / job["variant"] / f"seed{job['seed']}"
+    return _job_root(log_dir, job) / job["env"] / job["method"] / job["variant"] / f"seed{job['seed']}"
 
 
 def _adapt_ckpt(cell, update):
@@ -303,6 +390,9 @@ def _write_curve(cell, job, runner, update, network):
             "schema_version": "hackrl_dual_leo_compare_curve_v1",
             "env": job["env"],
             "method": job["method"],
+            "condition": job.get("condition"),
+            "size": job.get("size"),
+            **_job_widths(job),
             "seed": int(job["seed"]),
             "trained_variant": job["variant"],
             "adaptation_updates": int(update),
@@ -370,10 +460,7 @@ def _check_branch(spec, source, branch):
 
 def _load_adapt_start(log_dir, job, template, branch):
     spec = ENVS[job["env"]]
-    if job.get("pretrain_checkpoint"):
-        source = Path(job["pretrain_checkpoint"])
-    else:
-        source = _pretrain_dir(log_dir, job) / "checkpoints" / f"update_{PRETRAIN_UPDATES}"
+    source = _adapt_source(log_dir, job)
     _check_branch(spec, source, branch)
     if job["method"] == "gc":
         runner = spec["branch"](source, template, branch)
@@ -384,19 +471,59 @@ def _load_adapt_start(log_dir, job, template, branch):
         _check_arm(source, job.get("origin_arm", _arm(job)))
     if int(runner.global_update) != PRETRAIN_UPDATES:
         raise RuntimeError(f"pretrain loaded at update {int(runner.global_update)}")
-    before = tuple(np.asarray(jax.device_get(leaf)).tobytes() for leaf in jax.tree.leaves(runner.train_state.params))
+    before = tuple(
+        np.asarray(jax.device_get(leaf)).tobytes()
+        for leaf in jax.tree.leaves(runner.train_state.params)
+    )
     runner = spec["command"](runner)
-    after = tuple(np.asarray(jax.device_get(leaf)).tobytes() for leaf in jax.tree.leaves(runner.train_state.params))
+    after = tuple(
+        np.asarray(jax.device_get(leaf)).tobytes()
+        for leaf in jax.tree.leaves(runner.train_state.params)
+    )
     if before != after:
         raise RuntimeError("command switch changed PPO parameters")
     return runner, leo
+
+
+def _adapt_source(log_dir, job):
+    if job.get("pretrain_checkpoint"):
+        return Path(job["pretrain_checkpoint"])
+    return _pretrain_dir(log_dir, job) / "checkpoints" / f"update_{PRETRAIN_UPDATES}"
+
+
+def _record_adaptation_origin(log_dir, job, cell):
+    if not job.get("record_checkpoint_fingerprint", False):
+        return None
+    source = _adapt_source(log_dir, job)
+    fingerprint = _ensure_checkpoint_fingerprint(source)
+    document = {
+        "schema_version": "hackrl_adaptation_origin_v1",
+        "job": job["id"],
+        "size": job.get("size"),
+        "condition": job.get("condition"),
+        "seed": int(job["seed"]),
+        "variant": job["variant"],
+        "source_checkpoint": str(source.resolve()),
+        "source_checkpoint_sha256": fingerprint["sha256"],
+        "source_checkpoint_files": fingerprint["files"],
+    }
+    path = Path(cell) / "origin.json"
+    if path.is_file():
+        recorded = json.loads(path.read_text(encoding="utf-8"))
+        if recorded != document:
+            raise RuntimeError(f"adaptation origin changed: {path}")
+    else:
+        _write_json(path, document)
+    return document
 
 
 def _cell_finished(cell):
     final = _adapt_ckpt(cell, ADAPT_UPDATES)
     if _meta_update(final) != PRETRAIN_UPDATES + ADAPT_UPDATES:
         return False
-    return all(_curve_complete(_curve(cell, update), update) for update in SCIENCE_UPDATES)
+    return (Path(cell) / "summary.json").is_file() and all(
+        _curve_complete(_curve(cell, update), update) for update in SCIENCE_UPDATES
+    )
 
 
 def _latest_adapt(cell):
@@ -415,6 +542,29 @@ def _save_state(spec, method, directory, runner, leo, config, arm=None):
         save_dual_checkpoint(directory, runner, leo, spec["payload"](config))
         if arm is not None:
             _write_json(Path(directory) / "arm.json", arm)
+
+
+def _prune_rolling_checkpoints(checkpoint_root, prefix, keep_update):
+    """Keep one resumable state after its replacement was written safely."""
+
+    checkpoint_root = Path(checkpoint_root)
+    if not checkpoint_root.is_dir():
+        return
+    for path in checkpoint_root.iterdir():
+        if not path.is_dir() or not path.name.startswith(prefix):
+            continue
+        suffix = path.name[len(prefix) :]
+        if not suffix.isdigit() or int(suffix) == int(keep_update):
+            continue
+        if path.parent.resolve() != checkpoint_root.resolve():
+            raise RuntimeError(f"refusing to prune outside checkpoint root: {path}")
+        shutil.rmtree(path)
+
+
+def _pretrain_save_updates(job):
+    if job.get("rolling_checkpoints", False):
+        return tuple(range(0, PRETRAIN_UPDATES + 1, 64))
+    return (0, 256, PRETRAIN_UPDATES)
 
 
 def _load_state(spec, method, directory, template, leo_template, config, arm=None):
@@ -438,10 +588,17 @@ def _train_loop(update, runner, leo, method, target, on_step):
 
 def run_pretrain(log_dir, job):
     spec = ENVS[job["env"]]
-    config = _config(job["env"], seed=job["seed"], goal_mode="workshop12", variant="fixed", updates=PRETRAIN_UPDATES)
+    config = _job_config(
+        job,
+        goal_mode="workshop12",
+        variant="fixed",
+        updates=PRETRAIN_UPDATES,
+    )
     destination = _pretrain_dir(log_dir, job)
     final = destination / "checkpoints" / f"update_{PRETRAIN_UPDATES}"
     if _meta_update(final) == PRETRAIN_UPDATES:
+        if job.get("record_checkpoint_fingerprint", False):
+            _ensure_checkpoint_fingerprint(final)
         print(f"[skip] {destination}", flush=True)
         return
     network, runner = spec["initialize"](config)
@@ -455,12 +612,23 @@ def run_pretrain(log_dir, job):
         teacher_count = teacher_parameter_count(leo)
         update = _dual_update(spec, network, teacher, config, minibatch, arm)
     latest = None
-    for update_index in (0, 256, PRETRAIN_UPDATES):
+    save_updates = _pretrain_save_updates(job)
+    for update_index in save_updates:
         path = destination / "checkpoints" / f"update_{update_index}"
         if _meta_update(path) == update_index:
             latest = update_index
     if latest is None:
-        _save_state(spec, job["method"], destination / "checkpoints" / "update_0", runner, leo, config, arm)
+        _save_state(
+            spec,
+            job["method"],
+            destination / "checkpoints" / "update_0",
+            runner,
+            leo,
+            config,
+            arm,
+        )
+        if job.get("rolling_checkpoints", False):
+            _prune_rolling_checkpoints(destination / "checkpoints", "update_", 0)
         latest = 0
     elif latest:
         template_network, template = spec["initialize"](config)
@@ -469,7 +637,13 @@ def run_pretrain(log_dir, job):
         if arm is not None:
             _, leo_template, _ = _start_teacher(spec, config, template)
         runner, leo = _load_state(
-            spec, job["method"], destination / "checkpoints" / f"update_{latest}", template, leo_template, config, arm
+            spec,
+            job["method"],
+            destination / "checkpoints" / f"update_{latest}",
+            template,
+            leo_template,
+            config,
+            arm,
         )
     ppo_count = spec["parameters"](runner.train_state.params)
     started = time.perf_counter()
@@ -478,8 +652,20 @@ def run_pretrain(log_dir, job):
     def on_step(current, current_leo, metrics, seconds):
         finished = int(current.global_update)
         step_seconds.append(seconds)
-        if finished in (256, PRETRAIN_UPDATES):
-            _save_state(spec, job["method"], destination / "checkpoints" / f"update_{finished}", current, current_leo, config, arm)
+        if finished in save_updates:
+            _save_state(
+                spec,
+                job["method"],
+                destination / "checkpoints" / f"update_{finished}",
+                current,
+                current_leo,
+                config,
+                arm,
+            )
+            if job.get("rolling_checkpoints", False):
+                _prune_rolling_checkpoints(
+                    destination / "checkpoints", "update_", finished
+                )
         if finished % 32 == 0:
             host = _host_metrics(metrics, finished)
             print(
@@ -489,9 +675,15 @@ def run_pretrain(log_dir, job):
             )
 
     runner, leo = _train_loop(update, runner, leo, job["method"], PRETRAIN_UPDATES, on_step)
+    fingerprint = None
+    if job.get("record_checkpoint_fingerprint", False):
+        fingerprint = _ensure_checkpoint_fingerprint(final)
     summary = {
         "env": job["env"],
         "method": job["method"],
+        "condition": job.get("condition"),
+        "size": job.get("size"),
+        **_job_widths(job),
         "seed": int(job["seed"]),
         "updates": PRETRAIN_UPDATES,
         "ppo_parameters": int(ppo_count),
@@ -504,6 +696,7 @@ def run_pretrain(log_dir, job):
         "seconds_per_update": float(np.mean(step_seconds)) if step_seconds else None,
         "learn_teacher": None if arm is None else arm["learn_teacher"],
         "imitate_teacher": None if arm is None else arm["imitate_teacher"],
+        "checkpoint_sha256": None if fingerprint is None else fingerprint["sha256"],
     }
     if leo is not None:
         teacher_per_update = (config.batch_size // LEO_MINIBATCH_SIZE) * LEO_EPOCHS
@@ -515,10 +708,16 @@ def run_pretrain(log_dir, job):
 def run_adapt(log_dir, job):
     spec = ENVS[job["env"]]
     cell = _cell_dir(log_dir, job)
+    origin = _record_adaptation_origin(log_dir, job, cell)
     if _cell_finished(cell):
         print(f"[skip] {cell}", flush=True)
         return
-    branch = _config(job["env"], seed=job["seed"], goal_mode="deliver_3", variant=job["variant"], updates=ADAPT_UPDATES)
+    branch = _job_config(
+        job,
+        goal_mode="deliver_3",
+        variant=job["variant"],
+        updates=ADAPT_UPDATES,
+    )
     network, template = spec["initialize"](branch)
     update = None
     leo_template = None
@@ -534,6 +733,8 @@ def run_adapt(log_dir, job):
     if saved is None:
         runner, leo = _load_adapt_start(log_dir, job, template, branch)
         _save_state(spec, job["method"], _adapt_ckpt(cell, 0), runner, leo, branch, arm)
+        if job.get("rolling_checkpoints", False):
+            _prune_rolling_checkpoints(cell / "checkpoints", "adapt_", 0)
         saved = 0
     else:
         runner, leo = _load_state(spec, job["method"], _adapt_ckpt(cell, saved), template, leo_template, branch, arm)
@@ -551,6 +752,10 @@ def run_adapt(log_dir, job):
             _save_state(spec, job["method"], _adapt_ckpt(cell, finished), current, current_leo, branch, arm)
         if finished in SCIENCE_UPDATES:
             _write_curve(cell, job, current, finished, network)
+        if finished in SAVE_UPDATES and job.get("rolling_checkpoints", False):
+            _prune_rolling_checkpoints(
+                cell / "checkpoints", "adapt_", finished
+            )
         if finished in SCIENCE_UPDATES or finished % 32 == 0:
             host = _host_metrics(metrics, finished)
             extra = ""
@@ -570,6 +775,9 @@ def run_adapt(log_dir, job):
     summary = {
         "env": job["env"],
         "method": job["method"],
+        "condition": job.get("condition"),
+        "size": job.get("size"),
+        **_job_widths(job),
         "variant": job["variant"],
         "seed": int(job["seed"]),
         "ppo_parameters": int(ppo_count),
@@ -584,6 +792,9 @@ def run_adapt(log_dir, job):
         "seconds_per_update_this_process": float(np.mean(step_seconds)) if step_seconds else None,
         "learn_teacher": None if arm is None else arm["learn_teacher"],
         "imitate_teacher": None if arm is None else arm["imitate_teacher"],
+        "origin_checkpoint_sha256": (
+            None if origin is None else origin["source_checkpoint_sha256"]
+        ),
     }
     if leo is not None:
         teacher_per_update = (branch.batch_size // LEO_MINIBATCH_SIZE) * LEO_EPOCHS
@@ -625,8 +836,8 @@ def _job_complete(log_dir, job):
     return _cell_finished(_cell_dir(log_dir, job))
 
 
-def _ready(log_dir, job):
-    lookup = {item["id"]: item for item in build_jobs()}
+def _ready(log_dir, job, jobs=None):
+    lookup = {item["id"]: item for item in (build_jobs() if jobs is None else jobs)}
     return all(_job_complete(log_dir, lookup[name]) for name in job.get("depends_on", []))
 
 
@@ -702,7 +913,7 @@ def main():
         _reclaim(log_dir)
         chosen = None
         for job in jobs:
-            if _job_complete(log_dir, job) or not _ready(log_dir, job):
+            if _job_complete(log_dir, job) or not _ready(log_dir, job, jobs):
                 continue
             if _claim(log_dir, job["id"]):
                 chosen = job

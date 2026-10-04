@@ -63,7 +63,8 @@ class PackRestoreGCConfig:
     num_updates: int = 32
     update_epochs: int = 1
     minibatch_size: int = 1024
-    hidden_size: int = 512
+    policy_hidden_size: int = 512
+    teacher_hidden_size: int = 512
     learning_rate: float = 2e-4
     gamma: float = DISCOUNT
     gae_lambda: float = 0.95
@@ -100,8 +101,10 @@ class PackRestoreGCConfig:
             raise ValueError("update_epochs and minibatch_size must be positive")
         if self.batch_size % self.minibatch_size:
             raise ValueError("rollout batch must divide evenly into minibatches")
-        if self.hidden_size <= 0 or self.learning_rate <= 0:
-            raise ValueError("hidden_size and learning_rate must be positive")
+        if self.policy_hidden_size <= 0 or self.teacher_hidden_size <= 0:
+            raise ValueError("policy_hidden_size and teacher_hidden_size must be positive")
+        if self.learning_rate <= 0:
+            raise ValueError("learning_rate must be positive")
         if self.goal_mode not in {"deliver_3", "workshop12"}:
             raise ValueError("goal_mode must be 'deliver_3' or 'workshop12'")
         if self.source_growth_period < 0:
@@ -356,7 +359,7 @@ def initialize_pack_restore_gc(config):
         if not bool(jnp.all(sampler_valid)):
             raise ValueError("initial goal sampler could not find a false goal")
     model_inputs = jax.vmap(pack_restore_gc_inputs)(observations, current_goal)
-    network = PackRestoreGCActorCritic(hidden_size=config.hidden_size)
+    network = PackRestoreGCActorCritic(hidden_size=config.policy_hidden_size)
     parameters = network.init(
         init_rng,
         model_inputs[0][:1],
@@ -970,6 +973,22 @@ def pack_restore_gc_config_payload(config):
     return payload
 
 
+def _normalize_pack_restore_gc_payload(recorded):
+    """Translate checkpoints written before policy and teacher widths split."""
+
+    payload = dict(recorded)
+    legacy_width = payload.pop("hidden_size", None)
+    if legacy_width is not None:
+        if (
+            "policy_hidden_size" in payload
+            and payload["policy_hidden_size"] != legacy_width
+        ):
+            raise ValueError("legacy and policy hidden sizes disagree")
+        payload.setdefault("policy_hidden_size", legacy_width)
+    payload.setdefault("teacher_hidden_size", 512)
+    return payload
+
+
 def checkpoint_files_present(directory):
     directory = Path(directory)
     state = directory / "state.msgpack"
@@ -1003,6 +1022,7 @@ def save_pack_restore_gc_checkpoint(directory, runner, config):
 
 
 def _recorded_config_matches(recorded, config):
+    recorded = _normalize_pack_restore_gc_payload(recorded)
     payload = pack_restore_gc_config_payload(config)
     if any(payload.get(key) != value for key, value in recorded.items()):
         return False
@@ -1011,6 +1031,7 @@ def _recorded_config_matches(recorded, config):
 
 
 def config_from_pack_restore_gc_payload(recorded):
+    recorded = _normalize_pack_restore_gc_payload(recorded)
     names = {item.name for item in fields(PackRestoreGCConfig)}
     config = PackRestoreGCConfig(**{name: recorded[name] for name in names if name in recorded})
     if not _recorded_config_matches(recorded, config):
@@ -1034,7 +1055,8 @@ _BRANCH_LOCKED_FIELDS = (
     "num_steps",
     "update_epochs",
     "minibatch_size",
-    "hidden_size",
+    "policy_hidden_size",
+    "teacher_hidden_size",
     "learning_rate",
     "gamma",
     "gae_lambda",
