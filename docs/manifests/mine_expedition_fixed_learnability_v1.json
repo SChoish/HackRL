@@ -1,0 +1,142 @@
+{
+  "schema_version": "hackrl_mine_expedition_learnability_v1",
+  "fixture_id": "mine_expedition_pack_restore_v0",
+  "gate_id": "mine_expedition_fixed_learnability_v1",
+  "status": "implementation_validated_training_not_started",
+  "runnable": true,
+  "runnable_scope": "Fixed-kernel, fixed-map normal-task learnability only. Mutant training and exploit comparison remain closed.",
+  "training_queued": false,
+  "understood_as": "The active 240-job PACK-RESTORE scale-by-BC sweep remains unchanged through adaptation update 4096. This gate measures fixed natural-start mine-expedition learnability under the declared public observation, shared reward, reset, and 256-tick termination contract. Mutant training remains closed until the fixed gate passes.",
+  "provenance": {
+    "kernel_validation_revision": "74de413b49fe92432c89a0d513547d783c5cc214",
+    "active_pack_restore_training_revision": "eaf603b1ab378b34bf2a788927f59446cabdde50",
+    "kernel": "src/hackrl/mine_expedition.py",
+    "environment": "src/hackrl/mine_expedition_env.py",
+    "learner": "src/hackrl/mine_expedition_ppo.py",
+    "runner": "scripts/run_mine_expedition_fixed_gate.py",
+    "queue": "scripts/run_mine_expedition_fixed_gate_queue.sh",
+    "adjudicator": "scripts/summarize_mine_expedition_fixed_gate.py",
+    "tests": [
+      "tests/test_mine_expedition.py",
+      "tests/test_mine_expedition_env.py",
+      "tests/test_mine_expedition_gate.py",
+      "tests/test_mine_expedition_ppo.py"
+    ]
+  },
+  "authorized_source_sha256": {
+    "scripts/run_mine_expedition_fixed_gate.py": "8a31754eefafdfcd63fb2a9dec1e76bcbe44c0dc5bfb6fd563c609b45d685942",
+    "scripts/run_mine_expedition_fixed_gate_queue.sh": "27173a3a4d266fae14ef1adf65aa88bc8dfc4ca7852eec612f8a0c61b23908ac",
+    "scripts/summarize_mine_expedition_fixed_gate.py": "abcd4dc12d4ebd7265cb9c752ce565b8ad6dbc000264fe143b362b237f98cfff",
+    "src/hackrl/mine_expedition.py": "67874dda0c21249217e221d89f77596c39575c054b1e2081d0159af8a581c87c",
+    "src/hackrl/mine_expedition_env.py": "b544b4cae89149f126bac5ef261e7037ff554fdd1c0ed88ef3479104de76193f",
+    "src/hackrl/mine_expedition_ppo.py": "6c28a9ea546acdc45f35f208eda4aee501b68bd4118773b32cd0695b6fe1cf7b",
+    "tests/test_mine_expedition.py": "967dd6f268baf47dc011f132f8484aba58ceba59f2b38ef717efaef200df5761",
+    "tests/test_mine_expedition_env.py": "f37207e45866abea3dc7141f77d9e6a14c9966dbc38d73f48c57d4819cfc7005",
+    "tests/test_mine_expedition_gate.py": "94131b87802702b1abb42bd68445a7c717224107893733e3a30358bccede5384",
+    "tests/test_mine_expedition_ppo.py": "f8fe73f4f3a58454647d362b5cdab8fc7c215aba37d004e7beac97c1ee0a9711"
+  },
+  "source_authorization": "The adjudicator recomputes these hashes and requires every seed's run provenance to contain the same values. A different committed implementation is incomplete under this gate ID.",
+  "environment_contract": {
+    "kernel_variant": "fixed",
+    "map_shape": [32, 32, 8],
+    "numeric_feature_count": 22,
+    "action_count": 24,
+    "horizon": 256,
+    "terminal_success": "One target mineral has been returned to camp.",
+    "terminal_timeout": "The state reaches tick 256 without success.",
+    "post_terminal_behavior": "The wrapper freezes state and returns zero reward.",
+    "policy_hidden_information": [
+      "fixed or mutant variant",
+      "duplicate-iron provenance fields",
+      "target_mined_with_duplicate_tool oracle"
+    ],
+    "visible_storage_contents": "Contents are visible only while cardinally adjacent to the corresponding present storage object.",
+    "record_and_inventory_visibility": "A held packed object's contents and the learned record preview are globally visible numeric inventory or memory features once present; installed storage contents remain adjacency-limited.",
+    "layout_scope": "One deterministic map. This gate does not establish layout generalization."
+  },
+  "reward_contract": {
+    "shared_between_future_fixed_and_mutant_runs": true,
+    "movement_progress": 0.01,
+    "craft_iron_pickaxe": 0.25,
+    "mine_target": 0.5,
+    "return_target": 1.0,
+    "duplication_activation_reward": 0.0,
+    "pack_restore_actions_with_zero_event_reward": [
+      "MAKE_RECORD",
+      "PACK_STORAGE",
+      "PLACE_PACKED",
+      "REBUILD_EMPTY"
+    ],
+    "shaping_information": "Movement progress uses the current task stage and a global shortest-path distance map. This privileged scalar training signal is not part of the policy observation; the gate does not claim sparse-reward learnability.",
+    "primary_evaluation_return": "success * 0.995 ** (episode_length - 1)",
+    "interpretation": "Shaped reward is for optimization. Natural-start success, length, and discounted task return are the gate evidence."
+  },
+  "training_contract": {
+    "seeds": [40, 41, 42],
+    "training_reset": "Uniform mixture of natural, resource-ready, one-iron, craft-ready, target-ready, and return-ready public states. The five shortened starts are synthetic normal-path snapshots checked by state invariants; they are curriculum states, not a layout holdout.",
+    "evaluation_reset": "natural only",
+    "num_envs": 128,
+    "num_steps": 64,
+    "num_updates": 2048,
+    "transitions_per_seed": 16777216,
+    "update_epochs": 1,
+    "minibatch_size": 1024,
+    "hidden_size": 512,
+    "actor_hidden_layers": 2,
+    "critic_hidden_layers": 4,
+    "learning_rate": 0.0002,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "entropy_coefficient": 0.005,
+    "checkpoint_updates": [0, 128, 512, 1024, 2048],
+    "capacity_check_interval_updates": 64,
+    "mode_eval_episodes_per_seed": 1,
+    "sample_eval_episodes_per_seed": 128,
+    "schedule_restart_at_checkpoint": false,
+    "budget_rationale": "128 environments bound the full-map rollout tensor. 2048 updates preserve the 16,777,216 transitions used by a 512-environment, 64-step, 512-update contract."
+  },
+  "predeclared_gate": {
+    "unit_of_learning_replication": "training seed, not evaluation episode",
+    "pass": "All three deterministic mode policies succeed from the natural start, and at least two of three seeds have stochastic natural-start success rate >= 0.8 at update 2048.",
+    "evidence_binding": "The adjudicator verifies the final state.msgpack hash and independently reruns mode and stochastic evaluation from that checkpoint. Stored evaluation JSON must exactly match the reproduced result.",
+    "failure": "Any other outcome keeps mutant training closed and is reported as a fixed-task learnability failure under this optimization contract.",
+    "no_result_driven_extension": "Do not extend updates, add widths, or sweep learning rate because of the observed gate result."
+  },
+  "implementation_validation": {
+    "command": "JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python -m pytest -q tests/test_mine_expedition.py tests/test_mine_expedition_env.py tests/test_mine_expedition_gate.py tests/test_mine_expedition_ppo.py",
+    "result": "22 passed",
+    "covers": [
+      "public observation excludes variant and duplicate provenance",
+      "duplicate-only state changes are observationally identical",
+      "PACK-RESTORE activation receives zero event reward",
+      "fixed reference normal completion and fixed counterfactual timeout",
+      "curriculum reset invariants",
+      "JIT and vmap environment stepping",
+      "one PPO update changes parameters",
+      "fixed-only metrics report no iron increase or indirect exploit",
+      "indirect-use is a one-step event and does not repeat on frozen terminal state",
+      "frozen evaluation does not mutate parameters",
+      "full runner checkpoint round trip",
+      "checkpoint content-hash corruption rejection",
+      "manifest training contract matches executable defaults",
+      "gate pass, scientific fail, and incomplete execution adjudication"
+    ]
+  },
+  "storage_and_queue": {
+    "checkpoint_destination": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_learnability_v1",
+    "repository_path_policy": "Use a symlink from runs/ only if repository-relative discovery is required.",
+    "capacity_check": "The runner records target, home, and RAID capacity; serialized checkpoint size; remaining checkpoints; predecessor-successor overlap; log allowance; and an >=8 GiB safety reserve before start or resume, every 64 updates, and before each checkpoint.",
+    "active_pack_restore_queue_unchanged": true,
+    "launch_order": "Do not replace the active PACK-RESTORE server watcher. Register this fixed gate only after that queue finishes.",
+    "predecessor_completion_gate": "After the PACK process exits, the queue verifies that the predecessor validation checkout is clean at eaf603b1ab378b34bf2a788927f59446cabdde50, runs its PACK summarizer with --require-complete, requires the result run-manifest SHA to match, and checks again for an active PACK process before every seed.",
+    "concurrency_guard": "The queue refuses to start while run_pack_restore_scale_bc.py exists and uses one nonblocking lock for all three fixed-gate seeds.",
+    "gate_result": "gate_result.json separates execution completeness from the predeclared scientific pass/fail verdict. A scientific fail exits normally so a watcher does not rerun completed training."
+  },
+  "open_claims": {
+    "fixed_policy_learnability": "unmeasured",
+    "mutant_policy_learnability": "not authorized",
+    "exploit_learning": "not authorized",
+    "layout_generalization": "not tested"
+  },
+  "independence_limit": "The kernel, environment, scorer, reference paths, and gate were designed in the same project. The gate establishes internal fixed-task trainability under the declared shaped reward; it is not independent benchmark validation."
+}

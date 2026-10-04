@@ -4,9 +4,10 @@
   "fixture_id": "mine_expedition_pack_restore_v0",
   "status": "kernel_path_validated",
   "runnable": false,
-  "runnable_meaning": "The kernel and verifier execute, but there is no training-runnable environment contract.",
+  "runnable_meaning": "This construction manifest is not a launch source. The fixed-only environment and learner are defined by mine_expedition_fixed_learnability_v1.",
   "training_queued": false,
-  "understood_as": "Finish the active 240-job PACK-RESTORE scale-by-BC sweep at adaptation update 4096 without an 8192 extension or added width/LR sweep. In parallel, prepare only the fixed normal path and mutant indirect-use path for the mine expedition; do not start new-environment training.",
+  "successor_gate": "docs/manifests/mine_expedition_fixed_learnability_v1.json",
+  "understood_as": "This manifest validates the fixed normal and mutant indirect-use kernel paths only. The active 240-job PACK-RESTORE sweep remains fixed at adaptation update 4096, and the successor manifest governs the fixed-only mine learnability gate. Mutant mine training remains closed.",
   "claim_scope": "Construction gate for three deterministic reference traces. It is not an exhaustive state-space proof, an optimal-path proof, a learned-policy result, or an independent benchmark validation.",
   "active_sweep_operational_directive": {
     "evidence_scope": "Recorded user directive and live-run provenance; not established by the mine-expedition fixture tests.",
@@ -89,7 +90,7 @@
     "repeatability": "The record persists. An emptied rebuilt anchor can be packed for another frame while the loaded packed original remains held, preserving the parent PACK-RESTORE mechanism. Restoration can repeat if a caller keeps stepping; the intended wrapper horizon bounds an episode, but this construction step does not enforce it. The reference exploit uses one rebuild only.",
     "duplicate_provenance": "Duplicate counts are subsets of physical iron in each container or tool; they are not additional inventory fields.",
     "provenance_transfer_policy": "When mixed-provenance iron is stored, withdrawn, or consumed by crafting, duplicate-tagged units move first. Provenance is analysis-only and must be hidden from the policy.",
-    "reward": "Not implemented. Creating iron, crafting the pickaxe, and mining are not assigned task reward in this construction kernel."
+    "reward": "Not part of this construction kernel. The successor fixed-learnability environment defines the shared reward and assigns zero event reward to duplication activation."
   },
   "measured_reference_paths": {
     "fixed_normal": {
@@ -138,17 +139,11 @@
     "verifier_scope": "The executable verifier checks the three headline traces and per-step partial state invariants. Pytest additionally checks the empty-record control, sampled effect-gap controls, and one-step JIT/vmap behavior. Artifact hashes are recorded, not checked by the verifier.",
     "supported_project_contract": "Python >=3.10,<3.13 and craftax==1.6.1 as pinned in pyproject.toml"
   },
-  "still_required_before_training": [
-    "public observation and model encoding without variant or provenance leakage",
-    "task reward that gives no reward for duplication itself",
-    "environment reset, termination, and auto-reset contracts",
-    "train/validation/test layout distribution and materialized split hashes",
-    "natural-start and common-opportunity evaluation states",
+  "still_required_before_mutant_training": [
     "normal fixed learnability gate before any exploit comparison",
-    "independently materialized normal, exploit, counterfactual, and negative-control traces",
-    "goal-conditioned or single-goal training interface",
-    "checkpoint resume and frozen-evaluation immutability validation",
-    "shared normal-source replenishment rule if multi-episode training requires renewable iron"
+    "train/validation/test layout distribution and materialized split hashes before any layout-generalization claim",
+    "common-opportunity evaluation states for the later exploit comparison",
+    "independently materialized normal, exploit, counterfactual, and negative-control traces"
   ],
-  "queue_gate": "Closed. Do not launch mine-expedition training from this manifest."
+  "queue_gate": "Closed for this construction manifest. The successor manifest authorizes only the fixed-map fixed-kernel learnability gate after the active PACK-RESTORE queue finishes."
 }
