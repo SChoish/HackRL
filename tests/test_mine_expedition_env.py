@@ -1,8 +1,11 @@
 import jax
 import jax.numpy as jnp
 import numpy as np
+import pytest
 
 from hackrl.mine_expedition import (
+    WORKBENCH_POSE,
+    WORLD_HORIZON,
     MineExpeditionAction,
     MineExpeditionVariant,
     make_mine_expedition_state,
@@ -13,9 +16,12 @@ from hackrl.mine_expedition import (
 from hackrl.mine_expedition_env import (
     MAP_CHANNEL_NAMES,
     NUMERIC_FEATURE_NAMES,
+    TASK_DISCOUNT,
     MineExpeditionStart,
     encode_mine_expedition_observation,
     mine_expedition_observation_shapes,
+    mine_expedition_potential,
+    mine_expedition_potential_shaping,
     observe_mine_expedition,
     reset_mine_expedition,
     step_mine_expedition_env,
@@ -32,6 +38,12 @@ def _play(actions, variant):
         rewards.append(float(event.reward))
         events.append(event)
     return state, rewards, events
+
+
+def _discounted_return(rewards):
+    return sum(
+        TASK_DISCOUNT**index * reward for index, reward in enumerate(rewards)
+    )
 
 
 def _rebuild_ready():
@@ -70,20 +82,22 @@ def test_duplicate_only_state_changes_are_unobservable():
     assert np.array_equal(np.asarray(plain), np.asarray(hidden))
 
 
-def test_rebuild_has_zero_reward_and_only_mutant_increases_iron():
+def test_rebuild_has_no_event_bonus_and_only_mutant_increases_iron():
     ready = _rebuild_ready()
     for variant, increased in (
         (MineExpeditionVariant.FIXED, False),
         (MineExpeditionVariant.MUTANT, True),
     ):
-        _, _, event = step_mine_expedition_env(
+        _, after, event = step_mine_expedition_env(
             ready, int(MineExpeditionAction.REBUILD_EMPTY), variant
         )
-        assert float(event.reward) == 0.0
+        assert float(event.reward) == pytest.approx(
+            float(mine_expedition_potential_shaping(ready, after)), abs=1e-7
+        )
         assert bool(event.iron_increase) is increased
 
 
-def test_reference_paths_receive_only_progress_and_downstream_event_rewards():
+def test_reference_paths_complete_with_shared_shaping_and_event_rewards():
     fixed, fixed_rewards, fixed_events = _play(
         mine_expedition_normal_path(), MineExpeditionVariant.FIXED
     )
@@ -101,14 +115,105 @@ def test_reference_paths_receive_only_progress_and_downstream_event_rewards():
     assert int(fixed.returned_target) == int(mutant.returned_target) == 1
     assert sum(fixed_rewards) > 1.0
     assert sum(mutant_rewards) > 1.0
-    exploit = mine_expedition_exploit_path()
-    for action, reward in zip(exploit, mutant_rewards, strict=True):
-        if action in {
-            MineExpeditionAction.MAKE_RECORD,
-            MineExpeditionAction.PACK_STORAGE,
-            MineExpeditionAction.REBUILD_EMPTY,
-        }:
-            assert reward == 0.0
+
+
+def test_pack_restore_actions_receive_shaping_but_no_event_bonus():
+    pack_actions = {
+        MineExpeditionAction.MAKE_RECORD,
+        MineExpeditionAction.PACK_STORAGE,
+        MineExpeditionAction.PLACE_PACKED,
+        MineExpeditionAction.REBUILD_EMPTY,
+    }
+    state = make_mine_expedition_state()
+    for action in mine_expedition_exploit_path():
+        before = state
+        _, state, event = step_mine_expedition_env(
+            state, int(action), MineExpeditionVariant.MUTANT
+        )
+        if action in pack_actions:
+            assert float(event.reward) == pytest.approx(
+                float(mine_expedition_potential_shaping(before, state)), abs=1e-7
+            )
+
+
+def test_storage_loop_has_no_discounted_shaping_gain():
+    start = make_mine_expedition_state().replace(
+        player_position=jnp.asarray(WORKBENCH_POSE, dtype=jnp.int32),
+        player_direction=jnp.asarray(
+            int(MineExpeditionAction.RIGHT), dtype=jnp.int32
+        ),
+        source_iron=jnp.asarray(0, dtype=jnp.int32),
+        anchor_iron=jnp.asarray(0, dtype=jnp.int32),
+        carried_iron=jnp.asarray(2, dtype=jnp.int32),
+    )
+    loop = (
+        MineExpeditionAction.UP,
+        MineExpeditionAction.STORE_ONE,
+        MineExpeditionAction.DOWN,
+        MineExpeditionAction.LEFT,
+        MineExpeditionAction.WITHDRAW_ONE,
+        MineExpeditionAction.RIGHT,
+    )
+    state = start
+    for repeat in range(2):
+        rewards = []
+        for action in loop:
+            before = state
+            _, state, event = step_mine_expedition_env(
+                state, int(action), MineExpeditionVariant.FIXED
+            )
+            rewards.append(float(event.reward))
+            assert float(event.reward) == pytest.approx(
+                float(mine_expedition_potential_shaping(before, state)), abs=1e-7
+            )
+            assert not bool(event.crafted_pickaxe)
+            assert not bool(event.mined_target)
+            assert not bool(event.returned_target)
+        normalized = state.replace(tick=jnp.asarray(0, dtype=jnp.int32))
+        assert jax.tree.all(jax.tree.map(jnp.array_equal, start, normalized))
+        assert int(state.tick) == (repeat + 1) * len(loop)
+        assert _discounted_return(rewards) == pytest.approx(0.0, abs=1e-7)
+
+
+def test_nonzero_potential_cycle_obeys_telescoping_boundary_term():
+    start = make_mine_expedition_state().replace(
+        player_direction=jnp.asarray(
+            int(MineExpeditionAction.RIGHT), dtype=jnp.int32
+        )
+    )
+    before_potential = float(mine_expedition_potential(start))
+    assert before_potential != 0.0
+    state = start
+    rewards = []
+    for action in (MineExpeditionAction.LEFT, MineExpeditionAction.RIGHT):
+        _, state, event = step_mine_expedition_env(
+            state, int(action), MineExpeditionVariant.FIXED
+        )
+        rewards.append(float(event.reward))
+    normalized = state.replace(tick=jnp.asarray(0, dtype=jnp.int32))
+    assert jax.tree.all(jax.tree.map(jnp.array_equal, start, normalized))
+    expected = (
+        TASK_DISCOUNT**len(rewards) * float(mine_expedition_potential(state))
+        - before_potential
+    )
+    assert _discounted_return(rewards) == pytest.approx(expected, abs=1e-7)
+
+
+def test_timeout_zeroes_successor_potential():
+    state = make_mine_expedition_state().replace(
+        player_position=jnp.asarray(WORKBENCH_POSE, dtype=jnp.int32),
+        player_direction=jnp.asarray(
+            int(MineExpeditionAction.RIGHT), dtype=jnp.int32
+        ),
+        tick=jnp.asarray(WORLD_HORIZON - 1, dtype=jnp.int32),
+    )
+    before_potential = float(mine_expedition_potential(state))
+    assert before_potential != 0.0
+    _, _, event = step_mine_expedition_env(
+        state, int(MineExpeditionAction.NOOP), MineExpeditionVariant.FIXED
+    )
+    assert bool(event.timeout)
+    assert float(event.reward) == pytest.approx(-before_potential, abs=1e-7)
 
 
 def test_fixed_same_exploit_actions_timeout_without_success():

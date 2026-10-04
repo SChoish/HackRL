@@ -2,8 +2,9 @@
 
 The policy never observes the kernel variant or duplicate provenance.  Reward
 is shared by fixed and mutant kernels.  PACK-RESTORE record, pack, and rebuild
-actions receive no event reward; created iron matters only if later task
-progress uses it.
+actions receive no action-specific event bonus.  Their state changes can still
+alter the potential-based shaping applied to every transition.  Downstream
+exploit metrics separately require created iron to be used for task success.
 
 This module supplies a fixed-map learnability gate.  It is not yet a layout
 generalization benchmark.
@@ -99,7 +100,8 @@ NUMERIC_FEATURE_NAMES = (
 CRAFT_REWARD = 0.25
 TARGET_MINED_REWARD = 0.5
 RETURN_REWARD = 1.0
-MOVEMENT_PROGRESS_REWARD = 0.01
+TASK_DISCOUNT = 0.995
+TASK_POTENTIAL_SCALE = 0.01
 
 
 @struct.dataclass
@@ -350,25 +352,39 @@ def _task_distance(state: MineExpeditionState) -> jax.Array:
     )
 
 
-def mine_expedition_reward(before, after, action) -> jax.Array:
-    """Shared training reward; PACK-RESTORE activation itself scores zero."""
+def mine_expedition_potential(state: MineExpeditionState) -> jax.Array:
+    """Privileged task potential used only for discount-consistent shaping."""
 
-    action = jnp.asarray(action, dtype=jnp.int32)
-    movement = jnp.logical_and(
-        action >= int(MineExpeditionAction.LEFT),
-        action <= int(MineExpeditionAction.DOWN),
+    return -TASK_POTENTIAL_SCALE * _task_distance(state).astype(jnp.float32)
+
+
+def mine_expedition_potential_shaping(before, after) -> jax.Array:
+    """Return gamma * Phi(after) - Phi(before), with terminal Phi set to zero."""
+
+    terminal = jnp.logical_or(
+        after.returned_target > 0, mine_expedition_world_done(after)
     )
-    progress = jnp.clip(_task_distance(before) - _task_distance(after), -1, 1)
-    movement_reward = jnp.where(
-        movement, MOVEMENT_PROGRESS_REWARD * progress.astype(jnp.float32), 0.0
+    successor_potential = jnp.where(
+        terminal, 0.0, mine_expedition_potential(after)
     )
+    return (
+        TASK_DISCOUNT * successor_potential
+        - mine_expedition_potential(before)
+    )
+
+
+def mine_expedition_reward(before, after, action) -> jax.Array:
+    """Shared event reward plus policy-invariant potential shaping."""
+
+    del action
+    shaping_reward = mine_expedition_potential_shaping(before, after)
     crafted = jnp.logical_and(
         before.pickaxe_iron == 0, after.pickaxe_iron == PICKAXE_IRON_COST
     )
     mined = after.target_remaining < before.target_remaining
     returned = after.returned_target > before.returned_target
     return (
-        movement_reward
+        shaping_reward
         + CRAFT_REWARD * crafted.astype(jnp.float32)
         + TARGET_MINED_REWARD * mined.astype(jnp.float32)
         + RETURN_REWARD * returned.astype(jnp.float32)

@@ -34,14 +34,12 @@ from hackrl.mine_expedition import (
 from hackrl.mine_expedition_env import (
     MAP_CHANNEL_NAMES,
     NUMERIC_FEATURE_NAMES,
+    TASK_DISCOUNT,
     MineExpeditionStart,
     observe_mine_expedition,
     reset_mine_expedition,
     step_mine_expedition_env,
 )
-
-
-TASK_DISCOUNT = 0.995
 
 
 @dataclass(frozen=True)
@@ -54,7 +52,7 @@ class MineExpeditionPPOConfig:
     minibatch_size: int = 1024
     hidden_size: int = 512
     learning_rate: float = 2e-4
-    gamma: float = 0.995
+    gamma: float = TASK_DISCOUNT
     gae_lambda: float = 0.95
     clip_epsilon: float = 0.2
     entropy_coefficient: float = 0.005
@@ -90,6 +88,8 @@ class MineExpeditionPPOConfig:
             raise ValueError("hidden_size and learning_rate must be positive")
         if not 0 < self.gamma <= 1 or not 0 <= self.gae_lambda <= 1:
             raise ValueError("gamma and gae_lambda must lie in their probability ranges")
+        if self.gamma != TASK_DISCOUNT:
+            raise ValueError("gamma must match the environment shaping discount")
         if self.clip_epsilon <= 0 or self.entropy_coefficient < 0:
             raise ValueError("clip_epsilon must be positive and entropy non-negative")
         if self.value_coefficient < 0 or self.max_grad_norm <= 0:

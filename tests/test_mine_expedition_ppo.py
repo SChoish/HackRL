@@ -9,6 +9,8 @@ import pytest
 
 from hackrl.mine_expedition_ppo import (
     MineExpeditionPPOConfig,
+    MineExpeditionTransition,
+    calculate_mine_expedition_gae,
     evaluate_mine_expedition_frozen,
     initialize_mine_expedition_ppo,
     load_mine_expedition_checkpoint,
@@ -40,6 +42,42 @@ def test_fixed_gate_rejects_non_training_starts_and_bad_batches():
         MineExpeditionPPOConfig(
             num_envs=2, num_steps=3, minibatch_size=4
         ).validate()
+    with pytest.raises(ValueError, match="environment shaping discount"):
+        MineExpeditionPPOConfig(gamma=0.99).validate()
+
+
+def test_timeout_transition_does_not_bootstrap_successor_value():
+    shape = (1, 1)
+    zeros = jnp.zeros(shape, dtype=jnp.float32)
+    flags = jnp.zeros(shape, dtype=jnp.bool_)
+    trajectory = MineExpeditionTransition(
+        done=jnp.ones(shape, dtype=jnp.bool_),
+        action=jnp.zeros(shape, dtype=jnp.int32),
+        value=jnp.full(shape, 2.0, dtype=jnp.float32),
+        reward=jnp.ones(shape, dtype=jnp.float32),
+        log_prob=zeros,
+        map_channels=jnp.zeros((1, 1, 1), dtype=jnp.float32),
+        numeric_features=jnp.zeros((1, 1, 1), dtype=jnp.float32),
+        success=flags,
+        timeout=jnp.ones(shape, dtype=jnp.bool_),
+        crafted_pickaxe=flags,
+        mined_target=flags,
+        returned_target=flags,
+        iron_increase=flags,
+        indirect_use=flags,
+        completed_return=zeros,
+        completed_length=jnp.zeros(shape, dtype=jnp.int32),
+        reset_count=jnp.ones(shape, dtype=jnp.int32),
+    )
+    config = MineExpeditionPPOConfig()
+    advantages, targets = calculate_mine_expedition_gae(
+        trajectory,
+        last_value=jnp.asarray([100.0], dtype=jnp.float32),
+        gamma=config.gamma,
+        gae_lambda=config.gae_lambda,
+    )
+    np.testing.assert_allclose(np.asarray(advantages), [[-1.0]])
+    np.testing.assert_allclose(np.asarray(targets), [[1.0]])
 
 
 def test_manifest_training_contract_matches_executable_defaults():
