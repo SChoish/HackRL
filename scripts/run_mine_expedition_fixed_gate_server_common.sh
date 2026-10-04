@@ -3,8 +3,8 @@
 set -euo pipefail
 
 MODE="${1:?expected cpu or gpu}"
-EXECUTION_ROOT="/raid/ext_csv/HackRL/worktrees/mine_expedition_fixed_734c50c"
-EXECUTION_SHA="734c50c581a9a797c8f0fb83b88b6316c8b209b0"
+EXECUTION_ROOT="/raid/ext_csv/HackRL/worktrees/mine_expedition_fixed_b71c185"
+EXECUTION_SHA="b71c185384b0ab52bf5de4940125c576fee5e607"
 RUN_ROOT="/raid/ext_csv/HackRL/runs/mine_expedition_fixed_learnability_v1"
 
 if [[ "$MODE" != "cpu" && "$MODE" != "gpu" ]]; then
