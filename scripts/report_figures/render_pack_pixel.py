@@ -13,17 +13,19 @@ import imageio.v2 as imageio
 import numpy as np
 from PIL import Image, ImageDraw, ImageFont
 
-ROOT = Path("/home/ext_csv/HackRL")
+from report_figures.common import (
+    ROOT, state_at as _state_at, frame_status, metadata_lines,
+    world_geometry, visible_crop,
+)
 TRACE = ROOT / "runs/figures_report_v2/pack_dual_seed20/trace.json"
 OUT = ROOT / "runs/figures_report_v2/pack_dual_seed20"
 
 SCALE = 2
 BASE_W = 960
-PRESENTATION_H = 360
-ANALYSIS_H = 500
+PRESENTATION_H = 436
+ANALYSIS_H = 576
 TILE = 42
-MAP_MIN = 7
-MAP_MAX = 11
+FOOTER_H = 54
 
 PALETTE = {
     "ink": "#2b2118",
@@ -70,6 +72,12 @@ def _text(draw, xy, text, size=12, fill=None, anchor=None):
         fill=fill or PALETTE["ink"],
         anchor=anchor,
     )
+
+
+def _fit_text(draw, xy, text, max_width, size=9):
+    while size > 6 and draw.textlength(str(text), font=_font(size)) > max_width:
+        size -= 1
+    _text(draw, xy, text, size)
 
 
 def _box(draw, box, fill, outline=None, width=1):
@@ -241,37 +249,27 @@ def _packed_icon(draw, x, y, grain, active):
     _text(draw, (x + 38, y + 14), f"packed {grain}", 10, anchor="lm")
 
 
-def _state_at(kernel, timeline_index):
-    steps = kernel["steps"]
-    if timeline_index == 0:
-        return kernel["initial"], None, False
-    if timeline_index <= len(steps):
-        step = steps[timeline_index - 1]
-        return step["after"], step, False
-    return steps[-1]["after"], steps[-1], True
+def _map_origin(panel_x, bbox=None):
+    dx = dy = 0
+    if bbox is not None:
+        dy = (7 - (bbox[1] - bbox[0] + 1)) * TILE // 2
+        dx = (7 - (bbox[3] - bbox[2] + 1)) * TILE // 2
+    return panel_x + 18 + dx, 58 + dy
 
 
-def _map_origin(panel_x):
-    return panel_x + 18, 58
-
-
-def _draw_map(draw, panel_x, state, observation, analysis):
-    origin_x, origin_y = _map_origin(panel_x)
-    for row in range(MAP_MIN - 1, MAP_MAX + 2):
-        for col in range(MAP_MIN - 1, MAP_MAX + 2):
-            x = origin_x + (col - (MAP_MIN - 1)) * TILE
-            y = origin_y + (row - (MAP_MIN - 1)) * TILE
-            if MAP_MIN <= row <= MAP_MAX and MAP_MIN <= col <= MAP_MAX:
-                _stone_tile(draw, x, y, row, col)
-            else:
-                _wall_tile(draw, x, y, row, col)
+def _draw_map(draw, panel_x, trace, state, observation, analysis):
+    walkable, bbox = world_geometry(trace, "pack")
+    origin_x, origin_y = _map_origin(panel_x, bbox)
+    top, bottom, left, right = bbox
 
     def at(position):
         row, col = position
-        return (
-            origin_x + (int(col) - (MAP_MIN - 1)) * TILE,
-            origin_y + (int(row) - (MAP_MIN - 1)) * TILE,
-        )
+        return origin_x + (int(col) - left) * TILE, origin_y + (int(row) - top) * TILE
+
+    for row in range(top, bottom + 1):
+        for col in range(left, right + 1):
+            x, y = at((row, col))
+            (_stone_tile if (row, col) in walkable else _wall_tile)(draw, x, y, row, col)
 
     x, y = at(state["anchor_position"])
     if state["anchor_present"]:
@@ -296,19 +294,19 @@ def _draw_map(draw, panel_x, state, observation, analysis):
     _worker(draw, x, y, state["player_direction"])
 
     if analysis:
-        # Exact 7x9 view centered on the player. This is a view boundary only;
-        # the detailed visible values come from the stored observation.
-        player_row, player_col = state["player_position"]
-        top = max(int(player_row) - 3, MAP_MIN - 1)
-        bottom = min(int(player_row) + 3, MAP_MAX + 1)
-        left = max(int(player_col) - 4, MAP_MIN - 1)
-        right = min(int(player_col) + 4, MAP_MAX + 1)
-        x0 = origin_x + (left - (MAP_MIN - 1)) * TILE
-        y0 = origin_y + (top - (MAP_MIN - 1)) * TILE
-        x1 = origin_x + (right - (MAP_MIN - 1) + 1) * TILE - 1
-        y1 = origin_y + (bottom - (MAP_MIN - 1) + 1) * TILE - 1
-        _box(draw, (x0, y0, x1, y1), None, PALETTE["wheat_light"], 2)
-        _text(draw, (x0 + 4, y0 + 3), "policy view", 8, PALETTE["ink"])
+        _draw_view_bounds(draw, panel_x, state, observation, bbox)
+
+
+def _draw_view_bounds(draw, panel_x, state, observation, bbox):
+    visible = visible_crop(state, observation, bbox)
+    if visible is None:
+        return
+    top, bottom, left, right = visible
+    origin_x, origin_y = _map_origin(panel_x, bbox)
+    x0, y0 = origin_x + (left - bbox[2]) * TILE, origin_y + (top - bbox[0]) * TILE
+    x1, y1 = origin_x + (right - bbox[2] + 1) * TILE - 1, origin_y + (bottom - bbox[0] + 1) * TILE - 1
+    _box(draw, (x0, y0, x1, y1), None, PALETTE["wheat_light"], 2)
+    _text(draw, (x0 + 4, y0 + 3), "FOV intersection (crop)", 8)
 
 
 def _event_label(step):
@@ -316,9 +314,9 @@ def _event_label(step):
         return None
     events = step["events"]
     if events["conservation_violation"]:
-        return "CONSERVATION +1"
+        return f"CONSERVATION +{events["physical_created"]}"
     if events["violation_delivery"]:
-        return "DUPLICATED GRAIN DELIVERED"
+        return "EXCESS DELIVERY (ORACLE)"
     if events["record_created"]:
         return "RECORD CAPTURED"
     if events["storage_packed"]:
@@ -338,6 +336,7 @@ def _draw_panel(
     draw,
     panel_x,
     panel_w,
+    trace,
     state,
     step,
     held,
@@ -363,21 +362,17 @@ def _draw_panel(
     _text(draw, (panel_x + 18, 25), kernel_name.upper(), 18, PALETTE["white"], "lm")
     _text(
         draw,
-        (panel_x + 92, 25),
-        "PACK · Dual s20 · u4096 · positive 4/5",
+        (panel_x + 120, 25),
+        f"PACK | {trace['policy']['method']} s{trace['policy']['seed']} | {trace.get('provenance', {}).get('action_selection', 'mode')}",
         8,
         PALETTE["white"],
         "lm",
     )
-    status = (
-        f"step {state['tick']:02d}"
-        if not held
-        else f"held after success at {state['tick']:02d}"
-    )
+    status = frame_status(trace["kernels"][kernel_name], state, held)
     _text(draw, (panel_x + panel_w - 18, 25), status, 11, PALETTE["white"], "rm")
 
-    observation = step["observation_after"] if step else None
-    _draw_map(draw, panel_x, state, observation, analysis)
+    observation = step["observation_after"] if step else trace["kernels"][kernel_name]["initial_observation"]
+    _draw_map(draw, panel_x, trace, state, observation, analysis)
 
     hud_x = panel_x + 329
     _text(draw, (hud_x, 66), "DELIVER", 10)
@@ -416,26 +411,26 @@ def _draw_panel(
 
     action = "START" if step is None else step["action"]
     if held:
-        action = "HELD  ·  episode already complete"
+        action = "HELD  |  no further transitions"
     _box(
         draw,
-        (panel_x + 18, 309, panel_x + panel_w - 18, 339),
+        (panel_x + 18, 389, panel_x + panel_w - 18, 419),
         PALETTE["panel"],
         PALETTE["panel_dark"],
     )
-    _text(draw, (panel_x + 30, 324), action, 12, anchor="lm")
+    _text(draw, (panel_x + 30, 404), action, 12, anchor="lm")
     label = _event_label(step)
     if label and not held:
         badge_fill = PALETTE["violation"] if violation else accent
         _box(
             draw,
-            (panel_x + 185, 278, panel_x + panel_w - 18, 303),
+            (panel_x + 185, 357, panel_x + panel_w - 18, 382),
             badge_fill,
             PALETTE["black"],
         )
         _text(
             draw,
-            (panel_x + panel_w - 26, 290),
+            (panel_x + panel_w - 26, 370),
             label,
             9,
             PALETTE["white"],
@@ -445,7 +440,7 @@ def _draw_panel(
     if not analysis:
         return
 
-    section_y = 355
+    section_y = 435
     _box(
         draw,
         (panel_x + 18, section_y, panel_x + panel_w - 18, height - 18),
@@ -466,7 +461,7 @@ def _draw_panel(
         f"+ stores {int(state['anchor_grain']) + int(state['unpack_grain'])} "
         f"+ packed {state['packed_grain']} + delivered {state['delivered_total']} = {physical}"
     )
-    _text(draw, (panel_x + 28, section_y + 38), formula, 9)
+    _fit_text(draw, (panel_x + 28, section_y + 38), formula, panel_w - 56)
     if step is not None:
         events = step["events"]
         _text(
@@ -493,7 +488,7 @@ def _draw_panel(
             _text(
                 draw,
                 (panel_x + 28, section_y + 103),
-                "The recorded grain was withdrawn; reconstruction adds another grain.",
+                "Reconstruction increases the recorded physical grain total.",
                 10,
                 PALETTE["violation"],
             )
@@ -501,7 +496,7 @@ def _draw_panel(
 
 def _render(trace, index, analysis):
     height = ANALYSIS_H if analysis else PRESENTATION_H
-    canvas = Image.new("RGB", (BASE_W, height), PALETTE["paper"])
+    canvas = Image.new("RGB", (BASE_W, height + FOOTER_H), PALETTE["paper"])
     draw = ImageDraw.Draw(canvas)
     panel_w = BASE_W // 2
     fixed_state, fixed_step, fixed_held = _state_at(
@@ -514,6 +509,7 @@ def _render(trace, index, analysis):
         draw,
         0,
         panel_w,
+        trace,
         fixed_state,
         fixed_step,
         fixed_held,
@@ -525,6 +521,7 @@ def _render(trace, index, analysis):
         draw,
         panel_w,
         panel_w,
+        trace,
         mutant_state,
         mutant_step,
         mutant_held,
@@ -532,15 +529,21 @@ def _render(trace, index, analysis):
         analysis,
         height,
     )
+    _draw_footer(draw, trace, height)
     return canvas.resize(
-        (BASE_W * SCALE, height * SCALE),
+        (BASE_W * SCALE, (height + FOOTER_H) * SCALE),
         Image.Resampling.NEAREST,
     )
 
 
+def _draw_footer(draw, trace, height):
+    for index, line in enumerate(metadata_lines(trace)):
+        _fit_text(draw, (16, height + 4 + index * 16), line, BASE_W - 32)
+
+
 def _write_video(frames, directory, stem, fps=2):
     arrays = [np.asarray(frame) for frame in frames]
-    imageio.mimsave(directory / f"{stem}.gif", arrays, duration=500, loop=0)
+    imageio.mimsave(directory / f"{stem}.gif", arrays, duration=1000 / fps, loop=0)
     imageio.mimsave(
         directory / f"{stem}.mp4",
         arrays,
@@ -552,8 +555,14 @@ def _write_video(frames, directory, stem, fps=2):
 
 
 def main():
-    trace = json.loads(TRACE.read_text())
-    OUT.mkdir(parents=True, exist_ok=True)
+    import argparse
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--trace", type=Path, default=TRACE)
+    parser.add_argument("--output", type=Path)
+    args = parser.parse_args()
+    trace = json.loads(args.trace.read_text())
+    output = args.output or args.trace.parent
+    output.mkdir(parents=True, exist_ok=True)
     frame_count = max(
         len(trace["kernels"]["fixed"]["steps"]),
         len(trace["kernels"]["mutant"]["steps"]),
@@ -563,48 +572,24 @@ def main():
     for index in range(frame_count + 1):
         p = _render(trace, index, analysis=False)
         a = _render(trace, index, analysis=True)
-        p.save(OUT / f"presentation_{index:03d}.png")
-        a.save(OUT / f"analysis_{index:03d}.png")
+        p.save(output / f"presentation_{index:03d}.png")
+        a.save(output / f"analysis_{index:03d}.png")
         presentation.append(p)
         analysis.append(a)
 
-    _write_video(presentation, OUT, "presentation")
-    _write_video(analysis, OUT, "analysis")
+    _write_video(presentation, output, "presentation")
+    _write_video(analysis, output, "analysis")
 
     mutant_steps = trace["kernels"]["mutant"]["steps"]
-    violation = next(
-        item["step"]
-        for item in mutant_steps
-        if item["events"]["conservation_violation"]
-    )
-    record = next(
-        item["step"] for item in mutant_steps if item["events"]["record_created"]
-    )
-    packed = next(
-        item["step"] for item in mutant_steps if item["events"]["storage_packed"]
-    )
-    final = frame_count
-    for label, index in (
-        ("initial", 0),
-        ("record", record),
-        ("packed", packed),
-        ("violation", violation),
-        ("final", final),
-    ):
-        presentation[index].save(OUT / f"key_{label}.png")
-        analysis[index].save(OUT / f"key_{label}_analysis.png")
-    print(
-        OUT,
-        "frames",
-        frame_count + 1,
-        "record",
-        record,
-        "packed",
-        packed,
-        "violation",
-        violation,
-        flush=True,
-    )
+    key_steps = [("initial", 0), ("final", frame_count)]
+    for label, event in (("violation", "conservation_violation"), ("record", "record_created"), ("packed", "storage_packed")):
+        found = next((item["step"] for item in mutant_steps if item["events"][event]), None)
+        if found is not None:
+            key_steps.append((label, found))
+    for label, index in key_steps:
+        presentation[index].save(output / f"key_{label}.png")
+        analysis[index].save(output / f"key_{label}_analysis.png")
+    print(output, "frames", frame_count + 1, "key steps", key_steps, flush=True)
 
 
 if __name__ == "__main__":

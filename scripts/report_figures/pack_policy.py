@@ -43,7 +43,7 @@ from hackrl.pack_restore import observe_pack_restore, pack_restore_step
 from report_figures.render import draw_pair
 from report_figures.storyboards import _pack_view
 
-ROOT = Path("/home/ext_csv/HackRL")
+from report_figures.common import ROOT
 CHECKPOINT = (
     ROOT
     / "runs/dual_leo_compare_v1/pack/dual/mutant/seed20/checkpoints/adapt_4096"
@@ -149,7 +149,7 @@ def main():
         (OUT / "first_action_difference.png").write_bytes(first_action.read_bytes())
     (OUT / "final.png").write_bytes(pngs[-1].read_bytes())
     gif = OUT / "pair.gif"
-    imageio.mimsave(gif, [imageio.imread(path) for path in pngs], duration=0.7)
+    imageio.mimsave(gif, [imageio.imread(path) for path in pngs], duration=700)
     print("wrote", gif, "frames", len(pngs), flush=True)
 
 

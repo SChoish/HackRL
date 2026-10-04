@@ -45,7 +45,7 @@ from hackrl.pack_restore_gc import (
     pack_restore_gc_inputs,
 )
 
-ROOT = Path("/home/ext_csv/HackRL")
+from report_figures.common import ROOT, provenance
 CHECKPOINT = (
     ROOT
     / "runs/dual_leo_compare_v1/pack/dual/mutant/seed20/checkpoints/adapt_4096"
@@ -136,13 +136,13 @@ def _load_policy():
     return network, runner.train_state.params
 
 
-def _record_kernel(network, parameters, initial, variant):
+def _record_kernel(network, parameters, initial, variant, *, max_steps=128):
     apply = jax.jit(lambda p, m, n, g: network.apply(p, m, n, g))
     goal = jnp.asarray(DELIVER_3_GOAL_INDEX, dtype=jnp.int32)
     state = initial
     steps = []
     violation_balance = 0
-    for index in range(128):
+    for index in range(max_steps):
         if bool(pack_restore_goal_vector(state)[DELIVER_3_GOAL_INDEX]):
             break
         if bool(pack_restore_world_done(state)):
@@ -259,6 +259,7 @@ def main():
     )
     payload = {
         "schema_version": "hackrl_pack_restore_policy_trace_v1",
+        "provenance": provenance(CHECKPOINT),
         "environment": "PACK-RESTORE",
         "trace_semantics": (
             "Every before/after pair is an actual kernel transition. "
@@ -272,19 +273,16 @@ def main():
             "adaptation_updates": 4096,
             "goal": "deliver_3",
         },
+        "selection": {
+            "rule": "fixed example: validation layout 0, loaded",
+            "candidate_count": 1,
+        },
         "start": {
             "split": "validation",
             "family": "natural_reset",
             "layout": 0,
             "phase": "loaded",
             "source_growth_period": 8,
-            "reported_mode_excess_delivery_by_seed": {
-                "20": 1.0,
-                "21": 0.5,
-                "22": 1.0,
-                "23": 0.0,
-                "24": 0.5,
-            },
         },
         "geometry": {
             "walkable": np.argwhere(

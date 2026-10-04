@@ -1,4 +1,4 @@
-"""Record a representative Dual TICK-CLAIM policy on both kernels."""
+"""Record a selected maximum-gain Dual TICK-CLAIM example on both kernels."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ from hackrl.tick_claim_oracle import (
     initial_tick_claim_oracle,
 )
 
-ROOT = Path("/home/ext_csv/HackRL")
+from report_figures.common import ROOT, provenance
 CHECKPOINT = (
     ROOT
     / "runs/dual_leo_compare_v1/tick/dual/mutant/seed20/checkpoints/adapt_4096"
@@ -127,13 +127,13 @@ def _load_policy():
     return network, runner.train_state.params
 
 
-def _record_kernel(apply, parameters, initial, variant):
+def _record_kernel(apply, parameters, initial, variant, *, max_steps=128):
     goal = jnp.asarray(DELIVER_3_GOAL_INDEX, dtype=jnp.int32)
     state = initial
     oracle = initial_tick_claim_oracle()
     violation_balance = 0
     steps = []
-    for index in range(128):
+    for index in range(max_steps):
         if bool(tick_claim_goal_vector(observe_tick_claim(state))[DELIVER_3_GOAL_INDEX]):
             break
         if bool(tick_claim_world_done(state)):
@@ -282,6 +282,7 @@ def main():
     )
     payload = {
         "schema_version": "hackrl_tick_claim_policy_trace_v1",
+        "provenance": provenance(CHECKPOINT),
         "environment": "TICK-CLAIM",
         "trace_semantics": (
             "Every before/after pair is an actual kernel transition. "
@@ -294,6 +295,14 @@ def main():
             "adaptation_updates": 4096,
             "goal": "deliver_3",
         },
+        "selection": {
+            "rule": "max length gain among successful exploit pairs",
+            "candidate_count": 32,
+            "eligible_count": len(candidates),
+            "selected_length_gain": int(_gain),
+            "tie_break": "lower layout then phase",
+            "purpose": "illustrative selected example, not an unbiased estimate",
+        },
         "start": {
             "split": "validation",
             "family": "natural_reset",
@@ -303,9 +312,6 @@ def main():
                 if int(initial.initial_phase) == int(TickClaimPhase.RIPE)
                 else "unripe"
             ),
-            "reported_mode_excess_delivery_by_seed": {
-                str(seed): 1.0 for seed in range(20, 25)
-            },
         },
         "geometry": {
             "walkable": np.argwhere(

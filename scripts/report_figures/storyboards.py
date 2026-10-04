@@ -49,7 +49,7 @@ from hackrl.tick_claim import (
 
 from report_figures.render import draw_frame, draw_pair, draw_strip
 
-ROOT = Path("/home/ext_csv/HackRL")
+from report_figures.common import ROOT
 OUT = ROOT / "runs" / "figures_report_v1" / "storyboards"
 CAPTION = "Verified action sequence, not a learned policy. Lengths are for this start, not a policy score."
 DIRS = {0: "stay", 1: "W", 2: "E", 3: "N", 4: "S"}

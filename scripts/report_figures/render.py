@@ -56,7 +56,7 @@ def _grid(ax, cells, player, direction, title):
             )
     pad = 0.4
     ax.set_xlim(min(xs) - pad, max(xs) + 1 + pad)
-    ax.set_ylim(-(max(ys) + 1 + pad), -(min(ys) - pad))
+    ax.set_ylim(-max(ys) - pad, -min(ys) + 1 + pad)
     ax.set_aspect("equal")
     ax.set_xticks([])
     ax.set_yticks([])
@@ -83,7 +83,7 @@ def draw_frame(frame, path):
     side = fig.add_subplot(grid[0, 2])
     oracle = fig.add_subplot(grid[1, :])
     _grid(workshop, frame["workshop"], frame.get("player"), frame.get("direction"), "Workshop state")
-    _grid(observation, frame["observation"], frame.get("obs_player"), frame.get("direction"), "Policy observation 7x9")
+    _grid(observation, frame["observation"], frame.get("obs_player"), frame.get("direction"), "Observed map 7x9 (numeric inputs not shown)")
     _lines(
         side,
         "Action and resources",
@@ -97,10 +97,10 @@ def draw_frame(frame, path):
         ],
     )
     face = "#fdecea" if frame.get("diverges") else "#f7f7f7"
-    _lines(oracle, "Oracle only  ·  not a policy input", frame.get("oracle", []), face=face)
+    _lines(oracle, "Diagnostics (may include public fields)", frame.get("oracle", []), face=face)
     banner = frame["title"]
     if frame.get("diverges"):
-        banner += "   ·   kernels first differ here"
+        banner += "   ·   kernels differ in displayed quantities"
     fig.suptitle(banner, fontsize=13, x=0.01, ha="left")
     fig.text(0.01, 0.01, frame.get("caption", ""), fontsize=8, color="#333333")
     path = Path(path)
@@ -119,7 +119,7 @@ def draw_pair(left, right, path, title, caption):
         observation = fig.add_subplot(inner[0, 1])
         oracle = fig.add_subplot(inner[1, :])
         _grid(workshop, frame["workshop"], frame.get("player"), frame.get("direction"), frame["kernel"])
-        _grid(observation, frame["observation"], frame.get("obs_player"), frame.get("direction"), "Policy observation")
+        _grid(observation, frame["observation"], frame.get("obs_player"), frame.get("direction"), "Observed map (not full input)")
         face = "#fdecea" if frame.get("diverges") else "#f7f7f7"
         _lines(
             oracle,
