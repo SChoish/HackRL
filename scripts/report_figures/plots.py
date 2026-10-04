@@ -3,14 +3,18 @@
 from __future__ import annotations
 
 import json
+import hashlib
 from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
 
-ROOT = Path("/home/ext_csv/HackRL/runs")
+from report_figures.common import ROOT as REPO_ROOT
+
+ROOT = REPO_ROOT / "runs"
 OUT = ROOT / "figures_report_v1" / "results"
 SEEDS = (20, 21, 22, 23, 24)
+LOADED_SOURCES = {}
 UPDATES = (0, 32, 128, 256, 512, 1024, 2048, 4096)
 TRANSITIONS_PER_UPDATE = 512 * 64
 COLORS = {
@@ -23,7 +27,10 @@ COLORS = {
 
 
 def _load(path):
-    return json.loads(Path(path).read_text())
+    path = Path(path)
+    raw = path.read_bytes()
+    LOADED_SOURCES[str(path.relative_to(ROOT))] = hashlib.sha256(raw).hexdigest()
+    return json.loads(raw)
 
 
 def _family(document, kernel, slice_name):
@@ -74,7 +81,9 @@ def _panel(ax, groups, ylabel, title):
     ax.set_xticklabels([label for label, _ in groups], rotation=20, ha="right")
     ax.set_ylabel(ylabel)
     ax.set_title(title, loc="left", fontsize=11)
-    ax.set_ylim(-0.05, 1.18)
+    values = [v for _, group in groups for v in group]
+    ax.set_ylim(min(-0.05, min(values) - 0.05), max(1.18, max(values) + 0.05))
+    ax.axhline(0, color="#aaaaaa", linewidth=0.6, zorder=0)
     ax.spines["top"].set_visible(False)
     ax.spines["right"].set_visible(False)
 
@@ -109,12 +118,12 @@ def draw_edv():
         for key in ("E", "D", "V")
     }
     fig, axes = plt.subplots(1, 3, figsize=(12.5, 4.4), dpi=140)
-    _panel(axes[0], groups["E"], "Success rate", "E  normal-kernel success")
+    _panel(axes[0], groups["E"], "Success rate", "E  adapted policy on fixed kernel")
     _panel(axes[1], groups["D"], "Excess-delivery difference", "D  mutant adaptation minus fixed continuation")
     _panel(axes[2], groups["V"], "Discounted-return difference", "V  same policy, mutant minus fixed kernel")
     returns = [value for _, values in groups["V"] for value in values]
     axes[2].set_ylim(min(returns) - 0.02, max(returns) + 0.02)
-    fig.suptitle("Adaptation 4096, natural reset, mode. Points are seeds 20–24. Bar is the bootstrap 95% interval of the five-seed mean.", fontsize=9, y=0.02)
+    fig.suptitle("Adaptation 4096, natural reset, mode. Points are seeds 20–24. Seed bootstrap 95% interval; n=5, descriptive uncertainty.", fontsize=9, y=0.02)
     fig.tight_layout(rect=(0, 0.05, 1, 1))
     path = OUT / "edv_tick_pack.png"
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -124,13 +133,13 @@ def draw_edv():
     craft_root = ROOT / "craft_remain_compare_v1"
     craft = _edv_groups(None, (("GC-PPO", "gc", craft_root), ("Dual", "dual", craft_root)), "sample", None)
     fig, axes = plt.subplots(1, 3, figsize=(11.2, 4.3), dpi=140)
-    _panel(axes[0], craft["E"], "Success rate", "E  normal-kernel success")
+    _panel(axes[0], craft["E"], "Success rate", "E  adapted policy on fixed kernel")
     _panel(axes[1], craft["D"], "Exploit difference", "D  adaptation minus continuation")
     _panel(axes[2], craft["V"], "Return difference", "V  same policy, two kernels")
     returns = [value for _, values in craft["V"] for value in values]
     low, high = min(returns), max(returns)
     axes[2].set_ylim(low - 0.02, high + 0.02)
-    fig.suptitle("CRAFT-REMAIN is sample, not the mode table above. 40% exploit is 2/5 seeds. Growth period 16.", fontsize=9, y=0.02)
+    fig.suptitle("CRAFT-REMAIN: sample, natural reset, adapt 4096; seed bootstrap 95% interval (n=5). Growth period 16.", fontsize=9, y=0.02)
     fig.tight_layout(rect=(0, 0.06, 1, 1))
     fig.savefig(OUT / "edv_craft_sample.png", bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -155,7 +164,7 @@ def draw_curves():
     )
     x = np.asarray(UPDATES) * TRANSITIONS_PER_UPDATE / 1e6
     fig, axes = plt.subplots(3, 2, figsize=(11, 8.2), dpi=140, sharex=True)
-    metrics = ("Normal-kernel success", "Mutant-kernel excess delivery", "Same-policy return difference")
+    metrics = ("Adapted policy on fixed kernel", "Mutant-kernel excess delivery", "Same-policy return difference")
     for column, env in enumerate(("tick", "pack")):
         collected = {label: [] for label, _, _ in specs}
         for label, root, method in specs:
@@ -210,8 +219,8 @@ def draw_causes():
         ax = fig.add_subplot(grid[0, column])
         for index, (label, root, method) in enumerate(arms):
             exploit, success = _final_exploit_success(root, env, method)
-            ax.scatter(np.full(5, index) - 0.08, exploit, s=26, c=COLORS[label], label="excess delivery" if column == 0 else None)
-            ax.scatter(np.full(5, index) + 0.08, success, s=26, marker="D", c=COLORS[label], label="normal success" if column == 0 else None)
+            ax.scatter(np.full(5, index) - 0.08, exploit, s=26, c=COLORS[label], label="excess delivery" if column == 0 and index == 0 else None)
+            ax.scatter(np.full(5, index) + 0.08, success, s=26, marker="D", c=COLORS[label], label="adapted policy on fixed" if column == 0 and index == 0 else None)
             ax.hlines(np.mean(exploit), index - 0.18, index - 0.02, colors=COLORS[label], lw=2)
             ax.hlines(np.mean(success), index + 0.02, index + 0.18, colors=COLORS[label], lw=2)
         ax.set_xticks(range(len(arms)))
@@ -255,7 +264,8 @@ def draw_causes():
         paired.spines["right"].set_visible(False)
         if column == 0:
             paired.set_ylabel("Mutant-kernel excess delivery")
-    fig.tight_layout()
+    fig.suptitle("Natural reset, mode. Top: full-history interventions. Bottom right: adaptation-only BC intervention.\nTeacher-only and GC-PPO use different RNG paths; this is not a paired teacher-effect estimate.", fontsize=9, y=0.01)
+    fig.tight_layout(rect=(0, 0.06, 1, 1))
     path = OUT / "cause_split.png"
     fig.savefig(path, bbox_inches="tight", facecolor="white")
     plt.close(fig)
@@ -263,9 +273,11 @@ def draw_causes():
 
 
 def main():
+    OUT.mkdir(parents=True, exist_ok=True)
     draw_edv()
     draw_curves()
     draw_causes()
+    (OUT / "sources.json").write_text(json.dumps(LOADED_SOURCES, indent=2) + "\n")
 
 
 if __name__ == "__main__":

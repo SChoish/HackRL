@@ -1,6 +1,6 @@
 # HackRL
 
-기존 강화학습 환경에 실제 게임 버그의 **메커니즘을 참고한 작은 변형**을 적용하고, 에이전트가 이를 발견·재현·활용하는 능력을 연구합니다.
+실제 게임에서 보고된 결함의 증상을 참고해, 에이전트가 결함을 발견하고 목표 달성에 활용하는 과정을 연구합니다. 초기 R/B/L 트랙은 Craftax-Classic 변형이고, 현재 TICK-CLAIM·PACK-RESTORE·CRAFT-REMAIN은 전이 규칙을 별도로 작성한 **합성 작업장**입니다. 원본 게임 패치의 직접 실행 재현은 아닙니다.
 
 핵심 질문은 **알고리즘, 탐험 방식, 신경망 크기에 따라 환경의 예외적 동작을 활용하는 능력이 어떻게 달라지는가?** 입니다.
 
@@ -8,18 +8,18 @@
 
 - [연구계획서 v2](docs/research_plan_ko.md): 연구 질문, 가설, 후보 선택과 진행 기준
 - [GBGallery 분류·기존 9개 과제](docs/benchmark_catalog_ko.md): 공식 분류와 R/B/L 설계 이력. 기존 E/M/H는 발견·활용 난도의 검증된 등급이 아니다.
-- [발견·활용 결함 명세](docs/exploit_benchmark_redesign_ko.md): TICK-CLAIM/PACK-RESTORE 전이, 정상·예외 경로와 후보별 설계 manifest. TICK-CLAIM 구현·실행 결과는 위 보고서에 정리했으며 PACK-RESTORE 검증은 남아 있다.
+- [발견·활용 결함 명세](docs/exploit_benchmark_redesign_ko.md): TICK-CLAIM/PACK-RESTORE 전이, 정상·예외 경로와 후보별 설계 manifest. 초기 설계 이력이며, 현재 구현과 렌더링 범위는 아래 안내를 참고한다.
 - [버그·과제 명세](docs/bug_specifications_ko.md): 코드 변경 지점, 정상/예외 경로, 독립 판정기
 - [실험 프로토콜](docs/experiment_protocol_ko.md): 온라인 설정·스윕 예산·평가와 오프라인 확장
 - [GC 기본 목표·훈련·스윕 v1](docs/gc_training_sweep_ko.md): LEO를 참고한 12-goal 정상 사전학습, fixed 계속 학습/mutant 적응과 단계별 예산. 설계 이력 문서이며, 실제 GC-PPO 구현·학습 결과와 목표 선택 계약은 위 보고서에서 구분한다.
 - [R-E Easy 진단·12런 비교](docs/r_e_easy_diagnosis.md): 목표 성공과 재료 소진 후 복구 성공을 구분한 수치. 보충 fixture 튜닝은 여기서 멈춘다.
 - [R-M 6런 비교](docs/r_m_compare.md): 짧은 후속 활용(3스텝)과 평가 종료 사유. 원시 수치는 `docs/r_m_compare_6run.json`.
 - 과제 구성: 기존 R/B/L 9칸은 역사적 과제 변형으로 보존합니다. 새 후보는 발동에 필요한 사건·상태 조합과 이용 절차가 달라야 하며, 난도는 측정한 뒤 부여합니다.
-- 다음 구현: PACK-RESTORE 커널·정상 경로·독립 oracle·실제 활용 이득 검증. TICK-CLAIM의 추가 세부 스윕은 종료하고 별도 결함에서 핵심 이력 비교를 반복합니다.
+- [환경 영상·결과 그림 실행 안내](rendering.md): 실제 trace 기반 렌더링, 관전자 화면과 정책 관측의 구분, 사례 선택 기준 및 검증 범위.
 - 기존 고정 목표 트랙: 온라인 PPO/PPO+RND → PPO 크기 비교와 PQN-FF → 필요한 경우 기억·적응 진단
 - 새 GC 트랙: GC-PPO → Dual LEO (PPO) → 필요한 경우 RND·PQN·RNN. 기존 결과와 별도 버전으로 기록
 
-현재 세 root mutation, Easy 3개, R-M 개발 fixture와 고정 목표 PPO 파일럿 학습·평가 흐름이 구현되어 있습니다. R-M이라는 기존 ID는 유지하지만 이를 Medium 발견 난도의 검증으로 해석하지 않습니다. TICK-CLAIM 작업장과 GC-PPO는 구현됐고 사전학습·적응 결과가 보고됐습니다. PACK-RESTORE 작업장은 설계 단계입니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
+현재 세 root mutation, Easy 3개, R-M 개발 fixture와 고정 목표 PPO 파일럿 학습·평가 흐름이 구현되어 있습니다. R-M이라는 기존 ID는 유지하지만 이를 Medium 발견 난도의 검증으로 해석하지 않습니다. 세 합성 작업장과 GC-PPO/Dual 학습·평가 코드가 구현됐습니다. 아래 계획의 변형은 원본 환경에서 확인된 취약점이나 GBGallery 버그의 직접 재현을 의미하지 않습니다.
 
 ## 구현 상태
 

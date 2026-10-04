@@ -1,4 +1,4 @@
-"""Record a representative Dual CRAFT-REMAIN policy on both kernels."""
+"""Record a selected maximum-gain Dual CRAFT-REMAIN example on both kernels."""
 
 from __future__ import annotations
 
@@ -43,7 +43,7 @@ from hackrl.craft_remain_gc import (
 )
 from hackrl.dual_leo import init_dual_leo_teacher, load_dual_checkpoint
 
-ROOT = Path("/home/ext_csv/HackRL")
+from report_figures.common import ROOT, provenance
 CHECKPOINT = (
     ROOT
     / "runs/craft_remain_compare_v1/dual/mutant/seed21/checkpoints/adapt_4096"
@@ -117,11 +117,11 @@ def _load_policy():
     return network, runner.train_state.params
 
 
-def _record_kernel(apply, parameters, initial, variant):
+def _record_kernel(apply, parameters, initial, variant, *, max_steps=128):
     goal = jnp.asarray(DELIVER_3_GOAL_INDEX, dtype=jnp.int32)
     state = initial
     steps = []
-    for index in range(128):
+    for index in range(max_steps):
         if bool(craft_remain_goal_vector(state)[DELIVER_3_GOAL_INDEX]):
             break
         if bool(craft_remain_world_done(state)):
@@ -241,6 +241,7 @@ def main():
     )
     payload = {
         "schema_version": "hackrl_craft_remain_policy_trace_v1",
+        "provenance": provenance(CHECKPOINT),
         "environment": "CRAFT-REMAIN",
         "trace_semantics": (
             "Every before/after pair is an actual kernel transition. "
@@ -253,6 +254,14 @@ def main():
             "adaptation_updates": 4096,
             "goal": "deliver_3",
         },
+        "selection": {
+            "rule": "max length gain among successful exploit pairs",
+            "candidate_count": 2,
+            "eligible_count": len(candidates),
+            "selected_length_gain": int(_gain),
+            "tie_break": "lower phase",
+            "purpose": "illustrative selected example, not an unbiased estimate",
+        },
         "start": {
             "family": "natural_reset",
             "phase": (
@@ -261,17 +270,13 @@ def main():
                 else "unripe"
             ),
             "growth_period": 16,
-            "reported_sample_exploit_by_seed": {
-                "20": 0.0,
-                "21": 1.0,
-                "22": 0.0,
-                "23": 1.0,
-                "24": 0.0,
-            },
-            "reported_count": "2/5",
         },
         "geometry": {
             "map_size": 16,
+            "walkable": [
+                [row, col] for row in range(16) for col in range(16)
+                if (row, col) not in {tuple(_value(p)) for p in (SOURCE, GRID, DELIVERY)}
+            ],
             "source": _value(SOURCE),
             "grid": _value(GRID),
             "delivery": _value(DELIVERY),
