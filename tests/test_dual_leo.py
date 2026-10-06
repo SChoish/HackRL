@@ -12,6 +12,7 @@ from hackrl.dual_leo import (
     BC_POLICY_COEF,
     BC_VALUE_COEF,
     bc_policy_coefficient,
+    _teacher_td_loss,
     dual_leo_q_targets,
     init_dual_leo_teacher,
     load_dual_checkpoint,
@@ -40,6 +41,33 @@ from hackrl.tick_claim_gc import (
     initialize_tick_claim_gc,
     step_tick_claim_gc_workers,
 )
+
+
+def test_teacher_goal_mask_preserves_each_selected_head_loss_scale():
+    chosen = jnp.zeros((2, 3), dtype=jnp.float32)
+    target = jnp.ones((2, 3), dtype=jnp.float32)
+    valid = jnp.asarray([True, True])
+    all_goals = _teacher_td_loss(chosen, target, valid, jnp.ones((3,)))
+    delivery_only = _teacher_td_loss(
+        chosen, target, valid, jnp.asarray([0.0, 0.0, 1.0])
+    )
+    np.testing.assert_allclose(float(all_goals), 1.5)
+    np.testing.assert_allclose(float(delivery_only), 0.5)
+    np.testing.assert_allclose(float(all_goals), 3.0 * float(delivery_only))
+
+
+def test_teacher_goal_mask_has_zero_direct_gradient_for_unselected_heads():
+    chosen = jnp.zeros((2, 3), dtype=jnp.float32)
+    target = jnp.ones((2, 3), dtype=jnp.float32)
+    valid = jnp.asarray([True, True])
+    goal_mask = jnp.asarray([0.0, 0.0, 1.0])
+    gradient = jax.grad(
+        lambda value: _teacher_td_loss(value, target, valid, goal_mask)
+    )(chosen)
+    np.testing.assert_array_equal(
+        np.asarray(gradient[:, :2]), np.zeros((2, 2), dtype=np.float32)
+    )
+    assert np.all(np.asarray(gradient[:, 2]) != 0)
 
 
 def test_per_goal_bootstrap_stops_only_for_that_goal_or_a_real_reset():

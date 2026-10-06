@@ -1,0 +1,238 @@
+{
+  "authorized_source_sha256": {
+    "scripts/analyze_pack_restore_common_state_teachers.py": "6a545d90921f7692eb3bbfa14da45902d426dc6568f2bad63393bdc0a9e03032",
+    "scripts/audit_pack_restore_teacher_evaluation.py": "7f9abd1dd2ab30dac498dc98bb83ede210a9c070e4f36634c55f0f6c35dff925",
+    "scripts/run_dual_leo_compare.py": "0b57854ebd86de7f1ca1bcac483db2e025c78437d3e00d08bd60198820612351",
+    "scripts/run_pack_restore_delivery_only_teacher.py": "39bf69d7d0e18f9bc01e90e50fedcc984b9a1e3e2c1f87e22ff07910b0defcb9",
+    "scripts/run_pack_restore_delivery_only_teacher_queue.sh": "b9fc5cfbfc1caca44126882cd2fb6d94f22a1646f3ba8f0ecd1fe30de6d0d42b",
+    "scripts/run_pack_restore_delivery_only_teacher_watchdog.sh": "eeba90e97c685e3eb8afae229b41d51f0baa925ae9c7f1b3231bbe70329398e0",
+    "scripts/run_pack_restore_pretrained_teacher_freeze.py": "c4f7004a31ebb836d70ec4ac3a65b2cef261fa017e1678eb224df9a50382d8d9",
+    "scripts/summarize_pack_restore_delivery_only_teacher.py": "4c23031247d8ed45f845ac98e4d4f13803cc6496935fd8fab786b993e850c07a",
+    "scripts/trace_pack_restore_teacher_recommendations.py": "f46a1a98278319ad8ab4e49f9a19437e478f26b7c6e30b60d204e64ae7dd9b2a",
+    "src/hackrl/batch_renorm.py": "d116730d13dbb72ea046b779010224563f593f82ce30f61ddaba77eafe67590e",
+    "src/hackrl/dual_leo.py": "8f2479a25a05ec9be2e37cc1376377f1bc7439e67107f76393e01ba889d7ecdd",
+    "src/hackrl/pack_restore.py": "22a393a56151925bfe1f4af062befbdbb219ba62d85e0c2e0a5c50bc6e10b677",
+    "src/hackrl/pack_restore_gc.py": "acdc23233e69ce98d87336e6080b4e505d69bd51f8da9d28e3fd6277c7ea0587",
+    "src/hackrl/tick_claim.py": "476acd94b9285d132fa06e455adc9f30a6efc50d3acbffba3df132ba38c4ca86",
+    "src/hackrl/tick_claim_gc.py": "2979cae96363b2acc0d8d8b933fccb27af77c93528e4b8123f140c942b357079",
+    "src/hackrl/tick_claim_oracle.py": "ffd4cd487d1d8dd950dd3827535337953bbf71542e98d9095a65e72d6b3b4aa0"
+  },
+  "budget": {
+    "automatic_extension": false,
+    "new_total_jobs": 20,
+    "new_total_transitions": 2684354560,
+    "seeds": [
+      30,
+      31,
+      32,
+      33,
+      34,
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "variants": [
+      "fixed",
+      "mutant"
+    ]
+  },
+  "claim_scope": {
+    "not_tested": "The necessity of multi-goal pretraining, because both arms start from the same multi-goal-pretrained checkpoint.",
+    "tested": "The role of multi-goal versus delivery-only teacher targets during adaptation."
+  },
+  "conditions": {
+    "D-delivery": {
+      "adaptation_teacher_goal_indices": [
+        11
+      ],
+      "adaptation_teacher_targets": 1,
+      "imitate_teacher": true,
+      "learn_teacher": true,
+      "source": "new jobs"
+    },
+    "D-on": {
+      "adaptation_teacher_targets": 12,
+      "cell_template": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/{fixed|mutant}/seed{30..39}",
+      "imitate_teacher": true,
+      "learn_teacher": true,
+      "origin": "The same authenticated per-seed full-Dual update-512 checkpoint used by D-delivery",
+      "source": "existing retrospective baseline"
+    }
+  },
+  "definitions": {
+    "S_policy": "The 512-wide CNN actor with two MLP layers and four-layer critic used by the existing size-S run.",
+    "U": "Mutant-kernel violation-delivery rate of the mutant-adapted policy minus that of the fixed-continued policy.",
+    "common_setup": "The controlled opportunity start-state family.",
+    "fixed": "Adaptation on the conservation-preserving PACK kernel.",
+    "full_Dual": "PPO plus a 12-goal value teacher, with teacher TD learning and policy behavior cloning both enabled.",
+    "mode": "Greedy policy action evaluation.",
+    "mutant": "Adaptation on the PACK-RESTORE kernel that may create grain during reconstruction.",
+    "natural_reset": "The original environment start-state family.",
+    "sample": "Categorical policy sampling evaluation."
+  },
+  "evaluation": {
+    "adaptation_updates": [
+      0,
+      32,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "artifacts": {
+      "cell_summary": "summary.json",
+      "final_checkpoint": "checkpoints/adapt_4096",
+      "objective_verification": "delivery_only_verification.json",
+      "per_update_metrics": "updates.jsonl",
+      "run_result": "result.json",
+      "saved_evaluations": "curve/adapt_{0,32,128,256,512,1024,2048,4096}.json"
+    },
+    "conditions": [
+      "D-delivery",
+      "D-on"
+    ],
+    "outcomes_kept_separate": [
+      "normal success rate",
+      "conservation violation rate",
+      "violation delivery rate",
+      "mean violation grain delivered",
+      "same-policy fixed versus mutant success, length, and discounted return"
+    ],
+    "paired_primary_contrast": "D-on minus D-delivery",
+    "policies": [
+      "mode",
+      "sample"
+    ],
+    "primary": "U at update 4096 under mode natural_reset",
+    "start_families": [
+      "natural_reset",
+      "common_setup"
+    ]
+  },
+  "excluded": [
+    "new pretraining",
+    "new random seeds",
+    "M or L policy widths",
+    "Transformer policies",
+    "8192-update extension",
+    "learning-rate sweep",
+    "mine curriculum changes",
+    "mutant mine training"
+  ],
+  "execution": {
+    "queue": "scripts/run_pack_restore_delivery_only_teacher_queue.sh",
+    "runner": "scripts/run_pack_restore_delivery_only_teacher.py",
+    "summary": "scripts/summarize_pack_restore_delivery_only_teacher.py",
+    "watchdog": "scripts/run_pack_restore_delivery_only_teacher_watchdog.sh"
+  },
+  "mandela_audit": {
+    "baseline_is_cross_sha_retrospective": true,
+    "fixture_oracle_is_internal_not_external_validation": true,
+    "later_visitation_divergence_is_part_of_the_mediated_effect": true,
+    "no_seed_selection": true,
+    "only_the_current_TD_loss_targets_are_restricted": true,
+    "same_transition_budget_does_not_mean_same_target_count": true,
+    "target_term_count_differs_by_design": true,
+    "teacher_adam_state_is_inherited_from_multi_goal_pretraining": true
+  },
+  "manifest_id": "pack_restore_delivery_only_teacher_v1",
+  "optimization": {
+    "adaptation_updates": 4096,
+    "delivery_head_scale": "same per-transition contribution as the delivery head in the original all-goal objective",
+    "loss_normalization": "sum selected-head half-squared TD errors divided by valid transitions, not by selected-head count",
+    "num_envs": 512,
+    "num_steps": 64,
+    "optimizer_state": "Policy, critic, teacher, BatchRenorm, Adam, environment, and RNG state are loaded from the source checkpoint; inherited Adam momentum is not reset.",
+    "record_separately": [
+      "teacher optimizer gradient steps",
+      "valid teacher transitions",
+      "teacher target head count",
+      "teacher target terms"
+    ],
+    "teacher_epochs": 2,
+    "teacher_minibatch_size": 512
+  },
+  "preflight_evaluation_audit": {
+    "batch_protocol": "Compare the full per-seed batch, its reversed order, and fixed 64-observation chunks on the delivery head.",
+    "checks": [
+      "BatchRenorm evaluation uses saved statistics with train=false",
+      "teacher delivery-head recommendations are exactly order-invariant; chunking sensitivity is quantified and gated at no more than 0.25 percent argmax disagreement and 0.001 absolute Q difference",
+      "unique-state equal weighting and visit-frequency weighting are reported separately with learner seed as the independent unit",
+      "normal success, conservation violation, violation delivery, and same-policy kernel return gain remain separate",
+      "saved teachers are evaluated as greedy delivery policies"
+    ],
+    "entrypoint": "scripts/audit_pack_restore_teacher_evaluation.py",
+    "greedy_teacher_interpretation": "Descriptive evidence of an executable teacher policy, not proof that teacher advice caused student exploitation.",
+    "inputs": {
+      "common_state_records": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/common_state_teacher_analysis.json",
+      "common_state_tensors": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/common_state_teacher_analysis_states.npz",
+      "prior_result": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/result.json"
+    },
+    "required": true,
+    "training_or_optimizer_updates": 0
+  },
+  "question": "Does adaptation-time multi-goal teacher learning add exploitation benefit beyond an adapting delivery-goal-only value teacher?",
+  "smoke_gate": {
+    "counted_as_training_job": false,
+    "entrypoint": "scripts/run_pack_restore_delivery_only_teacher.py --smoke",
+    "required": [
+      "policy global update advances from 512 to 513",
+      "teacher optimizer advances by exactly 128 gradient steps",
+      "learn_teacher and imitate_teacher metrics both equal 1",
+      "teacher target head count equals 1 and target terms equal valid teacher transitions",
+      "delivery output changes and BC coefficient is positive"
+    ],
+    "shape": "512 environments x 64 steps",
+    "updates": 1
+  },
+  "source_scale_run": {
+    "execution_code_sha": "eaf603b1ab378b34bf2a788927f59446cabdde50",
+    "manifest_sha256": "85ee37b55b4e7904391b817d924c381e613911cd91d13574b4fd4c07bf4dc534",
+    "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1",
+    "source_checkpoint_fingerprints": {
+      "30": "72a22fd391b4ead94ec4f27f6eecf3ec329573ae087b9a51587ce4027c06ae47",
+      "31": "3de211aaf701de9e867ecca30f132f60d31a110b3d08205373f202a6facabb9d",
+      "32": "167f68663089ffa94d8180d74ea680023f35ea237b8b1e00800922d87b76ef6d",
+      "33": "b4c8d414e778b1021ab1d24dfe0d6b2ff5bd23f8e3b7606ce94f13d257a5ad09",
+      "34": "18e67f005537a4ee83ccc6e8f9f29af29596e345f1845de5486a01f38b5f5cc2",
+      "35": "6c526121ca8ce95c1081466169e6bbd7eb9a7d9cd3802209f4bf5476293ccf3f",
+      "36": "9993e0ebdbe1c02c3591727a4fc51671c026bddacd5df2374daa8ac05dbbf9c5",
+      "37": "73fb64ba75c3cbe570dfeb5bcf649af689ca89376267cbc0a2cf3659a9462376",
+      "38": "446cd0ab191477f05c1f5c853754e5a31810b82d0610cc926dd9cc3f7d8f3b7d",
+      "39": "9e2fe3947e58f1ae10f54243061f4fbb98d3b632b4f82c68b7c95cf12f505730"
+    }
+  },
+  "statistics": {
+    "bootstrap_resamples": 20000,
+    "bootstrap_seed": 20261006,
+    "episode_count_is_not_a_replication_unit": true,
+    "independent_unit": "learner_seed",
+    "paired_seed_comparison": true
+  },
+  "status": "implementation_validated_execution_authorized",
+  "storage": {
+    "active_overlap_checkpoints": 1,
+    "capacity_check_before_every_job": true,
+    "capacity_measurement_utc": "2026-10-06T13:49:47Z",
+    "home_free_bytes_at_measurement": 205589995520,
+    "log_and_evaluation_allowance_bytes": 1073741824,
+    "measured_dual_checkpoint_bytes": 49568320,
+    "projected_remaining_write_bytes": 2114676544,
+    "raid_free_bytes_at_measurement": 7058934247424,
+    "required_free_bytes": 10704611136,
+    "retained_final_checkpoints": 20,
+    "run_root": "/raid/ext_csv/HackRL/runs/pack_restore_delivery_only_teacher_v1",
+    "safety_reserve_bytes": 8589934592
+  },
+  "understood_as": [
+    "Run a read-only audit of the existing evaluation before any new training.",
+    "If the audit and a real 512x64 GPU smoke pass, run exactly 20 S-policy adaptation jobs from the authenticated full-Dual seed 30-39 checkpoints.",
+    "During adaptation, keep PPO and BC unchanged and update the teacher from only the delivery goal TD target while retaining the full 12-head teacher architecture.",
+    "Compare the new D-delivery condition with the existing D-on condition using paired learner seeds.",
+    "Prepare but do not train GRU, Transformer, or a movement-collision bug in this cycle."
+  ]
+}

@@ -133,6 +133,26 @@ def _weighted_mean(value, mask):
     return jnp.sum(value * mask) / jnp.maximum(jnp.sum(mask), 1.0)
 
 
+def _teacher_td_loss(chosen, target, valid, goal_mask):
+    """Sum selected-head TD errors per valid transition.
+
+    The existing all-goal objective sums head losses and divides by valid
+    transitions, not by the number of goals. Keeping that denominator means a
+    selected delivery head has the same per-transition loss scale as its
+    contribution to the all-goal objective. The total scalar loss is naturally
+    smaller when fewer heads provide targets.
+    """
+
+    error = jnp.square(chosen - target)
+    transition_mask = valid.astype(jnp.float32)[:, None]
+    selected = goal_mask.astype(jnp.float32)[None, :]
+    return (
+        0.5
+        * jnp.sum(error * transition_mask * selected)
+        / jnp.maximum(jnp.sum(transition_mask), 1.0)
+    )
+
+
 def _gae(trajectory, last_value, gamma, gae_lambda):
     def backward(carry, transition):
         gae, next_value = carry
@@ -217,6 +237,7 @@ def make_dual_leo_update(
     *,
     learn_teacher=True,
     imitate_teacher=True,
+    teacher_goal_indices=None,
 ):
     """One PPO update plus the all-goal teacher update.
 
@@ -227,9 +248,26 @@ def make_dual_leo_update(
     BatchRenorm statistics at their current values. The teacher shuffle still
     consumes gc_runner.rng, so turning learning off does not change the policy
     random stream. imitate_teacher=False multiplies the policy BC term by 0.
+    teacher_goal_indices limits teacher TD targets while retaining the full
+    multi-head architecture. None preserves the original all-goal objective.
     """
 
     num_goals = teacher_network.num_goals
+    if teacher_goal_indices is None:
+        teacher_goal_indices = tuple(range(num_goals))
+    else:
+        teacher_goal_indices = tuple(int(index) for index in teacher_goal_indices)
+    if (
+        not teacher_goal_indices
+        or len(set(teacher_goal_indices)) != len(teacher_goal_indices)
+        or min(teacher_goal_indices) < 0
+        or max(teacher_goal_indices) >= num_goals
+    ):
+        raise ValueError("teacher_goal_indices must be unique valid goal indices")
+    teacher_goal_mask = jnp.zeros((num_goals,), dtype=jnp.float32).at[
+        jnp.asarray(teacher_goal_indices, dtype=jnp.int32)
+    ].set(1.0)
+    teacher_target_head_count = len(teacher_goal_indices)
     leo_epochs = LEO_EPOCHS
     bc_horizon = BC_HORIZON_UPDATES
 
@@ -444,9 +482,9 @@ def make_dual_leo_update(
                     sample.action, predicted.shape[-1], dtype=predicted.dtype
                 )
                 chosen = jnp.sum(predicted * action_selector[:, None, :], axis=-1)
-                error = jnp.square(chosen - target)
-                mask = sample.valid.astype(jnp.float32)[:, None]
-                loss = 0.5 * jnp.sum(error * mask) / jnp.maximum(jnp.sum(mask), 1.0)
+                loss = _teacher_td_loss(
+                    chosen, target, sample.valid, teacher_goal_mask
+                )
                 return loss, next_stats["batch_stats"]
 
             valid_count = jnp.sum(sample.valid.astype(jnp.int32))
@@ -516,7 +554,16 @@ def make_dual_leo_update(
                 "bc_policy_coef": bc_coef.astype(jnp.float32),
                 "bc_value_coef": jnp.asarray(BC_VALUE_COEF, dtype=jnp.float32),
                 "teacher_td_loss": jnp.mean(td_loss),
+                "teacher_td_loss_per_target_head": (
+                    jnp.mean(td_loss) / teacher_target_head_count
+                ),
                 "teacher_grad_steps": leo_state.step.astype(jnp.int32),
+                "teacher_target_head_count": jnp.asarray(
+                    teacher_target_head_count, dtype=jnp.int32
+                ),
+                "teacher_target_terms": (
+                    jnp.sum(teacher_valid_samples) * teacher_target_head_count
+                ).astype(jnp.int32),
                 "ppo_scheduled_minibatches": ppo_scheduled,
                 "ppo_applied_minibatches": ppo_scheduled - jnp.sum(losses["empty_minibatch"]),
                 "teacher_scheduled_minibatches": teacher_scheduled,

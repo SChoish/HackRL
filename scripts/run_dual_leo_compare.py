@@ -413,10 +413,15 @@ def _start_teacher(spec, config, runner):
 def _arm(job):
     if job["method"] == "gc":
         return None
-    return {
+    arm = {
         "learn_teacher": bool(job.get("learn_teacher", True)),
         "imitate_teacher": bool(job.get("imitate_teacher", True)),
     }
+    if "teacher_goal_indices" in job:
+        arm["teacher_goal_indices"] = [
+            int(index) for index in job["teacher_goal_indices"]
+        ]
+    return arm
 
 
 def _check_arm(directory, arm):
@@ -444,6 +449,7 @@ def _dual_update(spec, network, teacher, config, minibatch, arm):
             minibatch,
             learn_teacher=flags["learn_teacher"],
             imitate_teacher=flags["imitate_teacher"],
+            teacher_goal_indices=flags.get("teacher_goal_indices"),
         )
     )
 
@@ -792,6 +798,14 @@ def run_adapt(log_dir, job):
         "seconds_per_update_this_process": float(np.mean(step_seconds)) if step_seconds else None,
         "learn_teacher": None if arm is None else arm["learn_teacher"],
         "imitate_teacher": None if arm is None else arm["imitate_teacher"],
+        "teacher_goal_indices": (
+            None if arm is None else arm.get("teacher_goal_indices")
+        ),
+        "teacher_loss_normalization": (
+            None
+            if arm is None
+            else "sum selected-head half-squared TD errors per valid transition"
+        ),
         "origin_checkpoint_sha256": (
             None if origin is None else origin["source_checkpoint_sha256"]
         ),
