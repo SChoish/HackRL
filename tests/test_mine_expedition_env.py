@@ -239,7 +239,10 @@ def test_fixed_same_exploit_actions_timeout_without_success():
 def test_all_fixed_curriculum_resets_are_valid_and_hide_stage_labels():
     observations = []
     for start in MineExpeditionStart:
-        if start is MineExpeditionStart.CURRICULUM:
+        if start in {
+            MineExpeditionStart.CURRICULUM,
+            MineExpeditionStart.NATURAL_LATE,
+        }:
             continue
         state = reset_mine_expedition(jax.random.PRNGKey(0), start)
         assert bool(validate_mine_expedition_reset(state))
@@ -250,6 +253,12 @@ def test_all_fixed_curriculum_resets_are_valid_and_hide_stage_labels():
     )(jax.random.split(jax.random.PRNGKey(1), 32))
     assert np.asarray(
         jax.vmap(validate_mine_expedition_reset)(sampled)
+    ).all()
+    natural_late = jax.vmap(
+        lambda key: reset_mine_expedition(key, MineExpeditionStart.NATURAL_LATE)
+    )(jax.random.split(jax.random.PRNGKey(3), 32))
+    assert np.asarray(
+        jax.vmap(validate_mine_expedition_reset)(natural_late)
     ).all()
 
 

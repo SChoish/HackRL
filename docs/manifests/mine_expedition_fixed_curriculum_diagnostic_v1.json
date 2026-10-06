@@ -1,0 +1,129 @@
+{
+  "schema_version": "hackrl_mine_expedition_fixed_curriculum_diagnostic_v1",
+  "diagnostic_id": "mine_expedition_fixed_curriculum_diagnostic_v1",
+  "status": "implementation_validated_training_authorized",
+  "training_queued": true,
+  "scope": "One fixed-kernel backward-curriculum diagnostic after the completed natural-start learnability failure. No mutant training, model-width sweep, BC comparison, reward change, map change, or horizon change is authorized.",
+  "understood_as": "First train only from the normal craft-ready state. If that suffix is learned, transfer the full learner checkpoint into a natural-plus-late-start phase. If it is not learned, run only a target-ready mining-and-return localization phase and stop. Every frozen evaluation starts from the original natural state.",
+  "predecessor": {
+    "gate_id": "mine_expedition_fixed_learnability_v1",
+    "execution_code_sha": "b71c185384b0ab52bf5de4940125c576fee5e607",
+    "result": "execution_complete_scientific_fail",
+    "result_manifest": "docs/manifests/mine_expedition_fixed_learnability_v1_results.json"
+  },
+  "provenance": {
+    "kernel": "src/hackrl/mine_expedition.py",
+    "environment": "src/hackrl/mine_expedition_env.py",
+    "learner": "src/hackrl/mine_expedition_ppo.py",
+    "runner": "scripts/run_mine_expedition_fixed_gate.py",
+    "queue": "scripts/run_mine_expedition_fixed_curriculum_diagnostic_queue.sh",
+    "adjudicator": "scripts/summarize_mine_expedition_fixed_curriculum_diagnostic.py",
+    "tests": [
+      "tests/test_mine_expedition.py",
+      "tests/test_mine_expedition_env.py",
+      "tests/test_mine_expedition_gate.py",
+      "tests/test_mine_expedition_ppo.py",
+      "tests/test_mine_expedition_curriculum_diagnostic.py"
+    ]
+  },
+  "authorized_source_sha256": {
+    "scripts/run_mine_expedition_fixed_gate.py": "b90f9a2e3b535363f759d4f226c915d411295270ab301d9465f072462000ba37",
+    "scripts/run_mine_expedition_fixed_gate_queue.sh": "27173a3a4d266fae14ef1adf65aa88bc8dfc4ca7852eec612f8a0c61b23908ac",
+    "scripts/summarize_mine_expedition_fixed_gate.py": "c2c4b5856d58765f3630e281d7db5f7ad269b839be64e97464169b47027c92f9",
+    "scripts/run_mine_expedition_fixed_curriculum_diagnostic_queue.sh": "0f155440ecce18a8826d240e61a2e6f7b9bb231d21b1530eaf1dc6458a41da4a",
+    "scripts/summarize_mine_expedition_fixed_curriculum_diagnostic.py": "f43d108a8dd6d0b258de1e9d95c7b68e4526b35621dcd1f9b8ca7bbf1b8bc8ab",
+    "src/hackrl/mine_expedition.py": "67874dda0c21249217e221d89f77596c39575c054b1e2081d0159af8a581c87c",
+    "src/hackrl/mine_expedition_env.py": "7cc621fb5b50dd0afc3479ea7a56b0ca41e760ed7cd554a9f9083fab346baf5d",
+    "src/hackrl/mine_expedition_ppo.py": "bbe9e49da4c000318f62cbdf5eea860a4faee13f0b14f6cb714864c6ebc3a515",
+    "docs/manifests/mine_expedition_fixed_learnability_v1.json": "f25674057f0a46e21f41b66cdcef3701034c816253651aa995b2b0d7c9b2216d",
+    "tests/test_mine_expedition.py": "967dd6f268baf47dc011f132f8484aba58ceba59f2b38ef717efaef200df5761",
+    "tests/test_mine_expedition_env.py": "d5cdee3447eedbccfe2939bb9a9cafa636f2c84bfe8fb12c25f24056b134743e",
+    "tests/test_mine_expedition_gate.py": "94131b87802702b1abb42bd68445a7c717224107893733e3a30358bccede5384",
+    "tests/test_mine_expedition_ppo.py": "5f2446049d8d415fa8789ad7ddda7e77d726a5bedf18b857d5e142ec9d8b994e",
+    "tests/test_mine_expedition_curriculum_diagnostic.py": "9369fc51073fface455f6f9242286fd583883339fe6ca2a88b08bbc8b94efa66"
+  },
+  "fixed_contract": {
+    "variant": "fixed",
+    "map": "mine_expedition_pack_restore_v0 deterministic map",
+    "reward": "Unchanged discount-consistent potential shaping and fixed normal event rewards from b71c185.",
+    "horizon": 256,
+    "policy_observation": "Unchanged public observation without kernel variant, duplicate provenance, or curriculum-stage label.",
+    "evaluation_start": "natural",
+    "seeds": [40, 41, 42]
+  },
+  "optimizer": {
+    "num_envs": 128,
+    "num_steps": 64,
+    "update_epochs": 1,
+    "minibatch_size": 1024,
+    "hidden_size": 512,
+    "learning_rate": 0.0002,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "entropy_coefficient": 0.005,
+    "mode_eval_episodes_per_seed": 1,
+    "sample_eval_episodes_per_seed": 128
+  },
+  "phases": {
+    "stage_a_craft_ready": {
+      "training_start": "craft_ready",
+      "description": "Normal fixed state at the workbench with the two legitimate iron units required for a pickaxe.",
+      "updates": 512,
+      "transitions_per_seed": 4194304,
+      "checkpoint_updates": [0, 128, 512],
+      "route_window_updates": 128,
+      "advance_rule": "At least two of three seeds have completed-success fraction >= 0.8 in the final 128 training updates and record positive craft, mine, and return events.",
+      "claim_limit": "This rule chooses the next diagnostic phase. It is not the fixed-task learnability gate."
+    },
+    "stage_b_natural_late": {
+      "condition": "Run only if stage A advances.",
+      "training_start": "natural_late",
+      "reset_distribution": "1/2 natural, 1/6 craft-ready, 1/6 target-ready, 1/6 return-ready.",
+      "initialization": "Per seed, transfer policy, critic, Adam, and action RNG from that seed's final stage-A checkpoint; freshly reset environments and local experience counters start the new phase.",
+      "updates": 2048,
+      "transitions_per_seed": 16777216,
+      "checkpoint_updates": [0, 128, 512, 1024, 2048],
+      "pass_rule": "All three final deterministic natural-start policies succeed, and at least two of three final stochastic natural-start success rates are >= 0.8."
+    },
+    "fallback_target_ready": {
+      "condition": "Run only if stage A does not advance; stage B is then prohibited.",
+      "training_start": "target_ready",
+      "description": "Normal fixed state at the target with a legitimately constructed iron pickaxe.",
+      "updates": 512,
+      "transitions_per_seed": 4194304,
+      "checkpoint_updates": [0, 128, 512],
+      "route_window_updates": 128,
+      "localization_rule": "At least two of three seeds have completed-success fraction >= 0.8 in the final 128 training updates and record positive mine and return events.",
+      "claim_limit": "This only localizes whether mining-and-return can be learned. It cannot pass the natural-start gate."
+    }
+  },
+  "maximum_budget": {
+    "route_if_stage_a_advances": 62914560,
+    "route_if_stage_a_falls_back": 25165824,
+    "no_result_driven_extension": "Stop after stage B or the fallback. Do not add updates, widths, learning rates, reward changes, or horizon changes in this diagnostic."
+  },
+  "evaluation_and_leakage": {
+    "primary_ground_truth": "Terminal return of one target mineral from the original natural start under the fixed kernel.",
+    "training_rollout_metrics": "Used only to choose the predeclared branch; never reported as natural-start task success.",
+    "verifier_designer_limit": "The kernel, shaped reward, curriculum, and scorer are project-internal. A pass establishes internal fixed-map learnability under this curriculum, not independent benchmark validity or layout generalization.",
+    "map_reuse_limit": "Training and evaluation share one deterministic map by design; no generalization claim is allowed."
+  },
+  "implementation_validation": {
+    "command": "JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python -m pytest -q tests/test_mine_expedition.py tests/test_mine_expedition_env.py tests/test_mine_expedition_gate.py tests/test_mine_expedition_ppo.py tests/test_mine_expedition_curriculum_diagnostic.py",
+    "result": "32 passed, 1 dependency deprecation warning",
+    "covers": [
+      "exact craft-ready and target-ready fixed resets",
+      "natural-late reset validity without a stage label in the observation",
+      "policy, critic, Adam, and action-RNG checkpoint transfer with fresh environment and local counters",
+      "training rollout metrics select only the predeclared branch",
+      "only stage-B natural-start evaluation can open the fixed gate or authorize future mutant work",
+      "the target-ready fallback can localize mining-and-return but cannot authorize mutant training"
+    ]
+  },
+  "future_branching": "Only after a stage-B natural-start pass may later D-on/D-off conditions be cloned from identical complete learner checkpoints. This diagnostic does not create those branches.",
+  "storage": {
+    "run_root": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1",
+    "home_policy": "Home was 99% utilized with 25,047,605,248 bytes available at launch preparation; all checkpoints remain on RAID.",
+    "required_record": "Before launch/resume and periodically, record home and RAID capacity, current run bytes, projected remaining checkpoints plus predecessor-successor overlap, evaluation/log allowance, and an >=8 GiB or 20% reserve."
+  }
+}

@@ -96,8 +96,17 @@ class MineExpeditionPPOConfig:
             raise ValueError("value coefficient and max gradient norm are invalid")
         if self.mode_eval_episodes <= 0 or self.sample_eval_episodes <= 0:
             raise ValueError("evaluation episode counts must be positive")
-        if start not in {MineExpeditionStart.CURRICULUM, MineExpeditionStart.NATURAL}:
-            raise ValueError("training_start must be curriculum or natural")
+        if start not in {
+            MineExpeditionStart.CURRICULUM,
+            MineExpeditionStart.NATURAL,
+            MineExpeditionStart.NATURAL_LATE,
+            MineExpeditionStart.CRAFT_READY,
+            MineExpeditionStart.TARGET_READY,
+        }:
+            raise ValueError(
+                "training_start must be natural, curriculum, natural_late, "
+                "craft_ready, or target_ready"
+            )
         if any(update < 0 or update > self.num_updates for update in self.checkpoint_updates):
             raise ValueError("checkpoint updates must lie within the training run")
 

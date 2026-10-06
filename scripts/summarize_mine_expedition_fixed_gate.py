@@ -176,14 +176,18 @@ def adjudicate(run_root, *, reevaluate=True):
     if not isinstance(authorized, dict) or not authorized:
         errors.append("gate manifest has no authorized source hash set")
         authorized = {}
-    for relative, expected_digest in authorized.items():
-        try:
-            actual_digest = _sha256(REPOSITORY / relative)
-        except OSError as error:
-            errors.append(f"authorized source missing: {relative}: {error}")
-            continue
-        if actual_digest != expected_digest:
-            errors.append(f"authorized source hash mismatch: {relative}")
+    # Re-evaluation executes the current checkout, so it must be the exact
+    # authorized source set. Artifact-only adjudication instead verifies the
+    # source hashes recorded inside each run and is used by synthetic tests.
+    if reevaluate:
+        for relative, expected_digest in authorized.items():
+            try:
+                actual_digest = _sha256(REPOSITORY / relative)
+            except OSError as error:
+                errors.append(f"authorized source missing: {relative}: {error}")
+                continue
+            if actual_digest != expected_digest:
+                errors.append(f"authorized source hash mismatch: {relative}")
 
     for seed in seeds:
         destination = run_root / f"seed{seed}"

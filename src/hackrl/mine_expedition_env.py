@@ -54,6 +54,7 @@ from hackrl.mine_expedition import (
 class MineExpeditionStart(str, Enum):
     NATURAL = "natural"
     CURRICULUM = "curriculum"
+    NATURAL_LATE = "natural_late"
     RESOURCE_READY = "resource_ready"
     ONE_IRON = "one_iron"
     CRAFT_READY = "craft_ready"
@@ -301,14 +302,35 @@ _CURRICULUM_STARTS = (
     MineExpeditionStart.RETURN_READY,
 )
 
+# The diagnostic continuation first teaches the post-resource suffix from an
+# exact normal state. Its second phase gives half of resets to the real natural
+# start and uses only later normal-path states for the other half. Repeating
+# NATURAL is an explicit sampling weight, not an observation label.
+_NATURAL_LATE_STARTS = (
+    MineExpeditionStart.NATURAL,
+    MineExpeditionStart.NATURAL,
+    MineExpeditionStart.NATURAL,
+    MineExpeditionStart.CRAFT_READY,
+    MineExpeditionStart.TARGET_READY,
+    MineExpeditionStart.RETURN_READY,
+)
+
 
 def reset_mine_expedition(
     key, start=MineExpeditionStart.NATURAL
 ) -> MineExpeditionState:
     start = MineExpeditionStart(start)
-    if start is not MineExpeditionStart.CURRICULUM:
+    if start not in {
+        MineExpeditionStart.CURRICULUM,
+        MineExpeditionStart.NATURAL_LATE,
+    }:
         return _state_for_start(start)
-    candidates = tuple(_state_for_start(item) for item in _CURRICULUM_STARTS)
+    starts = (
+        _CURRICULUM_STARTS
+        if start is MineExpeditionStart.CURRICULUM
+        else _NATURAL_LATE_STARTS
+    )
+    candidates = tuple(_state_for_start(item) for item in starts)
     index = jax.random.randint(
         key, (), 0, len(candidates), dtype=jnp.int32
     )

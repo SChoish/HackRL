@@ -42,14 +42,18 @@ EXECUTION_SOURCES = (
     Path("scripts/run_mine_expedition_fixed_gate.py"),
     Path("scripts/run_mine_expedition_fixed_gate_queue.sh"),
     Path("scripts/summarize_mine_expedition_fixed_gate.py"),
+    Path("scripts/run_mine_expedition_fixed_curriculum_diagnostic_queue.sh"),
+    Path("scripts/summarize_mine_expedition_fixed_curriculum_diagnostic.py"),
     Path("src/hackrl/mine_expedition.py"),
     Path("src/hackrl/mine_expedition_env.py"),
     Path("src/hackrl/mine_expedition_ppo.py"),
     Path("docs/manifests/mine_expedition_fixed_learnability_v1.json"),
+    Path("docs/manifests/mine_expedition_fixed_curriculum_diagnostic_v1.json"),
     Path("tests/test_mine_expedition.py"),
     Path("tests/test_mine_expedition_env.py"),
     Path("tests/test_mine_expedition_gate.py"),
     Path("tests/test_mine_expedition_ppo.py"),
+    Path("tests/test_mine_expedition_curriculum_diagnostic.py"),
 )
 GIB = 1024**3
 MINIMUM_RESERVE_BYTES = 8 * GIB
@@ -178,7 +182,7 @@ def _append_capacity_record(destination, record, event):
     _write_json(path, history)
 
 
-def _provenance(config, runtime):
+def _provenance(config, runtime, initialization):
     relative = [str(path) for path in EXECUTION_SOURCES]
     dirty = _git("status", "--porcelain", "--", *relative)
     if dirty:
@@ -197,7 +201,78 @@ def _provenance(config, runtime):
         "config": mine_expedition_config_payload(config),
         "kernel_variant": "fixed",
         "evaluation_start": "natural",
+        "initialization": initialization,
         "runtime": runtime,
+    }
+
+
+_TRANSFER_COMPATIBILITY_FIELDS = (
+    "seed",
+    "num_envs",
+    "num_steps",
+    "update_epochs",
+    "minibatch_size",
+    "hidden_size",
+    "learning_rate",
+    "gamma",
+    "gae_lambda",
+    "clip_epsilon",
+    "entropy_coefficient",
+    "value_coefficient",
+    "max_grad_norm",
+)
+
+
+def _initialize_runner(config, init_checkpoint=None):
+    network, runner = initialize_mine_expedition_ppo(config)
+    if init_checkpoint is None:
+        return network, runner, {"kind": "random"}
+
+    source = Path(init_checkpoint).resolve()
+    recorded = json.loads((source / "config.json").read_text(encoding="utf-8"))
+    source_config = MineExpeditionPPOConfig(**recorded)
+    source_config.validate()
+    mismatches = {
+        name: (getattr(source_config, name), getattr(config, name))
+        for name in _TRANSFER_COMPATIBILITY_FIELDS
+        if getattr(source_config, name) != getattr(config, name)
+    }
+    if mismatches:
+        raise ValueError(f"initialization checkpoint is incompatible: {mismatches}")
+    _, source_template = initialize_mine_expedition_ppo(source_config)
+    restored = load_mine_expedition_checkpoint(
+        source, source_template, source_config
+    )
+    metadata = json.loads((source / "metadata.json").read_text(encoding="utf-8"))
+    if (
+        metadata.get("variant") != "fixed"
+        or metadata.get("evaluation_start") != "natural"
+        or int(metadata.get("global_update", -1)) != source_config.num_updates
+    ):
+        raise ValueError("initialization must be a final fixed natural-eval checkpoint")
+    source_manifest_path = source.parent.parent / "run_manifest.json"
+    source_manifest = json.loads(source_manifest_path.read_text(encoding="utf-8"))
+    # Preserve the learned policy, critic, Adam state, and action RNG. Start
+    # the new stage with freshly reset target-stage environments and local
+    # counters so its experience budget is independently auditable.
+    runner = runner.replace(
+        train_state=restored.train_state,
+        rng=restored.rng,
+    )
+    return network, runner, {
+        "kind": "fixed_checkpoint_transfer",
+        "checkpoint": str(source),
+        "state_sha256": metadata["state_sha256"],
+        "source_execution_code_sha": source_manifest.get("execution_code_sha"),
+        "source_config": recorded,
+        "preserved": ["policy", "critic", "adam", "action_rng"],
+        "reset": [
+            "environment_state",
+            "environment_rng",
+            "episode_counters",
+            "stage_update",
+            "stage_environment_steps",
+        ],
     }
 
 
@@ -320,7 +395,7 @@ def _save_snapshot(destination, update, network, runner, config):
     return evaluation
 
 
-def run_cell(config, log_dir=None):
+def run_cell(config, log_dir=None, init_checkpoint=None):
     config.validate()
     runtime = _runtime_record()
     expected_backend = "gpu" if runtime["requested_device"] == "cuda" else "cpu"
@@ -329,7 +404,7 @@ def run_cell(config, log_dir=None):
             f"HACKRL_DEVICE={runtime['requested_device']} requested but JAX initialized "
             f"{runtime['jax_backend']} instead of {expected_backend}"
         )
-    network, runner = initialize_mine_expedition_ppo(config)
+    network, runner, initialization = _initialize_runner(config, init_checkpoint)
     update = jax.jit(make_mine_expedition_update(network, config))
     destination = None if log_dir is None else Path(log_dir)
     metrics_history = []
@@ -340,7 +415,7 @@ def run_cell(config, log_dir=None):
 
     if destination is not None:
         capacity = _capacity_record(destination, runner, config)
-        provenance = _provenance(config, runtime)
+        provenance = _provenance(config, runtime, initialization)
         destination.mkdir(parents=True, exist_ok=True)
         _append_capacity_record(destination, capacity, "start_or_resume")
         manifest_path = destination / "run_manifest.json"
@@ -459,6 +534,7 @@ def run_cell(config, log_dir=None):
             None if provenance is None else provenance["execution_code_sha"]
         ),
         "runtime": runtime,
+        "initialization": initialization,
     }
     if destination is not None:
         _write_json(destination / "summary.json", summary)
@@ -476,7 +552,15 @@ def parse_args():
     parser.add_argument("--hidden-size", type=int, default=512)
     parser.add_argument("--learning-rate", type=float, default=2e-4)
     parser.add_argument(
-        "--training-start", choices=("curriculum", "natural"), default="curriculum"
+        "--training-start",
+        choices=(
+            "curriculum",
+            "natural",
+            "natural_late",
+            "craft_ready",
+            "target_ready",
+        ),
+        default="curriculum",
     )
     parser.add_argument("--mode-eval-episodes", type=int, default=1)
     parser.add_argument("--sample-eval-episodes", type=int, default=128)
@@ -484,6 +568,7 @@ def parse_args():
         "--checkpoint-updates", default="0,128,512,1024,2048"
     )
     parser.add_argument("--log-dir", default=None)
+    parser.add_argument("--init-checkpoint", default=None)
     return parser.parse_args()
 
 
@@ -505,7 +590,13 @@ def main():
             int(item) for item in args.checkpoint_updates.split(",") if item
         ),
     )
-    print(json.dumps(run_cell(config, args.log_dir), indent=2, sort_keys=True))
+    print(
+        json.dumps(
+            run_cell(config, args.log_dir, args.init_checkpoint),
+            indent=2,
+            sort_keys=True,
+        )
+    )
 
 
 if __name__ == "__main__":

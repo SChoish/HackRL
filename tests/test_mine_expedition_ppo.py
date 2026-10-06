@@ -1,4 +1,5 @@
 import json
+import importlib.util
 import math
 from pathlib import Path
 
@@ -21,6 +22,16 @@ from hackrl.mine_expedition_ppo import (
 )
 
 
+REPOSITORY = Path(__file__).resolve().parents[1]
+RUNNER_SPEC = importlib.util.spec_from_file_location(
+    "run_mine_expedition_fixed_gate",
+    REPOSITORY / "scripts/run_mine_expedition_fixed_gate.py",
+)
+RUNNER = importlib.util.module_from_spec(RUNNER_SPEC)
+assert RUNNER_SPEC.loader is not None
+RUNNER_SPEC.loader.exec_module(RUNNER)
+
+
 def _small_config():
     return MineExpeditionPPOConfig(
         seed=0,
@@ -36,8 +47,10 @@ def _small_config():
 
 
 def test_fixed_gate_rejects_non_training_starts_and_bad_batches():
-    with pytest.raises(ValueError, match="curriculum or natural"):
-        MineExpeditionPPOConfig(training_start="target_ready").validate()
+    for start in ("craft_ready", "target_ready", "natural_late"):
+        MineExpeditionPPOConfig(training_start=start).validate()
+    with pytest.raises(ValueError, match="training_start must be"):
+        MineExpeditionPPOConfig(training_start="one_iron").validate()
     with pytest.raises(ValueError, match="divide evenly"):
         MineExpeditionPPOConfig(
             num_envs=2, num_steps=3, minibatch_size=4
@@ -170,3 +183,48 @@ def test_checkpoint_round_trip_preserves_full_runner(tmp_path):
     with (destination / "state.msgpack").open("ab") as handle:
         handle.write(b"corrupt")
     assert not mine_expedition_checkpoint_files_present(destination)
+
+
+def test_stage_transfer_preserves_learner_and_resets_stage_counters(tmp_path):
+    source_config = _small_config()
+    source_config = MineExpeditionPPOConfig(
+        **{
+            **source_config.__dict__,
+            "training_start": "craft_ready",
+            "checkpoint_updates": (1,),
+        }
+    )
+    network, source = initialize_mine_expedition_ppo(source_config)
+    source, _ = jax.jit(make_mine_expedition_update(network, source_config))(source)
+    checkpoint = save_mine_expedition_checkpoint(
+        tmp_path / "seed0/checkpoints/update_1", source, source_config
+    )
+    (tmp_path / "seed0/run_manifest.json").write_text(
+        json.dumps({"execution_code_sha": "a" * 40}), encoding="utf-8"
+    )
+    target_config = MineExpeditionPPOConfig(
+        **{
+            **source_config.__dict__,
+            "num_updates": 2,
+            "training_start": "natural_late",
+            "checkpoint_updates": (0, 2),
+        }
+    )
+    _, target, initialization = RUNNER._initialize_runner(
+        target_config, checkpoint
+    )
+
+    assert int(source.global_update) == 1
+    assert int(target.global_update) == 0
+    assert int(target.env_steps) == 0
+    assert int(target.train_state.step) == int(source.train_state.step)
+    assert initialization["kind"] == "fixed_checkpoint_transfer"
+    assert initialization["source_execution_code_sha"] == "a" * 40
+    assert all(
+        np.array_equal(np.asarray(left), np.asarray(right))
+        for left, right in zip(
+            jax.tree.leaves(source.train_state),
+            jax.tree.leaves(target.train_state),
+            strict=True,
+        )
+    )

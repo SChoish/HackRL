@@ -1,0 +1,59 @@
+{
+  "schema_version": "hackrl_mine_expedition_fixed_learnability_result_v1",
+  "gate_id": "mine_expedition_fixed_learnability_v1",
+  "execution_code_sha": "b71c185384b0ab52bf5de4940125c576fee5e607",
+  "status": "fail",
+  "execution_complete": true,
+  "gate_passed": false,
+  "interpretation": "The fixed kernel and execution contract completed, but no tested seed learned the natural-start normal route. This is a normal-route learnability failure under the declared curriculum and optimization contract, not evidence about mutant discovery.",
+  "seeds": [40, 41, 42],
+  "budget": {
+    "updates_per_seed": 2048,
+    "transitions_per_seed": 16777216,
+    "total_transitions": 50331648
+  },
+  "natural_start_final": {
+    "mode_success_rates": [0.0, 0.0, 0.0],
+    "sample_success_rates": [0.0, 0.0, 0.0],
+    "mode_crafted_pickaxe_rates": [0.0, 0.0, 0.0],
+    "sample_crafted_pickaxe_rates": [0.0, 0.0, 0.0],
+    "mode_mined_target_rates": [0.0, 0.0, 0.0],
+    "sample_mined_target_rates": [0.0, 0.0, 0.0],
+    "mean_lengths": [256.0, 256.0, 256.0]
+  },
+  "training_rollout_diagnostic": {
+    "final_128_update_success_fractions": [0.42762221167536785, 0.6742378233936597, 0.31801566579634466],
+    "meaning": "The uniform shortened-start mixture produced successful training episodes, so the frozen natural-start failure does not show that every suffix behavior was absent. Stage labels were not logged, so this does not localize the successful starts."
+  },
+  "timing": {
+    "first_logged_seed_start_utc": "2026-10-05T14:11:01Z",
+    "first_logged_queue_complete_utc": "2026-10-05T14:18:16Z",
+    "first_logged_seed_start_kst": "2026-10-05T23:11:01+09:00",
+    "first_logged_queue_complete_kst": "2026-10-05T23:18:16+09:00",
+    "limitation": "The queue did not timestamp its predecessor validation and test start. The previously reported 23:11-23:22 window crossed two later no-op replays; it is not the first invocation duration. Replayed summary timing fields are not used."
+  },
+  "replay_incident": {
+    "cause": "The central host watcher continued treating the scientifically failed but execution-complete queue as its desired GPU queue and relaunched it after normal exit.",
+    "effect": "Checkpoints and updates were reused without retraining, but summary timing fields, capacity histories, gate_result.json, and queue.log were rewritten or appended.",
+    "stopped_by": "The supported server-management registration command switched ext_csv to the idle CPU/GPU queue pair.",
+    "verified_state": {
+      "phase": "gpu_holding",
+      "event": "gpu_keepalive",
+      "gpu_queue_idle": true
+    }
+  },
+  "evidence_archive": {
+    "path": "/raid/ext_csv/HackRL/runs/_archive/mine_expedition_fixed_learnability_v1_initial_evidence_20261005T141101Z",
+    "logical_size": "469M",
+    "verification": "cmp queue.log and diff -qr over the full source and archive trees both returned success immediately after the copy.",
+    "note": "The archive preserves the full append-only queue log, including the first invocation, and the original updates/checkpoints. Summary-like files had already been replayed before archival and must not be used for wall-clock timing."
+  },
+  "storage_at_archive": {
+    "home_available": "47G",
+    "home_utilization": "98%",
+    "raid_available": "6.5T",
+    "raid_utilization": "76%",
+    "decision": "Keep the archive and all continuation checkpoints on RAID; do not start a large checkpoint run under /home/ext_csv."
+  },
+  "next_gate": "One fixed-only backward-curriculum diagnostic. Mutant training, model-width changes, BC comparisons, and horizon changes remain closed."
+}
