@@ -40,20 +40,18 @@ from hackrl.mine_expedition_ppo import (
 REPOSITORY = Path(__file__).resolve().parents[1]
 EXECUTION_SOURCES = (
     Path("scripts/run_mine_expedition_fixed_gate.py"),
-    Path("scripts/run_mine_expedition_fixed_gate_queue.sh"),
-    Path("scripts/summarize_mine_expedition_fixed_gate.py"),
-    Path("scripts/run_mine_expedition_fixed_curriculum_diagnostic_queue.sh"),
-    Path("scripts/summarize_mine_expedition_fixed_curriculum_diagnostic.py"),
+    Path("scripts/run_mine_expedition_fixed_return_curriculum_queue.sh"),
+    Path("scripts/summarize_mine_expedition_fixed_return_curriculum.py"),
     Path("src/hackrl/mine_expedition.py"),
+    Path("src/hackrl/mine_expedition_adjudication.py"),
     Path("src/hackrl/mine_expedition_env.py"),
     Path("src/hackrl/mine_expedition_ppo.py"),
-    Path("docs/manifests/mine_expedition_fixed_learnability_v1.json"),
-    Path("docs/manifests/mine_expedition_fixed_curriculum_diagnostic_v1.json"),
+    Path("docs/manifests/mine_expedition_fixed_return_curriculum_v1.json"),
     Path("tests/test_mine_expedition.py"),
     Path("tests/test_mine_expedition_env.py"),
     Path("tests/test_mine_expedition_gate.py"),
     Path("tests/test_mine_expedition_ppo.py"),
-    Path("tests/test_mine_expedition_curriculum_diagnostic.py"),
+    Path("tests/test_mine_expedition_return_curriculum.py"),
 )
 GIB = 1024**3
 MINIMUM_RESERVE_BYTES = 8 * GIB
@@ -559,6 +557,11 @@ def parse_args():
             "natural_late",
             "craft_ready",
             "target_ready",
+            "return_near",
+            "return_path",
+            "mine_return",
+            "craft_mine_return",
+            "natural_return",
         ),
         default="curriculum",
     )

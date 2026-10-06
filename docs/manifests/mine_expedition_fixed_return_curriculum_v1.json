@@ -1,0 +1,185 @@
+{
+  "schema_version": "hackrl_mine_expedition_fixed_return_curriculum_v1",
+  "experiment_id": "mine_expedition_fixed_return_curriculum_v1",
+  "status": "implementation_validated_execution_authorized",
+  "understood_as": "Run one fixed-only, five-stage cumulative return curriculum from fresh seeds 40-42. Change only the reset-state distribution; keep the map, fixed kernel, observation, reward, optimizer, and 256-tick horizon unchanged. Advance only when all three seeds meet each predeclared suffix-learning rule, never extend a failed stage, and judge the experiment only by frozen original-natural-start mode success plus sample success >= 0.90 for every seed at the final predeclared checkpoint.",
+  "scope": {
+    "authorized": "One bounded fixed normal-task curriculum run and frozen natural-start adjudication.",
+    "prohibited": [
+      "mutant training or evaluation",
+      "BC-on/off branching",
+      "reward, map, observation, kernel, action, or horizon changes",
+      "model-width, learning-rate, or optimizer sweeps",
+      "result-driven update extension",
+      "checkpoint selection by natural-start evaluation"
+    ]
+  },
+  "predecessor": {
+    "diagnostic_execution_sha": "cafe45b695f1fea0ab42e6ebf66bd9bf77a6bbb9",
+    "result_summary": "docs/manifests/mine_expedition_post_mine_frozen_diagnostic_v1_results.json",
+    "finding": "Tested goal switching, observation change, terminal masking, event agreement, camp adjacency, and learner immutability were consistent. Failed frozen policies primarily did not execute the return route, with occasional missed final delivery after reaching camp adjacency."
+  },
+  "fixed_contract": {
+    "variant": "fixed",
+    "map": "mine_expedition_pack_restore_v0 deterministic map, unchanged",
+    "reward": "Unchanged discount-consistent potential shaping and fixed normal event rewards from b71c185.",
+    "observation": "Unchanged public observation without kernel variant, duplicate provenance, or curriculum-stage label.",
+    "horizon": 256,
+    "seeds": [40, 41, 42],
+    "initialization": "Fresh random learner initialization for each seed in phase 1. Later phases transfer that seed policy, critic, Adam state, and action RNG while resetting environments and phase-local counters.",
+    "evaluation_start": "natural"
+  },
+  "optimizer": {
+    "num_envs": 128,
+    "num_steps": 64,
+    "update_epochs": 1,
+    "minibatch_size": 1024,
+    "hidden_size": 512,
+    "learning_rate": 0.0002,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "entropy_coefficient": 0.005,
+    "mode_eval_episodes_per_seed": 1,
+    "sample_eval_episodes_per_seed": 128
+  },
+  "reference_start_contract": {
+    "construction": "Every non-natural curriculum candidate is an exact state obtained by replaying the fixed normal reference path from the original natural state.",
+    "snapshot_ticks": {
+      "craft_ready_before_action": 50,
+      "target_ready_before_mining": 94,
+      "just_after_mining": 95,
+      "return_route": [106, 118, 130],
+      "camp_adjacent_before_delivery": 142
+    },
+    "cumulative_rule": "Each phase retains every candidate introduced by earlier phases. The final distribution contains eight natural candidates and seven suffix candidates, so natural resets are 8/15."
+  },
+  "phases": {
+    "return_near": {
+      "directory": "phase_1_return_near",
+      "training_start": "return_near",
+      "candidate_ticks": [142],
+      "updates": 128,
+      "transitions_per_seed": 1048576,
+      "checkpoint_updates": [0, 128],
+      "route_window_updates": 64,
+      "advance_success_fraction": 0.9,
+      "advance_events": ["returned_targets"]
+    },
+    "return_path": {
+      "directory": "phase_2_return_path",
+      "training_start": "return_path",
+      "candidate_ticks": [142, 130, 118, 106, 95],
+      "updates": 384,
+      "transitions_per_seed": 3145728,
+      "checkpoint_updates": [0, 128, 384],
+      "route_window_updates": 128,
+      "advance_success_fraction": 0.9,
+      "advance_events": ["returned_targets"]
+    },
+    "mine_return": {
+      "directory": "phase_3_mine_return",
+      "training_start": "mine_return",
+      "candidate_ticks": [142, 130, 118, 106, 95, 94],
+      "updates": 512,
+      "transitions_per_seed": 4194304,
+      "checkpoint_updates": [0, 128, 512],
+      "route_window_updates": 128,
+      "advance_success_fraction": 0.9,
+      "advance_events": ["mined_targets", "returned_targets"]
+    },
+    "craft_mine_return": {
+      "directory": "phase_4_craft_mine_return",
+      "training_start": "craft_mine_return",
+      "candidate_ticks": [142, 130, 118, 106, 95, 94, 50],
+      "updates": 1024,
+      "transitions_per_seed": 8388608,
+      "checkpoint_updates": [0, 128, 512, 1024],
+      "route_window_updates": 128,
+      "advance_success_fraction": 0.9,
+      "advance_events": ["crafted_pickaxes", "mined_targets", "returned_targets"]
+    },
+    "natural_full": {
+      "directory": "phase_5_natural_full",
+      "training_start": "natural_return",
+      "candidate_ticks": [0, 0, 0, 0, 0, 0, 0, 0, 142, 130, 118, 106, 95, 94, 50],
+      "updates": 2048,
+      "transitions_per_seed": 16777216,
+      "checkpoint_updates": [0, 128, 512, 1024, 2048],
+      "final_natural_gate": {
+        "mode_success_required_each_seed": true,
+        "sample_success_rate_minimum_each_seed": 0.9
+      }
+    }
+  },
+  "phase_order": [
+    "return_near",
+    "return_path",
+    "mine_return",
+    "craft_mine_return",
+    "natural_full"
+  ],
+  "budget": {
+    "updates_per_seed": 4096,
+    "transitions_per_seed": 33554432,
+    "maximum_transitions_all_seeds": 100663296,
+    "stop_rule": "Stop after the first phase that does not advance all three seeds, or after the final 2048-update phase. Do not add updates or rerun failed seeds."
+  },
+  "evaluation_and_leakage": {
+    "primary_ground_truth": "Terminal return of one target mineral by each frozen final policy from the original natural start under the fixed kernel.",
+    "checkpoint_rule": "Only the final checkpoint of each predeclared phase is eligible; natural evaluation never selects a checkpoint or changes the route.",
+    "route_metrics": "Training-rollout success and required normal events only decide whether the next predeclared phase is entered. They cannot pass the final natural-start gate.",
+    "replication_limit": "The 128 sample episodes per checkpoint are action-sampling replications, not independent learner seeds.",
+    "threshold_limit": "The 0.90 sample rule is an empirical threshold on 128 draws, not a confidence bound or a power guarantee.",
+    "verifier_designer_limit": "The map, legal reference path, reward, curriculum, and scorer are project-internal. A pass establishes fixed-map learnability under this curriculum, not independent benchmark validity or layout generalization.",
+    "shared_map_limit": "Training and evaluation intentionally reuse one deterministic map. No held-out-layout or exploration-without-curriculum claim is allowed."
+  },
+  "storage": {
+    "run_root": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_return_curriculum_v1",
+    "measured_home_available_bytes": 22092685312,
+    "measured_raid_available_bytes": 7505797664768,
+    "measured_existing_run_bytes": 0,
+    "measured_checkpoint_bytes": 32032572,
+    "retained_checkpoint_count": 51,
+    "active_overlap_checkpoint_count": 2,
+    "log_and_evaluation_allowance_bytes": 536870912,
+    "projected_peak_remaining_write_bytes": 2234597228,
+    "safety_reserve_bytes": 8589934592,
+    "required_available_bytes": 10824531820,
+    "chosen_filesystem": "/raid/ext_csv"
+  },
+  "provenance": {
+    "external_launch_authorization": "The queue requires an expected Git execution SHA and this manifest's SHA-256 from outside the execution commit. Every phase and the final adjudicator must match both values exactly; a mixed-SHA run is incomplete and cannot authorize mutant work.",
+    "runner": "scripts/run_mine_expedition_fixed_gate.py",
+    "queue": "scripts/run_mine_expedition_fixed_return_curriculum_queue.sh",
+    "adjudicator": "scripts/summarize_mine_expedition_fixed_return_curriculum.py",
+    "evidence_checks": "src/hackrl/mine_expedition_adjudication.py",
+    "tests": [
+      "tests/test_mine_expedition.py",
+      "tests/test_mine_expedition_env.py",
+      "tests/test_mine_expedition_gate.py",
+      "tests/test_mine_expedition_ppo.py",
+      "tests/test_mine_expedition_return_curriculum.py"
+    ]
+  },
+  "implementation_validation": {
+    "validated_at_utc": "2026-10-06T04:00:20Z",
+    "cpu_regression": "36 passed, 1 dependency deprecation warning",
+    "syntax_and_compile_checks": "passed",
+    "authorized_source_hashes": "12 of 12 matched",
+    "review_outcome": "The final aggregate recomputes every ordered phase from checkpoints and logs, enforces per-seed lineage plus one externally pinned execution SHA and manifest digest, and alone can authorize later mutant work from the frozen final natural-start gate. Standalone phase results never authorize mutant work. The queue rejects unvalidated manifests, non-RAID roots, insufficient reserve, source drift, mixed execution provenance, and stale completion summaries."
+  },
+  "authorized_source_sha256": {
+    "scripts/run_mine_expedition_fixed_gate.py": "8b9130d2f506a8b1438622a7a0cf07a28cb79c99ae0a46a3d35589fe89c25a90",
+    "scripts/run_mine_expedition_fixed_return_curriculum_queue.sh": "924c4617ee0a1248ce078bace72f9c6526f3ad18695a7f47511a1e81b4ae39c9",
+    "scripts/summarize_mine_expedition_fixed_return_curriculum.py": "ce99d2ce72acd3d481ebbff4160cf293d1e28b7628bb92aa1ddcd809430c98a4",
+    "src/hackrl/mine_expedition.py": "67874dda0c21249217e221d89f77596c39575c054b1e2081d0159af8a581c87c",
+    "src/hackrl/mine_expedition_adjudication.py": "cdfd41581e6ec7bccfb8f7538240e842eb0920cbaf4a82f1fc9030681ad61bcc",
+    "src/hackrl/mine_expedition_env.py": "a704240a016f24533d1946af11494d5dd29ef9d27129959ad788c711681b7ccb",
+    "src/hackrl/mine_expedition_ppo.py": "32498d1b2b7160ff00943c1ae9880bf9eda9457971c3e4f072adee50c0ec917d",
+    "tests/test_mine_expedition.py": "967dd6f268baf47dc011f132f8484aba58ceba59f2b38ef717efaef200df5761",
+    "tests/test_mine_expedition_env.py": "bc2024580685d3478d1799881118f2d2e207efc9204d923e62d4f90aadb3b365",
+    "tests/test_mine_expedition_gate.py": "94131b87802702b1abb42bd68445a7c717224107893733e3a30358bccede5384",
+    "tests/test_mine_expedition_ppo.py": "2cba3b1c435e17a470a944d3a37053245a387c72860ff18d889b446e07162774",
+    "tests/test_mine_expedition_return_curriculum.py": "740e3320b4fdb80ed25df2e59a5d66cdaab7ee0aee8a5f3e0f964fc3fba36736"
+  }
+}

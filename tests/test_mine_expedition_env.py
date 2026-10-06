@@ -22,6 +22,7 @@ from hackrl.mine_expedition_env import (
     mine_expedition_observation_shapes,
     mine_expedition_potential,
     mine_expedition_potential_shaping,
+    mine_expedition_start_candidates,
     observe_mine_expedition,
     reset_mine_expedition,
     step_mine_expedition_env,
@@ -260,6 +261,68 @@ def test_all_fixed_curriculum_resets_are_valid_and_hide_stage_labels():
     assert np.asarray(
         jax.vmap(validate_mine_expedition_reset)(natural_late)
     ).all()
+
+
+def test_return_curriculum_candidates_are_fixed_normal_reference_states():
+    expected_ticks = {
+        MineExpeditionStart.RETURN_NEAR: (142,),
+        MineExpeditionStart.RETURN_PATH: (142, 130, 118, 106, 95),
+        MineExpeditionStart.MINE_RETURN: (142, 130, 118, 106, 95, 94),
+        MineExpeditionStart.CRAFT_MINE_RETURN: (
+            142,
+            130,
+            118,
+            106,
+            95,
+            94,
+            50,
+        ),
+        MineExpeditionStart.NATURAL_RETURN: (
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            0,
+            142,
+            130,
+            118,
+            106,
+            95,
+            94,
+            50,
+        ),
+    }
+    reference = {0: make_mine_expedition_state()}
+    state = reference[0]
+    wanted = {tick for ticks in expected_ticks.values() for tick in ticks}
+    for tick, action in enumerate(mine_expedition_normal_path(), start=1):
+        state = mine_expedition_step(
+            state, int(action), MineExpeditionVariant.FIXED
+        )
+        if tick in wanted:
+            reference[tick] = state
+
+    for start, ticks in expected_ticks.items():
+        candidates = mine_expedition_start_candidates(start)
+        assert tuple(int(item.tick) for item in candidates) == ticks
+        assert all(
+            jax.tree.all(
+                jax.tree.map(jnp.array_equal, candidate, reference[tick])
+            )
+            for candidate, tick in zip(candidates, ticks, strict=True)
+        )
+        sampled = jax.vmap(lambda key: reset_mine_expedition(key, start))(
+            jax.random.split(jax.random.PRNGKey(100 + len(ticks)), 64)
+        )
+        assert np.asarray(
+            jax.vmap(validate_mine_expedition_reset)(sampled)
+        ).all()
+
+    final_ticks = expected_ticks[MineExpeditionStart.NATURAL_RETURN]
+    assert final_ticks.count(0) / len(final_ticks) > 0.5
 
 
 def test_env_step_is_jittable_and_vmap_safe():

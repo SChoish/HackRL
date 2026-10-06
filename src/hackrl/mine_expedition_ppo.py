@@ -102,10 +102,16 @@ class MineExpeditionPPOConfig:
             MineExpeditionStart.NATURAL_LATE,
             MineExpeditionStart.CRAFT_READY,
             MineExpeditionStart.TARGET_READY,
+            MineExpeditionStart.RETURN_NEAR,
+            MineExpeditionStart.RETURN_PATH,
+            MineExpeditionStart.MINE_RETURN,
+            MineExpeditionStart.CRAFT_MINE_RETURN,
+            MineExpeditionStart.NATURAL_RETURN,
         }:
             raise ValueError(
                 "training_start must be natural, curriculum, natural_late, "
-                "craft_ready, or target_ready"
+                "craft_ready, target_ready, return_near, return_path, "
+                "mine_return, craft_mine_return, or natural_return"
             )
         if any(update < 0 or update > self.num_updates for update in self.checkpoint_updates):
             raise ValueError("checkpoint updates must lie within the training run")

@@ -47,7 +47,16 @@ def _small_config():
 
 
 def test_fixed_gate_rejects_non_training_starts_and_bad_batches():
-    for start in ("craft_ready", "target_ready", "natural_late"):
+    for start in (
+        "craft_ready",
+        "target_ready",
+        "natural_late",
+        "return_near",
+        "return_path",
+        "mine_return",
+        "craft_mine_return",
+        "natural_return",
+    ):
         MineExpeditionPPOConfig(training_start=start).validate()
     with pytest.raises(ValueError, match="training_start must be"):
         MineExpeditionPPOConfig(training_start="one_iron").validate()

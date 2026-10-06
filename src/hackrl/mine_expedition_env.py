@@ -47,6 +47,7 @@ from hackrl.mine_expedition import (
     materialize_mine_expedition_map,
     mine_expedition_state_invariants,
     mine_expedition_step,
+    mine_expedition_normal_path,
     mine_expedition_world_done,
 )
 
@@ -60,6 +61,11 @@ class MineExpeditionStart(str, Enum):
     CRAFT_READY = "craft_ready"
     TARGET_READY = "target_ready"
     RETURN_READY = "return_ready"
+    RETURN_NEAR = "return_near"
+    RETURN_PATH = "return_path"
+    MINE_RETURN = "mine_return"
+    CRAFT_MINE_RETURN = "craft_mine_return"
+    NATURAL_RETURN = "natural_return"
 
 
 MAP_CHANNEL_NAMES = (
@@ -316,21 +322,69 @@ _NATURAL_LATE_STARTS = (
 )
 
 
+# These snapshots are produced by replaying the fixed normal reference path,
+# not by editing privileged state fields.  The selected ticks are respectively
+# just before crafting, just before mining, just after mining, four points on
+# the return route, and the camp-adjacent state just before RETURN_TARGET.
+_REFERENCE_START_TICKS = (50, 94, 95, 106, 118, 130, 142)
+
+
+def _build_reference_start_states():
+    snapshots = {}
+    state = make_mine_expedition_state()
+    for tick, action in enumerate(mine_expedition_normal_path(), start=1):
+        if tick > max(_REFERENCE_START_TICKS):
+            break
+        state = mine_expedition_step(
+            state, int(action), MineExpeditionVariant.FIXED
+        )
+        if tick in _REFERENCE_START_TICKS:
+            snapshots[tick] = state
+    if tuple(sorted(snapshots)) != _REFERENCE_START_TICKS:
+        raise RuntimeError("normal reference path did not produce curriculum snapshots")
+    return snapshots
+
+
+_REFERENCE_START_STATES = _build_reference_start_states()
+_RETURN_PATH_TICKS = (142, 130, 118, 106, 95)
+_REFERENCE_CURRICULUM_TICKS = {
+    MineExpeditionStart.RETURN_NEAR: (142,),
+    MineExpeditionStart.RETURN_PATH: _RETURN_PATH_TICKS,
+    MineExpeditionStart.MINE_RETURN: _RETURN_PATH_TICKS + (94,),
+    MineExpeditionStart.CRAFT_MINE_RETURN: _RETURN_PATH_TICKS + (94, 50),
+    # Eight natural starts make the final distribution 8/15 natural while
+    # every previously learned suffix remains represented once.
+    MineExpeditionStart.NATURAL_RETURN: (0,) * 8
+    + _RETURN_PATH_TICKS
+    + (94, 50),
+}
+
+
+def mine_expedition_start_candidates(start):
+    """Return the exact normal states represented by one reset contract."""
+
+    start = MineExpeditionStart(start)
+    if start in _REFERENCE_CURRICULUM_TICKS:
+        return tuple(
+            _state_for_start(MineExpeditionStart.NATURAL)
+            if tick == 0
+            else _REFERENCE_START_STATES[tick]
+            for tick in _REFERENCE_CURRICULUM_TICKS[start]
+        )
+    if start is MineExpeditionStart.CURRICULUM:
+        return tuple(_state_for_start(item) for item in _CURRICULUM_STARTS)
+    if start is MineExpeditionStart.NATURAL_LATE:
+        return tuple(_state_for_start(item) for item in _NATURAL_LATE_STARTS)
+    return (_state_for_start(start),)
+
+
 def reset_mine_expedition(
     key, start=MineExpeditionStart.NATURAL
 ) -> MineExpeditionState:
     start = MineExpeditionStart(start)
-    if start not in {
-        MineExpeditionStart.CURRICULUM,
-        MineExpeditionStart.NATURAL_LATE,
-    }:
-        return _state_for_start(start)
-    starts = (
-        _CURRICULUM_STARTS
-        if start is MineExpeditionStart.CURRICULUM
-        else _NATURAL_LATE_STARTS
-    )
-    candidates = tuple(_state_for_start(item) for item in starts)
+    candidates = mine_expedition_start_candidates(start)
+    if len(candidates) == 1:
+        return candidates[0]
     index = jax.random.randint(
         key, (), 0, len(candidates), dtype=jnp.int32
     )
@@ -464,7 +518,10 @@ def mine_expedition_observation_shapes() -> dict[str, tuple[int, ...]]:
 def validate_mine_expedition_reset(state) -> jax.Array:
     return jnp.logical_and(
         mine_expedition_state_invariants(state),
-        jnp.logical_and(state.tick == 0, state.returned_target == 0),
+        jnp.logical_and(
+            jnp.logical_and(state.tick >= 0, state.tick < WORLD_HORIZON),
+            state.returned_target == 0,
+        ),
     )
 
 
