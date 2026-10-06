@@ -510,16 +510,18 @@ def evaluate_mine_expedition_frozen(
     learner_seed,
     discount=TASK_DISCOUNT,
     record_episodes=False,
+    start=MineExpeditionStart.NATURAL,
 ):
-    """Evaluate natural-start fixed play without changing learner state."""
+    """Evaluate fixed play from one declared start without changing learner state."""
 
     if episodes <= 0:
         raise ValueError("episodes must be positive")
+    start = MineExpeditionStart(start)
     keys = jax.vmap(jax.random.PRNGKey)(
         seed_base + 1000 * learner_seed + jnp.arange(episodes, dtype=jnp.int32)
     )
     states = jax.vmap(
-        lambda key: reset_mine_expedition(key, MineExpeditionStart.NATURAL)
+        lambda key: reset_mine_expedition(key, start)
     )(keys)
 
     def rollout(parameters):
@@ -595,6 +597,7 @@ def evaluate_mine_expedition_frozen(
         int(seed_base),
         int(learner_seed),
         float(discount),
+        start.value,
     )
     compiled = _FROZEN_EVAL_CACHE.get(cache_key)
     if compiled is None:
@@ -619,7 +622,7 @@ def evaluate_mine_expedition_frozen(
     )
     result = {
         "variant": MineExpeditionVariant.FIXED.value,
-        "start": MineExpeditionStart.NATURAL.value,
+        "start": start.value,
         "stochastic": bool(stochastic),
         "episodes": int(episodes),
         "success_rate": float(np.mean(success_array)),

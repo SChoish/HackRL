@@ -8,6 +8,7 @@ import jax.numpy as jnp
 import numpy as np
 import pytest
 
+from hackrl.mine_expedition_env import MineExpeditionStart
 from hackrl.mine_expedition_ppo import (
     MineExpeditionPPOConfig,
     MineExpeditionTransition,
@@ -172,6 +173,23 @@ def test_frozen_natural_evaluation_does_not_mutate_parameters():
             strict=True,
         )
     )
+
+
+def test_frozen_evaluation_accepts_declared_return_start():
+    config = _small_config()
+    network, runner = initialize_mine_expedition_ppo(config)
+    result = evaluate_mine_expedition_frozen(
+        network,
+        runner.train_state.params,
+        stochastic=False,
+        episodes=1,
+        seed_base=101,
+        learner_seed=config.seed,
+        start=MineExpeditionStart.RETURN_NEAR,
+    )
+    assert result["variant"] == "fixed"
+    assert result["start"] == "return_near"
+    assert result["episodes"] == 1
 
 
 def test_checkpoint_round_trip_preserves_full_runner(tmp_path):

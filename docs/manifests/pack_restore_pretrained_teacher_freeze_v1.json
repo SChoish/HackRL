@@ -1,0 +1,302 @@
+{
+  "schema_version": "hackrl_pack_restore_pretrained_teacher_freeze_v1",
+  "manifest_id": "pack_restore_pretrained_teacher_freeze_v1",
+  "manifest_path": "docs/manifests/pack_restore_pretrained_teacher_freeze_v1.json",
+  "status": "implementation_validated_execution_authorized",
+  "execution_authorization": {
+    "date": "2026-10-06",
+    "understood_as": "First close the mine study with one no-learning return_near re-evaluation of the frozen phase-2 checkpoints, then run exactly 20 S-policy PACK-RESTORE adaptations from the existing seed30-39 full-Dual pretraining checkpoints with teacher learning disabled and policy imitation retained. Do not add widths, Transformer runs, mine training, longer adaptation, or extra sweeps."
+  },
+  "mine_closeout": {
+    "run_root": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_return_curriculum_v1",
+    "source_checkpoint_template": "{run_root}/phase_2_return_path/seed{40..42}/checkpoints/update_384",
+    "source_result": "{run_root}/diagnostic_result.json",
+    "source_study": "mine_expedition_fixed_return_curriculum_v1",
+    "source_result_sha256": "7aa01e77a929ed895f9204dac3e9aa550ad12e740f59e1f1408dd7e51c21d243",
+    "source_phase": "phase_2_return_path",
+    "source_update": 384,
+    "seeds": [40, 41, 42],
+    "evaluation_start": "return_near",
+    "mode_episodes_per_seed": 1,
+    "sample_episodes_per_seed": 128,
+    "training_or_optimizer_updates": 0,
+    "kernel": "fixed",
+    "rng": "PRNGKey(31000 + 1000 * learner_seed + episode_index); mode consumes keys without sampling and sample draws categorical actions",
+    "output": "{run_root}/retention_return_near_evaluation.json",
+    "purpose": "Distinguish retained near-delivery behavior from loss of the phase-1 behavior after phase-2 route training.",
+    "terminal_rule": "Record the result and freeze the mine study regardless of outcome; do not alter its curriculum or launch mutant training."
+  },
+  "question": "Does continued policy imitation from an already learned, fully frozen teacher preserve the PACK-RESTORE exploitation advantage, or is adaptation-time teacher updating important?",
+  "source_scale_run": {
+    "run_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1",
+    "execution_code_sha": "eaf603b1ab378b34bf2a788927f59446cabdde50",
+    "manifest_sha256": "85ee37b55b4e7904391b817d924c381e613911cd91d13574b4fd4c07bf4dc534",
+    "model_size": "S",
+    "policy_hidden_size": 512,
+    "teacher_hidden_size": 512,
+    "seeds": [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
+    "source_condition": "full Dual pretraining",
+    "source_update": 512,
+    "source_checkpoint_template": "{run_root}/size_s/pack/dual/pretrain/seed{30..39}/checkpoints/update_512",
+    "baseline_cell_templates": {
+      "D-on": "{run_root}/size_s/pack/dual/{fixed|mutant}/seed{30..39}",
+      "D-off": "{run_root}/size_s/pack/dual_bc_off/{fixed|mutant}/seed{30..39}"
+    },
+    "source_checkpoint_fingerprints": {
+      "30": "72a22fd391b4ead94ec4f27f6eecf3ec329573ae087b9a51587ce4027c06ae47",
+      "31": "3de211aaf701de9e867ecca30f132f60d31a110b3d08205373f202a6facabb9d",
+      "32": "167f68663089ffa94d8180d74ea680023f35ea237b8b1e00800922d87b76ef6d",
+      "33": "b4c8d414e778b1021ab1d24dfe0d6b2ff5bd23f8e3b7606ce94f13d257a5ad09",
+      "34": "18e67f005537a4ee83ccc6e8f9f29af29596e345f1845de5486a01f38b5f5cc2",
+      "35": "6c526121ca8ce95c1081466169e6bbd7eb9a7d9cd3802209f4bf5476293ccf3f",
+      "36": "9993e0ebdbe1c02c3591727a4fc51671c026bddacd5df2374daa8ac05dbbf9c5",
+      "37": "73fb64ba75c3cbe570dfeb5bcf649af689ca89376267cbc0a2cf3659a9462376",
+      "38": "446cd0ab191477f05c1f5c853754e5a31810b82d0610cc926dd9cc3f7d8f3b7d",
+      "39": "9e2fe3947e58f1ae10f54243061f4fbb98d3b632b4f82c68b7c95cf12f505730"
+    }
+  },
+  "conditions": {
+    "D-off": {
+      "role": "existing retrospective baseline",
+      "pretraining": "full Dual",
+      "adaptation_teacher_learning": true,
+      "adaptation_policy_imitation": false
+    },
+    "D-frozen": {
+      "role": "only newly trained arm",
+      "pretraining": "the same full-Dual checkpoint",
+      "adaptation_teacher_learning": false,
+      "adaptation_policy_imitation": true,
+      "frozen_state": [
+        "teacher parameters",
+        "teacher Adam state",
+        "teacher BatchRenorm statistics",
+        "teacher optimizer step"
+      ],
+      "teacher_shuffle_rng": "consumed by the unchanged update contract even though teacher gradients are not applied"
+    },
+    "D-on": {
+      "role": "existing retrospective baseline",
+      "pretraining": "full Dual",
+      "adaptation_teacher_learning": true,
+      "adaptation_policy_imitation": true
+    }
+  },
+  "branch_identity": {
+    "shared_at_adaptation_start": [
+      "policy parameters",
+      "critic parameters",
+      "PPO Adam state",
+      "teacher parameters",
+      "teacher Adam state",
+      "teacher BatchRenorm state",
+      "environment state",
+      "all RNG state",
+      "global update and rollout counters"
+    ],
+    "D_on_vs_D_frozen_initial_intervention": "Only adaptation-time teacher updating differs; imitation and its coefficient schedule are retained in both.",
+    "post_start_divergence": "Policy updates, visited states, and downstream learner states may diverge. The contrast estimates the full mediated effect of allowing teacher updates, not a fixed-state teacher output effect.",
+    "D_frozen_vs_D_off_limit": "Both teacher updating and policy imitation differ, so this is not an isolated single-factor contrast."
+  },
+  "environment": {
+    "fixture_id": "pack_restore_workshop_v2_source_growth",
+    "pretraining_kernel": "fixed",
+    "adaptation_kernels": ["fixed", "mutant"],
+    "training_split": "train",
+    "evaluation_split": "validation",
+    "fixture_reward_observation_unchanged": true
+  },
+  "definitions": {
+    "full_Dual": "A checkpoint whose adaptation-start arm record is learn_teacher=true and imitate_teacher=true.",
+    "mode": "Deterministic categorical-policy argmax.",
+    "sample": "Categorical action sampling with four repeats for every validation state.",
+    "natural_reset": "The validation fixture's ordinary initial state.",
+    "common_setup": "The same validation layouts after the fixed ten-action setup prefix.",
+    "violation_delivery_rate": "Fraction of evaluation episodes that deliver at least one unit of grain attributed to a conservation-violating creation event.",
+    "logical_job": "One seed-by-adaptation-kernel D-frozen cell. A resumed process attempt continues the same logical job and does not create an additional experimental cell."
+  },
+  "optimization": {
+    "num_envs": 512,
+    "num_steps": 64,
+    "adaptation_updates": 4096,
+    "PPO_learning_rate": 0.0002,
+    "PPO_epochs": 1,
+    "PPO_minibatch_size": 1024,
+    "entropy_coefficient": 0.005,
+    "gamma": 0.995,
+    "gae_lambda": 0.95,
+    "bc_schedule": "0.1 * max(0, 1 - global_update / 4608); never restarted",
+    "bc_at_adaptation_start": 0.08888888888888889,
+    "bc_at_adaptation_end": 0,
+    "science_evaluations": [0, 32, 128, 256, 512, 1024, 2048, 4096]
+  },
+  "budget": {
+    "new_pretraining_jobs": 0,
+    "new_fixed_adaptation_jobs": 10,
+    "new_mutant_adaptation_jobs": 10,
+    "new_total_jobs": 20,
+    "transitions_per_job": 134217728,
+    "new_total_transitions": 2684354560,
+    "automatic_extension": false
+  },
+  "evaluation": {
+    "primary_view": {"policy": "mode", "start_family": "natural_reset"},
+    "primary_endpoint": "adaptation-relative update 4096 (global update 4608)",
+    "science_update_numbering": "adaptation-relative; update 0 is the loaded pretraining state after the goal switch and before any adaptation optimizer update",
+    "reported_views": {
+      "policies": ["mode", "sample"],
+      "start_families": ["natural_reset", "common_setup"],
+      "science_updates": [0, 32, 128, 256, 512, 1024, 2048, 4096]
+    },
+    "episodes_per_kernel_and_checkpoint": {
+      "mode": {"natural_reset": 32, "common_setup": 32, "total": 64},
+      "sample": {"natural_reset": 128, "common_setup": 128, "total": 256}
+    },
+    "episode_horizon": 128,
+    "primary_metric": "For the same condition and seed, evaluate both branches on the mutant validation kernel and compute U = violation_delivery_rate(mutant-adapted policy) - violation_delivery_rate(fixed-continued policy). Each rate denominator is all evaluation episodes in the named policy/start-family view.",
+    "primary_mechanism_contrast": "U_D-on - U_D-frozen",
+    "supporting_contrasts": ["U_D-frozen - U_D-off", "U_D-on - U_D-off"],
+    "normal_performance": ["success_rate", "mean_length", "mean_discounted_return"],
+    "realized_gain": "For the same mutant-adapted policy, mutant-kernel minus fixed-kernel success rate, length, and discounted return. Interpret length only together with success and return because an early failure can also be short.",
+    "teacher_trace": {
+      "policy": "mode",
+      "trained_variant": "mutant",
+      "evaluation_kernel": "mutant",
+      "split": "validation",
+      "start_families": ["natural_reset", "common_setup"],
+      "visited_action_states": ["MAKE_RECORD", "PACK_STORAGE", "REBUILD_EMPTY", "WITHDRAW_ONE"],
+      "conditions": ["D-off", "D-frozen", "D-on"],
+      "episodes_per_condition_and_seed": 64,
+      "state_sampling": "One deterministic mode rollout from each of the 32 natural_reset and 32 common_setup validation states; record every attempted target action and whether it changes state as required.",
+      "interpretation": "descriptive only; policy-dependent state visitation and temporal order do not establish a causal effect of teacher advice"
+    }
+  },
+  "statistics": {
+    "independent_unit": "learner seed",
+    "episode_count_is_not_a_replication_unit": true,
+    "seeds_are_reused": true,
+    "independent_replication_claim": false,
+    "report": [
+      "every seed point",
+      "paired condition contrasts",
+      "20,000-resample learner-seed bootstrap 95% percentile intervals",
+      "all completed learning failures"
+    ],
+    "bootstrap_seed": 20261006,
+    "bootstrap_pairing": "Resample the ten learner seeds; for every draw carry the complete paired condition and fixed/mutant branch tuple for the requested contrast.",
+    "decision_rule": "Report seed points, paired mean effects, and intervals. No equivalence or noninferiority margin was preregistered, so a confidence interval containing zero does not establish that conditions are equivalent.",
+    "technical_failure_rule": "Never impute or silently drop a missing or corrupt cell. Resume the same logical job from its declared rolling checkpoint and keep execution_complete=false until every paired cell validates."
+  },
+  "leakage_and_claim_audit": {
+    "checkpoint_pairing": "The intervention is applied after loading an identical pretraining checkpoint, which is deliberate pairing rather than test-set leakage.",
+    "baseline_timing": "D-on and D-off were produced under the earlier execution SHA while D-frozen is produced under the new execution SHA. Load-bearing PACK source hashes are required to remain identical and both SHAs are reported.",
+    "runtime_limit": "Matching load-bearing source hashes narrows but does not eliminate every possible runtime, dependency, driver, or wall-clock-period confound in the retrospective cross-SHA comparison.",
+    "fixture_and_scorer": "The environment, validation layouts, and exploitation oracle are internally constructed. The experiment supports a mechanism claim inside this fixture, not external or real-world generalization.",
+    "selection": "No seeds or conditions may be dropped based on interim outcome.",
+    "teacher_trace": "The trace is not an intervention and cannot by itself show that the teacher caused the policy action."
+  },
+  "storage": {
+    "run_root": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1",
+    "home_is_not_a_checkpoint_target": true,
+    "measured_checkpoint_bytes": 49568320,
+    "retained_final_checkpoint_count": 20,
+    "active_predecessor_successor_overlap_count": 1,
+    "log_and_evaluation_allowance_bytes": 1073741824,
+    "projected_remaining_write_bytes": 2114676544,
+    "safety_reserve_bytes": 8589934592,
+    "required_free_bytes": 10704611136,
+    "capacity_recheck": "before and after every job and at completion"
+  },
+  "excluded": [
+    "new pretraining",
+    "new random seeds",
+    "M or L policy widths",
+    "Transformer policies",
+    "8192-update extension",
+    "learning-rate sweep",
+    "mine curriculum changes",
+    "mutant mine training"
+  ],
+  "implementation": {
+    "runner": "scripts/run_pack_restore_pretrained_teacher_freeze.py",
+    "queue": "scripts/run_pack_restore_pretrained_teacher_freeze_queue.sh",
+    "watchdog": "scripts/run_pack_restore_pretrained_teacher_freeze_watchdog.sh",
+    "aggregator": "scripts/summarize_pack_restore_pretrained_teacher_freeze.py",
+    "teacher_trace": "scripts/trace_pack_restore_teacher_recommendations.py",
+    "mine_closeout": "scripts/evaluate_mine_return_retention.py",
+    "queue_concurrency": 1,
+    "claim_identity": ["PID", "Linux process start ticks", "unique run token", "host"],
+    "checkpoint_cadence": "Save adaptation update 0, every 256 updates, and every science evaluation; retain only the newest resumable checkpoint after its successor and any evaluation curve are complete, then retain the final update-4096 checkpoint.",
+    "capacity_failure_behavior": "Stop before the next checkpoint write when required free bytes are unavailable. Do not move a live tree; stop at a completed resumable checkpoint, copy and verify to a new RAID target, switch the path, confirm resume, and only then remove the source copy.",
+    "expected_outputs": {
+      "run_provenance": "{storage.run_root}/run_manifest.json",
+      "capacity_log": "{storage.run_root}/capacity_checks.json",
+      "mine_closeout": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_return_curriculum_v1/retention_return_near_evaluation.json",
+      "per_cell_summary": "{storage.run_root}/size_s/pack/dual_teacher_frozen/{fixed|mutant}/seed{30..39}/summary.json",
+      "per_cell_freeze_check": "{storage.run_root}/size_s/pack/dual_teacher_frozen/{fixed|mutant}/seed{30..39}/freeze_verification.json",
+      "teacher_trace": "{storage.run_root}/teacher_recommendations.json",
+      "final_result": "{storage.run_root}/result.json"
+    },
+    "completion_rule": "result.json must have execution_complete=true, no errors or missing curves, 480 validated curves (3 conditions x 10 seeds x 2 branches x 8 checkpoints), 20 passing freeze checks, and a validated teacher trace.",
+    "execution_command": "Set HACKRL_AUTHORIZED_EXECUTION_SHA to the committed execution SHA and HACKRL_AUTHORIZED_MANIFEST_SHA256 to this manifest's externally measured digest, then run bash scripts/run_pack_restore_pretrained_teacher_freeze_watchdog.sh.",
+    "authorization_integrity": "The manifest cannot contain its own stable digest. The queue therefore requires the manifest SHA-256 and execution Git SHA as external environment values and records both in run_manifest.json.",
+    "teacher_state_scope": "DualLeoState learning state is params, opt_state, batch_stats, and step. The network apply function and optimizer transform are static definitions; teacher shuffle consumes the PPO runner RNG and there is no separate mutable teacher RNG.",
+    "freeze_verification": "Each final D-frozen cell must exactly match its source teacher params, Adam state, BatchRenorm state, and step using canonical numeric PyTree hashes independent of host/device container representation.",
+    "execution_sources": [
+      "docs/manifests/pack_restore_pretrained_teacher_freeze_v1.json",
+      "scripts/run_pack_restore_pretrained_teacher_freeze.py",
+      "scripts/run_pack_restore_pretrained_teacher_freeze_queue.sh",
+      "scripts/run_pack_restore_pretrained_teacher_freeze_watchdog.sh",
+      "scripts/summarize_pack_restore_pretrained_teacher_freeze.py",
+      "scripts/trace_pack_restore_teacher_recommendations.py",
+      "scripts/evaluate_mine_return_retention.py",
+      "scripts/run_dual_leo_compare.py",
+      "src/hackrl/pack_restore.py",
+      "src/hackrl/pack_restore_gc.py",
+      "src/hackrl/dual_leo.py",
+      "src/hackrl/batch_renorm.py",
+      "src/hackrl/tick_claim.py",
+      "src/hackrl/tick_claim_gc.py",
+      "src/hackrl/tick_claim_oracle.py",
+      "src/hackrl/mine_expedition.py",
+      "src/hackrl/mine_expedition_env.py",
+      "src/hackrl/mine_expedition_ppo.py"
+    ]
+  },
+  "validation_evidence": {
+    "focused_cpu_tests": "31 passed across mine PPO, Dual LEO, original scale-contract, and new teacher-freeze-contract tests",
+    "source_checkpoint_contract": "All ten seed30-39 update-512 full-Dual checkpoints matched the predeclared fingerprints, arm, width, update, and 512x64 configuration.",
+    "real_gpu_smoke": {
+      "shape": "512 environments x 64 steps",
+      "source_seed": 30,
+      "global_update_before": 512,
+      "global_update_after": 513,
+      "learn_teacher_metric": 0,
+      "imitate_teacher_metric": 1,
+      "bc_policy_coef": 0.08888889104127884,
+      "compile_and_update_seconds": 9.757984520867467,
+      "teacher_params_adam_batchrenorm_and_step_canonical_hashes_identical": true
+    },
+    "teacher_trace_smoke": "Existing D-on seed30 final mutant policy produced 320 successful visited-state records spanning MAKE_RECORD, PACK_STORAGE, REBUILD_EMPTY, and WITHDRAW_ONE.",
+    "evidence_scope": "These are launch gates, not evidence that all 20 long runs, resume paths, or the final aggregate have completed."
+  },
+  "authorized_source_sha256": {
+    "scripts/run_pack_restore_pretrained_teacher_freeze.py": "c4f7004a31ebb836d70ec4ac3a65b2cef261fa017e1678eb224df9a50382d8d9",
+    "scripts/run_pack_restore_pretrained_teacher_freeze_queue.sh": "86cbc93574faa4ecb74a4365d08b1161604718bbe971962023a4110ef3bdec2a",
+    "scripts/run_pack_restore_pretrained_teacher_freeze_watchdog.sh": "543aa6da4edd229a27b9b3935212f39e5260899d4f3ea1ad5b43b108fe1fd3e4",
+    "scripts/summarize_pack_restore_pretrained_teacher_freeze.py": "b9e8339bf869442b8bd12a463e8e0bf60d09f89aa947cf8a51d69a5fd4fd24f3",
+    "scripts/trace_pack_restore_teacher_recommendations.py": "f46a1a98278319ad8ab4e49f9a19437e478f26b7c6e30b60d204e64ae7dd9b2a",
+    "scripts/evaluate_mine_return_retention.py": "896e1ae1d19e7a2506dd77cec899f22537692c053ed18a7c8b03f0a8ab3e6de9",
+    "scripts/run_dual_leo_compare.py": "3b6e607c202296352ac037a0fb4729141e589edb2a76143a488a261633da361e",
+    "src/hackrl/pack_restore.py": "22a393a56151925bfe1f4af062befbdbb219ba62d85e0c2e0a5c50bc6e10b677",
+    "src/hackrl/pack_restore_gc.py": "acdc23233e69ce98d87336e6080b4e505d69bd51f8da9d28e3fd6277c7ea0587",
+    "src/hackrl/dual_leo.py": "28b3f55b0b72f1ea0f949f880c3bd61ffccb36ce7ddb8bb1314652521f982695",
+    "src/hackrl/batch_renorm.py": "d116730d13dbb72ea046b779010224563f593f82ce30f61ddaba77eafe67590e",
+    "src/hackrl/tick_claim.py": "476acd94b9285d132fa06e455adc9f30a6efc50d3acbffba3df132ba38c4ca86",
+    "src/hackrl/tick_claim_gc.py": "2979cae96363b2acc0d8d8b933fccb27af77c93528e4b8123f140c942b357079",
+    "src/hackrl/tick_claim_oracle.py": "ffd4cd487d1d8dd950dd3827535337953bbf71542e98d9095a65e72d6b3b4aa0",
+    "src/hackrl/mine_expedition.py": "67874dda0c21249217e221d89f77596c39575c054b1e2081d0159af8a581c87c",
+    "src/hackrl/mine_expedition_env.py": "a704240a016f24533d1946af11494d5dd29ef9d27129959ad788c711681b7ccb",
+    "src/hackrl/mine_expedition_ppo.py": "70dd683ff5971a964c6855a94048a11d8a1534947614c4a49f682eafe9d8904b"
+  }
+}
