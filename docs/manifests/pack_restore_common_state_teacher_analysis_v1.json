@@ -1,0 +1,139 @@
+{
+  "schema_version": "hackrl_pack_restore_common_state_teacher_analysis_v1",
+  "manifest_id": "pack_restore_common_state_teacher_analysis_v1",
+  "status": "authorized_no_learning_analysis",
+  "authorization": {
+    "date": "2026-10-06",
+    "instruction": "Run a frozen same-state analysis of pretrained, D-off, D-frozen, and D-on teachers and policies. Do not add learning or reopen the mine study."
+  },
+  "question": "On exactly the same PACK-RESTORE observations and delivery goal, did adaptation change teacher action values and recommendations, policy action probabilities, state visitation, or more than one of these?",
+  "inputs": {
+    "teacher_freeze_run_root": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1",
+    "teacher_freeze_result": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/result.json",
+      "sha256": "2da51da872745ae7d59bb8690827610405ec59ba0ca3346daa401d9e404b68a6"
+    },
+    "prior_teacher_trace": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/teacher_recommendations.json",
+      "sha256": "f3eb797ea819fb750474dda8646f8e91686e2cb2772f74e00eab6616653db91d"
+    },
+    "teacher_freeze_run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/run_manifest.json",
+      "sha256": "c57b128d77f8f51aa2a8c3cf2cbfe9683388d0784ee1d89f00a1779aa7a09467"
+    },
+    "source_scale_run_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1",
+    "seeds": [30, 31, 32, 33, 34, 35, 36, 37, 38, 39],
+    "checkpoint_update": {
+      "pretrain": 512,
+      "D-off": "adaptation 4096 / global 4608",
+      "D-frozen": "adaptation 4096 / global 4608",
+      "D-on": "adaptation 4096 / global 4608"
+    }
+  },
+  "no_learning_contract": {
+    "training_or_optimizer_updates": 0,
+    "checkpoint_access": "read_only",
+    "checkpoint_immutability": "Hash every loaded state.msgpack before and after analysis and require equality.",
+    "excluded": [
+      "new rollouts for training",
+      "optimizer updates",
+      "new checkpoints",
+      "new seeds",
+      "model width changes",
+      "mine training or evaluation",
+      "causal intervention on teacher advice"
+    ]
+  },
+  "state_pool": {
+    "evaluation_kernel": "mutant",
+    "evaluation_split": "validation",
+    "policy": "deterministic mode",
+    "start_families": ["natural_reset", "common_setup"],
+    "episodes_per_source_policy_and_seed": 64,
+    "horizon": 128,
+    "goal": "delivery/count_ge_3",
+    "source_policies": ["pretrain", "D-off", "D-frozen", "D-on"],
+    "target_actions": ["MAKE_RECORD", "PACK_STORAGE", "REBUILD_EMPTY", "WITHDRAW_ONE"],
+    "same_state_definition": "Exact equality of the map_channels, numeric_features, and delivery-goal tensors presented to the models. This does not assert equality of unobserved latent environment state.",
+    "selection_rule": "At every active state, apply all four target actions in a side-effect-free mutant-kernel branch. Include the state when at least one action performs its declared stage transition, regardless of which action the source policy chose.",
+    "deduplication": "Within each learner seed, hash the exact map_channels, numeric_features, and delivery goal tensors and weight each distinct observation-goal once in the common-state analysis.",
+    "observation_alias_rule": "If the same observation-goal hash has different environment-semantic target eligibility across occurrences, exclude it from the primary same-state summary and report it as ambiguous.",
+    "visitation_rule": "Keep source-policy occurrence counts separate from the unique-observation common-state estimates. Report active-state opportunity rate, episode opportunity rate, and policy selection conditional on an opportunity, with learner-seed paired contrasts. States and episodes are descriptive, not independent replicates."
+  },
+  "cross_evaluation": {
+    "evaluators": ["pretrain", "D-off", "D-frozen", "D-on"],
+    "pairing": "For each learner seed, apply all four same-seed saved teachers and policies to every observation in that seed's pooled set.",
+    "teacher_outputs": [
+      "all 24 action Q values for delivery/count_ge_3",
+      "argmax recommendation",
+      "eligible target action Q minus best non-target-action Q"
+    ],
+    "policy_outputs": [
+      "all 24 action probabilities",
+      "mode action",
+      "eligible target action probability minus best non-target-action probability"
+    ],
+    "checkpoint_identity": "Require the exact same-seed checkpoint path, arm flags, variant, goal mode, update counters, and authenticated state hash. Pretraining checkpoints must match the recorded source fingerprint; final checkpoints must match the authenticated prior teacher trace.",
+    "normal_alternative_definition": "The highest-Q or highest-probability action outside the four target-stage actions. It is an operational comparator, not an externally certified optimal action.",
+    "argmax_tie_rule": "Use first-index argmax and separately report every observation with more than one exactly maximal teacher Q value or policy probability.",
+    "frozen_identity_gate": "On every pooled observation, including observations excluded as environment-semantically ambiguous, pretrain and D-frozen teacher Q arrays must be exactly identical for the same seed."
+  },
+  "statistics": {
+    "independent_unit": "learner seed",
+    "state_or_episode_is_not_a_replication_unit": true,
+    "within_seed_weighting": "Each unique exact observation-goal and eligible target-action pair receives equal weight.",
+    "report": [
+      "all per-state Q values and policy probabilities",
+      "seed-level action-specific means",
+      "paired teacher and policy contrasts",
+      "20,000-resample learner-seed bootstrap 95% percentile intervals",
+      "normalized source-policy visitation rates and paired learner-seed contrasts"
+    ],
+    "decision_rule": "Report seed points, means, paired differences, and intervals. No equivalence or minimum-effect threshold is declared; exact frozen identity is an implementation gate.",
+    "bootstrap_seed": 20261006,
+    "bootstrap_resamples": 20000
+  },
+  "leakage_audit": {
+    "selection_tautology": {
+      "risk": "Selecting only moments where a policy performed a target action conditions on the behavior being explained.",
+      "fix": "Select states by independent environment transition eligibility before considering policy choice or teacher recommendation."
+    },
+    "shared_pool_bias": {
+      "risk": "A state set drawn from only one condition can make that condition look uniquely competent.",
+      "fix": "Use the union of all four same-seed source-policy paths, cross-evaluate all checkpoints, and report visitation separately."
+    },
+    "wrong_null": {
+      "risk": "Calling the contrast Q-weight learning would ignore updated BatchRenorm statistics.",
+      "fix": "Interpret D-on versus pretrain or D-frozen as the effect of the complete teacher learning state, including Q parameters and BatchRenorm state."
+    },
+    "remaining_internal_ground_truth_limit": "Eligibility, target actions, environment, and goal are internally constructed. The analysis is a fixture-level mechanism diagnostic, not external validation or a causal intervention on advice."
+  },
+  "outputs": {
+    "result": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/common_state_teacher_analysis.json",
+    "exact_state_tensors": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/common_state_teacher_analysis_states.npz",
+    "tensor_round_trip_gate": "Reload the NPZ without pickle; require exact dtype and array equality and recompute every observation hash before publishing the JSON."
+  },
+  "storage": {
+    "filesystem": "/raid/ext_csv",
+    "minimum_free_space_before_write_bytes": 8589934592,
+    "home_is_not_an_output_target": true,
+    "checkpoint_writes": 0
+  },
+  "implementation": {
+    "script": "scripts/analyze_pack_restore_common_state_teachers.py",
+    "execution_sources": [
+      "docs/manifests/pack_restore_common_state_teacher_analysis_v1.json",
+      "scripts/analyze_pack_restore_common_state_teachers.py",
+      "scripts/run_pack_restore_pretrained_teacher_freeze.py",
+      "scripts/trace_pack_restore_teacher_recommendations.py",
+      "scripts/run_dual_leo_compare.py",
+      "src/hackrl/pack_restore.py",
+      "src/hackrl/pack_restore_gc.py",
+      "src/hackrl/dual_leo.py",
+      "src/hackrl/batch_renorm.py"
+    ],
+    "execution_integrity": "Commit the manifest and analysis code, pass the commit SHA and externally measured manifest SHA to the script, and require every execution source to match that commit byte-for-byte.",
+    "runtime_capture": "Record Python, JAX, NumPy, backend, x64 mode, and device identities in the result."
+  },
+  "claim_limit": "Different teacher recommendations or Q margins on identical inputs demonstrate a saved-output difference without state-selection confounding. They do not prove that advice caused policy behavior, and they do not isolate Q parameter updates from BatchRenorm-state updates."
+}
