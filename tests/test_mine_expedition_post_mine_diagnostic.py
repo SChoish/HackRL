@@ -27,6 +27,7 @@ def _empty_trace(steps=3, episodes=2):
     if steps > 1 and episodes > 0:
         before_camp_distance[1:, 0] = 0
         after_camp_distance[1:, 0] = 0
+        positions[1:, 0] = np.asarray((28, 3), dtype=np.int32)
     return {
         "active": np.ones((steps, episodes), dtype=bool),
         "action": scalar_int.copy(),
@@ -104,6 +105,7 @@ def test_final_step_arrival_is_not_classified_as_never_reached():
     trace = _empty_trace(steps=1, episodes=1)
     trace["before_camp_distance"][0, 0] = 1
     trace["after_camp_distance"][0, 0] = 0
+    trace["after_position"][0, 0] = np.asarray((28, 3), dtype=np.int32)
     trace["timeout"][0, 0] = True
     trace["done"][0, 0] = True
 

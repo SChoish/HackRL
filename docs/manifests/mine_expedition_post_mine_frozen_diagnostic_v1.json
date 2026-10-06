@@ -60,7 +60,7 @@
     "result": "24 passed, 1 dependency deprecation warning",
     "cold_read_fixes": [
       "success, return-event, and terminal-classification mismatches abort the diagnostic",
-      "camp arrival considers both sides of the final movement transition",
+      "camp arrival uses the kernel's camp-adjacency rule on both sides of the final movement transition",
       "episode counts, common RNG seeds, and horizon are read from and checked against this manifest",
       "full learner serialization is identical before and after evaluation"
     ]

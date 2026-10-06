@@ -25,6 +25,7 @@ import numpy as np
 from flax import serialization
 
 from hackrl.mine_expedition import (
+    CAMP_POSITION,
     TARGET_POSE,
     WORLD_HORIZON,
     MineExpeditionAction,
@@ -230,12 +231,15 @@ def _episode_metrics(trace, *, start_is_post_mine):
         mined_episode = np.ones_like(success, dtype=bool)
         first_mine = np.full_like(first_mine, -1)
     post_mine = active & (arrays["before_carried_target"] > 0)
+    camp_position = np.asarray(CAMP_POSITION, dtype=np.int32)
+    before_return_adjacent = (
+        np.abs(arrays["before_position"] - camp_position).sum(axis=-1) == 1
+    )
+    after_return_adjacent = (
+        np.abs(arrays["after_position"] - camp_position).sum(axis=-1) == 1
+    )
     reached_return_pose = (
-        post_mine
-        & (
-            (arrays["before_camp_distance"] == 0)
-            | (arrays["after_camp_distance"] == 0)
-        )
+        post_mine & (before_return_adjacent | after_return_adjacent)
     ).any(axis=0)
     return_attempt = (
         post_mine
@@ -243,7 +247,7 @@ def _episode_metrics(trace, *, start_is_post_mine):
     ).any(axis=0)
     legal_return_attempt = (
         post_mine
-        & (arrays["before_camp_distance"] == 0)
+        & before_return_adjacent
         & (arrays["action"] == int(MineExpeditionAction.RETURN_TARGET))
     ).any(axis=0)
     returned_event = arrays["returned"].astype(bool).any(axis=0)
