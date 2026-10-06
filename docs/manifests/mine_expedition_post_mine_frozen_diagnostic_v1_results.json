@@ -1,0 +1,115 @@
+{
+  "schema_version": "hackrl_mine_expedition_post_mine_frozen_result_summary_v1",
+  "diagnostic_id": "mine_expedition_post_mine_frozen_diagnostic_v1",
+  "status": "execution_complete",
+  "execution_complete": true,
+  "design_manifest": "docs/manifests/mine_expedition_post_mine_frozen_diagnostic_v1.json",
+  "diagnostic_execution_sha": "cafe45b695f1fea0ab42e6ebf66bd9bf77a6bbb9",
+  "checkpoint_execution_sha": "8477e4ea63ada6d7a8e9adfe52086a69f3bd07a2",
+  "measured_utc": "2026-10-06T02:14:52Z",
+  "canonical_mining_transition": {
+    "target_remaining": [1, 0],
+    "carried_target": [0, 1],
+    "public_carried_target_feature": [0.0, 0.5],
+    "public_target_channel_sum": [1.0, 0.0],
+    "privileged_task_distance": [0, 47],
+    "reward": 0.032350003719329834,
+    "done": false,
+    "success": false,
+    "timeout": false,
+    "gae_nonterminal_mask": 1.0,
+    "interpretation": "Mining switches the shaping objective and public observation to return mode without terminating or masking the transition."
+  },
+  "learning_and_scoring_contract": {
+    "action_count": 24,
+    "action_mask_present": false,
+    "training_transition_valid_mask_present": false,
+    "bootstrap_mask": "1 - done",
+    "success_state_mismatch_steps": 0,
+    "return_event_mismatch_steps": 0,
+    "terminal_classification_mismatch_steps": 0,
+    "all_six_learner_states_byte_identical_after_evaluation": true,
+    "learning_contract_scope": "The mask fields describe the fixed PPO implementation at the recorded source hashes; they are not an independent measurement from checkpoint tensors."
+  },
+  "frozen_policy_findings": {
+    "craft_ready_seed40_unqualified": {
+      "phase_start_sample": {
+        "episodes": 128,
+        "mined": 103,
+        "succeeded": 0,
+        "timed_out": 128,
+        "reached_camp_adjacent_after_mining": 0,
+        "mean_mine_tick": 83.12621359223301,
+        "mean_ticks_remaining_after_mine": 172.873786407767
+      },
+      "canonical_post_mine_mode": "DO for all 255 active steps at the target pose, then timeout",
+      "canonical_post_mine_sample": {
+        "succeeded": 0,
+        "reached_camp_adjacent": 0,
+        "timed_out": 128
+      }
+    },
+    "craft_ready_seed41_unqualified": {
+      "phase_start_sample": {
+        "episodes": 128,
+        "mined": 128,
+        "succeeded": 0,
+        "timed_out": 128,
+        "reached_camp_adjacent_after_mining": 0,
+        "mean_mine_tick": 46.7734375,
+        "mean_ticks_remaining_after_mine": 209.2265625
+      },
+      "canonical_post_mine_mode": "DOWN for all 255 active steps; stops progressing at position [14, 26], then timeout",
+      "canonical_post_mine_sample": {
+        "succeeded": 0,
+        "reached_camp_adjacent": 0,
+        "timed_out": 128
+      }
+    },
+    "craft_ready_seed42_qualified": {
+      "phase_start_mode_success": true,
+      "phase_start_sample_successes": 128,
+      "canonical_post_mine_mode_success": true,
+      "canonical_post_mine_sample_successes": 128
+    },
+    "target_ready_seed40_qualified": {
+      "phase_start_mode_success": true,
+      "phase_start_sample_successes": 128,
+      "canonical_post_mine_mode_success": true,
+      "canonical_post_mine_sample_successes": 128
+    },
+    "target_ready_seed41_qualified": {
+      "phase_start_mode_success": true,
+      "phase_start_sample_successes": 128,
+      "canonical_post_mine_mode_success": true,
+      "canonical_post_mine_sample_successes": 128
+    },
+    "target_ready_seed42_unqualified": {
+      "phase_start_mode": "DO for all 255 post-mine active steps at the target pose, then timeout",
+      "phase_start_sample": {
+        "episodes": 128,
+        "mined": 128,
+        "succeeded": 2,
+        "timed_out": 126,
+        "reached_camp_adjacent": 11,
+        "legal_return_actions": 2,
+        "failed_without_reaching_camp_adjacent": 117,
+        "reached_camp_adjacent_but_no_legal_return": 9,
+        "mean_mine_tick": 1.0,
+        "mean_ticks_remaining_after_mine": 255.0
+      }
+    }
+  },
+  "conclusion": {
+    "tested_implementation_fault_found": false,
+    "tested_implementation_fault_scope": "Goal switching and observation changes at mining, PPO terminal masking, success/return/terminal agreement, camp-adjacency classification, and frozen learner-state immutability.",
+    "primary_observed_failure": "Frozen failed policies usually do not execute a return route after mining; their modal behavior loops on DO or one blocked movement direction until timeout.",
+    "secondary_observed_failure": "In target-ready seed 42 stochastic evaluation, 9 of 126 failed episodes reached a legal camp-adjacent return position but did not take a legal RETURN_TARGET action.",
+    "horizon_interpretation": "Failures terminate at the 256-tick horizon. Across the three unqualified phase-start samples, observed mining left 109 to 255 ticks; the canonical post-mine state has task distance 47. This makes immediate horizon exhaustion at mining implausible, but does not prove the horizon is irrelevant to inefficient trajectories.",
+    "sampling_limit": "The 128 sample episodes per frozen checkpoint are evaluation replications, not independent training seeds. Common episode action-draw keys are reused across policies within each start, so counts such as 128/128 are not seed replication.",
+    "claim_limit": "This supports a return-navigation and occasional final-action learning failure in these frozen policies. It does not establish a unique underlying optimization cause or explain the entire natural-start failure."
+  },
+  "raw_result": "/raid/ext_csv/HackRL/runs/mine_expedition_post_mine_frozen_diagnostic_v1/result.json",
+  "mutant_training_authorized": false,
+  "additional_training_performed": false
+}
