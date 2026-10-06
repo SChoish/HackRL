@@ -299,7 +299,7 @@ def _verify_delivery_only_teacher(log_dir, job):
         jax.device_get(final_teacher.params["q_output"]["bias"])
     ).reshape((NUM_GOALS, NUM_ACTIONS))
     non_delivery = np.arange(NUM_GOALS) != DELIVER_3_GOAL_INDEX
-    expected_step_delta = (
+    scheduled_step_delta = (
         ADAPT_UPDATES
         * (branch.batch_size // LEO_MINIBATCH_SIZE)
         * LEO_EPOCHS
@@ -309,7 +309,13 @@ def _verify_delivery_only_teacher(log_dir, job):
         for line in (cell / "updates.jsonl").read_text(encoding="utf-8").splitlines()
         if line.strip()
     ]
-    target_metrics_valid = bool(log_rows) and all(
+    summary = json.loads((cell / "summary.json").read_text(encoding="utf-8"))
+    applied_step_delta = sum(
+        int(row.get("teacher_applied_minibatches", -scheduled_step_delta))
+        for row in log_rows
+    )
+    observed_step_delta = final_digest["step"] - source_digest["step"]
+    target_metrics_valid = len(log_rows) == ADAPT_UPDATES and all(
         int(row.get("teacher_target_head_count", -1)) == 1
         and int(row.get("teacher_target_terms", -1))
         == int(row.get("teacher_valid_samples", -2))
@@ -318,8 +324,15 @@ def _verify_delivery_only_teacher(log_dir, job):
     checks = {
         "arm_exact": recorded_arm == DELIVERY_ONLY_ARM,
         "teacher_state_changed": source_digest != final_digest,
-        "teacher_step_delta_exact": (
-            final_digest["step"] - source_digest["step"] == expected_step_delta
+        "teacher_step_delta_matches_applied_log": (
+            observed_step_delta == applied_step_delta
+        ),
+        "teacher_step_delta_positive_and_within_schedule": (
+            0 < observed_step_delta <= scheduled_step_delta
+        ),
+        "summary_matches_final_teacher_step": (
+            int(summary.get("teacher_applied_grad_steps", -1))
+            == final_digest["step"]
         ),
         "delivery_output_changed": (
             not np.array_equal(
@@ -347,7 +360,9 @@ def _verify_delivery_only_teacher(log_dir, job):
             "sum selected-head half-squared TD errors per valid transition; "
             "the delivery head contribution keeps the baseline per-transition scale"
         ),
-        "expected_teacher_step_delta": expected_step_delta,
+        "scheduled_teacher_step_delta": scheduled_step_delta,
+        "applied_teacher_step_delta_from_log": applied_step_delta,
+        "observed_teacher_step_delta": observed_step_delta,
         "update_log_rows": len(log_rows),
         "optimizer_state_inherited_from_multi_goal_pretraining": True,
         "non_delivery_output_parameter_drift": {

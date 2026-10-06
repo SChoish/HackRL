@@ -3,7 +3,7 @@
     "scripts/analyze_pack_restore_common_state_teachers.py": "6a545d90921f7692eb3bbfa14da45902d426dc6568f2bad63393bdc0a9e03032",
     "scripts/audit_pack_restore_teacher_evaluation.py": "7f9abd1dd2ab30dac498dc98bb83ede210a9c070e4f36634c55f0f6c35dff925",
     "scripts/run_dual_leo_compare.py": "0b57854ebd86de7f1ca1bcac483db2e025c78437d3e00d08bd60198820612351",
-    "scripts/run_pack_restore_delivery_only_teacher.py": "39bf69d7d0e18f9bc01e90e50fedcc984b9a1e3e2c1f87e22ff07910b0defcb9",
+    "scripts/run_pack_restore_delivery_only_teacher.py": "938fa87eef23053825d58a573900faf3d007b841fe2505406975ed6c5e8b964d",
     "scripts/run_pack_restore_delivery_only_teacher_queue.sh": "b9fc5cfbfc1caca44126882cd2fb6d94f22a1646f3ba8f0ecd1fe30de6d0d42b",
     "scripts/run_pack_restore_delivery_only_teacher_watchdog.sh": "eeba90e97c685e3eb8afae229b41d51f0baa925ae9c7f1b3231bbe70329398e0",
     "scripts/run_pack_restore_pretrained_teacher_freeze.py": "c4f7004a31ebb836d70ec4ac3a65b2cef261fa017e1678eb224df9a50382d8d9",
@@ -234,5 +234,10 @@
     "During adaptation, keep PPO and BC unchanged and update the teacher from only the delivery goal TD target while retaining the full 12-head teacher architecture.",
     "Compare the new D-delivery condition with the existing D-on condition using paired learner seeds.",
     "Prepare but do not train GRU, Transformer, or a movement-collision bug in this cycle."
-  ]
+  ],
+  "verification_correction": {
+    "contract": "Final teacher step delta equals the sum of applied teacher minibatches in updates.jsonl and does not exceed the scheduled count.",
+    "reason": "Teacher minibatches with zero valid samples are intentionally skipped.",
+    "validated_against_failed_gate_artifact": "pack-s-d-delivery-s30-fixed at update 4096"
+  }
 }
