@@ -1,0 +1,116 @@
+{
+  "schema_version": "hackrl_mine_expedition_fixed_curriculum_diagnostic_result_v1",
+  "diagnostic_id": "mine_expedition_fixed_curriculum_diagnostic_v1",
+  "status": "execution_complete_fallback_localized",
+  "execution_complete": true,
+  "design_manifest": "docs/manifests/mine_expedition_fixed_curriculum_diagnostic_v1.json",
+  "execution_code_sha": "8477e4ea63ada6d7a8e9adfe52086a69f3bd07a2",
+  "server_entrypoint_sha": "cb9c7c1df7891ce505b69fed5bde30e06db4d97e",
+  "timing": {
+    "started_utc": "2026-10-06T00:11:48Z",
+    "completed_utc": "2026-10-06T00:18:04Z",
+    "started_kst": "2026-10-06T09:11:48+09:00",
+    "completed_kst": "2026-10-06T09:18:04+09:00",
+    "wall_seconds": 376
+  },
+  "preflight": {
+    "authorized_source_hashes_verified": 14,
+    "cpu_tests": "32 passed, 1 dependency deprecation warning",
+    "gpu_checkpoint_transfer_smoke": "1 passed, 1 dependency deprecation warning",
+    "jax_backend": "gpu",
+    "device": "cuda:0"
+  },
+  "stage_a_craft_ready": {
+    "status": "fallback",
+    "execution_complete": true,
+    "qualified_seeds": [42],
+    "advance_rule_required_qualified_seeds": 2,
+    "qualification_rule": "For each seed, final-128-update completed-success fraction >= 0.8 and positive crafted-pickaxe, mined-target, and returned-target counts.",
+    "final_128_update_rollouts": {
+      "40": {
+        "completed_episodes": 4096,
+        "completed_successes": 0,
+        "success_fraction": 0.0,
+        "crafted_pickaxes": 4095,
+        "mined_targets": 1274,
+        "returned_targets": 0
+      },
+      "41": {
+        "completed_episodes": 4096,
+        "completed_successes": 0,
+        "success_fraction": 0.0,
+        "crafted_pickaxes": 4095,
+        "mined_targets": 3855,
+        "returned_targets": 0
+      },
+      "42": {
+        "completed_episodes": 11284,
+        "completed_successes": 11258,
+        "success_fraction": 0.9976958525345622,
+        "crafted_pickaxes": 11282,
+        "mined_targets": 11283,
+        "returned_targets": 11258
+      }
+    },
+    "interpretation": "The craft-ready suffix was not reproducibly learned: two seeds learned crafting and some mining but recorded no returns, while one seed learned the full suffix. The predeclared natural-late phase was therefore not run."
+  },
+  "fallback_target_ready": {
+    "status": "localized",
+    "execution_complete": true,
+    "qualified_seeds": [40, 41],
+    "localization_rule_required_qualified_seeds": 2,
+    "qualification_rule": "For each seed, final-128-update completed-success fraction >= 0.8 and positive mined-target and returned-target counts.",
+    "final_128_update_rollouts": {
+      "40": {
+        "completed_episodes": 20295,
+        "completed_successes": 20293,
+        "success_fraction": 0.9999014535599902,
+        "mined_targets": 20293,
+        "returned_targets": 20293
+      },
+      "41": {
+        "completed_episodes": 21213,
+        "completed_successes": 21209,
+        "success_fraction": 0.9998114363833498,
+        "mined_targets": 21212,
+        "returned_targets": 21209
+      },
+      "42": {
+        "completed_episodes": 4096,
+        "completed_successes": 0,
+        "success_fraction": 0.0,
+        "mined_targets": 4094,
+        "returned_targets": 0
+      }
+    },
+    "interpretation": "Mining-and-return was learned in two of three target-ready seeds, while the remaining seed mined but did not return. This shows that the suffix can be learned but does not identify a dominant causal bottleneck. This fallback is not a natural-start learnability pass."
+  },
+  "natural_start_gate": {
+    "evaluated_only_from_original_natural_start": true,
+    "mode_evaluation_episodes_per_seed": 1,
+    "sample_evaluation_episodes_per_seed": 128,
+    "evaluation_protocol": "Frozen final policy; mode uses deterministic modal actions and sample draws stochastic policy actions, with horizon 256.",
+    "mode_success_rate_by_seed": {"40": 0.0, "41": 0.0, "42": 0.0},
+    "sample_success_rate_by_seed": {"40": 0.0, "41": 0.0, "42": 0.0},
+    "fixed_natural_gate_passed": false,
+    "mutant_training_authorized": false
+  },
+  "storage": {
+    "run_root": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1",
+    "final_run_bytes": 578458476,
+    "launch_projected_remaining_bytes": 1369718382,
+    "launch_safety_reserve_bytes": 8589934592,
+    "launch_required_available_bytes": 9959652974,
+    "minimum_checkpoint_record_raid_free_bytes": 7089973252096,
+    "capacity_records_per_seed_per_phase": 12,
+    "home_available_bytes_after_run": 25005932544,
+    "raid_available_bytes_after_run": 7089941147648
+  },
+  "artifacts": {
+    "result": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1/diagnostic_result.json",
+    "stage_a_result": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1/stage_a_result.json",
+    "queue_log": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1/queue.log"
+  },
+  "executed_route": ["stage_a_craft_ready", "fallback_target_ready"],
+  "conclusion": "The fixed task remains unlearned from the natural start under this diagnostic. The target-ready fallback shows that mining-and-return is learnable in two of three seeds, while the craft-ready suffix was not reproducibly learned because two seeds failed to return after crafting and mining. The mutant gate remains closed."
+}
