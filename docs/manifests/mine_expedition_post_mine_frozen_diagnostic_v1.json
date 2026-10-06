@@ -1,0 +1,69 @@
+{
+  "schema_version": "hackrl_mine_expedition_post_mine_frozen_diagnostic_v1",
+  "diagnostic_id": "mine_expedition_post_mine_frozen_diagnostic_v1",
+  "status": "implementation_validated_execution_authorized",
+  "understood_as": "Freeze the six final fixed-policy checkpoints from the completed craft-ready and target-ready diagnostic. Compare qualified and unqualified policies within the same exact start state, then compare all policies from one canonical post-mine state. Inspect goal switching, PPO terminal masking, return navigation, delivery action, horizon exhaustion, and success/event agreement. Do not train, add curriculum starts, change rewards, or open mutant work.",
+  "source_result": "docs/manifests/mine_expedition_fixed_curriculum_diagnostic_v1_results.json",
+  "provenance": {
+    "runner": "scripts/diagnose_mine_expedition_post_mine.py",
+    "tests": "tests/test_mine_expedition_post_mine_diagnostic.py",
+    "kernel": "src/hackrl/mine_expedition.py",
+    "environment": "src/hackrl/mine_expedition_env.py",
+    "learner": "src/hackrl/mine_expedition_ppo.py"
+  },
+  "execution_code_sha_of_checkpoints": "8477e4ea63ada6d7a8e9adfe52086a69f3bd07a2",
+  "checkpoint_groups": {
+    "craft_ready": {
+      "directory": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1/stage_a",
+      "qualified_seeds": [42],
+      "unqualified_seeds": [40, 41]
+    },
+    "target_ready": {
+      "directory": "/raid/ext_csv/HackRL/runs/mine_expedition_fixed_curriculum_diagnostic_v1/fallback",
+      "qualified_seeds": [40, 41],
+      "unqualified_seeds": [42]
+    }
+  },
+  "frozen_evaluation": {
+    "kernel": "fixed",
+    "phase_start_mode_episodes_per_checkpoint": 1,
+    "phase_start_sample_episodes_per_checkpoint": 128,
+    "canonical_post_mine_mode_episodes_per_checkpoint": 1,
+    "canonical_post_mine_sample_episodes_per_checkpoint": 128,
+    "sample_randomness": "Common episode action-draw keys across policies within each start; no learner-seed offset.",
+    "mode_action_seed": 61000,
+    "sample_action_seed": 62000,
+    "horizon": 256,
+    "policy_mutation_check": "Serialize learner state before and after evaluation and require byte identity."
+  },
+  "canonical_post_mine_state": "Apply DO once in the fixed kernel to the exact target-ready reset. Require target_remaining=0, carried_target=1, returned_target=0, done=false, success=false, timeout=false, and tick=1.",
+  "questions": [
+    "Does the privileged shaping goal switch from the target to camp after mining, and does the public observation expose carried target while removing the remaining target?",
+    "Does the mining transition remain nonterminal so PPO GAE bootstraps and learns from later return outcomes?",
+    "After mining, does each policy approach the camp return pose, reach it without RETURN_TARGET, or time out before reaching it?",
+    "How much horizon remains at mining, and what minimum camp distance is reached afterward?",
+    "For every evaluated transition, does returned-target increase agree with success and terminal classification?"
+  ],
+  "claim_limits": [
+    "Checkpoint qualification labels come from the completed training-rollout adjudication and are not recomputed from these traces.",
+    "The deterministic map and project-internal kernel/scorer are reused; this diagnoses these policies and does not establish generalization or a unique causal mechanism.",
+    "Sample episodes are evaluation replications, not independent training seeds."
+  ],
+  "prohibited": [
+    "optimizer updates",
+    "new training starts or curriculum changes",
+    "reward, map, or horizon changes",
+    "mutant training"
+  ],
+  "implementation_validation": {
+    "command": "JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python -m pytest -q tests/test_mine_expedition_post_mine_diagnostic.py tests/test_mine_expedition_env.py tests/test_mine_expedition_ppo.py",
+    "result": "24 passed, 1 dependency deprecation warning",
+    "cold_read_fixes": [
+      "success, return-event, and terminal-classification mismatches abort the diagnostic",
+      "camp arrival considers both sides of the final movement transition",
+      "episode counts, common RNG seeds, and horizon are read from and checked against this manifest",
+      "full learner serialization is identical before and after evaluation"
+    ]
+  },
+  "output_root": "/raid/ext_csv/HackRL/runs/mine_expedition_post_mine_frozen_diagnostic_v1"
+}
