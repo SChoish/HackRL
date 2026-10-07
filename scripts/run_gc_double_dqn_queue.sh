@@ -11,18 +11,23 @@ case "$MODE" in
     RUN_ROOT=/raid/ext_csv/HackRL/runs/gc_double_dqn_development_v1
     EXTRA=(--development)
     ;;
+  development-replay262k)
+    RUN_ROOT=/raid/ext_csv/HackRL/runs/gc_double_dqn_development_replay262k_v1
+    EXTRA=(--development --development-profile replay262k)
+    ;;
   main)
     RUN_ROOT=/raid/ext_csv/HackRL/runs/gc_double_dqn_two_defects_v1
     EXTRA=()
     ;;
   *)
-    printf 'usage: %s [development|main]\n' "$0" >&2
+    printf 'usage: %s [development|development-replay262k|main]\n' "$0" >&2
     exit 64
     ;;
 esac
 
 SOURCES=(
   docs/manifests/gc_double_dqn_two_defects_v1.json
+  docs/manifests/gc_double_dqn_replay262k_development_v1.json
   scripts/evaluate_dual_teacher_greedy.py
   scripts/run_gc_double_dqn.py
   scripts/run_gc_double_dqn_queue.sh

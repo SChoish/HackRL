@@ -67,6 +67,47 @@ def test_replay_and_gradient_contract_records_compute_separately():
 
 
 
+def test_replay262k_profile_changes_only_replay_and_storage_contract():
+    baseline = dict(RUNNER.ALGORITHM_CONFIG)
+    try:
+        RUNNER._configure_development_profile("replay262k")
+        changed = dict(RUNNER.ALGORITHM_CONFIG)
+        assert changed["replay_capacity"] == 262_144
+        assert changed["development_profile"] == "replay262k"
+        assert RUNNER.ESTIMATED_FULL_CHECKPOINT_BYTES == 2 * 1024**3
+        assert (
+            RUNNER.DEVELOPMENT_RUN_ID
+            == "gc_double_dqn_development_replay262k_v1"
+        )
+        assert RUNNER.DEVELOPMENT_RUN_ROOT.is_relative_to(
+            Path("/raid/ext_csv")
+        )
+        for key, value in baseline.items():
+            if key == "replay_capacity":
+                continue
+            assert changed[key] == value
+        manifest = json.loads(
+            (
+                REPOSITORY
+                / "docs/manifests/gc_double_dqn_replay262k_development_v1.json"
+            ).read_text(encoding="utf-8")
+        )
+        assert manifest["single_change"]["candidate"] == RUNNER.REPLAY_CAPACITY
+        storage = manifest["storage"]
+        assert (
+            storage["estimated_full_checkpoint_bytes"]
+            == RUNNER.ESTIMATED_FULL_CHECKPOINT_BYTES
+        )
+        assert (
+            storage["projected_peak_write_bytes"]
+            == RUNNER.PROJECTED_PEAK_WRITE_BYTES
+        )
+        assert storage["safety_reserve_bytes"] == RUNNER.SAFETY_RESERVE_BYTES
+        assert storage["required_free_bytes"] == RUNNER.REQUIRED_FREE_BYTES
+    finally:
+        RUNNER._configure_development_profile("baseline")
+
+
 def test_storage_forecast_keeps_raid_reserve():
     assert RUNNER.DEFAULT_RUN_ROOT.is_relative_to(Path("/raid/ext_csv"))
     assert RUNNER.RETAINED_FULL_CHECKPOINTS == 18

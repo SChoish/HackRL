@@ -1,0 +1,75 @@
+{
+  "schema_version": "hackrl_gc_double_dqn_development_profile_v1",
+  "manifest_id": "gc_double_dqn_replay262k_development_v1",
+  "status": "gpu_smoke_validated_normal_only_development_gate_pending",
+  "parent_experiment": "docs/manifests/gc_double_dqn_two_defects_v1.json",
+  "triggering_result": "docs/manifests/gc_double_dqn_two_defects_v1_results.json",
+  "question": "Does retaining eight rollouts instead of two allow the independently trained Double DQN to learn fixed normal delivery?",
+  "selection_scope": {
+    "learner_seed": 100,
+    "environments": ["TICK-CLAIM", "PACK-RESTORE"],
+    "kernel": "fixed",
+    "goals": "existing workshop12 sampler",
+    "updates": 512,
+    "num_envs": 512,
+    "steps_per_update": 64,
+    "normal_success_only": true,
+    "bug_exploitation_used_for_selection": false
+  },
+  "single_change": {
+    "field": "replay_capacity",
+    "baseline": 65536,
+    "candidate": 262144,
+    "retained_generated_rollouts": 8
+  },
+  "held_fixed": [
+    "Q architecture and hidden size",
+    "learning rate",
+    "epsilon schedule",
+    "discount",
+    "batch size",
+    "gradient steps per rollout",
+    "target update interval",
+    "normal-task transition budget",
+    "evaluation starts and gate threshold"
+  ],
+  "gate": {
+    "natural_reset_success_threshold": 0.9,
+    "common_setup_success_threshold": 0.9,
+    "required_in_each_environment": true,
+    "automatic_extension": false,
+    "automatic_main_launch": false
+  },
+  "storage": {
+    "run_root": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_replay262k_v1",
+    "estimated_full_checkpoint_bytes": 2147483648,
+    "conservative_retained_checkpoint_count": 18,
+    "projected_retained_bytes": 38654705664,
+    "projected_active_predecessor_successor_overlap_bytes": 4294967296,
+    "log_and_evaluation_allowance_bytes": 2147483648,
+    "projected_peak_write_bytes": 45097156608,
+    "safety_reserve_bytes": 9019431322,
+    "required_free_bytes": 54116587930,
+    "chosen_filesystem": "/raid/ext_csv"
+  },
+  "gpu_smoke": {
+    "passed": true,
+    "shape": "512 environments x 64 steps",
+    "replay_capacity": 262144,
+    "gradient_steps_per_environment_update": 32,
+    "tick_elapsed_seconds": 10.161460319533944,
+    "pack_elapsed_seconds": 9.28405821043998,
+    "jax_preallocation_disabled": true,
+    "external_gpu_keepalive_was_not_modified": true
+  },
+  "operation": {
+    "command": "bash scripts/run_gc_double_dqn_queue.sh development-replay262k",
+    "result": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_replay262k_v1/development_gate.json",
+    "baseline_artifacts_are_immutable": true
+  },
+  "interpretation_limits": [
+    "A passing single development seed selects a candidate configuration; it is not scientific replication.",
+    "A failure leaves defect exploitation unresolved.",
+    "The final replay is a bounded window and cannot establish the absence of earlier delivery experience."
+  ]
+}

@@ -39,14 +39,18 @@ SCIENCE_UPDATES = (0, 32, 128, 256, 512, 1024, 2048, 4096)
 ROLLING_INTERVAL = 256
 RUN_ID = "gc_double_dqn_two_defects_v1"
 DEFAULT_RUN_ROOT = Path("/raid/ext_csv/HackRL/runs") / RUN_ID
-DEVELOPMENT_RUN_ROOT = Path(
-    "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_v1"
+BASELINE_DEVELOPMENT_RUN_ID = "gc_double_dqn_development_v1"
+REPLAY262K_DEVELOPMENT_RUN_ID = (
+    "gc_double_dqn_development_replay262k_v1"
 )
+DEVELOPMENT_RUN_ID = BASELINE_DEVELOPMENT_RUN_ID
+DEVELOPMENT_RUN_ROOT = Path("/raid/ext_csv/HackRL/runs") / DEVELOPMENT_RUN_ID
 DEVELOPMENT_SUCCESS_THRESHOLD = 0.9
 REPOSITORY = Path(__file__).resolve().parents[1]
 HOME_LINK = REPOSITORY / "runs" / RUN_ID
 EXECUTION_SOURCES = (
     "docs/manifests/gc_double_dqn_two_defects_v1.json",
+    "docs/manifests/gc_double_dqn_replay262k_development_v1.json",
     "scripts/evaluate_dual_teacher_greedy.py",
     "scripts/run_gc_double_dqn.py",
     "scripts/run_gc_double_dqn_queue.sh",
@@ -119,6 +123,60 @@ ALGORITHM_CONFIG = {
     "epsilon_decay_transitions": EPSILON_DECAY_TRANSITIONS,
     "epsilon_after_pretraining": EPSILON_END,
 }
+
+
+def _configure_development_profile(profile):
+    """Select one preregistered normal-only development configuration."""
+
+    global REPLAY_CAPACITY
+    global ESTIMATED_FULL_CHECKPOINT_BYTES
+    global PROJECTED_RETAINED_BYTES
+    global PROJECTED_ACTIVE_OVERLAP_BYTES
+    global PROJECTED_PEAK_WRITE_BYTES
+    global SAFETY_RESERVE_BYTES
+    global REQUIRED_FREE_BYTES
+    global ALGORITHM_CONFIG
+    global DEVELOPMENT_RUN_ID
+    global DEVELOPMENT_RUN_ROOT
+
+    if profile == "baseline":
+        replay_capacity = 65_536
+        estimated_checkpoint_bytes = 512 * 1024**2
+        development_run_id = BASELINE_DEVELOPMENT_RUN_ID
+    elif profile == "replay262k":
+        replay_capacity = 262_144
+        estimated_checkpoint_bytes = 2 * 1024**3
+        development_run_id = REPLAY262K_DEVELOPMENT_RUN_ID
+    else:
+        raise ValueError(f"unknown development profile: {profile}")
+
+    REPLAY_CAPACITY = replay_capacity
+    ESTIMATED_FULL_CHECKPOINT_BYTES = estimated_checkpoint_bytes
+    PROJECTED_RETAINED_BYTES = (
+        RETAINED_FULL_CHECKPOINTS * ESTIMATED_FULL_CHECKPOINT_BYTES
+    )
+    PROJECTED_ACTIVE_OVERLAP_BYTES = 2 * ESTIMATED_FULL_CHECKPOINT_BYTES
+    PROJECTED_PEAK_WRITE_BYTES = (
+        PROJECTED_RETAINED_BYTES
+        + PROJECTED_ACTIVE_OVERLAP_BYTES
+        + LOG_AND_EVALUATION_ALLOWANCE_BYTES
+    )
+    SAFETY_RESERVE_BYTES = max(
+        8 * 1024**3, int(np.ceil(0.2 * PROJECTED_PEAK_WRITE_BYTES))
+    )
+    REQUIRED_FREE_BYTES = PROJECTED_PEAK_WRITE_BYTES + SAFETY_RESERVE_BYTES
+    ALGORITHM_CONFIG = {
+        key: value
+        for key, value in ALGORITHM_CONFIG.items()
+        if key != "development_profile"
+    }
+    ALGORITHM_CONFIG["replay_capacity"] = REPLAY_CAPACITY
+    if profile != "baseline":
+        ALGORITHM_CONFIG["development_profile"] = profile
+    DEVELOPMENT_RUN_ID = development_run_id
+    DEVELOPMENT_RUN_ROOT = (
+        Path("/raid/ext_csv/HackRL/runs") / DEVELOPMENT_RUN_ID
+    )
 
 
 class GreedyQPolicy:
@@ -772,7 +830,7 @@ def _prepare_run_root(run_root, *, mode):
         text=True,
     ).strip()
     if mode == "development":
-        contract_run_id = "gc_double_dqn_development_v1"
+        contract_run_id = DEVELOPMENT_RUN_ID
         contract_jobs = [
             job
             for job in build_jobs((DEVELOPMENT_SEED,))
@@ -1189,7 +1247,15 @@ def main():
     parser.add_argument("--job")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--development", action="store_true")
+    parser.add_argument(
+        "--development-profile",
+        choices=("baseline", "replay262k"),
+        default="baseline",
+    )
     arguments = parser.parse_args()
+    if arguments.development_profile != "baseline" and not arguments.development:
+        parser.error("non-baseline profiles are development-only")
+    _configure_development_profile(arguments.development_profile)
     if arguments.smoke:
         result = smoke()
         print(json.dumps({"smoke": result}, indent=2, sort_keys=True))
