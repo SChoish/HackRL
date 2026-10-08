@@ -25,7 +25,7 @@ def test_corrected_rerun_changes_no_candidate_seed_or_budget_contract():
 def test_corrected_rerun_isolated_on_raid_and_waits_for_fresh_smoke():
     rerun = _load(RERUN)
     execution = rerun["execution"]
-    assert rerun["status"] == "authorized_waiting_for_post_fix_smoke"
+    assert rerun["status"] == "authorized_ready_to_execute"
     assert execution["run_root"].startswith("/raid/ext_csv/HackRL/runs/")
     assert execution["clean_worktree_root"].startswith(
         "/raid/ext_csv/HackRL/worktrees/"
@@ -37,7 +37,7 @@ def test_corrected_rerun_isolated_on_raid_and_waits_for_fresh_smoke():
 
 def test_post_fix_smoke_requires_full_shape_and_seen_goal_expansion():
     smoke = _load(SMOKE)
-    assert smoke["status"] == "authorized_not_started"
+    assert smoke["status"] == "passed"
     assert smoke["cells"]["count_per_tier"] == 8
     assert smoke["cells"]["gpu_shape"] == "512x64"
     assert any("online-value cell" in item and "SD-SAC cell" in item for item in smoke["pass_criteria"])

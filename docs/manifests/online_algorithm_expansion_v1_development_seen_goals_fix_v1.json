@@ -137,30 +137,30 @@
     "forecast": {
       "basis": "reuse the original conservative preregistered peak forecast; observed original 32-job tree was 80,258,114,089 bytes",
       "projected_peak_write_bytes": 343597383680,
-      "raid_margin_after_requirement_bytes": 6546683904000,
+      "raid_margin_after_requirement_bytes": 7647967649792,
       "required_free_bytes": 412316860416,
       "reserve_rule": "max(8 GiB, 20% of projected peak writes)",
       "safety_reserve_bytes": 68719476736
     },
     "home": {
-      "available_bytes": 194327982080,
+      "available_bytes": 194044661760,
       "decision": "rejected for checkpoint writes",
       "filesystem": "/dev/md0",
       "reported_use_percent": 90,
       "total_bytes": 1888425144320,
-      "used_bytes": 1598094946304
+      "used_bytes": 1598378266624
     },
     "live_tree_rule": "never move a live checkpoint tree; any migration requires a completed checkpoint, verified copy/hash, switched path, successful resume, then source cleanup",
-    "observed_utc": "2026-10-08T05:38:08Z",
+    "observed_utc": "2026-10-08T07:25:43Z",
     "raid": {
-      "available_bytes": 6959000764416,
+      "available_bytes": 8060284510208,
       "decision": "selected",
       "filesystem": "/dev/md1",
       "new_run_existing_bytes": 0,
       "original_development_run_bytes": 80258114089,
-      "reported_use_percent": 77,
+      "reported_use_percent": 73,
       "total_bytes": 30601613336576,
-      "used_bytes": 22106347651072
+      "used_bytes": 21005063905280
     },
     "runtime_enforcement": "recheck before every job and checkpoint; stop at a complete resumable checkpoint if projected writes plus reserve are no longer available"
   },
@@ -287,6 +287,6 @@
     "select_only_from_fixed_normal_development": true
   },
   "smoke_manifest": "docs/manifests/online_algorithm_seen_goals_fix_v1_smoke.json",
-  "status": "authorized_waiting_for_post_fix_smoke",
+  "status": "authorized_ready_to_execute",
   "understood_as": "After correcting the shared seen-goal accumulation defect and passing fresh CPU/GPU smokes, rerun exactly the original 32 fixed-normal development jobs with unchanged candidates, seeds, transition budgets, evaluation, selection, and stopping rules. Main adaptation remains closed."
 }

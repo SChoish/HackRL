@@ -38,9 +38,20 @@
     "runtime_worktree": "a clean detached worktree at the recorded source_git_sha"
   },
   "execution_identity": {
-    "result_binding": "not populated until all cells complete; development remains blocked",
-    "runtime_source_sha256": {},
-    "source_git_sha": null
+    "result_binding": "the development runner rehashes every listed runtime source and the aggregate before accepting this smoke gate",
+    "runtime_source_sha256": {
+      "scripts/smoke_online_algorithms.py": "03baf05d29dd8a47747d332ec7fb35e30ad5234cb959dc66a32a7fc2c7c7b3cf",
+      "scripts/stop_identity_checked_gpu_keepalive.py": "905a7d6700c0589a1292eb5eb368dc67e77fd00fc7ac8de80683e4ce7674c8a1",
+      "src/hackrl/discrete_sac.py": "9acdecf457cb8c9dbde7d18811c2e062b9c14ac77ca0e4f09c6cd461e511e32e",
+      "src/hackrl/online_algorithm_env.py": "70f6f696633b798024f67a5d92fea2a9abf2c40abe5882d58b5b1609d61e2d0a",
+      "src/hackrl/online_value.py": "e21298c01eed683211d8c36f8395790003d72c396b335384f5a496bcb707dbfc",
+      "src/hackrl/pack_restore.py": "22a393a56151925bfe1f4af062befbdbb219ba62d85e0c2e0a5c50bc6e10b677",
+      "src/hackrl/pack_restore_gc.py": "acdc23233e69ce98d87336e6080b4e505d69bd51f8da9d28e3fd6277c7ea0587",
+      "src/hackrl/tick_claim.py": "476acd94b9285d132fa06e455adc9f30a6efc50d3acbffba3df132ba38c4ca86",
+      "src/hackrl/tick_claim_gc.py": "2979cae96363b2acc0d8d8b933fccb27af77c93528e4b8123f140c942b357079"
+    },
+    "runtime_worktree": "/raid/ext_csv/HackRL/worktrees/online_algorithm_seen_goals_fix_smoke_9706cc8",
+    "source_git_sha": "9706cc85c092cb0e0c89c4a3363a95fef342dc85"
   },
   "manifest_id": "online_algorithm_seen_goals_fix_v1_smoke",
   "parent": "docs/manifests/online_algorithm_zero_gate_diagnostic_v1_results.json",
@@ -52,18 +63,32 @@
     "raw per-cell JSON, aggregate JSON, source hashes, and exact source commit are preserved under the declared RAID artifact root"
   ],
   "purpose": "Re-run all eight CPU and eight 512x64 GPU one-update cells after the shared seen-goal fix before any corrected development checkpoint is written.",
+  "result_artifact": {
+    "aggregate_path": "/raid/ext_csv/HackRL/runs/online_algorithm_seen_goals_fix_v1_smoke/aggregate.json",
+    "aggregate_sha256": "db710b30369724124f8c208de47ce8ffd61c90944288b29d737abea27f8311f4",
+    "artifact_tree_bytes": 38029,
+    "completed_utc": "2026-10-08T07:25:43Z",
+    "gpu_entry_json_count": 8,
+    "raw_cell_json_count": 16
+  },
   "results": {
     "cpu": {
-      "cells_passed": 0,
+      "cells_passed": 8,
       "cells_total": 8,
-      "status": "not_started"
+      "checkpoint_written": false,
+      "physical_transitions": 64,
+      "status": "passed"
     },
     "gpu": {
-      "cells_passed": 0,
+      "all_eight_cells_expanded_seen_goals_beyond_initialized_three": true,
+      "cells_passed": 8,
       "cells_total": 8,
-      "status": "not_started"
+      "checkpoint_written": false,
+      "online_value_and_sd_sac_expanded_seen_goals_in_both_environments": true,
+      "physical_transitions": 262144,
+      "status": "passed"
     }
   },
   "schema_version": "hackrl_online_algorithm_seen_goals_fix_v1_smoke",
-  "status": "authorized_not_started"
+  "status": "passed"
 }
