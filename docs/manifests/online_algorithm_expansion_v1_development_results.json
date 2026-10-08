@@ -1,0 +1,79 @@
+{
+  "schema_version": "hackrl_online_algorithm_expansion_v1_development_results",
+  "manifest_id": "online_algorithm_expansion_v1_development_results",
+  "parent": "docs/manifests/online_algorithm_expansion_v1_development.json",
+  "status": "complete_fixed_normal_gate_failed_main_closed",
+  "execution": {
+    "git_head": "5148bc06a1e5876b9e4a56eb48c19c920c6d7db6",
+    "run_root": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development",
+    "backend": "gpu",
+    "device": "cuda:0",
+    "started_utc": "2026-10-08T04:07:11Z",
+    "completed_utc": "2026-10-08T04:51:54Z",
+    "wall_clock_seconds": 2683.620831012726,
+    "learner_seeds": [110, 111],
+    "jobs_completed": 32,
+    "updates_per_job": 512,
+    "transitions_per_job": 16777216,
+    "training_transitions": 536870912,
+    "main_automatically_launched": false
+  },
+  "artifacts": {
+    "job_summaries": 32,
+    "evaluations": 32,
+    "checkpoint_directories": 160,
+    "checkpoint_updates_per_job": [0, 128, 256, 384, 512],
+    "run_tree_observed_bytes": 80258114089,
+    "run_tree_observed_size": "75G",
+    "development_gate_sha256": "2d30056ad3cea7d68f5f76d18c0e065c670737f6349b19a65b20fdacde3904a8",
+    "run_contract_sha256": "ca81379269cc97db64ff3ce35399a7f83e2d39512f9b6e265cebde7f70cb5486",
+    "capacity_checks_sha256": "a2289f9a0bff76152ba937a5afa4a8ee31d397e2cca8f8a56d56f99bf593815d"
+  },
+  "capacity_audit": {
+    "checks": 193,
+    "all_passed": true,
+    "minimum_observed_raid_free_bytes": 6960924053504,
+    "required_free_bytes": 412316860416,
+    "final_observed_raid_free_bytes": 6959018708992
+  },
+  "evaluation_contract": {
+    "kernel": "fixed",
+    "split": "validation",
+    "action_selection": "deterministic greedy/mode",
+    "natural_start_episodes_per_job": 32,
+    "common_setup_episodes_per_job": 32,
+    "minimum_natural_start_successes_per_seed": 29,
+    "bug_or_mutant_metric_persisted_or_used": false
+  },
+  "result": {
+    "passed_cells": 0,
+    "total_cells": 8,
+    "natural_start_success_counts": {
+      "jobs_with_0_of_32": 32,
+      "jobs_with_any_success": 0
+    },
+    "common_setup_success_counts": {
+      "jobs_with_0_of_32": 32,
+      "jobs_with_any_success": 0
+    },
+    "cells": [
+      {"environment": "TICK-CLAIM", "method": "GC-PQN", "passed": false},
+      {"environment": "TICK-CLAIM", "method": "LEO", "passed": false},
+      {"environment": "TICK-CLAIM", "method": "Dual LEO(PQN)", "passed": false},
+      {"environment": "TICK-CLAIM", "method": "GC-SD-SAC", "passed": false},
+      {"environment": "PACK-RESTORE", "method": "GC-PQN", "passed": false},
+      {"environment": "PACK-RESTORE", "method": "LEO", "passed": false},
+      {"environment": "PACK-RESTORE", "method": "Dual LEO(PQN)", "passed": false},
+      {"environment": "PACK-RESTORE", "method": "GC-SD-SAC", "passed": false}
+    ]
+  },
+  "interpretation": {
+    "supported": "Under the preregistered two-candidate, two-seed fixed-normal development settings, none of the four online methods acquired the normal delivery task in either environment.",
+    "not_supported": [
+      "These runs do not show that any method cannot exploit TICK-CLAIM or PACK-RESTORE bugs.",
+      "These runs do not compare bug exploitation because the normal-task capability gate failed first.",
+      "The all-zero gate does not authorize choosing new candidates from bug or mutant results."
+    ],
+    "operational_decision": "Do not launch the fixed/mutant main matrix. Preserve all failed jobs and checkpoints; do not automatically extend training or add candidates."
+  }
+}
