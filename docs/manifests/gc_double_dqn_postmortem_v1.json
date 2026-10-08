@@ -1,0 +1,56 @@
+{
+  "schema_version": "hackrl_gc_double_dqn_postmortem_manifest_v1",
+  "manifest_id": "gc_double_dqn_postmortem_v1",
+  "status": "no_training_analysis_pending",
+  "decision": {
+    "double_dqn_training_stopped": true,
+    "main_18_job_experiment_authorized": false,
+    "additional_replay_size_or_training_budget_sweep": false,
+    "scientific_reason": "Normal delivery was not learned, so defect-exploitation algorithm comparison is not identified."
+  },
+  "inputs": [
+    {
+      "run": "baseline_replay65k",
+      "root": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_v1",
+      "development_gate": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_v1/development_gate.json",
+      "seed": 100
+    },
+    {
+      "run": "replay262k",
+      "root": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_replay262k_v1",
+      "development_gate": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_replay262k_v1/development_gate.json",
+      "seed": 100
+    },
+    {
+      "run": "dual_teacher_greedy_two_defects_v1",
+      "artifact": "/raid/ext_csv/HackRL/runs/dual_teacher_greedy_two_defects_v1/result.json",
+      "expected_checkpoint_count": 30,
+      "training_or_optimizer_updates": 0
+    }
+  ],
+  "checks": [
+    "Count goal and positive-reward identities in each final replay window.",
+    "Report whether update logs preserved per-goal success and sampled-goal identities.",
+    "Evaluate the frozen delivery-head Q ranking on legal fixed normal-trace suffix states in the validation split.",
+    "Reuse the already completed frozen Dual-teacher greedy execution without new learning."
+  ],
+  "q_probe_contract": {
+    "tick": "Sixteen validation layouts, ripe path-check start: three harvest decisions, delivery approach, and delivery.",
+    "pack": "Sixteen validation layouts and both loaded/empty path-check phases with source growth period 8: storage withdrawal where applicable, two harvest decisions, delivery approach, and delivery.",
+    "ground_truth": "Each full scripted fixed trace is replayed through the actual kernel and must reach delivery/count_ge_3 before any Q ranking is reported.",
+    "claim_limit": "Local expected-action rankings do not establish an executable natural-start policy."
+  },
+  "leakage_audit": {
+    "verifier_equals_designer": "The fixture and constructive traces are repository-designed rather than an external benchmark.",
+    "independence_fix": "Treat kernel replay only as local transition ground truth and retain natural-start success as the independent end-to-end gate.",
+    "tautology_guard": "Do not call a matching scripted action a learned delivery policy; report only action rank on the named probe state."
+  },
+  "operation": {
+    "command": "JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/analyze_gc_double_dqn_postmortem.py --force",
+    "compute_platform": "CPU",
+    "checkpoint_parameters_mutated": false,
+    "training_or_optimizer_updates": 0
+  },
+  "output": "/raid/ext_csv/HackRL/runs/gc_double_dqn_postmortem_v1/result.json",
+  "training_or_optimizer_updates": 0
+}
