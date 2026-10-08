@@ -1,0 +1,637 @@
+{
+  "schema_version": "hackrl_online_algorithm_expansion_v1",
+  "manifest_id": "online_algorithm_expansion_v1",
+  "status": "phase_1_design_frozen_no_training_authority",
+  "understood_as": "This phase freezes provenance, adaptation boundaries, cell-local development gates, seeds, budgets, storage/stop contracts, and does not authorize training.",
+  "scope_guard_verbatim": [
+    "ABSOLUTE EXCLUSION: do not copy, vendor, translate, or inspect implementation text from an external repository without an explicit license, including coldsummerday/SD-SAC at SHA 006809db08513fbeea2bfaecea1c03b59c3bb0d5.",
+    "ALLOWED ALTERNATIVE: specify GC-SD-SAC independently from the published Discrete SAC (arXiv:1910.07207) and Revisiting Discrete Soft Actor-Critic (arXiv:2209.10081) algorithm contracts; record the unlicensed repository only as a provenance/reference boundary.",
+    "ALLOWED LICENSED REFERENCES: MichaelTMatthews/purejaxgcrl at eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7 (MIT) and mttga/purejaxql at 47af6d7b35c89ddfe633aaf7341bdb8964cb7cce (Apache-2.0), with attribution and explicit adaptation records. Do not vendor either in this task.",
+    "No training, no queue launch, no checkpoint writes, and no dependency installation. Safe preparation must not be diluted."
+  ],
+  "phase_1_authority": {
+    "permitted": [
+      "freeze this design manifest",
+      "add focused manifest validation",
+      "inspect repository-owned code and manifests needed to describe local contracts",
+      "inspect only the pinned licensed references needed for provenance and source-conformance checks"
+    ],
+    "training_authorized": false,
+    "queue_launch_authorized": false,
+    "checkpoint_writes_authorized": false,
+    "dependency_installation_authorized": false,
+    "cpu_smoke_authorized_by_this_manifest": false,
+    "gpu_smoke_authorized_by_this_manifest": false,
+    "future_execution_requires": "separate stage-specific authority as defined below; a manifest may authorize the next preflight stage and is not required to claim that the stage it authorizes is already complete"
+  },
+  "authorization_stages": [
+    {
+      "order": 1,
+      "stage": "Phase-1 design",
+      "authority_in_this_manifest": true,
+      "scope": "manifest and focused contract tests only; no implementation, smoke, development, or main execution"
+    },
+    {
+      "order": 2,
+      "stage": "implementation and unit tests",
+      "authority_in_this_manifest": false,
+      "entry": "reviewed source provenance, licenses, planned adaptation mappings, dependency/API risk inventory, and complete hashed method specifications; resolved implementation hashes are produced in this stage, not required before it"
+    },
+    {
+      "order": 3,
+      "stage": "CPU minimal smoke",
+      "authority_in_this_manifest": false,
+      "entry": "separate smoke authority after implementation unit tests pass"
+    },
+    {
+      "order": 4,
+      "stage": "per-cell 512x64 GPU one-update smoke and capacity forecast",
+      "authority_in_this_manifest": false,
+      "entry": "separate per-cell smoke authority after CPU smoke; capacity must pass before any checkpoint-writing development"
+    },
+    {
+      "order": 5,
+      "stage": "normal-only development",
+      "authority_in_this_manifest": false,
+      "entry": "separate authority after the shared candidate registries, evaluation protocol, GPU smoke, and capacity record are frozen and passing"
+    },
+    {
+      "order": 6,
+      "stage": "per-cell main",
+      "authority_in_this_manifest": false,
+      "entry": "a separate per-cell main manifest after both development seeds pass that method x environment gate"
+    }
+  ],
+  "matrix": {
+    "methods": [
+      "GC-PQN",
+      "LEO",
+      "Dual LEO(PQN)",
+      "GC-SD-SAC"
+    ],
+    "environments": [
+      "TICK-CLAIM",
+      "PACK-RESTORE"
+    ],
+    "method_environment_cells": 8,
+    "initial_main_state": "closed for every method x environment cell"
+  },
+  "environment_contracts": {
+    "TICK-CLAIM": "docs/manifests/tick_claim_v1.json",
+    "PACK-RESTORE": "docs/manifests/pack_restore_v1.json",
+    "term_authority": "fixed, mutant, natural start, common setup, delivery success, trigger, exploit, actual delivered value, observations, goals, terminal semantics, and layout families are defined by the named canonical environment manifests and their audited resolved-runtime successors",
+    "required_freeze_before_development": [
+      "resolved environment implementation Git SHA and source hashes",
+      "development and held-out final layout IDs and content hashes",
+      "episodes per learner seed, layout, kernel, checkpoint, start family, and action-selection view",
+      "delivery-success numerator and denominator, return aggregation, and tie precision",
+      "missing episode/job handling and failed-seed denominator rules",
+      "kernel/oracle validation evidence kept separate from learned-policy results"
+    ],
+    "phase_1_executability": "these fields are intentionally not invented here; until a reviewed evaluation contract freezes them, this manifest is not executable"
+  },
+  "provenance": {
+    "papers": [
+      {
+        "title": "Soft Actor-Critic for Discrete Action Settings",
+        "identifier": "arXiv:1910.07207",
+        "url": "https://arxiv.org/abs/1910.07207",
+        "role": "published Discrete SAC algorithm contract used for an independent GC-SD-SAC specification",
+        "implementation_license_implied": false
+      },
+      {
+        "title": "Revisiting Discrete Soft Actor-Critic",
+        "identifier": "arXiv:2209.10081",
+        "url": "https://arxiv.org/abs/2209.10081",
+        "role": "published revised Discrete SAC algorithm contract used for an independent GC-SD-SAC specification",
+        "implementation_license_implied": false
+      }
+    ],
+    "repositories": [
+      {
+        "repository": "MichaelTMatthews/purejaxgcrl",
+        "url": "https://github.com/MichaelTMatthews/purejaxgcrl",
+        "commit_url": "https://github.com/MichaelTMatthews/purejaxgcrl/tree/eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+        "sha": "eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+        "license": "MIT",
+        "boundary": "licensed reference; attribution and an explicit file-level adaptation record are required for any later code adaptation",
+        "vendored_in_this_phase": false,
+        "external_implementation_text_inspected_in_this_phase": true,
+        "inspected_paths": [
+          "README.md",
+          "LICENSE",
+          "requirements.txt",
+          "pqn.py",
+          "leo.py",
+          "sweeps/craftax/pqn.yaml",
+          "sweeps/craftax/leo.yaml",
+          "sweeps/craftax/dual_leo_pqn.yaml",
+          "dual_leo_pqn.py"
+        ],
+        "contract_evidence": "https://github.com/MichaelTMatthews/purejaxgcrl/blob/eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7/dual_leo_pqn.py"
+      },
+      {
+        "repository": "mttga/purejaxql",
+        "url": "https://github.com/mttga/purejaxql",
+        "commit_url": "https://github.com/mttga/purejaxql/tree/47af6d7b35c89ddfe633aaf7341bdb8964cb7cce",
+        "sha": "47af6d7b35c89ddfe633aaf7341bdb8964cb7cce",
+        "license": "Apache-2.0",
+        "boundary": "licensed reference; attribution and an explicit file-level adaptation record are required for any later code adaptation",
+        "vendored_in_this_phase": false,
+        "external_implementation_text_inspected_in_this_phase": true,
+        "inspected_paths": [
+          "README.md",
+          "LICENSE",
+          "pyproject.toml",
+          "purejaxql/pqn_craftax.py"
+        ],
+        "contract_evidence": "https://github.com/mttga/purejaxql/blob/47af6d7b35c89ddfe633aaf7341bdb8964cb7cce/purejaxql/pqn_craftax.py"
+      },
+      {
+        "repository": "coldsummerday/SD-SAC",
+        "url": "https://github.com/coldsummerday/SD-SAC",
+        "commit_url": "https://github.com/coldsummerday/SD-SAC/tree/006809db08513fbeea2bfaecea1c03b59c3bb0d5",
+        "sha": "006809db08513fbeea2bfaecea1c03b59c3bb0d5",
+        "license": "no explicit license supplied; treated as unlicensed",
+        "boundary": "provenance/reference boundary only",
+        "implementation_text_use": "forbidden: do not inspect, copy, vendor, or translate",
+        "vendored_in_this_phase": false,
+        "external_implementation_text_inspected_in_this_phase": false
+      }
+    ],
+    "adaptation_records": [
+      {
+        "source": "MichaelTMatthews/purejaxgcrl@eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+        "license": "MIT",
+        "targets": [
+          "LEO",
+          "Dual LEO(PQN)"
+        ],
+        "phase_1_use": "licensed provenance and source-conformance audit of the listed inspected paths; no file or implementation text was vendored",
+        "observed_upstream_contract": "default acting mode lc uses Q_act=(1-w)*Q_UVFA+w*Q_LEO with w=0.3 while the two TD learners retain separate state and losses",
+        "planned_adaptation": "map a licensed, attributed LEO contract onto the repository's goal-conditioned observations, valid-transition mask, per-goal terminal semantics, and method-local state containers; for Dual LEO(PQN), preserve the upstream contract in which LEO and UVFA Q-values are combined for acting while both TD learners train",
+        "required_before_implementation": "record each consulted upstream path, its upstream SHA, target path, retained notices, and a concise transformation/difference account"
+      },
+      {
+        "source": "mttga/purejaxql@47af6d7b35c89ddfe633aaf7341bdb8964cb7cce",
+        "license": "Apache-2.0",
+        "targets": [
+          "GC-PQN",
+          "Dual LEO(PQN)"
+        ],
+        "phase_1_use": "licensed provenance and source-conformance audit of the listed inspected paths, including purejaxql/pqn_craftax.py; no file or implementation text was vendored",
+        "planned_adaptation": "map a licensed, attributed PQN contract onto goal-conditioned inputs, canonical environment action/no-op and terminal semantics, and the shared physical/valid-transition accounting contract",
+        "required_before_implementation": "record each consulted upstream path, its upstream SHA, target path, retained notices, and a concise transformation/difference account"
+      },
+      {
+        "source": "arXiv:1910.07207 and arXiv:2209.10081",
+        "license": "paper algorithm descriptions; no implementation license inferred",
+        "targets": [
+          "GC-SD-SAC"
+        ],
+        "phase_1_use": "independent algorithm specification from the published contracts",
+        "planned_adaptation": "add goal conditioning, canonical environment action/no-op semantics, repository terminal semantics, symmetric replay branching, and explicit compute accounting",
+        "excluded_source": "coldsummerday/SD-SAC@006809db08513fbeea2bfaecea1c03b59c3bb0d5 implementation text"
+      }
+    ]
+  },
+  "algorithm_contracts": {
+    "common": {
+      "goal_conditioning": "the behavior policy and every learned value used by that policy receive the commanded goal; all-goal auxiliary heads must retain per-goal terminal semantics",
+      "action_semantics": "use each canonical environment's full action enum; environment-invalid actions remain no-op and are not masked unless a later audited environment contract explicitly changes that rule; behavior and targets use the same action set",
+      "terminal_semantics": "world reset is terminal for all goals; achieving a goal is terminal for that goal; command switching alone is not terminal for another goal",
+      "physical_vs_valid": "environment steps and learning-eligible transitions are counted separately",
+      "implementation_freeze": "architecture, losses, optimizers, schedules, target updates, replay rules, and initialization must be complete and hashed before any normal-only development result is observed"
+    },
+    "GC-PQN": {
+      "family": "goal-conditioned parallelized Q-network online learner with neither a replay buffer nor a target network",
+      "behavior": "epsilon behavior is a training/sampling view; greedy behavior is a separately reported deterministic evaluation view",
+      "targets": "online Q-learning or Q(lambda) targets are computed from the frozen rollout batch with the current online network; the exact Q(lambda) choice and lambda must be predeclared per candidate",
+      "learning_state": [
+        "online parameters",
+        "optimizer",
+        "normalization",
+        "RNG",
+        "schedule and update counters"
+      ],
+      "replay_retention": "none; frozen online rollout batches may be reused only for the predeclared number of optimizer steps and are not carried across updates"
+    },
+    "LEO": {
+      "family": "standalone goal-conditioned all-goal Q learner acting from its own Q policy",
+      "behavior": "epsilon behavior is a training/sampling view; greedy behavior is the deterministic primary evaluation view",
+      "targets": "each valid physical transition may supply predeclared per-goal TD targets; a goal head bootstraps until that goal is achieved or the world resets",
+      "learning_state": [
+        "Q parameters",
+        "optimizer",
+        "input normalization statistics",
+        "RNG",
+        "schedule and update counters"
+      ],
+      "replay_retention": "none; frozen online rollout batches may be reused only for the predeclared number of optimizer steps and are not carried across updates"
+    },
+    "Dual LEO(PQN)": {
+      "family": "separately parameterized LEO and goal-conditioned UVFA/PQN Q learners trained with their own TD objectives",
+      "behavior": "the licensed purejaxgcrl contract at eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7 combines LEO and UVFA Q-values for action selection",
+      "default_acting_equation": "Q_act = 0.7*Q_UVFA + 0.3*Q_LEO",
+      "candidate_rule": "acting mode and weight must be explicitly frozen for every candidate; the upstream default is linear combination with LEO weight 0.3",
+      "targets": "LEO and UVFA/PQN TD targets and losses remain separate and are both logged; the LEO head uses per-goal terminal semantics",
+      "pqn_target_network": "none; the PQN component follows the online no-target-network contract",
+      "ppo_style_behavior_cloning": "not part of this Phase-1 Dual LEO(PQN) specification; do not introduce or describe PPO-style behavior cloning unless a later licensed source-conformance audit establishes and freezes a different contract",
+      "learning_state": [
+        "PQN online parameters",
+        "PQN optimizer",
+        "LEO parameters",
+        "LEO optimizer",
+        "normalization statistics for both components",
+        "RNG",
+        "linear-combination, learning-rate, and update counters"
+      ],
+      "replay_retention": "none; frozen online rollout batches may be reused only for the predeclared number of optimizer steps and are not carried across updates"
+    },
+    "GC-SD-SAC": {
+      "family": "goal-conditioned Stable Discrete SAC independently specified from Discrete SAC arXiv:1910.07207 and the entropy-penalty, double-average Q-learning, and Q-clip contract in arXiv:2209.10081",
+      "actor": "a goal-conditioned categorical policy over the canonical environment's full discrete action enum",
+      "critics": "two goal-conditioned local Q critics and two Polyak-updated target critics; do not substitute the vanilla clipped-min target for the published Stable Discrete SAC double-average contract",
+      "critic_target": "reward plus discounted nonterminal average of the two target-critic policy values at the next state, with exact categorical expectation over the canonical action enum and terminal masking from the common contract",
+      "q_clip": "each critic uses the published max-of-two squared-error Q-clip loss with its local-to-target Q change clipped to [-c,c]; c, reductions, gradient stops, and Polyak tau must be frozen from the published equation before implementation",
+      "stored_entropy": "store the behavior policy entropy H_old with every replay transition, as required by the published entropy-penalty contract",
+      "actor_objective": "exact categorical expectation over the canonical action enum of alpha*log(policy)-Q_actor plus beta/2*(H_old-H_current)^2; the two-critic Q_actor aggregation, beta, reductions, and gradient stops must be frozen from the published equation before implementation",
+      "temperature": "automatic entropy-temperature optimization is part of the method; its target entropy, loss sign, bounds, and schedule must be frozen in the implementation audit",
+      "learning_state": [
+        "actor parameters and optimizer",
+        "two critic parameter sets and optimizers",
+        "two target-critic parameter sets",
+        "temperature parameter and optimizer",
+        "normalization",
+        "RNG",
+        "replay contents, cursor, capacity, and sampling counters",
+        "schedule and update counters"
+      ],
+      "replay_retention": "retain the completed fixed-normal pretraining replay snapshot at the fork; clone identical contents, cursor, capacity, and sampler state into fixed and mutant branches; thereafter use identical eviction and sampling rules without cross-branch sharing"
+    }
+  },
+  "dependency_api_compatibility": {
+    "current_offrl_environment": {
+      "jax": "0.10.2",
+      "jaxlib": "0.10.2",
+      "flax": "0.12.7",
+      "optax": "0.2.8",
+      "chex": "0.1.92",
+      "craftax": "1.6.1"
+    },
+    "upstream_declared_constraints": [
+      {
+        "source": "MichaelTMatthews/purejaxgcrl@eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+        "constraint": "jax[cuda12]==0.6.0 and orbax-checkpoint==0.5.0"
+      },
+      {
+        "source": "mttga/purejaxql@47af6d7b35c89ddfe633aaf7341bdb8964cb7cce",
+        "constraint": "jax and jaxlib <=0.4.38"
+      }
+    ],
+    "risk": "both licensed references target older JAX APIs than the current offrl environment; source-level conformance does not establish runtime compatibility",
+    "preflight": [
+      "inventory every adapted JAX, Flax, Optax, Chex, Craftax, and checkpoint API against the current versions",
+      "record intentional API substitutions and semantic equivalence tests in the adaptation record",
+      "freeze the resolved runtime versions and dependency lock fingerprint before unit or smoke tests",
+      "pass focused CPU tests in the existing environment before any GPU smoke"
+    ],
+    "dependency_installation_authorized": false,
+    "environment_mutation_authorized": false,
+    "resolution": "perform the compatibility audit without installing, downgrading, or upgrading dependencies under this manifest; any future environment change requires separate authority"
+  },
+  "development": {
+    "learner_seeds": [
+      110,
+      111
+    ],
+    "seed_rule": "both seeds are required independently in every method x environment cell",
+    "configuration_contract": {
+      "maximum_predeclared_configurations_per_method": 4,
+      "cap_scope": "one shared normal-only candidate registry per method across both environments; the cap is not multiplied by environment or cell",
+      "environment_resolution": "a candidate may contain a complete predeclared environment-keyed parameter table, but that table remains one candidate ID and may not be expanded after any result",
+      "registries": {
+        "GC-PQN": [],
+        "LEO": [],
+        "Dual LEO(PQN)": [],
+        "GC-SD-SAC": []
+      },
+      "empty_registry_meaning": "Phase 1 authorizes zero development runs. A reviewed amendment must freeze and hash no more than four complete normal-only configurations for a method before that method observes any development result.",
+      "candidate_requirements": [
+        "a stable configuration ID and complete resolved hyperparameters",
+        "implementation and adaptation-record SHAs",
+        "identical fixed-normal development evaluation layouts for all candidates of a method x environment cell",
+        "no field chosen from bug, exploitation, mutant, or final-evaluation evidence"
+      ]
+    },
+    "selection": {
+      "training_kernel": "fixed normal only",
+      "evaluation_kernel": "fixed normal only",
+      "evaluation_start": "natural-start only",
+      "primary_metric": "delivery success",
+      "tie_breaker": "fixed-normal return",
+      "ordering": "maximize each candidate's fixed-normal natural-start delivery success aggregated only across development seeds; break an exact success tie by fixed-normal return",
+      "bug_or_exploitation_metric_may_select": false,
+      "mutant_result_may_select": false,
+      "final_evaluation_layout_may_select": false,
+      "common_setup_may_select_or_substitute": false,
+      "no_post_result_candidate_addition": true
+    }
+  },
+  "gate": {
+    "scope": "cell-local method x environment",
+    "metric": "fixed-normal natural-start delivery success",
+    "threshold_inclusive": 0.9,
+    "required_development_seeds": [
+      110,
+      111
+    ],
+    "rule": "each required development seed must individually achieve success >= 0.90",
+    "common_setup_role": "diagnostic only; it may not substitute for natural-start",
+    "on_pass": "open only this method x environment main cell, subject to a separately authorized execution manifest and capacity check",
+    "on_failure": "close only this method x environment main cell",
+    "failure_blocks_other_cells": false,
+    "automatic_extension": false,
+    "automatic_main_launch": false
+  },
+  "final_exploratory": {
+    "learner_seeds": [
+      120,
+      121,
+      122
+    ],
+    "seed_independence": "learner seed is the independent unit",
+    "cross_algorithm_seed_note": "The same numeric labels do not imply paired initialization across algorithms.",
+    "failed_seed_policy": "failed, collapsed, and incomplete-policy seeds remain included in denominators and seed-level reporting; operationally missing jobs are reported as missing, not silently dropped",
+    "layout_freeze": "held-out final layouts and their hashes must be fixed before any development or final run and may not participate in configuration selection",
+    "claims": "descriptive, seed-level exploratory outcomes for the frozen selected method x environment configuration only",
+    "not_claimed": "not confirmatory replication, not a cross-algorithm paired-seed estimate, not authority to retune, and not evidence about unopened or failed-gate cells",
+    "future_confirmatory_use": "any confirmatory claim, extra seed, or new hypothesis requires a new preregistered manifest"
+  },
+  "budget": {
+    "transition_unit": "physical environment transitions; valid transitions, replay samples, TD targets, and optimizer steps are separate compute counters and never replace this budget unit",
+    "transition_total_scope": "declared totals cover training transitions only; evaluation rollouts, CPU/GPU smokes, replay samples, TD targets, and optimizer compute are excluded and must receive separate frozen counts before their stage is authorized",
+    "symbols": {
+      "P_pretraining_transitions_per_seed": 16777216,
+      "A_adaptation_transitions_per_branch_per_seed": 134217728
+    },
+    "per_passing_method_environment_cell": {
+      "learner_seeds": 3,
+      "pretraining_jobs_per_seed": 1,
+      "adaptation_branches": [
+        "fixed",
+        "mutant"
+      ],
+      "adaptation_jobs_per_seed": 2,
+      "jobs_per_seed": 3,
+      "jobs": 9,
+      "pretraining_jobs": 3,
+      "adaptation_jobs": 6,
+      "transitions_per_seed_formula": "P + 2*A",
+      "transitions_per_seed": 285212672,
+      "transitions_formula": "3*(P + 2*A)",
+      "transitions": 855638016
+    },
+    "all_eight_new_method_cells": {
+      "method_environment_cells": 8,
+      "pretraining_jobs": 24,
+      "adaptation_jobs": 48,
+      "jobs": 72,
+      "pretraining_transitions": 402653184,
+      "adaptation_transitions": 6442450944,
+      "transitions_formula": "8*3*(P + 2*A)",
+      "transitions": 6845104128,
+      "interpretation": "full gated design total if all eight cells pass; a failed gate removes only that cell's 9 jobs and 855638016 transitions from any later authorized launch"
+    },
+    "maximum_normal_only_development": {
+      "assumption": "all four methods use the full four-candidate cap in both environments and both development seeds",
+      "jobs_formula": "4 methods * 4 candidates * 2 environments * 2 seeds",
+      "jobs": 64,
+      "transitions_formula": "64*P",
+      "transitions": 1073741824
+    },
+    "maximum_development_plus_full_main": {
+      "assumption": "maximum normal-only development plus all eight cells passing and running the full exploratory main",
+      "jobs": 136,
+      "transitions": 7918845952
+    },
+    "budget_extension": "forbidden without a new reviewed manifest"
+  },
+  "branch_fork": {
+    "source": "the same completed fixed-normal pretraining state for a learner seed",
+    "branches": [
+      "fixed",
+      "mutant"
+    ],
+    "branch_kernel_mapping": {
+      "fixed": "continue adaptation on the fixed kernel",
+      "mutant": "adapt on the mutant kernel"
+    },
+    "clone_exactly": [
+      "parameters",
+      "optimizer state",
+      "normalization state",
+      "RNG state",
+      "replay state when applicable",
+      "all other algorithm state, target networks, temperatures, schedules, and counters when applicable"
+    ],
+    "replay_symmetry": "the per-method replay-retention rule is predeclared above and must be identical at the fork and symmetric thereafter",
+    "rng_semantics": "clone the exact RNG state and freeze an identical random-draw consumption schedule for symmetric operations; each branch owns its cloned state with no mutable sharing",
+    "rng_nonclaim": "do not claim episode-wise common random numbers after trajectories or conditional draw counts diverge unless exogenous events are explicitly paired and that pairing is logged",
+    "no_cross_branch_state_sharing": true,
+    "fork_fingerprint_required": true
+  },
+  "compute_logging": {
+    "required_per_seed_branch_fields": [
+      "physical_transitions",
+      "valid_transitions",
+      "td_targets",
+      "scheduled_gradient_steps",
+      "applied_gradient_steps",
+      "update_to_data_ratio",
+      "wall_time_seconds",
+      "parameter_counts_by_component"
+    ],
+    "update_to_data_ratio": "report applied optimizer steps and sampled learning transitions per physical transition and per valid transition; do not equate environment-transition budgets with compute",
+    "parameter_components": "report actor, each critic/value component, target networks, teacher/student, temperature, and normalization components separately when present, plus a deduplicated total",
+    "invalid_or_empty_update": "an empty or invalid-only minibatch is not an applied gradient step"
+  },
+  "evaluation": {
+    "protocol_status": "checkpoint locations and view separation are frozen here; episode/layout counts, hashes, aggregation, denominators, and missing-data rules must be frozen in the reviewed evaluation contract before development",
+    "adaptation_transition_checkpoints": [
+      0,
+      1048576,
+      4194304,
+      8388608,
+      16777216,
+      33554432,
+      67108864,
+      134217728
+    ],
+    "primary_final_view": {
+      "checkpoint": 134217728,
+      "start": "natural",
+      "action_selection": "deterministic/greedy",
+      "unit": "learner seed"
+    },
+    "separate_secondary_views": [
+      "sample/stochastic actor view",
+      "epsilon behavior view",
+      "common-setup diagnostic view"
+    ],
+    "separation_rule": "secondary views are separately named and reported; they cannot replace, pool with, or select the primary natural deterministic/greedy result",
+    "selection_use": "no final evaluation layout or final-seed result may select a configuration"
+  },
+  "measurement_taxonomy": {
+    "separate_categories": {
+      "normal_ability": "fixed-kernel natural-start delivery success and return",
+      "trigger": "whether the state/event that makes the defect behavior available is reached",
+      "exploit": "whether the policy uses the defect conditional on its opportunity",
+      "adaptation_effect": "seed-level contrast between the symmetrically forked fixed and mutant adaptation branches",
+      "actual_value": "task return or delivered value under the named kernel and evaluation view",
+      "discovery_interval": "first-to-last checkpoint interval consistent with first observed discovery; not an interpolated discovery time",
+      "maintenance": "whether separately defined discovered behavior persists at later checkpoints",
+      "failure": "normal inability, missing trigger, no exploit, lost maintenance, collapse, operational failure, and missing job remain distinct failure labels"
+    },
+    "no_category_substitution_or_pooling": true,
+    "independent_unit": "learner seed",
+    "failed_seeds_stay_included": true
+  },
+  "mandela_leakage_audit": {
+    "validation_components": {
+      "model": "the learned policy for a named method, environment, and learner seed",
+      "scorer": "the fixed evaluation runner plus metric aggregation",
+      "designer": "the team that defines fixtures, layouts, candidates, gates, and reporting",
+      "dataset": "fixed-normal development starts and held-out final layouts/seeds"
+    },
+    "core_question": "Does outcome validation receive ground truth independent of the learner and configuration-selection loop?",
+    "likely_hits": [
+      {
+        "pattern": "Verifier = designer",
+        "status": "fires for internal fixtures",
+        "risk": "the same project defines the kernel fixtures and their verifier, so a fixture can consistently encode the designer's mistake",
+        "independence_fix": "validate kernel semantics and scripted oracles separately from learned-policy outcomes, with reproducible fixture evidence"
+      },
+      {
+        "pattern": "Tautology",
+        "status": "conditional risk if bug metrics tune configurations",
+        "risk": "a bug/exploitation score used both to choose a candidate and to claim exploitation would grade a bucket the experiment drew itself",
+        "independence_fix": "select only on fixed-normal development success and its fixed-normal return tie-breaker; prohibit every bug, mutant, exploitation, and final-layout metric from tuning"
+      }
+    ],
+    "independence_fixes": [
+      "normal-only development selection",
+      "held-out final learner seeds and layouts fixed before runs",
+      "kernel/oracle validation separate from learned-policy outcome",
+      "no bug metric in tuning"
+    ],
+    "nonclaim": "passing internal unit tests validates the encoded contract, not a learned-policy scientific outcome"
+  },
+  "baseline_policy": {
+    "PPO_rerun_authorized": false,
+    "Dual_PPO_rerun_authorized": false,
+    "conditional_rerun_rule": "a PPO or Dual PPO rerun requires a separate manifest that states the scientific need, gate, budget, and storage authority",
+    "historical_baseline_rule": "a historical baseline remains historical unless its exact execution Git SHA, checkpoint or result fingerprint, working-tree provenance, and separately frozen evaluation-contract linkage are audited",
+    "existing_Dual_result_boundary": "docs/manifests/dual_leo_ppo_compare_v1_results.json records that its execution included working-tree changes; it must not be described as a same-code simultaneous baseline",
+    "historical_baseline_is_configuration_selector": false
+  },
+  "storage_contract": {
+    "authority": "capacity planning only in Phase 1; no checkpoint writes",
+    "required_prewrite_measurements": [
+      "free bytes and utilization on the intended filesystem under /home/ext_csv",
+      "free bytes and utilization on /raid/ext_csv",
+      "existing bytes in the intended run tree"
+    ],
+    "peak_forecast_includes": [
+      "all retained final checkpoints",
+      "active predecessor-plus-successor checkpoint overlap",
+      "evaluation artifacts",
+      "logs",
+      "safety reserve"
+    ],
+    "safety_reserve_formula": "max(8 GiB, 20% of projected remaining writes before adding the reserve)",
+    "home_rejection_rule": "do not start a new large checkpoint run under /home/ext_csv if the forecast would exhaust the reserve or that filesystem is already above 90% utilization",
+    "default_run_path": "/raid/ext_csv/HackRL/runs/<run-id>",
+    "repository_path_rule": "keep a repository symlink to the RAID run path only when code or provenance requires the expected repository path",
+    "live_tree_move_forbidden": true,
+    "migration_sequence": [
+      "stop at a completed resumable checkpoint",
+      "copy to a new RAID target",
+      "verify content hashes or a no-change dry run",
+      "switch the path",
+      "confirm successful resume",
+      "only then remove the source copy"
+    ],
+    "record_in_run_manifest_or_operational_log": [
+      "capacity measurement",
+      "projected peak",
+      "chosen filesystem",
+      "reserve calculation",
+      "migration verification when applicable"
+    ],
+    "long_run_recheck": "recheck capacity during long runs",
+    "reserve_erosion_action": "stop safely at a resumable boundary and migrate; never allow a partial checkpoint or silently delete required seeds, conditions, or final states"
+  },
+  "stop_contracts": [
+    "Phase 1 stops before any smoke, training, queue launch, checkpoint write, or dependency installation.",
+    "A failed development gate closes only its method x environment cell and cannot be extended automatically.",
+    "A capacity forecast that cannot preserve the required reserve stops the affected run before checkpoint writing.",
+    "Capacity erosion during an authorized future run triggers a safe resumable stop and verified migration.",
+    "NaN/Inf, state-fingerprint mismatch, branch asymmetry, budget overrun, or missing required logging stops the affected cell and preserves its failure record.",
+    "No failed seed, condition, or required final state may be deleted to make a summary complete."
+  ],
+  "preflight_order": [
+    {
+      "order": 1,
+      "step": "upstream/adaptation audit",
+      "substep": "dependency/API compatibility audit without installing or changing dependencies",
+      "exit_requirement": "verify source URL, exact SHA or paper version, license and attribution where applicable, prohibited-source boundary, planned local adaptation mapping, current/upstream dependency constraints, and the API substitutions that implementation must resolve for every method"
+    },
+    {
+      "order": 2,
+      "step": "implementation and unit tests",
+      "exit_requirement": "the separately authorized implementation is complete with adaptation records and resolved hashes, then algorithm, environment, accounting, state-clone, evaluation, and manifest contract tests pass"
+    },
+    {
+      "order": 3,
+      "step": "CPU minimal smoke",
+      "exit_requirement": "one bounded no-checkpoint update path per method x environment validates finite losses, state shapes, counters, and teardown"
+    },
+    {
+      "order": 4,
+      "step": "512x64 GPU one-update smoke per method x environment",
+      "exit_requirement": "all eight cells complete one update with finite outputs and expected physical/valid/TD/gradient accounting; no checkpoint retained"
+    },
+    {
+      "order": 5,
+      "step": "capacity forecast",
+      "exit_requirement": "measure home, RAID, and run storage; forecast peak and reserve; choose and record a compliant filesystem"
+    },
+    {
+      "order": 6,
+      "step": "normal-only development",
+      "exit_requirement": "run only predeclared configurations on seeds 110 and 111 under fixed normal natural starts"
+    }
+  ],
+  "preflight_authorization_rule": "preflight is a staged sequence, not a circular prerequisite: each future manifest authorizes only its named next stage; completion is recorded before separate authority is requested for the following stage",
+  "main_opening_rule": "Main stays closed for each method x environment cell until that cell's natural-start gate passes; passing one cell never opens another.",
+  "autobahn_scope_ledger": {
+    "status": "closed after the safe Phase-1 preparation run",
+    "archive_destination": "docs/manifests/online_algorithm_expansion_v1.json#autobahn_scope_ledger",
+    "items": [
+      {
+        "item": "coldsummerday/SD-SAC implementation text at 006809db08513fbeea2bfaecea1c03b59c3bb0d5",
+        "risk_class": "bright-line licensing/IP boundary",
+        "verdict": "descoped",
+        "reason": "the pinned GitHub repository exposed no explicit license in repository metadata or its file tree at audit time",
+        "safe_alternative": "independent specification and implementation from arXiv:1910.07207 and arXiv:2209.10081, without consulting that repository's implementation text"
+      }
+    ]
+  },
+  "phase_1_completion": {
+    "artifact": "docs/manifests/online_algorithm_expansion_v1.json",
+    "focused_test": "tests/test_online_algorithm_expansion_manifest.py",
+    "phase_1_design_artifacts_completed": true,
+    "experiment_execution_started": false
+  }
+}
