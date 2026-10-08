@@ -2,7 +2,7 @@
   "schema_version": "hackrl_online_algorithm_expansion_v1_development_results",
   "manifest_id": "online_algorithm_expansion_v1_development_results",
   "parent": "docs/manifests/online_algorithm_expansion_v1_development.json",
-  "status": "complete_fixed_normal_gate_failed_main_closed",
+  "status": "complete_invalidated_by_shared_wiring_defect_main_closed",
   "execution": {
     "git_head": "5148bc06a1e5876b9e4a56eb48c19c920c6d7db6",
     "run_root": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development",

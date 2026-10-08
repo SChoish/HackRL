@@ -5,7 +5,7 @@
     "development": false,
     "gpu_smoke": true,
     "main": false,
-    "process_termination_scope": "SIGTERM only for an identity-checked --beyondg-gpu-keepalive process immediately before a GPU smoke cell",
+    "process_termination_scope": "SIGTERM only for a GPU-0 process validated by pidfd, same uid, exact Python executable, and standalone --beyondg-gpu-keepalive marker immediately before each GPU smoke cell",
     "source": "user instruction to diagnose common wiring and fix a concrete defect before rerun"
   },
   "cells": {
@@ -24,13 +24,32 @@
     ],
     "seed": 109
   },
+  "execution_contract": {
+    "checkpoint_writes": false,
+    "cpu_command": "JAX_PLATFORMS=cpu PYTHONPATH=<worktree>/src python scripts/smoke_online_algorithms.py --tier cpu --environment <tick|pack> --method <pqn|leo|dual|sd-sac>",
+    "gpu_command": "JAX_PLATFORMS=cuda CUDA_VISIBLE_DEVICES=0 PYTHONPATH=<worktree>/src python scripts/smoke_online_algorithms.py --tier gpu --environment <tick|pack> --method <pqn|leo|dual|sd-sac>",
+    "gpu_entry": "run scripts/stop_identity_checked_gpu_keepalive.py immediately before every GPU cell; abort on any unrecognized GPU-0 process or nonempty GPU-0 process list after termination",
+    "gpu_index": 0,
+    "gpu_uuid": "GPU-88f9a048-01dd-f24b-c1aa-cd5f04621b81",
+    "host": "ext_csv-box",
+    "order": "all eight CPU cells must pass before eight GPU cells run; cells are sequential and each uses a fresh process",
+    "python": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
+    "raw_artifact_root": "/raid/ext_csv/HackRL/runs/online_algorithm_seen_goals_fix_v1_smoke",
+    "runtime_worktree": "a clean detached worktree at the recorded source_git_sha"
+  },
+  "execution_identity": {
+    "result_binding": "not populated until all cells complete; development remains blocked",
+    "runtime_source_sha256": {},
+    "source_git_sha": null
+  },
   "manifest_id": "online_algorithm_seen_goals_fix_v1_smoke",
   "parent": "docs/manifests/online_algorithm_zero_gate_diagnostic_v1_results.json",
   "pass_criteria": [
-    "all 16 processes exit zero with finite state and metrics",
+    "all eight CPU processes pass before any GPU process starts; all eight GPU processes then exit zero with finite state and metrics",
     "each cell collects exactly its declared transitions and writes no checkpoint",
-    "the emitted metrics include all 12 commanded-goal, goal-success, and seen-goal counters",
-    "at least one 512x64 cell per environment expands seen_goals beyond the three initialized goals"
+    "the emitted metrics include all 12 commanded-goal, valid goal-success, and seen-goal counters",
+    "for each environment, at least one GPU online-value cell and the GPU SD-SAC cell expand seen_goals beyond the three initialized goals, thereby exercising both repaired collector paths",
+    "raw per-cell JSON, aggregate JSON, source hashes, and exact source commit are preserved under the declared RAID artifact root"
   ],
   "purpose": "Re-run all eight CPU and eight 512x64 GPU one-update cells after the shared seen-goal fix before any corrected development checkpoint is written.",
   "results": {

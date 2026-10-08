@@ -8,39 +8,17 @@ PYTHON=/home/ext_csv/miniconda3/envs/offrl/bin/python
 LOCK=/tmp/hackrl-online-algorithm-seen-goals-fix-v1-gpu.lock
 
 if [[ ! -f "$WORKTREE/scripts/run_online_algorithm_seen_goals_fix.py" ]]; then
-  exit 0
-fi
-if [[ -f "$RUN_ROOT/development_gate.json" ]]; then
-  exit 0
+  echo "missing corrected development worktree" >&2
+  exit 66
 fi
 
 exec 9>"$LOCK"
 if ! flock -n 9; then
-  exit 0
+  echo "corrected development GPU lock is already held" >&2
+  exit 75
 fi
 
-mapfile -t GPU_PIDS < <(nvidia-smi --query-compute-apps=pid --format=csv,noheader,nounits | sed '/^[[:space:]]*$/d')
-for GPU_PID in "${GPU_PIDS[@]}"; do
-  GPU_PID="${GPU_PID//[[:space:]]/}"
-  [[ -n "$GPU_PID" ]] || continue
-  if [[ ! -r "/proc/$GPU_PID/cmdline" ]]; then
-    exit 0
-  fi
-  COMMAND=$(tr '\0' ' ' < "/proc/$GPU_PID/cmdline")
-  if [[ "$COMMAND" != *"--beyondg-gpu-keepalive"* ]]; then
-    exit 0
-  fi
-  kill -TERM "$GPU_PID"
-  for _ in {1..100}; do
-    if ! kill -0 "$GPU_PID" 2>/dev/null; then
-      break
-    fi
-    sleep 0.1
-  done
-  if kill -0 "$GPU_PID" 2>/dev/null; then
-    exit 1
-  fi
-done
+"$PYTHON" "$WORKTREE/scripts/stop_identity_checked_gpu_keepalive.py"
 
 cd "$WORKTREE"
 export HACKRL_DEVICE=cuda

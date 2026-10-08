@@ -117,7 +117,7 @@
     "checkpoint_mutation_check": "All source checkpoints were opened read-only; the diagnostic wrote only its result JSON.",
     "command": "JAX_PLATFORMS=cpu HACKRL_DEVICE=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/diagnose_online_algorithm_zero_gate.py",
     "development_execution_git_head": "5148bc06a1e5876b9e4a56eb48c19c920c6d7db6",
-    "development_result_sha256_after_posthoc_addendum": "a25449b25866ecc68f0935f66bcdec2b29417d34c2970bed6115bf51b8617e19",
+    "development_result_sha256_after_posthoc_addendum": "ca2630bbde5582802e43dc6cca370bd6373ab49cc3b3550bb7317aa7576b8190",
     "development_result_sha256_at_diagnostic": "f2442ccb2d065f2c1a9b76b6c190b389e7fa44425981592e64303747a7c73578",
     "diagnostic_completed_utc": "2026-10-08T05:23:21Z",
     "execution_backend": "cpu",

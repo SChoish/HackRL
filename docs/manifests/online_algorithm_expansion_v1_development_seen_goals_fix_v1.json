@@ -7,6 +7,8 @@
     "implementation_bugfix": "seen-goal accumulation and per-goal observability only",
     "main_adaptation": false,
     "normal_only_development": true,
+    "process_termination": true,
+    "process_termination_scope": "immediately before corrected development, SIGTERM only through scripts/stop_identity_checked_gpu_keepalive.py after GPU-0, same-uid, exact-executable, standalone-marker, and pidfd identity validation; abort on any other process",
     "queue_launch": true,
     "source": "user instruction to diagnose the common all-zero wiring, fix a concrete defect, and rerun the bounded normal gate"
   },
@@ -255,7 +257,7 @@
     "python": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
     "queue_wrapper": "scripts/run_online_algorithm_seen_goals_fix_gpu_queue.sh",
     "required_entry_checks": [
-      "the smoke manifest records CPU 8/8 and GPU 8/8 passed with no checkpoint writes",
+      "the immutable smoke record reports CPU 8/8 and GPU 8/8, binds exact runtime-source hashes, exercises online-value and SD-SAC seen-goal expansion in both environments, and writes no checkpoints",
       "the queue wrapper identity-checks and stops only --beyondg-gpu-keepalive processes, then sets HACKRL_DUMMY_KEEPALIVE_CLEARED=1",
       "the interpreter and repository root match the paths declared here",
       "every imported hackrl project module resolves beneath the declared clean worktree",

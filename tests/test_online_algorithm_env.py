@@ -14,6 +14,7 @@ from hackrl.online_algorithm_env import (
     environment_adapter,
     frozen_evaluation_binding,
     OnlineValueNetworks,
+    per_goal_rollout_counts,
     rollout_phase_steps,
 )
 
@@ -74,6 +75,17 @@ def test_seen_goals_accumulate_across_workers_and_rollout_steps():
         accumulate_seen_goals(previous, observed),
         [True, True, True, False],
     )
+
+
+def test_per_goal_success_counts_exclude_invalid_rewarded_rows():
+    one_hot = jnp.asarray(
+        [[1.0, 0.0], [0.0, 1.0], [0.0, 1.0]], dtype=jnp.float32
+    )
+    reward = jnp.asarray([1.0, 1.0, 1.0])
+    valid = jnp.asarray([True, False, True])
+    commanded, successes = per_goal_rollout_counts(one_hot, reward, valid)
+    np.testing.assert_array_equal(commanded, [1, 1])
+    np.testing.assert_array_equal(successes, [1, 1])
 
 
 def test_clone_materializes_identical_independent_array_leaves():

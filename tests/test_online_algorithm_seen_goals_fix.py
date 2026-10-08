@@ -40,6 +40,28 @@ def test_post_fix_smoke_requires_full_shape_and_seen_goal_expansion():
     assert smoke["status"] == "authorized_not_started"
     assert smoke["cells"]["count_per_tier"] == 8
     assert smoke["cells"]["gpu_shape"] == "512x64"
-    assert any("expands seen_goals" in item for item in smoke["pass_criteria"])
+    assert any("online-value cell" in item and "SD-SAC cell" in item for item in smoke["pass_criteria"])
     assert smoke["authority"]["checkpoint_writes"] is False
     assert smoke["authority"]["main"] is False
+
+
+def test_historical_gate_is_machine_readably_invalidated_and_queue_is_fail_closed():
+    historical = _load(
+        Path("docs/manifests/online_algorithm_expansion_v1_development_results.json")
+    )
+    assert "invalidated_by_shared_wiring_defect" in historical["status"]
+    queue = Path(
+        "scripts/run_online_algorithm_seen_goals_fix_gpu_queue.sh"
+    ).read_text(encoding="utf-8")
+    assert "stop_identity_checked_gpu_keepalive.py" in queue
+    assert "kill -TERM" not in queue
+    assert "exit 66" in queue and "exit 75" in queue
+
+
+def test_development_runner_binds_smoke_sources_and_aggregate_hash():
+    runner = Path("scripts/run_online_algorithm_seen_goals_fix.py").read_text(
+        encoding="utf-8"
+    )
+    assert "runtime_source_sha256" in runner
+    assert "aggregate_sha256" in runner
+    assert "base._require_smoke_passed = _require_bound_seen_goal_smoke" in runner

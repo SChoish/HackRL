@@ -183,6 +183,16 @@ def accumulate_seen_goals(seen_goals, rollout_observed_goals):
     )
 
 
+def per_goal_rollout_counts(goal_one_hot, reward, valid):
+    """Count commanded and successful valid transitions for every goal."""
+
+    valid_float = valid.astype(jnp.float32)
+    commanded = jnp.sum(goal_one_hot * valid_float[:, None], axis=0)
+    successful = jnp.logical_and(valid, reward > 0).astype(jnp.float32)
+    successes = jnp.sum(goal_one_hot * successful[:, None], axis=0)
+    return commanded.astype(jnp.int32), successes.astype(jnp.int32)
+
+
 def _schedule_state(method, state):
     return state.pqn if method == DUAL else state
 
@@ -331,16 +341,9 @@ def make_online_value_update(
             seen_goals=seen_goals,
             global_update=runner.global_update + 1,
         )
-        commanded_goals = jnp.sum(
-            flat.pqn.goal_one_hot
-            * flat.pqn.valid.astype(jnp.float32)[:, None],
-            axis=0,
-        ).astype(jnp.int32)
-        goal_successes = jnp.sum(
-            flat.pqn.goal_one_hot
-            * (flat.pqn.reward > 0).astype(jnp.float32)[:, None],
-            axis=0,
-        ).astype(jnp.int32)
+        commanded_goals, goal_successes = per_goal_rollout_counts(
+            flat.pqn.goal_one_hot, flat.pqn.reward, flat.pqn.valid
+        )
         metrics = {
             "learning": learning,
             "epsilon_start": epsilon[0],
@@ -496,15 +499,9 @@ def make_sd_sac_collection(
             runner.train_state, env_config.batch_size
         )
         runner = runner.replace(train_state=state, seen_goals=seen_goals)
-        commanded_goals = jnp.sum(
-            flat.goal_one_hot * flat.valid.astype(jnp.float32)[:, None],
-            axis=0,
-        ).astype(jnp.int32)
-        goal_successes = jnp.sum(
-            flat.goal_one_hot
-            * (flat.reward > 0).astype(jnp.float32)[:, None],
-            axis=0,
-        ).astype(jnp.int32)
+        commanded_goals, goal_successes = per_goal_rollout_counts(
+            flat.goal_one_hot, flat.reward, flat.valid
+        )
         metrics = {
             "commanded_goals": {
                 str(index): commanded_goals[index]
