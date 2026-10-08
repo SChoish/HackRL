@@ -1,0 +1,914 @@
+[
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      6
+    ],
+    "item": [
+      9,
+      11
+    ],
+    "layout_index": 0,
+    "player": [
+      9,
+      7
+    ],
+    "sha256": "dd384071be0d2b240ff9e68be8ea2d435f8d609edbd26d3a84faa1d0f48670f4",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      6,
+      9
+    ],
+    "item": [
+      11,
+      9
+    ],
+    "layout_index": 1,
+    "player": [
+      7,
+      9
+    ],
+    "sha256": "160f8746e57547bc5b68f521f2111e5c3ff1461240669b7d49cf49311150b3bd",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      12
+    ],
+    "item": [
+      9,
+      7
+    ],
+    "layout_index": 2,
+    "player": [
+      9,
+      11
+    ],
+    "sha256": "47fa006b42d51b623791b1cf5c25caa7686c78a954500e22550b846f639dbd88",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      12,
+      9
+    ],
+    "item": [
+      7,
+      9
+    ],
+    "layout_index": 3,
+    "player": [
+      11,
+      9
+    ],
+    "sha256": "d7e475e3ef9b6a7e84be91d79f4546f8013c091deadd9ba666d4dda44d12ae65",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      12
+    ],
+    "item": [
+      9,
+      7
+    ],
+    "layout_index": 4,
+    "player": [
+      9,
+      11
+    ],
+    "sha256": "5785b20e9a769ae0aa548a50bbc51cb9ac9a3adb4af8e03127922e7f52217d77",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      12,
+      9
+    ],
+    "item": [
+      7,
+      9
+    ],
+    "layout_index": 5,
+    "player": [
+      11,
+      9
+    ],
+    "sha256": "e6ad415c10f8a8d0504b2efe8ceaf0b64edb72e4e0d968069515bfd627eb7fb0",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      6
+    ],
+    "item": [
+      9,
+      11
+    ],
+    "layout_index": 6,
+    "player": [
+      9,
+      7
+    ],
+    "sha256": "6b548eb24bcfa474c48f39315bd87bae3ffcdb9edfdc1a2e757319f4b7f03985",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      6,
+      9
+    ],
+    "item": [
+      11,
+      9
+    ],
+    "layout_index": 7,
+    "player": [
+      7,
+      9
+    ],
+    "sha256": "959e275a5e0c85eaf7ed7baaa50b776ce061b55eba141f8b1f823aefc5498b6b",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      7
+    ],
+    "item": [
+      9,
+      12
+    ],
+    "layout_index": 8,
+    "player": [
+      9,
+      8
+    ],
+    "sha256": "c934e07fc315af2fb29ceaafa848854ebb638fa362218faec5a3c13e15d92960",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      6,
+      10
+    ],
+    "item": [
+      11,
+      10
+    ],
+    "layout_index": 9,
+    "player": [
+      7,
+      10
+    ],
+    "sha256": "4ebd5cf03adceba03101e2454747e5489691cc4e2de57dd42d6d949b989d8883",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      13
+    ],
+    "item": [
+      9,
+      8
+    ],
+    "layout_index": 10,
+    "player": [
+      9,
+      12
+    ],
+    "sha256": "91c598058faf513ed8a07688bb8e39b9fd60289fdfe72e97443161fe65f7d31e",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      12,
+      10
+    ],
+    "item": [
+      7,
+      10
+    ],
+    "layout_index": 11,
+    "player": [
+      11,
+      10
+    ],
+    "sha256": "404997231f3ccf744a3fa5df4790992842a2aed1b4a426de46ccceae0ea0450e",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      13
+    ],
+    "item": [
+      9,
+      8
+    ],
+    "layout_index": 12,
+    "player": [
+      9,
+      12
+    ],
+    "sha256": "b63d40a17c812607be71a29647decc6a67b74d16f6143cc8cc94906a3da386fd",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      12,
+      10
+    ],
+    "item": [
+      7,
+      10
+    ],
+    "layout_index": 13,
+    "player": [
+      11,
+      10
+    ],
+    "sha256": "b7bf1d876835e9cb8d8d6e42c72e2e2e57e6f8b55f05b8b56b4c90facbc985bc",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      9,
+      7
+    ],
+    "item": [
+      9,
+      12
+    ],
+    "layout_index": 14,
+    "player": [
+      9,
+      8
+    ],
+    "sha256": "e4f061de846001cc5c5b6a44779d2cd4d5eb7ca2fa897fbf525644bf9bcaae54",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      6,
+      10
+    ],
+    "item": [
+      11,
+      10
+    ],
+    "layout_index": 15,
+    "player": [
+      7,
+      10
+    ],
+    "sha256": "9daf83e45bb1d4aad165a2ead2e37f2a977119706254af2f2d793fdf49c627ac",
+    "split": "train",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      6
+    ],
+    "item": [
+      8,
+      11
+    ],
+    "layout_index": 0,
+    "player": [
+      8,
+      7
+    ],
+    "sha256": "b519af9d31d1877cfee1d0b03fe42f3b914bcf02283a64469c0fcb0ea9bd09b1",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      5,
+      9
+    ],
+    "item": [
+      10,
+      9
+    ],
+    "layout_index": 1,
+    "player": [
+      6,
+      9
+    ],
+    "sha256": "8dfd165d81361e6de6f731b547f735f5c0984a193100349e1f0f68df5a6fed54",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      12
+    ],
+    "item": [
+      8,
+      7
+    ],
+    "layout_index": 2,
+    "player": [
+      8,
+      11
+    ],
+    "sha256": "c573167463e62a1abef23253f542ee8e6777d456542e90db44b82821d243755e",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      11,
+      9
+    ],
+    "item": [
+      6,
+      9
+    ],
+    "layout_index": 3,
+    "player": [
+      10,
+      9
+    ],
+    "sha256": "0039cb19c81e41ba751f1507949acf13884265c71799044bf8d93fdd25a83af4",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      12
+    ],
+    "item": [
+      8,
+      7
+    ],
+    "layout_index": 4,
+    "player": [
+      8,
+      11
+    ],
+    "sha256": "572291b342235759602e7d086e556782797d47f29a0564f599e0a40c22c6b229",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      11,
+      9
+    ],
+    "item": [
+      6,
+      9
+    ],
+    "layout_index": 5,
+    "player": [
+      10,
+      9
+    ],
+    "sha256": "09b75854511f47c9238a16cfad5d7b097fe177b4e3c9c249f91af5b76b390cde",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      6
+    ],
+    "item": [
+      8,
+      11
+    ],
+    "layout_index": 6,
+    "player": [
+      8,
+      7
+    ],
+    "sha256": "574b3f3e479166d264af946360ab9c964f5150e9b20b38b7ee805067e4fd3ffe",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      5,
+      9
+    ],
+    "item": [
+      10,
+      9
+    ],
+    "layout_index": 7,
+    "player": [
+      6,
+      9
+    ],
+    "sha256": "98847596329cbf3aac26cf44cdb63b89cacacb78d4b8ff6794336d298850734a",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      7
+    ],
+    "item": [
+      8,
+      12
+    ],
+    "layout_index": 8,
+    "player": [
+      8,
+      8
+    ],
+    "sha256": "529409d50bac98d8e4adaaaa4e15b7bf496e8141097d01d5e0925540fa59ff45",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      5,
+      10
+    ],
+    "item": [
+      10,
+      10
+    ],
+    "layout_index": 9,
+    "player": [
+      6,
+      10
+    ],
+    "sha256": "8f09e34789416c17161dcd4dfed1eacdea214b1139cb9389a27ead1357647401",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      13
+    ],
+    "item": [
+      8,
+      8
+    ],
+    "layout_index": 10,
+    "player": [
+      8,
+      12
+    ],
+    "sha256": "bf7ec3d2a976531db7c9d6930956f1ce86702aa847e15197f96b5a3a888436c6",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      11,
+      10
+    ],
+    "item": [
+      6,
+      10
+    ],
+    "layout_index": 11,
+    "player": [
+      10,
+      10
+    ],
+    "sha256": "bc1e5b16b12aecbd25d3a550a2e1b21bac408169efefdb69518992d46b4ce234",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      13
+    ],
+    "item": [
+      8,
+      8
+    ],
+    "layout_index": 12,
+    "player": [
+      8,
+      12
+    ],
+    "sha256": "90b340ba739d508eb1b487914ef90e71786a58b84bce52da7cc12424d683d17b",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      11,
+      10
+    ],
+    "item": [
+      6,
+      10
+    ],
+    "layout_index": 13,
+    "player": [
+      10,
+      10
+    ],
+    "sha256": "f1daa4dfcfc933795277b5344a73e9cb8caced0f72d887f1a6c5866c11d70836",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      8,
+      7
+    ],
+    "item": [
+      8,
+      12
+    ],
+    "layout_index": 14,
+    "player": [
+      8,
+      8
+    ],
+    "sha256": "d263b70f9c541dc38b50f79c30df51674a0503ad39eae47964446495f93466d3",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      5,
+      10
+    ],
+    "item": [
+      10,
+      10
+    ],
+    "layout_index": 15,
+    "player": [
+      6,
+      10
+    ],
+    "sha256": "a8bd45457cad54fee901a743410e0d41b91d2f2febad867f3cbce33a1e1e9771",
+    "split": "validation",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      6
+    ],
+    "item": [
+      10,
+      11
+    ],
+    "layout_index": 0,
+    "player": [
+      10,
+      7
+    ],
+    "sha256": "782016c70ab000dca6cc8eb42db926dc7a1d502ede47b8fbcf618bdf4964b7b5",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      7,
+      9
+    ],
+    "item": [
+      12,
+      9
+    ],
+    "layout_index": 1,
+    "player": [
+      8,
+      9
+    ],
+    "sha256": "19752b7aa88081d6f98bd66a0ac763cb3b0ff1a3066ed25b31079fd56086fdce",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      12
+    ],
+    "item": [
+      10,
+      7
+    ],
+    "layout_index": 2,
+    "player": [
+      10,
+      11
+    ],
+    "sha256": "7ffac3e06d73d65d2e790fc2dae37edf38607a8d13b3159691dcf8018b5f8c04",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      13,
+      9
+    ],
+    "item": [
+      8,
+      9
+    ],
+    "layout_index": 3,
+    "player": [
+      12,
+      9
+    ],
+    "sha256": "4e6cd18fec84616e2ed17f7871693608690ba7b9d643428055c2d0d770acb06a",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      12
+    ],
+    "item": [
+      10,
+      7
+    ],
+    "layout_index": 4,
+    "player": [
+      10,
+      11
+    ],
+    "sha256": "bb1e700d75bf7e909b31717d03e10e69ce9fb77df2c3f135ca9cf77338b894f6",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      13,
+      9
+    ],
+    "item": [
+      8,
+      9
+    ],
+    "layout_index": 5,
+    "player": [
+      12,
+      9
+    ],
+    "sha256": "989ad675f07f1b3a032630216e97b84912a01763c09bb2d7873b0bee9a4ed766",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      6
+    ],
+    "item": [
+      10,
+      11
+    ],
+    "layout_index": 6,
+    "player": [
+      10,
+      7
+    ],
+    "sha256": "ff48ef8c7dee2232d6b5332b85f7fae8b6c66dfb777cf6a1dc30db7b8d5230f4",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      7,
+      9
+    ],
+    "item": [
+      12,
+      9
+    ],
+    "layout_index": 7,
+    "player": [
+      8,
+      9
+    ],
+    "sha256": "3a976432cc86f2fa8d1f2233d7b06182639d8b8aa0ac76452729512024a1256c",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      7
+    ],
+    "item": [
+      10,
+      12
+    ],
+    "layout_index": 8,
+    "player": [
+      10,
+      8
+    ],
+    "sha256": "9f4665529fa35c9d8ea3ebfe7d6df7500e601ef51e784ec8f3be3fd72fef9cc6",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      7,
+      10
+    ],
+    "item": [
+      12,
+      10
+    ],
+    "layout_index": 9,
+    "player": [
+      8,
+      10
+    ],
+    "sha256": "25c81bbeb3eba5f55e5ed3d46348b01b37254ce508ca9a3d989090f11985c080",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      13
+    ],
+    "item": [
+      10,
+      8
+    ],
+    "layout_index": 10,
+    "player": [
+      10,
+      12
+    ],
+    "sha256": "2fa6db98e08c718597dc9d398f5d9892b1ee53fd3874151723c5ca7ecec1a98e",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      13,
+      10
+    ],
+    "item": [
+      8,
+      10
+    ],
+    "layout_index": 11,
+    "player": [
+      12,
+      10
+    ],
+    "sha256": "ebc1886a6d928b30fa2cd7331d955c04fdef07295327d039a9c7df6dc582f241",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      13
+    ],
+    "item": [
+      10,
+      8
+    ],
+    "layout_index": 12,
+    "player": [
+      10,
+      12
+    ],
+    "sha256": "0e45f28b9bb1600d552103d0f06f5cdd51e69dafe6d40205693d15a83350b8dd",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      13,
+      10
+    ],
+    "item": [
+      8,
+      10
+    ],
+    "layout_index": 13,
+    "player": [
+      12,
+      10
+    ],
+    "sha256": "c2a304a2aa13c6eef7b9212060f2cede1d842ed75dd4f423baad96dc1b67ec0b",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      10,
+      7
+    ],
+    "item": [
+      10,
+      12
+    ],
+    "layout_index": 14,
+    "player": [
+      10,
+      8
+    ],
+    "sha256": "4c9d096ff33ddd9c08d0e3a85b276c3784b1846af8495875e91d79fa3604a4ef",
+    "split": "test",
+    "walkable_cells": 43
+  },
+  {
+    "barrier_cells": 5,
+    "camp": [
+      7,
+      10
+    ],
+    "item": [
+      12,
+      10
+    ],
+    "layout_index": 15,
+    "player": [
+      8,
+      10
+    ],
+    "sha256": "e097533a6b46f281765b23e020ec3e0b88bb0026a2a0a97d8957cc4f04534823",
+    "split": "test",
+    "walkable_cells": 43
+  }
+]

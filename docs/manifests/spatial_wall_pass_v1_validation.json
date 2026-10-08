@@ -1,0 +1,23 @@
+{
+  "candidate_id": "SPATIAL-WALL-PASS",
+  "exploit_replays": 96,
+  "fixed_counterfactual_successes": 0,
+  "independence_boundary": "The oracle is a separate state-difference implementation but was written in the same repository and author scope as the kernel; this is internal consistency evidence, not external ground truth.",
+  "kernel_stage": "transition_and_reference_path_validation",
+  "layout_count": 48,
+  "learning_gate_remaining": [
+    "wire the structured observation and 12 normal goals into the validated PPO and Dual learner",
+    "confirm fixed natural-start normal-task learning before mutant adaptation",
+    "freeze evaluation episodes, action selection, seeds, and transition budgets before viewing exploit outcomes"
+  ],
+  "mutant_exploit_is_shortest_path_claim": false,
+  "mutant_exploit_reference_length": 8,
+  "mutant_exploit_successes": 48,
+  "normal_reference_is_shortest_path_claim": false,
+  "normal_reference_length": 14,
+  "normal_replays": 96,
+  "normal_successes": 96,
+  "queue_gate": "closed",
+  "schema_version": "hackrl_spatial_wall_pass_validation_v1",
+  "training_started": false
+}
