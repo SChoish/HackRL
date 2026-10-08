@@ -1,0 +1,138 @@
+{
+  "schema_version": "hackrl_gc_double_dqn_postmortem_result_v1",
+  "experiment_id": "gc_double_dqn_postmortem_v1",
+  "status": "complete_dqn_branch_closed",
+  "execution_complete": true,
+  "design_manifest": "docs/manifests/gc_double_dqn_postmortem_v1.json",
+  "execution_code_sha": "0b5c895f20829dd7219098d4b0bcb458ed6d44d1",
+  "training_or_optimizer_updates": 0,
+  "main_18_job_experiment_started": false,
+  "decision": {
+    "double_dqn_training_stopped": true,
+    "additional_replay_or_budget_sweep": false,
+    "reason": "Neither development configuration learned fixed normal delivery, so a defect-exploitation algorithm comparison is not identified."
+  },
+  "normal_development_gates": {
+    "baseline_replay65k": {
+      "passed": false,
+      "tick_natural_success_rate": 0.0,
+      "tick_common_success_rate": 0.0,
+      "pack_natural_success_rate": 0.0,
+      "pack_common_success_rate": 0.0,
+      "artifact_sha256": "986cbf4054a3a23fba8c4a813f612ea277609f18ca3f4dc55abd2001d92d7385"
+    },
+    "replay262k": {
+      "passed": false,
+      "tick_natural_success_rate": 0.0,
+      "tick_common_success_rate": 0.0,
+      "pack_natural_success_rate": 0.0,
+      "pack_common_success_rate": 0.0,
+      "artifact_sha256": "b2daf8dfbcbae278fce181c5cc8674fbd8405101a5c52c898d14dfe02953dec8"
+    }
+  },
+  "postmortem": [
+    {
+      "run": "baseline_replay65k",
+      "environment": "TICK-CLAIM",
+      "checkpoint_fingerprint": "2792aedb38509261430eacf98b5e3edbc06205376e673f3b597c38d17ebf0191",
+      "goal_completions_all_goals": 1544415,
+      "sampled_valid_transitions_all_goals": 16777216,
+      "final_delivery_goal_entries": 0,
+      "final_rewarded_delivery_entries": 0,
+      "normal_suffix_probe_states": 80,
+      "expected_action_top1_matches": 0,
+      "median_expected_action_rank": {
+        "harvest_1": 5.0,
+        "harvest_2": 5.0,
+        "harvest_3": 6.0,
+        "approach_delivery": 11.5,
+        "deliver_3": 7.0
+      }
+    },
+    {
+      "run": "baseline_replay65k",
+      "environment": "PACK-RESTORE",
+      "checkpoint_fingerprint": "f3632ae8a8ad80df17a7a54db5b61c1868135e84ca18fdc4637e7e395612886b",
+      "goal_completions_all_goals": 4737496,
+      "sampled_valid_transitions_all_goals": 16777216,
+      "final_delivery_goal_entries": 0,
+      "final_rewarded_delivery_entries": 0,
+      "normal_suffix_probe_states": 144,
+      "expected_action_top1_matches": 0,
+      "median_expected_action_rank": {
+        "empty_harvest_1": 21.0,
+        "empty_harvest_2": 22.0,
+        "empty_approach_delivery": 11.5,
+        "empty_deliver_3": 11.0,
+        "loaded_withdraw_storage": 17.5,
+        "loaded_harvest_1": 21.0,
+        "loaded_harvest_2": 22.0,
+        "loaded_approach_delivery": 11.5,
+        "loaded_deliver_3": 11.0
+      }
+    },
+    {
+      "run": "replay262k",
+      "environment": "TICK-CLAIM",
+      "checkpoint_fingerprint": "6708560664934578a97ccbfbaaac0557ce32b9e2f9c259bca955fe2b6f1fb433",
+      "goal_completions_all_goals": 1706234,
+      "sampled_valid_transitions_all_goals": 16777216,
+      "final_delivery_goal_entries": 0,
+      "final_rewarded_delivery_entries": 0,
+      "normal_suffix_probe_states": 80,
+      "expected_action_top1_matches": 0,
+      "median_expected_action_rank": {
+        "harvest_1": 9.0,
+        "harvest_2": 10.0,
+        "harvest_3": 10.0,
+        "approach_delivery": 12.0,
+        "deliver_3": 3.0
+      }
+    },
+    {
+      "run": "replay262k",
+      "environment": "PACK-RESTORE",
+      "checkpoint_fingerprint": "704d100edcbbf30baa355c15b2fdf84a1726c121d273a499fe224dfb60b129f9",
+      "goal_completions_all_goals": 4760801,
+      "sampled_valid_transitions_all_goals": 16777216,
+      "final_delivery_goal_entries": 0,
+      "final_rewarded_delivery_entries": 0,
+      "normal_suffix_probe_states": 144,
+      "expected_action_top1_matches": 0,
+      "median_expected_action_rank": {
+        "empty_harvest_1": 18.0,
+        "empty_harvest_2": 18.0,
+        "empty_approach_delivery": 8.5,
+        "empty_deliver_3": 9.5,
+        "loaded_withdraw_storage": 14.0,
+        "loaded_harvest_1": 18.0,
+        "loaded_harvest_2": 18.0,
+        "loaded_approach_delivery": 8.5,
+        "loaded_deliver_3": 9.5
+      }
+    }
+  ],
+  "log_identifiability": {
+    "per_goal_success_counts_coverage": "none",
+    "sampled_goal_indices_coverage": "none",
+    "consequence": "Earlier delivery-goal experiences that were overwritten, and whether any such experiences were sampled, cannot be reconstructed from the saved artifacts."
+  },
+  "dual_teacher_greedy_reference": {
+    "checkpoint_count": 30,
+    "training_or_optimizer_updates": 0,
+    "tick": "All saved stages and kernels had 0% natural-reset success and 0% violation delivery.",
+    "pack": "Adapted stages and kernels had 0% success and 0% violation delivery; pretraining averaged 1.25% success and 0% violation delivery.",
+    "interpretation": "The saved Dual teacher was not a complete greedy delivery policy; useful recommendations on selected states do not imply complete standalone execution.",
+    "artifact_sha256": "9c2f3dab0b16ea8a58ad0c8b1a312f8c0b52ff5eb5432e0fb3b7a628b9997e17"
+  },
+  "interpretation": {
+    "supported": "The retained final replay windows contain no delivery-goal experience, and the frozen delivery heads do not rank the scripted valid suffix action first on any checked state.",
+    "not_supported": "These artifacts do not distinguish exploration failure, goal-conditioning failure, and TD-learning failure, and they do not show that Double DQN cannot exploit either defect after normal delivery is learned."
+  },
+  "artifacts": {
+    "full_result": "/raid/ext_csv/HackRL/runs/gc_double_dqn_postmortem_v1/result.json",
+    "full_result_sha256": "b017f3cf388dd7a1b3906230823c86c7559d62d6f2cc18a774b851e3fe84b309",
+    "analysis_source_sha256": "b45625c360ea0f6ace17463b0b162d186bfc6e64fca4550c2ac2edd3936758de"
+  },
+  "conclusion": "The independent Double DQN branch is closed as a normal-task acquisition failure. No 18-job defect comparison or additional replay/training-budget sweep was launched."
+}

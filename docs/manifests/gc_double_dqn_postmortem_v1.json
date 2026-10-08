@@ -1,7 +1,7 @@
 {
   "schema_version": "hackrl_gc_double_dqn_postmortem_manifest_v1",
   "manifest_id": "gc_double_dqn_postmortem_v1",
-  "status": "no_training_analysis_pending",
+  "status": "no_training_analysis_complete",
   "decision": {
     "double_dqn_training_stopped": true,
     "main_18_job_experiment_authorized": false,
@@ -52,5 +52,6 @@
     "training_or_optimizer_updates": 0
   },
   "output": "/raid/ext_csv/HackRL/runs/gc_double_dqn_postmortem_v1/result.json",
+  "result_manifest": "docs/manifests/gc_double_dqn_postmortem_v1_results.json",
   "training_or_optimizer_updates": 0
 }

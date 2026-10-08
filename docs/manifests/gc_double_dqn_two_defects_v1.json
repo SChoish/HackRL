@@ -1,7 +1,8 @@
 {
   "schema_version": "hackrl_gc_double_dqn_experiment_v1",
   "manifest_id": "gc_double_dqn_two_defects_v1",
-  "status": "implementation_and_gpu_smoke_validated_development_gate_pending",
+  "status": "closed_after_normal_gate_failure_main_not_started",
+  "closure_result": "docs/manifests/gc_double_dqn_postmortem_v1_results.json",
   "question": "Does an independently trained goal-conditioned Double DQN learn to exploit TICK-CLAIM and PACK-RESTORE without a PPO policy-teacher coupling?",
   "preflight_teacher_execution": {
     "training_or_optimizer_updates": 0,

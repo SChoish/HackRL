@@ -1,9 +1,10 @@
 {
   "schema_version": "hackrl_gc_double_dqn_two_defects_result_v1",
   "experiment_id": "gc_double_dqn_two_defects_v1",
-  "status": "development_gate_failed_main_not_started",
+  "status": "development_gate_failed_main_not_started_branch_closed",
   "execution_complete": true,
   "design_manifest": "docs/manifests/gc_double_dqn_two_defects_v1.json",
+  "branch_closure": "docs/manifests/gc_double_dqn_postmortem_v1_results.json",
   "execution_code_sha": "d3281dbba13fe738edc7a9339557cb94fe73eb0e",
   "timing": {
     "started_utc": "2026-10-07T15:38:53Z",
@@ -137,5 +138,5 @@
     "tick_summary": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_v1/tick/pretrain/seed100/summary.json",
     "pack_summary": "/raid/ext_csv/HackRL/runs/gc_double_dqn_development_v1/pack/pretrain/seed100/summary.json"
   },
-  "conclusion": "The implementation, full-shape GPU smoke, checkpointing, and two normal pretraining jobs completed, but the fixed normal-delivery gate failed at 0% success in both environments. The main fixed/mutant exploitation comparison was therefore not launched. One bounded normal-only setting check may be justified, but changing replay capacity or adding replay enhancements would create a new configuration and must not overwrite this result."
+  "conclusion": "The implementation, full-shape GPU smoke, checkpointing, and two normal pretraining jobs completed, but the fixed normal-delivery gate failed at 0% success in both environments. A bounded replay-capacity check also failed, and the no-training postmortem found no retained delivery-goal entries or correct top-1 suffix actions. The main fixed/mutant exploitation comparison was not launched, and this DQN branch is closed without further replay or training-budget sweeps."
 }

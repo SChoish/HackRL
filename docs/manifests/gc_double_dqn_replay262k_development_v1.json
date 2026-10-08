@@ -1,9 +1,10 @@
 {
   "schema_version": "hackrl_gc_double_dqn_development_profile_v1",
   "manifest_id": "gc_double_dqn_replay262k_development_v1",
-  "status": "gpu_smoke_validated_normal_only_development_gate_pending",
+  "status": "normal_only_development_gate_failed_branch_closed",
   "parent_experiment": "docs/manifests/gc_double_dqn_two_defects_v1.json",
   "triggering_result": "docs/manifests/gc_double_dqn_two_defects_v1_results.json",
+  "closure_result": "docs/manifests/gc_double_dqn_postmortem_v1_results.json",
   "question": "Does retaining eight rollouts instead of two allow the independently trained Double DQN to learn fixed normal delivery?",
   "selection_scope": {
     "learner_seed": 100,
