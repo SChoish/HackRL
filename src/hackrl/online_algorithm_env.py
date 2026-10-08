@@ -40,6 +40,7 @@ from hackrl.online_value import (
     update_all_goal_q,
     update_dual_q,
     update_goal_q,
+    update_goal_q_minibatches,
 )
 
 
@@ -280,6 +281,8 @@ def make_online_value_update(
     epsilon_start: float,
     epsilon_finish: float,
     epsilon_decay_transitions: int,
+    minibatch_size: int | None = None,
+    update_epochs: int = 1,
 ):
     """Build one frozen-rollout online update; no replay is retained."""
 
@@ -287,6 +290,16 @@ def make_online_value_update(
         raise ValueError(f"unsupported online value method: {method!r}")
     if not 0.0 <= epsilon_finish <= epsilon_start <= 1.0:
         raise ValueError("epsilon must satisfy 0 <= finish <= start <= 1")
+    if minibatch_size is not None:
+        if method != PQN:
+            raise ValueError(
+                "the restored minibatch schedule is currently registered "
+                "only for GC-PQN"
+            )
+        if int(minibatch_size) <= 0:
+            raise ValueError("minibatch_size must be positive")
+        if int(update_epochs) <= 0:
+            raise ValueError("update_epochs must be positive")
 
     def rollout_step(runner, _):
         inputs = adapter.batch_inputs(runner.env_state, runner.current_goal)
@@ -319,7 +332,18 @@ def make_online_value_update(
             runner.seen_goals, trajectory.observed_goals
         )
         flat = _flatten_rollout(trajectory)
-        if method == PQN:
+        learner_rng = runner.rng
+        if method == PQN and minibatch_size is not None:
+            learner, learner_rng, learning = update_goal_q_minibatches(
+                networks.pqn,
+                runner.train_state,
+                flat.pqn,
+                gamma=env_config.gamma,
+                rng=learner_rng,
+                minibatch_size=minibatch_size,
+                update_epochs=update_epochs,
+            )
+        elif method == PQN:
             learner, learning = update_goal_q(
                 networks.pqn, runner.train_state, flat.pqn, gamma=env_config.gamma
             )
@@ -339,6 +363,7 @@ def make_online_value_update(
         runner = runner.replace(
             train_state=learner,
             seen_goals=seen_goals,
+            rng=learner_rng,
             global_update=runner.global_update + 1,
         )
         commanded_goals, goal_successes = per_goal_rollout_counts(

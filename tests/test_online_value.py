@@ -16,6 +16,7 @@ from hackrl.online_value import (
     reset_phase_counter,
     update_all_goal_q,
     update_goal_q,
+    update_goal_q_minibatches,
     weighted_td_loss,
 )
 
@@ -108,6 +109,89 @@ def test_pqn_state_has_no_replay_target_or_q_lambda_and_updates_finitely():
     restarted = reset_phase_counter(updated)
     assert int(restarted.phase_steps) == 0
     assert int(restarted.environment_steps) == 4
+
+
+def test_pqn_minibatch_schedule_separates_experience_and_optimizer_counts():
+    maps, numeric, goals = _examples(batch_size=8)
+    network, state = init_goal_q(
+        jax.random.PRNGKey(7),
+        maps,
+        numeric,
+        goals,
+        num_actions=5,
+        hidden_size=8,
+        learning_rate=1e-3,
+        max_grad_norm=1.0,
+    )
+    transition = GoalQTransition(
+        map_channels=maps,
+        numeric_features=numeric,
+        goal_one_hot=goals,
+        action=jnp.arange(8) % 5,
+        reward=(jnp.arange(8) % 3 == 0).astype(jnp.float32),
+        next_map_channels=maps + 0.01,
+        next_numeric_features=numeric + 0.01,
+        next_goal_one_hot=goals,
+        done=jnp.zeros(8, dtype=jnp.bool_),
+        valid=jnp.asarray([True] * 7 + [False]),
+    )
+    updated, _, metrics = update_goal_q_minibatches(
+        network,
+        state,
+        transition,
+        gamma=0.99,
+        rng=jax.random.PRNGKey(8),
+        minibatch_size=2,
+        update_epochs=2,
+    )
+    assert int(updated.environment_steps) == 8
+    assert int(updated.phase_steps) == 8
+    assert int(updated.update_steps) == 1
+    assert int(updated.gradient_steps) == 8
+    assert int(metrics["physical_transitions"]) == 8
+    assert int(metrics["sampled_training_transitions"]) == 16
+    assert int(metrics["applied_gradient_steps"]) == 8
+    assert int(metrics["valid_transitions"]) == 7
+    for stats in updated.batch_stats.values():
+        assert int(stats["steps"]) == 8
+    assert _all_finite(updated)
+    assert _all_finite(metrics)
+
+
+def test_pqn_minibatch_schedule_rejects_inexact_batches():
+    maps, numeric, goals = _examples(batch_size=4)
+    network, state = init_goal_q(
+        jax.random.PRNGKey(9),
+        maps,
+        numeric,
+        goals,
+        num_actions=5,
+        hidden_size=8,
+        learning_rate=1e-3,
+        max_grad_norm=1.0,
+    )
+    transition = GoalQTransition(
+        map_channels=maps,
+        numeric_features=numeric,
+        goal_one_hot=goals,
+        action=jnp.arange(4),
+        reward=jnp.zeros(4),
+        next_map_channels=maps,
+        next_numeric_features=numeric,
+        next_goal_one_hot=goals,
+        done=jnp.zeros(4, dtype=jnp.bool_),
+        valid=jnp.ones(4, dtype=jnp.bool_),
+    )
+    with pytest.raises(ValueError, match="evenly divide"):
+        update_goal_q_minibatches(
+            network,
+            state,
+            transition,
+            gamma=0.99,
+            rng=jax.random.PRNGKey(10),
+            minibatch_size=3,
+            update_epochs=1,
+        )
 
 
 def test_leo_update_is_separate_all_goal_td_and_finite():

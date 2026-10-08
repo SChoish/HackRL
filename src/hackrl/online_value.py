@@ -305,7 +305,15 @@ def reset_phase_counter(state: OnlineQTrainState):
     return state.replace(phase_steps=jnp.asarray(0, dtype=state.phase_steps.dtype))
 
 
-def update_goal_q(network, state, transition: GoalQTransition, *, gamma: float):
+def update_goal_q(
+    network,
+    state,
+    transition: GoalQTransition,
+    *,
+    gamma: float,
+    record_environment_steps: bool = True,
+    record_update_step: bool = True,
+):
     """Apply one current-network PQN gradient step to a flat rollout batch."""
 
     batch_size = int(transition.action.shape[0])
@@ -341,11 +349,13 @@ def update_goal_q(network, state, transition: GoalQTransition, *, gamma: float):
     (loss, (batch_stats, chosen, target)), gradients = jax.value_and_grad(
         loss_fn, has_aux=True
     )(state.params)
+    physical_steps = batch_size if record_environment_steps else 0
+    update_steps = 1 if record_update_step else 0
     state = state.apply_gradients(grads=gradients).replace(
         batch_stats=batch_stats,
-        environment_steps=state.environment_steps + batch_size,
-        phase_steps=state.phase_steps + batch_size,
-        update_steps=state.update_steps + 1,
+        environment_steps=state.environment_steps + physical_steps,
+        phase_steps=state.phase_steps + physical_steps,
+        update_steps=state.update_steps + update_steps,
         gradient_steps=state.gradient_steps + 1,
     )
     metrics = {
@@ -353,10 +363,90 @@ def update_goal_q(network, state, transition: GoalQTransition, *, gamma: float):
         "chosen_q_mean": jnp.mean(chosen),
         "target_mean": jnp.mean(target),
         "valid_transitions": jnp.sum(transition.valid.astype(jnp.int32)),
-        "physical_transitions": jnp.asarray(batch_size, dtype=jnp.int32),
+        "physical_transitions": jnp.asarray(physical_steps, dtype=jnp.int32),
         "applied_gradient_steps": jnp.asarray(1, dtype=jnp.int32),
     }
     return state, metrics
+
+
+def update_goal_q_minibatches(
+    network,
+    state,
+    transition: GoalQTransition,
+    *,
+    gamma: float,
+    rng,
+    minibatch_size: int,
+    update_epochs: int,
+):
+    """Shuffle one rollout and apply the official PQN-style update schedule.
+
+    Physical experience and rollout-update counters advance once per collected
+    rollout. Gradient and BatchRenorm counters advance once per minibatch. The
+    rollout is not retained after these epochs.
+    """
+
+    rollout_size = int(transition.action.shape[0])
+    minibatch_size = int(minibatch_size)
+    update_epochs = int(update_epochs)
+    if minibatch_size <= 0 or rollout_size % minibatch_size:
+        raise ValueError("minibatch_size must evenly divide the rollout")
+    if update_epochs <= 0:
+        raise ValueError("update_epochs must be positive")
+    num_minibatches = rollout_size // minibatch_size
+
+    def epoch_step(carry, _):
+        epoch_state, epoch_rng = carry
+        epoch_rng, permutation_rng = jax.random.split(epoch_rng)
+        permutation = jax.random.permutation(permutation_rng, rollout_size)
+        shuffled = jax.tree.map(
+            lambda value: value[permutation].reshape(
+                (num_minibatches, minibatch_size) + value.shape[1:]
+            ),
+            transition,
+        )
+
+        def minibatch_step(minibatch_state, minibatch):
+            minibatch_state, metrics = update_goal_q(
+                network,
+                minibatch_state,
+                minibatch,
+                gamma=gamma,
+                record_environment_steps=False,
+                record_update_step=False,
+            )
+            return minibatch_state, metrics
+
+        epoch_state, metrics = jax.lax.scan(
+            minibatch_step, epoch_state, shuffled
+        )
+        return (epoch_state, epoch_rng), metrics
+
+    (state, rng), per_minibatch = jax.lax.scan(
+        epoch_step, (state, rng), None, length=update_epochs
+    )
+    state = state.replace(
+        environment_steps=state.environment_steps + rollout_size,
+        phase_steps=state.phase_steps + rollout_size,
+        update_steps=state.update_steps + 1,
+    )
+    valid_transitions = jnp.sum(transition.valid.astype(jnp.int32))
+    metrics = {
+        "loss": jnp.mean(per_minibatch["loss"]),
+        "chosen_q_mean": jnp.mean(per_minibatch["chosen_q_mean"]),
+        "target_mean": jnp.mean(per_minibatch["target_mean"]),
+        "valid_transitions": valid_transitions,
+        "physical_transitions": jnp.asarray(rollout_size, dtype=jnp.int32),
+        "sampled_training_transitions": jnp.asarray(
+            update_epochs * rollout_size, dtype=jnp.int32
+        ),
+        "applied_gradient_steps": jnp.asarray(
+            update_epochs * num_minibatches, dtype=jnp.int32
+        ),
+        "num_minibatches": jnp.asarray(num_minibatches, dtype=jnp.int32),
+        "update_epochs": jnp.asarray(update_epochs, dtype=jnp.int32),
+    }
+    return state, rng, metrics
 
 
 def update_all_goal_q(

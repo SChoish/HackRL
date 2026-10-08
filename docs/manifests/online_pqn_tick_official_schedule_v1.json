@@ -1,0 +1,296 @@
+{
+  "authority": {
+    "automatic_extension": false,
+    "checkpoint_writes": true,
+    "main_matrix": false,
+    "process_termination": true,
+    "process_termination_scope": "GPU 0 only: terminate exact same-uid, exact-interpreter processes carrying the standalone --beyondg-gpu-keepalive marker after pidfd validation; never signal unknown GPU processes; the wrapper may stop only its own runner on an unknown conflict",
+    "queue_launch": true,
+    "source": "user direction after review of 5daa1d6"
+  },
+  "budget": {
+    "automatic_extension": false,
+    "jobs": 2,
+    "maximum_evaluation_episodes": 128,
+    "training_transitions": 33554432
+  },
+  "candidate": {
+    "epsilon_decay_transitions": 16777216,
+    "epsilon_finish": 0.1,
+    "epsilon_start": 1.0,
+    "id": "pqn_lr2e4_eps10_full_schedule_v1",
+    "learning_rate": 0.0002,
+    "leo_hidden_size": 512,
+    "parent_candidate_id": "pqn_lr2e4_eps10_full_v1",
+    "pqn_hidden_size": 1024
+  },
+  "capacity_preflight": {
+    "existing_corrected_run_bytes": 80259184764,
+    "forecast": {
+      "basis": "Ten retained PQN state files are expected from five checkpoints x two seeds; the prior corresponding state file was 51,113,850 bytes. The 16 GiB projection conservatively covers retained files, predecessor-successor overlap, evaluation artifacts, logs, compilation artifacts in the RAID run tree, and large estimation error; the separate reserve remains 8 GiB.",
+      "projected_peak_write_bytes": 17179869184,
+      "required_free_bytes": 25769803776,
+      "reserve_rule": "max(8 GiB, 20% of projected remaining writes)",
+      "safety_reserve_bytes": 8589934592
+    },
+    "home": {
+      "available_bytes": 193893109760,
+      "decision": "rejected for checkpoint writes",
+      "filesystem": "/dev/md0",
+      "reported_use_percent": 90
+    },
+    "live_tree_rule": "never move a live checkpoint tree",
+    "observed_utc": "2026-10-08T09:07:33Z",
+    "raid": {
+      "available_bytes": 7970570301440,
+      "decision": "selected",
+      "filesystem": "/dev/md1",
+      "reported_use_percent": 73
+    },
+    "runtime_enforcement": "recheck before every job and checkpoint; stop at a completed resumable checkpoint if the reserve is threatened"
+  },
+  "common_training": {
+    "derived_compatibility_view_of": "training; retained because the established checkpoint and evaluation helpers consume this schema, and validate_manifest checks agreement",
+    "evaluation": {
+      "action_selection": "deterministic greedy/mode",
+      "bug_and_mutant_metrics_persisted_or_used": false,
+      "candidate_choice_boundary": "The lr=2e-4 parent candidate was chosen before this rerun because it matches the upstream default learning rate; no schedule-restoration bug metric or rerun result selected it.",
+      "common_setup_diagnostic_episodes": 32,
+      "gate": "each seed must achieve at least 29/32 natural-start successes",
+      "kernel": "fixed",
+      "layouts": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "natural_start_episodes": 32,
+      "oracle_boundary": "Success is scored by the project-owned TICK fixture and evaluator. Scripted kernel tests validate the encoded task contract; they are not independent external scientific ground truth.",
+      "phases": [
+        0,
+        1
+      ],
+      "selection": "none; one predeclared candidate only",
+      "selection_bias_boundary": "The same 32 validation states were used by prior development gates. This bounded rerun diagnoses the schedule under a fixed operational gate and is not held-out evidence of generalization.",
+      "split": "validation",
+      "threshold": 0.9
+    },
+    "gamma": 0.995,
+    "goal_mode": "workshop12",
+    "kernel": "fixed",
+    "learner_seeds": [
+      110,
+      111
+    ],
+    "log_interval_updates": 1024,
+    "max_grad_norm": 1.0,
+    "num_envs": 512,
+    "num_steps": 2,
+    "transitions_per_job": 16777216,
+    "transitions_per_update": 1024,
+    "updates": 16384
+  },
+  "evaluation": {
+    "action_selection": "deterministic greedy/mode",
+    "bug_and_mutant_metrics_persisted_or_used": false,
+    "candidate_choice_boundary": "The lr=2e-4 parent candidate was chosen before this rerun because it matches the upstream default learning rate; no schedule-restoration bug metric or rerun result selected it.",
+    "common_setup_diagnostic_episodes": 32,
+    "gate": "each seed must achieve at least 29/32 natural-start successes",
+    "kernel": "fixed",
+    "layouts": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5,
+      6,
+      7,
+      8,
+      9,
+      10,
+      11,
+      12,
+      13,
+      14,
+      15
+    ],
+    "natural_start_episodes": 32,
+    "oracle_boundary": "Success is scored by the project-owned TICK fixture and evaluator. Scripted kernel tests validate the encoded task contract; they are not independent external scientific ground truth.",
+    "phases": [
+      0,
+      1
+    ],
+    "selection": "none; one predeclared candidate only",
+    "selection_bias_boundary": "The same 32 validation states were used by prior development gates. This bounded rerun diagnoses the schedule under a fixed operational gate and is not held-out evidence of generalization.",
+    "split": "validation",
+    "threshold": 0.9
+  },
+  "execution": {
+    "checkpoint_updates": [
+      0,
+      4096,
+      8192,
+      12288,
+      16384
+    ],
+    "clean_worktree_root": "/raid/ext_csv/HackRL/worktrees/online_pqn_tick_official_schedule_v1",
+    "device_environment": {
+      "CUDA_VISIBLE_DEVICES": "0",
+      "HACKRL_DEVICE": "cuda",
+      "HACKRL_DUMMY_KEEPALIVE_CLEARED": "1",
+      "HACKRL_GPU_GUARD_ACTIVE": "1",
+      "JAX_PLATFORMS": "cuda",
+      "PYTHONPATH": "/raid/ext_csv/HackRL/worktrees/online_pqn_tick_official_schedule_v1/src",
+      "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+    },
+    "main_launch": "forbidden",
+    "operator_sequence": [
+      "Use the committed SHA to create the exact clean RAID worktree.",
+      "Run the queue wrapper once with --smoke; it identity-checks the existing keepalive, supervises both runner and guard, and writes no checkpoint.",
+      "Run the queue wrapper once with no --job argument; it executes seed 110 then 111 and produces gate.json and result.json.",
+      "Do not invoke per-job mode for the planned run; it is a resume/debug surface and does not finalize the gate by itself."
+    ],
+    "python": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
+    "queue_wrapper": "scripts/run_online_pqn_tick_official_schedule_gpu.sh",
+    "resume": "only from a complete checkpoint with matching job identity, update, state hash, and execution-source hashes",
+    "retention": "retain all five checkpoints for both seeds",
+    "run_id": "online_pqn_tick_official_schedule_v1",
+    "run_root": "/raid/ext_csv/HackRL/runs/online_pqn_tick_official_schedule_v1",
+    "runner": "scripts/run_online_pqn_tick_official_schedule.py",
+    "runner_lock": "/tmp/hackrl-online-pqn-tick-official-schedule-v1-runner.lock",
+    "sequential_single_gpu_jobs": true,
+    "source_hash_boundary": "The runner hashes its manifest, runner/wrapper/guard/stop helper, shared base runner, and all directly imported HackRL modules on the loaded PQN/TICK path. Runtime package versions and module origins are recorded in run_contract.json.",
+    "wrapper_only_boundary": "GPU execution requires HACKRL_GPU_GUARD_ACTIVE=1 in addition to the existing device variables; the committed wrapper is the authorized setter and supervises runner and guard together."
+  },
+  "manifest_id": "online_pqn_tick_official_schedule_v1",
+  "normalization_diagnostic": {
+    "checkpoints": "both PQN candidates x seeds 110 and 111 at update 512",
+    "decision_rule": "Descriptive mechanism check, not a configuration selector: any finite result with unchanged checkpoint hashes permits the predeclared schedule rerun. Missing, mutated, non-finite, or hash-mismatched evidence stops execution. The observed high disagreement strengthens the rationale for the rerun but is not itself a performance result.",
+    "fixed_observation_batch": "the 512 fixed TICK initial worker states from seed 110 crossed with all 12 commanded goals",
+    "interpretation_boundary": "train-mode batch-stat outputs are diagnostic only and are never reported as policy performance",
+    "measurements": [
+      "saved BatchRenorm step counters",
+      "Q mean/max absolute difference",
+      "greedy action disagreement overall and by goal",
+      "checkpoint SHA-256 before and after"
+    ],
+    "observed_result": {
+      "all_below_correction_threshold_1000": true,
+      "checkpoint_hashes_unchanged": true,
+      "checkpoints": 4,
+      "greedy_action_disagreement_rate_range": [
+        0.8489583333333334,
+        0.9739583333333334
+      ],
+      "q_mean_absolute_difference_range": [
+        0.00844933744519949,
+        0.00956988986581564
+      ],
+      "saved_batch_renorm_steps_each": [
+        512,
+        512
+      ]
+    },
+    "output": "/raid/ext_csv/HackRL/runs/online_pqn_tick_official_schedule_v1/batch_renorm_diagnostic.json",
+    "output_bytes": 18275,
+    "output_sha256": "6758bea0ff038451efb0c941b9ba1945a8f1d68d43f693f21f61ce3c5ceec070",
+    "rerun_policy": "The hash-bound artifact is immutable evidence. --diagnose-batch-renorm prints it without rewriting; a missing or changed artifact requires a reviewed manifest revision.",
+    "source_run": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1"
+  },
+  "parent": "docs/manifests/online_algorithm_expansion_v1_development_seen_goals_fix_v1_results.json",
+  "schema_version": "hackrl_online_pqn_tick_official_schedule_v1",
+  "selection_and_stop": {
+    "capacity_failure": "stop before the next checkpoint write",
+    "failed_seed_included": true,
+    "failure_does_not_authorize_more_seeds_or_transitions": true,
+    "gpu_smoke_required_before_training": true,
+    "nan_inf_or_hash_mismatch": "stop and preserve artifacts",
+    "normalization_diagnostic_required_before_training": true,
+    "success_only_authorizes_review_of_LEO_and_Dual_schedule_restoration": true
+  },
+  "status": "diagnostic_passed_ready_for_bound_gpu_smoke_then_training",
+  "training": {
+    "batch_renorm_population": "All collected rows enter BatchRenorm statistics before the valid-transition mask is applied to TD loss; this existing behavior is held fixed in the schedule rerun.",
+    "candidate_id": "pqn_lr2e4_eps10_full_schedule_v1",
+    "checkpoint_updates": [
+      0,
+      4096,
+      8192,
+      12288,
+      16384
+    ],
+    "environment": "TICK-CLAIM",
+    "epsilon_decay_transitions": 16777216,
+    "epsilon_finish": 0.1,
+    "epsilon_start": 1.0,
+    "fixture_initializer_hidden_size": 8,
+    "fixture_initializer_hidden_size_boundary": "The canonical fixture initializer briefly constructs a discarded PPO learner at width 8; initialize_online_value_runner replaces that train state with the registered 1024-wide PQN before any action or training transition.",
+    "gamma": 0.995,
+    "goal_mode": "workshop12",
+    "kernel": "fixed",
+    "learner_seeds": [
+      110,
+      111
+    ],
+    "learning_rate": 0.0002,
+    "log_interval_updates": 1024,
+    "max_grad_norm": 1.0,
+    "method": "GC-PQN",
+    "minibatch_size": 256,
+    "num_envs": 512,
+    "num_minibatches": 4,
+    "num_steps": 2,
+    "optimizer_applications_per_job": 65536,
+    "optimizer_applications_per_update": 4,
+    "parent_candidate_id": "pqn_lr2e4_eps10_full_v1",
+    "pqn_hidden_size": 1024,
+    "replay": false,
+    "rollout_transitions": 1024,
+    "target": "current-network one-step TD with stop-gradient",
+    "total_jobs": 2,
+    "total_training_transitions": 33554432,
+    "transitions_per_job": 16777216,
+    "update_epochs": 1,
+    "updates": 16384
+  },
+  "understood_as": "First measure train-batch versus saved-running-stat Q values on the four completed PQN TICK checkpoints without mutating them. Then rerun only GC-PQN on fixed TICK-CLAIM for learner seeds 110 and 111 with the existing lr=2e-4 candidate, unchanged exploration/network/goals/reward/initialization/evaluation, 2-step collection, 256-transition shuffled minibatches, one epoch, and the same 16,777,216 physical transitions per seed. Do not launch LEO, Dual, SAC, mutant adaptation, or any automatic extension.",
+  "upstream_reference": {
+    "claim_boundary": "This is a schedule restoration inside the HackRL implementation, not an assertion that the complete upstream experiment has been reproduced.",
+    "commit": "eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+    "intentional_non_upstream_controls": [
+      "HackRL fixed TICK-CLAIM workshop12 fixture and rewards",
+      "512 environments",
+      "existing GoalConditionedQ architecture and current-network one-step TD target",
+      "existing candidate exploration schedule 1.0 to 0.1 across the full physical-transition budget",
+      "existing fixed validation evaluator",
+      "constant Adam learning rate rather than the upstream default linear annealing schedule"
+    ],
+    "pqn_defaults": {
+      "learning_rate": 0.0002,
+      "minibatch_size": 256,
+      "num_envs": 1024,
+      "num_epochs": 1,
+      "num_steps": 2
+    },
+    "repository": "https://github.com/MichaelTMatthews/purejaxgcrl",
+    "restored_mechanism": "short online collection followed by a shared random permutation and sequential minibatch optimizer applications; no replay and no target network",
+    "verified_source_sha256": {
+      "leo.py": "a44809a9fa4360a3fd29840a6e0bfc54beb9de8491095716a0bfa86e4d1f9214",
+      "models/batch_renorm.py": "d97cf65e418004929e6e84267e0ae551bd4e7cbfcb38371d7d9a72b02a541138",
+      "pqn.py": "a396e9ef78cc8f175d91fd83762fbdc4a3a40dfa0f82278fd57131240d72c9dc"
+    }
+  }
+}
