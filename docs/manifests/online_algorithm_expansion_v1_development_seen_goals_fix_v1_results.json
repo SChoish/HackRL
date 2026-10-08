@@ -1,0 +1,189 @@
+{
+  "artifacts": {
+    "capacity_checks.jsonl": {
+      "bytes": 107121,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/capacity_checks.jsonl",
+      "sha256": "93b163b5eb19af3d42a07441e0a391e6ca418d1bb80466733901ffb0e40da80e"
+    },
+    "corrected_result": {
+      "bytes": 22179,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/corrected_development_result.json",
+      "sha256": "638286457069b6aa1a1480a0396490a469bc657ffe248285a06611d2beebac76"
+    },
+    "development_gate.json": {
+      "bytes": 15232,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/development_gate.json",
+      "sha256": "2d30056ad3cea7d68f5f76d18c0e065c670737f6349b19a65b20fdacde3904a8"
+    },
+    "final_checkpoint_audit.json": {
+      "bytes": 709730,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/final_checkpoint_audit.json",
+      "sha256": "ffead6d7b0ce4145925f2c315642dfda8151a61e2a785d4d6aae7715b6a86f52"
+    },
+    "keepalive_guard_log": {
+      "bytes": 7944,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/keepalive_guard.jsonl",
+      "sha256": "cffbb7d6a85781fc69f6d595a26b0b3b759f76c9557fd81326f24e15e8e6c4b6"
+    },
+    "launcher_log": {
+      "bytes": 68338,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/launcher.log",
+      "sha256": "e3fa9fb2cf98473204c2c2eb6bdfe7b75aa01044ee3a3d4cbb965e701bf06aa5"
+    },
+    "run_contract.json": {
+      "bytes": 25155,
+      "path": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1/run_contract.json",
+      "sha256": "5b2a9af15d7d30458d8b1adc92189fee481bdd5f002a4aebb1bb6d97c392e37a"
+    }
+  },
+  "current_status_source_of_truth": "this result supersedes the parent manifest execution status; the parent remains immutable because its hash is part of every corrected checkpoint contract",
+  "execution": {
+    "backend": "gpu",
+    "completed_utc": "2026-10-08T08:11:30Z",
+    "device": "cuda:0",
+    "git_head": "9162480923b6eab61691845d15403d0c46d1cca6",
+    "jobs_completed": 32,
+    "main_automatically_launched": false,
+    "run_root": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1",
+    "started_utc": "2026-10-08T07:27:47Z",
+    "training_transitions": 536870912,
+    "transitions_per_job": 16777216,
+    "updates_per_job": 512,
+    "wall_clock_seconds": 2623.0
+  },
+  "interpretation": {
+    "not_supported": [
+      "This does not show that PQN, LEO, Dual LEO(PQN), or discrete SAC cannot exploit either defect; the fixed/mutant main comparison never opened.",
+      "Sparse rewarded transitions do not establish stable learning of delivery or any auxiliary goal.",
+      "The two candidate settings and two development seeds do not establish a general failure of value-based or entropy-based reinforcement learning.",
+      "The finite final-checkpoint evaluation does not exclude success on untested states or a transient policy at an earlier checkpoint."
+    ],
+    "operational_decision": "Keep the 72-job main matrix closed. Do not automatically extend replay, budget, candidates, or architectures. If continuing this branch, preregister the already-proposed one-method, one-environment PQN comparison between a delivery-near reset and the original natural reset to distinguish local value learning from long-horizon action linking.",
+    "supported": "Under the corrected preregistered two-candidate, two-seed fixed-normal settings, all four online methods encountered commanded delivery transitions and most jobs encountered at least one delivery-ge-3 success in persisted rollout snapshots. No final checkpoint succeeded in any of the recorded deterministic evaluations: 1,024 natural-start episodes and 1,024 common-setup episodes."
+  },
+  "manifest_id": "online_algorithm_expansion_v1_development_seen_goals_fix_v1_results",
+  "normal_capability_gate": {
+    "common_setup_successes": "0/1024",
+    "jobs_with_any_common_success": 0,
+    "jobs_with_any_natural_success": 0,
+    "natural_successes": "0/1024",
+    "passed_cells": 0,
+    "per_job_result": "all 32 jobs scored 0/32 in both deterministic greedy evaluation families",
+    "selection_note": "all candidate scores tied at zero; registry-order selections are operational tie-breaks, not evidence of superiority",
+    "total_cells": 8
+  },
+  "operations": {
+    "guard_completed": true,
+    "guard_fail_closed_events": 1,
+    "guard_note": "one transient unmarked GPU PID caused a fail-closed stop; no signal was sent to it. After it disappeared and a marker-bearing keepalive appeared, that keepalive was identity-checked, terminated, and the guard resumed without interrupting training.",
+    "identity_checked_keepalive_terminations": 79
+  },
+  "optimizer_and_integrity": {
+    "all_32_final_parameter_sets_changed_from_deterministic_initialization": true,
+    "all_capacity_checks_passed": true,
+    "all_expected_log_schedules_present": true,
+    "all_logged_apply_counters_positive": true,
+    "all_logged_numeric_metrics_finite": true,
+    "capacity_check_count": 193,
+    "checkpoint_directories": 160,
+    "minimum_raid_free_bytes": 7973230899200,
+    "optimizer_step_values": [
+      512,
+      2048
+    ],
+    "run_tree_bytes": 80259162470
+  },
+  "parent": "docs/manifests/online_algorithm_expansion_v1_development_seen_goals_fix_v1.json",
+  "schema_version": "hackrl_online_algorithm_expansion_v1_development_seen_goals_fix_v1_results",
+  "shared_wiring_fix_validation": {
+    "conclusion": "the corrected command distribution reached all goals; the original frozen-three-goal defect does not explain this rerun result",
+    "jobs_with_all_12_goals_seen": "32/32",
+    "smoke": "CPU 8/8 and 512x64 GPU 8/8; online-value and SD-SAC collectors expanded seen goals in both environments"
+  },
+  "status": "complete_fixed_normal_gate_failed_main_closed",
+  "stored_learning_signal": {
+    "by_method_environment": {
+      "dual|pack": {
+        "delivery1": 251,
+        "delivery3": 6,
+        "delivery3_commanded_transitions": 226201,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 4,
+        "logged_rows": 68
+      },
+      "dual|tick": {
+        "delivery1": 159,
+        "delivery3": 16,
+        "delivery3_commanded_transitions": 275255,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 4,
+        "logged_rows": 68
+      },
+      "leo|pack": {
+        "delivery1": 224,
+        "delivery3": 2,
+        "delivery3_commanded_transitions": 235320,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 2,
+        "logged_rows": 68
+      },
+      "leo|tick": {
+        "delivery1": 108,
+        "delivery3": 10,
+        "delivery3_commanded_transitions": 275214,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 4,
+        "logged_rows": 68
+      },
+      "pqn|pack": {
+        "delivery1": 248,
+        "delivery3": 3,
+        "delivery3_commanded_transitions": 229319,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 3,
+        "logged_rows": 68
+      },
+      "pqn|tick": {
+        "delivery1": 190,
+        "delivery3": 19,
+        "delivery3_commanded_transitions": 275262,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 4,
+        "logged_rows": 68
+      },
+      "sd-sac|pack": {
+        "delivery1": 291,
+        "delivery3": 5,
+        "delivery3_commanded_transitions": 240703,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 2,
+        "logged_rows": 68
+      },
+      "sd-sac|tick": {
+        "delivery1": 178,
+        "delivery3": 12,
+        "delivery3_commanded_transitions": 283143,
+        "jobs": 4,
+        "jobs_delivery1": 4,
+        "jobs_delivery3": 4,
+        "logged_rows": 68
+      }
+    },
+    "delivery_ge1_successes": 1649,
+    "delivery_ge3_commanded_valid_transitions": 2040417,
+    "delivery_ge3_successes": 73,
+    "interpretation_boundary": "rewarded experience and commanded transitions show exposure and learning signal; they do not prove that a stable greedy policy learned the corresponding goal",
+    "jobs_with_delivery_ge1_success": "32/32",
+    "jobs_with_delivery_ge3_success": "27/32",
+    "scope": "17 of 512 rollouts per job (update 1 and every 32 updates); counts are lower bounds, not full-training totals",
+    "sd_sac_final_replay_windows_with_any_delivery_reward": "7/8",
+    "sd_sac_final_replay_windows_with_delivery_ge3_reward": "3/8"
+  }
+}
