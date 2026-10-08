@@ -68,12 +68,19 @@
     ]
   },
   "interpretation": {
-    "supported": "Under the preregistered two-candidate, two-seed fixed-normal development settings, none of the four online methods acquired the normal delivery task in either environment.",
+    "supported": "The original fixed-normal development gate recorded zero delivery success under a shared command-distribution wiring defect; it is evidence of the defective execution, not of the four methods normal-task capability.",
     "not_supported": [
       "These runs do not show that any method cannot exploit TICK-CLAIM or PACK-RESTORE bugs.",
       "These runs do not compare bug exploitation because the normal-task capability gate failed first.",
       "The all-zero gate does not authorize choosing new candidates from bug or mutant results."
     ],
     "operational_decision": "Do not launch the fixed/mutant main matrix. Preserve all failed jobs and checkpoints; do not automatically extend training or add candidates."
+  },
+  "posthoc_wiring_defect": {
+    "recorded_utc": "2026-10-08",
+    "diagnostic_result": "docs/manifests/online_algorithm_zero_gate_diagnostic_v1_results.json",
+    "status": "the recorded 32-job execution remains immutable, but its capability interpretation is invalidated",
+    "defect": "new online collectors failed to accumulate observed goals into runner.seen_goals, preventing delivery from entering the commanded-goal distribution",
+    "required_action": "rerun the unchanged development matrix after the fix; do not compare these affected scores as algorithm performance"
   }
 }

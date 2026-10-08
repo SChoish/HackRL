@@ -1,0 +1,36 @@
+{
+  "schema_version": "hackrl_online_algorithm_zero_gate_diagnostic_v1",
+  "manifest_id": "online_algorithm_zero_gate_diagnostic_v1",
+  "parent_result": "docs/manifests/online_algorithm_expansion_v1_development_results.json",
+  "status": "authorized_diagnostic_not_started",
+  "understood_as": "Without opening new long training or the fixed/mutant main matrix, determine whether the all-zero fixed-normal gate comes from the shared environment/evaluation path, loss of successful transitions in collection and target construction, absence of learning signal, or failure to apply gradients and optimizer updates.",
+  "authority": {
+    "source": "user instruction following the 0/8 fixed-normal development gate",
+    "existing_checkpoint_evaluation": true,
+    "scripted_trace_instrumentation": true,
+    "stored_log_and_optimizer_audit": true,
+    "new_training": false,
+    "main_fixed_mutant_matrix": false,
+    "candidate_or_budget_sweep": false,
+    "checkpoint_writes": false
+  },
+  "diagnostics": [
+    {
+      "id": "existing_success_policy_evaluator_bridge",
+      "question": "Does a previously successful PPO or Dual policy produce the same actions and success outcome through the original evaluator and the new adapter/evaluation path when initial state, delivery goal, and deterministic action selection are identical?",
+      "failure_localization": "observation, goal encoding, action mapping, reset, or success aggregation"
+    },
+    {
+      "id": "scripted_success_trace_collector_and_targets",
+      "question": "Does a verified fixed normal success trace preserve the commanded goal, goal vector, reward, goal/world termination, next observation versus reset observation, valid mask, and goal-head index through the actual collector and each algorithm-specific target construction?",
+      "failure_localization": "shared transition wiring or algorithm-specific TD target"
+    },
+    {
+      "id": "stored_learning_signal_and_optimizer_audit",
+      "question": "Across the completed 32 jobs, which goals were commanded or achieved, whether delivery success entered learning data, how many valid TD samples existed, and whether gradients and optimizer steps were actually applied?",
+      "failure_localization": "experience acquisition, target allocation, or update application"
+    }
+  ],
+  "interpretation_boundary": "A failed normal-task gate does not establish inability to exploit either defect. Any missing historical metric is reported as unobserved rather than inferred as zero.",
+  "stop_rule": "After these three bounded diagnostics, do not automatically add replay, training-budget, candidate, or architecture sweeps."
+}

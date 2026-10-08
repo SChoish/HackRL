@@ -1,0 +1,290 @@
+{
+  "authority": {
+    "additional_candidates_after_results": false,
+    "bug_metric_configuration_selection": false,
+    "checkpoint_writes": true,
+    "dependency_changes": false,
+    "implementation_bugfix": "seen-goal accumulation and per-goal observability only",
+    "main_adaptation": false,
+    "normal_only_development": true,
+    "queue_launch": true,
+    "source": "user instruction to diagnose the common all-zero wiring, fix a concrete defect, and rerun the bounded normal gate"
+  },
+  "budget": {
+    "automatic_extension": false,
+    "candidates_per_method": 2,
+    "environments": 2,
+    "jobs": 32,
+    "learner_seeds": 2,
+    "maximum_evaluation_episodes": 2048,
+    "methods": 4,
+    "training_transitions": 536870912
+  },
+  "candidate_registry": {
+    "Dual LEO(PQN)": [
+      {
+        "acting": "0.7*Q_PQN + 0.3*Q_LEO",
+        "epsilon_decay_transitions": 16777216,
+        "epsilon_finish": 0.1,
+        "epsilon_start": 1.0,
+        "id": "dual_lr2e4_eps10_full_v1",
+        "learning_rate": 0.0002,
+        "leo_hidden_size": 512,
+        "pqn_hidden_size": 1024,
+        "replay": false
+      },
+      {
+        "acting": "0.7*Q_PQN + 0.3*Q_LEO",
+        "epsilon_decay_transitions": 13421772,
+        "epsilon_finish": 0.05,
+        "epsilon_start": 1.0,
+        "id": "dual_lr1e4_eps05_80pct_v1",
+        "learning_rate": 0.0001,
+        "leo_hidden_size": 512,
+        "pqn_hidden_size": 1024,
+        "replay": false
+      }
+    ],
+    "GC-PQN": [
+      {
+        "epsilon_decay_transitions": 16777216,
+        "epsilon_finish": 0.1,
+        "epsilon_start": 1.0,
+        "id": "pqn_lr2e4_eps10_full_v1",
+        "learning_rate": 0.0002,
+        "leo_hidden_size": 512,
+        "pqn_hidden_size": 1024,
+        "replay": false,
+        "target": "current-network one-step TD with stop-gradient"
+      },
+      {
+        "epsilon_decay_transitions": 13421772,
+        "epsilon_finish": 0.05,
+        "epsilon_start": 1.0,
+        "id": "pqn_lr1e4_eps05_80pct_v1",
+        "learning_rate": 0.0001,
+        "leo_hidden_size": 512,
+        "pqn_hidden_size": 1024,
+        "replay": false,
+        "target": "current-network one-step TD with stop-gradient"
+      }
+    ],
+    "GC-SD-SAC": [
+      {
+        "actor_learning_rate": 0.0002,
+        "beta": 0.1,
+        "critic_learning_rate": 0.0002,
+        "hidden_size": 1024,
+        "id": "sdsac_lr2e4_u1_v1",
+        "initial_alpha": 0.2,
+        "polyak_tau": 0.005,
+        "q_clip_range": 0.5,
+        "replay_batch_size": 1024,
+        "replay_capacity": 262144,
+        "replay_update_iterations_per_rollout": 1,
+        "sampled_transitions_per_physical_transition": 0.03125,
+        "target_entropy_fraction_of_log_actions": 0.98,
+        "temperature_learning_rate": 0.0002
+      },
+      {
+        "actor_learning_rate": 0.0001,
+        "beta": 0.1,
+        "critic_learning_rate": 0.0001,
+        "hidden_size": 1024,
+        "id": "sdsac_lr1e4_u4_v1",
+        "initial_alpha": 0.2,
+        "polyak_tau": 0.005,
+        "q_clip_range": 0.5,
+        "replay_batch_size": 1024,
+        "replay_capacity": 262144,
+        "replay_update_iterations_per_rollout": 4,
+        "sampled_transitions_per_physical_transition": 0.125,
+        "target_entropy_fraction_of_log_actions": 0.98,
+        "temperature_learning_rate": 0.0001
+      }
+    ],
+    "LEO": [
+      {
+        "epsilon_decay_transitions": 16777216,
+        "epsilon_finish": 0.1,
+        "epsilon_start": 1.0,
+        "id": "leo_lr2e4_eps10_full_v1",
+        "learning_rate": 0.0002,
+        "leo_hidden_size": 512,
+        "per_goal_terminal_td": true,
+        "pqn_hidden_size": 1024,
+        "replay": false
+      },
+      {
+        "epsilon_decay_transitions": 13421772,
+        "epsilon_finish": 0.05,
+        "epsilon_start": 1.0,
+        "id": "leo_lr1e4_eps05_80pct_v1",
+        "learning_rate": 0.0001,
+        "leo_hidden_size": 512,
+        "per_goal_terminal_td": true,
+        "pqn_hidden_size": 1024,
+        "replay": false
+      }
+    ],
+    "frozen_before_any_development_result": true,
+    "selection_is_cell_local_by_method_and_environment": true,
+    "shared_across_environments": true
+  },
+  "capacity_preflight": {
+    "forecast": {
+      "basis": "reuse the original conservative preregistered peak forecast; observed original 32-job tree was 80,258,114,089 bytes",
+      "projected_peak_write_bytes": 343597383680,
+      "raid_margin_after_requirement_bytes": 6546683904000,
+      "required_free_bytes": 412316860416,
+      "reserve_rule": "max(8 GiB, 20% of projected peak writes)",
+      "safety_reserve_bytes": 68719476736
+    },
+    "home": {
+      "available_bytes": 194327982080,
+      "decision": "rejected for checkpoint writes",
+      "filesystem": "/dev/md0",
+      "reported_use_percent": 90,
+      "total_bytes": 1888425144320,
+      "used_bytes": 1598094946304
+    },
+    "live_tree_rule": "never move a live checkpoint tree; any migration requires a completed checkpoint, verified copy/hash, switched path, successful resume, then source cleanup",
+    "observed_utc": "2026-10-08T05:38:08Z",
+    "raid": {
+      "available_bytes": 6959000764416,
+      "decision": "selected",
+      "filesystem": "/dev/md1",
+      "new_run_existing_bytes": 0,
+      "original_development_run_bytes": 80258114089,
+      "reported_use_percent": 77,
+      "total_bytes": 30601613336576,
+      "used_bytes": 22106347651072
+    },
+    "runtime_enforcement": "recheck before every job and checkpoint; stop at a complete resumable checkpoint if projected writes plus reserve are no longer available"
+  },
+  "common_training": {
+    "evaluation": {
+      "action_selection": "deterministic greedy/mode",
+      "bug_and_mutant_metrics_persisted_or_used": false,
+      "common_setup_diagnostic_episodes": 32,
+      "discounted_return_definition": "success * gamma^(length-1) for length >= 1, otherwise zero; the fixed normal delivery evaluator has unit reward on the success step",
+      "evaluator_family_mapping": "natural_reset is the canonical evaluator label for the manifest's natural-start family",
+      "exact_tie_breaker": "earlier candidate order in the frozen registry",
+      "gate": "selected candidate must achieve at least 29/32 natural-start successes independently for seeds 110 and 111",
+      "layouts": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15
+      ],
+      "natural_start_episodes": 32,
+      "oracle_boundary": "delivery success is scored by project-owned fixtures; independent kernel and scripted-oracle tests validate the encoded task contract, not an external scientific ground truth",
+      "phases": [
+        0,
+        1
+      ],
+      "record_episode_rows": true,
+      "selection_bias_boundary": "the same validation layouts select the candidate and adjudicate this operational gate, so a pass is not held-out evidence of generalization",
+      "selection_metric": "fixed-normal natural-start delivery success",
+      "split": "validation",
+      "threshold": 0.9,
+      "tie_breaker": "fixed-normal natural-start mean discounted return"
+    },
+    "gamma": 0.995,
+    "goal_mode": "workshop12",
+    "kernel": "fixed",
+    "learner_seeds": [
+      110,
+      111
+    ],
+    "log_interval_updates": 32,
+    "max_grad_norm": 1.0,
+    "num_envs": 512,
+    "num_steps": 64,
+    "transitions_per_job": 16777216,
+    "transitions_per_update": 32768,
+    "updates": 512
+  },
+  "current_status_source_of_truth": "this manifest owns the corrected fixed-normal rerun; the original development tree and result remain immutable historical evidence",
+  "defect_and_rerun_boundary": {
+    "historical_tree_policy": "do not resume from or overwrite the defective run; write a new RAID tree with new source hashes",
+    "main_rule": "never launch the 72-job main matrix automatically, regardless of the corrected gate result",
+    "observability_change": "update logs add per-goal commanded, successful, and seen counters",
+    "only_training_semantic_change": "runner.seen_goals now accumulates event.observed_goals after every rollout in both online-value and SD-SAC collectors",
+    "unchanged": [
+      "candidate registry",
+      "learner seeds",
+      "updates",
+      "physical-transition budget",
+      "fixed kernel",
+      "workshop12 goal definitions",
+      "evaluation states",
+      "selection and gate rules"
+    ]
+  },
+  "execution": {
+    "checkpoint_updates": [
+      0,
+      128,
+      256,
+      384,
+      512
+    ],
+    "clean_worktree_root": "/raid/ext_csv/HackRL/worktrees/online_algorithm_expansion_v1_development_seen_goals_fix_v1",
+    "device_environment": {
+      "CUDA_VISIBLE_DEVICES": "0",
+      "HACKRL_DEVICE": "cuda",
+      "HACKRL_DUMMY_KEEPALIVE_CLEARED": "1",
+      "JAX_PLATFORMS": "cuda",
+      "PYTHONPATH": "/raid/ext_csv/HackRL/worktrees/online_algorithm_expansion_v1_development_seen_goals_fix_v1/src",
+      "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+    },
+    "main_launch": "forbidden and never automatic",
+    "python": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
+    "queue_wrapper": "scripts/run_online_algorithm_seen_goals_fix_gpu_queue.sh",
+    "required_entry_checks": [
+      "the smoke manifest records CPU 8/8 and GPU 8/8 passed with no checkpoint writes",
+      "the queue wrapper identity-checks and stops only --beyondg-gpu-keepalive processes, then sets HACKRL_DUMMY_KEEPALIVE_CLEARED=1",
+      "the interpreter and repository root match the paths declared here",
+      "every imported hackrl project module resolves beneath the declared clean worktree",
+      "the JAX backend is gpu on CUDA_VISIBLE_DEVICES=0",
+      "the non-symlink run root itself is on the same device as /raid/ext_csv",
+      "a nonblocking single-runner lock is held"
+    ],
+    "resume": "resume only from a complete checkpoint whose state hash, candidate, environment, seed, update, and execution-source hashes match; preserve and stop on any existing invalid checkpoint directory",
+    "retention": "retain all five development checkpoints per job; never prune failed seeds or final states",
+    "run_id": "online_algorithm_expansion_v1_development_seen_goals_fix_v1",
+    "run_root": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development_seen_goals_fix_v1",
+    "run_root_override": "forbidden; the runner must resolve exactly to the RAID path above",
+    "runner": "scripts/run_online_algorithm_seen_goals_fix.py",
+    "runner_lock": "/tmp/hackrl-online-algorithm-seen-goals-fix-v1-runner.lock",
+    "sequential_single_gpu_jobs": true
+  },
+  "manifest_id": "online_algorithm_expansion_v1_development_seen_goals_fix_v1",
+  "parent": "docs/manifests/online_algorithm_zero_gate_diagnostic_v1_results.json",
+  "schema_version": "hackrl_online_algorithm_expansion_v1_development_seen_goals_fix_v1",
+  "selection_and_stop": {
+    "capacity_failure": "stop before the next checkpoint write",
+    "failed_cell_no_automatic_extension": true,
+    "failed_seed_included": true,
+    "main_requires_separate_result-backed manifest": true,
+    "nan_inf_or_hash_mismatch": "stop the affected job and preserve artifacts",
+    "one_cell_failure_does_not_block_other_cells": true,
+    "select_only_from_fixed_normal_development": true
+  },
+  "smoke_manifest": "docs/manifests/online_algorithm_seen_goals_fix_v1_smoke.json",
+  "status": "authorized_waiting_for_post_fix_smoke",
+  "understood_as": "After correcting the shared seen-goal accumulation defect and passing fresh CPU/GPU smokes, rerun exactly the original 32 fixed-normal development jobs with unchanged candidates, seeds, transition budgets, evaluation, selection, and stopping rules. Main adaptation remains closed."
+}

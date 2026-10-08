@@ -1,0 +1,50 @@
+{
+  "authority": {
+    "checkpoint_writes": false,
+    "cpu_smoke": true,
+    "development": false,
+    "gpu_smoke": true,
+    "main": false,
+    "process_termination_scope": "SIGTERM only for an identity-checked --beyondg-gpu-keepalive process immediately before a GPU smoke cell",
+    "source": "user instruction to diagnose common wiring and fix a concrete defect before rerun"
+  },
+  "cells": {
+    "count_per_tier": 8,
+    "cpu_shape": "2x4",
+    "environments": [
+      "TICK-CLAIM",
+      "PACK-RESTORE"
+    ],
+    "gpu_shape": "512x64",
+    "methods": [
+      "GC-PQN",
+      "LEO",
+      "Dual LEO(PQN)",
+      "GC-SD-SAC"
+    ],
+    "seed": 109
+  },
+  "manifest_id": "online_algorithm_seen_goals_fix_v1_smoke",
+  "parent": "docs/manifests/online_algorithm_zero_gate_diagnostic_v1_results.json",
+  "pass_criteria": [
+    "all 16 processes exit zero with finite state and metrics",
+    "each cell collects exactly its declared transitions and writes no checkpoint",
+    "the emitted metrics include all 12 commanded-goal, goal-success, and seen-goal counters",
+    "at least one 512x64 cell per environment expands seen_goals beyond the three initialized goals"
+  ],
+  "purpose": "Re-run all eight CPU and eight 512x64 GPU one-update cells after the shared seen-goal fix before any corrected development checkpoint is written.",
+  "results": {
+    "cpu": {
+      "cells_passed": 0,
+      "cells_total": 8,
+      "status": "not_started"
+    },
+    "gpu": {
+      "cells_passed": 0,
+      "cells_total": 8,
+      "status": "not_started"
+    }
+  },
+  "schema_version": "hackrl_online_algorithm_seen_goals_fix_v1_smoke",
+  "status": "authorized_not_started"
+}

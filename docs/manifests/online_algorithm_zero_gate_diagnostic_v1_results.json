@@ -1,0 +1,196 @@
+{
+  "artifacts": {
+    "result": "/raid/ext_csv/HackRL/runs/online_algorithm_zero_gate_diagnostic_v1/result.json",
+    "result_bytes": 711211,
+    "result_sha256": "04d5947e05473620b3d686a0c862b1d94f77da792d9c1c2d88579a08ce5589a8",
+    "script": "scripts/diagnose_online_algorithm_zero_gate.py",
+    "script_sha256": "8488b8716379fa0e846976769246c4571b5d64ce53d9fd04f68f32c809900ed9"
+  },
+  "bounded_conclusion": "The three preregistered checks passed within their stated scope, but a post-audit reconciliation of final runner state with the command sampler found a shared wiring defect: all 32 jobs retained only the three initially-seen goals because the new online collectors never accumulated event.observed_goals into runner.seen_goals. Consequently delivery and most workshop goals could not enter the commanded-goal distribution. The all-zero gate is not interpretable as an algorithm capability result.",
+  "decision": "Fix the common seen-goal accumulation in both online-value and SD-SAC collectors, rerun the unchanged 32-job fixed-normal development matrix in a new RAID run root, and keep the 72-job fixed/mutant main matrix closed. Do not launch the planned near-delivery PQN diagnostic because the upstream common defect was found first.",
+  "definitions": {
+    "all_zero_gate": "All 32 development jobs scored 0/32 fixed-kernel natural-reset delivery successes and 0/32 common-setup delivery successes under deterministic greedy evaluation.",
+    "diagnostic_complete": "The three authorized checks completed; this does not mean normal delivery was learned.",
+    "goal_done_without_world_done": "The commanded delivery predicate became true while the underlying world episode had not reached its reset condition.",
+    "valid_transition": "A collector transition whose command was active and therefore entered the learner mask."
+  },
+  "development_job_matrix": {
+    "candidates_per_method": 2,
+    "environments": [
+      "TICK-CLAIM",
+      "PACK-RESTORE"
+    ],
+    "jobs": 32,
+    "learner_seeds": [
+      110,
+      111
+    ],
+    "methods": [
+      "GC-PQN",
+      "LEO",
+      "Dual LEO(PQN)",
+      "GC-SD-SAC"
+    ],
+    "transitions_per_job": 16777216,
+    "updates_per_job": 512
+  },
+  "development_result": "docs/manifests/online_algorithm_expansion_v1_development_results.json",
+  "execution": {
+    "checkpoint_writes_performed": 0,
+    "existing_success_checkpoints_re_evaluated": 2,
+    "jobs_audited": 32,
+    "main_matrix_launched": false,
+    "replay_or_budget_sweep_launched": false,
+    "scripted_fixed_success_traces_checked": 2,
+    "source_fix_performed_after_raw_diagnostic": true,
+    "training_or_optimizer_updates_performed": 0
+  },
+  "existing_success_policy_evaluator_bridge": {
+    "checkpoint_count": 2,
+    "checkpoint_state_sha256": {
+      "PACK-RESTORE": "2974b403a1aca8948f34302abe11edb42ead4a58f0c9a007a5652f9781506528",
+      "TICK-CLAIM": "5b592e98b42550bea83598d53e27be0131d761089362163b486877684103db31"
+    },
+    "common_setup_successes": {
+      "PACK-RESTORE": "32/32",
+      "TICK-CLAIM": "32/32"
+    },
+    "environments": [
+      "TICK-CLAIM",
+      "PACK-RESTORE"
+    ],
+    "input_tensors_bit_equal": true,
+    "natural_start_successes": {
+      "PACK-RESTORE": "32/32",
+      "TICK-CLAIM": "32/32"
+    },
+    "original_and_bridged_episode_records_equal": true,
+    "passed": true,
+    "policy": "Dual PPO fixed adaptation checkpoint at update 4096, seed 20",
+    "scope_limit": "This establishes that the shared frozen evaluator and observation adapter can preserve a known successful PPO policy. It does not validate every algorithm-specific action policy or independently validate environment semantics.",
+    "stored_and_rerun_summaries_equal": true
+  },
+  "manifest_id": "online_algorithm_zero_gate_diagnostic_v1_results",
+  "next_bounded_diagnostic": {
+    "replacement": "unchanged 32-job fixed-normal development rerun after the shared fix",
+    "requirement_before_launch": "Freeze the exact candidate, environment, seeds, update budget, evaluation episodes, checkpoint destination, comparison metric, and stopping rule in a separate manifest.",
+    "shape": "One preregistered PQN candidate in one environment, comparing a delivery-near reset distribution with the original natural reset distribution.",
+    "status": "superseded_before_start_by_shared_wiring_defect"
+  },
+  "parent": "docs/manifests/online_algorithm_zero_gate_diagnostic_v1.json",
+  "post_audit_shared_wiring_defect": {
+    "all_32_equal_environment_initial_seen_goal_set": true,
+    "correction": [
+      "carry event.observed_goals through the online transition/SD-SAC rollout",
+      "OR-reduce time and worker axes into runner.seen_goals after each rollout",
+      "persist per-goal commanded, successful, and seen counts in update logs"
+    ],
+    "evidence_scope": "all 32 final development checkpoints plus source comparison with the established PPO collectors",
+    "final_seen_goals": {
+      "PACK-RESTORE": [
+        "inventory/raw_material_ge_1",
+        "facility/storage_empty",
+        "facility/storage_has_raw_material"
+      ],
+      "TICK-CLAIM": [
+        "facility/reservation_absent",
+        "visible/crop_ripe",
+        "visible/crop_unripe"
+      ]
+    },
+    "interpretation_boundary": "This establishes a common command-distribution defect. It does not predict whether any corrected method will learn normal delivery.",
+    "reward_alignment": "The only rewarded goals retained in final SD-SAC replay windows were members of the same three-goal initial set; delivery rewards were absent.",
+    "source_localization": {
+      "downstream_effect": "sample_false_seen_goal draws only from runner.seen_goals, so delivery could never be selected as a command goal in the affected runs.",
+      "established_collectors": [
+        "src/hackrl/tick_claim_gc.py accumulates event.observed_goals after every rollout",
+        "src/hackrl/pack_restore_gc.py accumulates event.observed_goals after every rollout"
+      ],
+      "faulty_collectors": [
+        "make_online_value_update omitted the accumulation",
+        "make_sd_sac_collection omitted the accumulation"
+      ]
+    },
+    "status": "confirmed_and_fixed_pending_rerun"
+  },
+  "provenance": {
+    "checkpoint_mutation_check": "All source checkpoints were opened read-only; the diagnostic wrote only its result JSON.",
+    "command": "JAX_PLATFORMS=cpu HACKRL_DEVICE=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/diagnose_online_algorithm_zero_gate.py",
+    "development_execution_git_head": "5148bc06a1e5876b9e4a56eb48c19c920c6d7db6",
+    "development_result_sha256_after_posthoc_addendum": "a25449b25866ecc68f0935f66bcdec2b29417d34c2970bed6115bf51b8617e19",
+    "development_result_sha256_at_diagnostic": "f2442ccb2d065f2c1a9b76b6c190b389e7fa44425981592e64303747a7c73578",
+    "diagnostic_completed_utc": "2026-10-08T05:23:21Z",
+    "execution_backend": "cpu",
+    "parent_manifest_sha256": "1c40d61281ed730439240cb666e60c7b7912e7b60cb56957dfeca4698a6fc14a",
+    "repository_head_during_diagnostic": "c46e30952ca2df54fe887e3329b2a1ac284d8ae0"
+  },
+  "purpose": "Complete a bounded no-training localization of the all-zero fixed-normal delivery gate before any main online-algorithm matrix is opened.",
+  "schema_version": "hackrl_online_algorithm_zero_gate_diagnostic_v1_results",
+  "scripted_success_trace_collector_and_targets": {
+    "PACK-RESTORE": {
+      "final_done": true,
+      "final_goal_done": true,
+      "final_reward": 1.0,
+      "final_world_done": false,
+      "leo_final_delivery_target": 1.0,
+      "next_observation_is_terminal_not_reset": true,
+      "pqn_final_delivery_target": 1.0,
+      "rewarded_steps": 1,
+      "sd_sac_final_delivery_target": 1.0,
+      "steps": 20
+    },
+    "TICK-CLAIM": {
+      "final_done": true,
+      "final_goal_done": true,
+      "final_reward": 1.0,
+      "final_world_done": false,
+      "leo_final_delivery_target": 1.0,
+      "next_observation_is_terminal_not_reset": true,
+      "pqn_final_delivery_target": 1.0,
+      "rewarded_steps": 1,
+      "sd_sac_final_delivery_target": 1.0,
+      "steps": 21
+    },
+    "independent_target_formula_max_abs_error_at_most": 0.0,
+    "passed": true,
+    "scope_limit": "This checks the fixed legal success trace and synthetic one-step targets, including the terminal transition. It does not exhaust all unsuccessful, truncated, replay-sampled, or nonterminal trajectories."
+  },
+  "status": "complete_shared_wiring_defect_found",
+  "stored_learning_signal_and_optimizer_audit": {
+    "missing_historical_metrics": {
+      "interpretation": "Missing historical fields are unobserved, not zero. PQN, LEO, and Dual retained no replay. SD-SAC retained only its final replay window.",
+      "jobs_with_goal_command_frequency_in_logs": 0,
+      "jobs_with_goal_completion_count_in_logs": 0,
+      "jobs_with_reward_count_in_logs": 0
+    },
+    "optimizer_scope_limit": "Exact counters plus changed parameter hashes establish that optimizer applications occurred. They do not establish that every gradient used the intended objective or experience.",
+    "passed": true,
+    "passed_checks": {
+      "all_17_logged_collection_snapshots_per_job_have_32768_valid_transitions": true,
+      "all_32_jobs_have_17_expected_log_rows": true,
+      "all_final_optimizer_counters_match_scheduled_counts": true,
+      "all_final_parameter_sets_changed_from_initialization": true,
+      "all_logged_apply_counters_positive": true,
+      "all_logged_numeric_metrics_finite": true
+    },
+    "sd_sac_final_replay_windows": {
+      "PACK-RESTORE_rewarded_entries_across_windows": {
+        "all_delivery_goals": 0,
+        "facility/storage_empty": 62,
+        "facility/storage_has_raw_material": 109,
+        "inventory/raw_material_ge_1": 221
+      },
+      "TICK-CLAIM_rewarded_entries_across_windows": {
+        "all_delivery_goals": 0,
+        "facility/reservation_absent": 11,
+        "visible/crop_ripe": 6188,
+        "visible/crop_unripe": 2197
+      },
+      "entries_per_window": 262144,
+      "interpretation": "Some non-delivery goal success experience is present in every retained SD-SAC window. This does not prove that the final greedy policy learned those goals. No retained window contains a delivery reward, but earlier SD-SAC delivery experience is unobserved rather than proven absent.",
+      "windows": 8,
+      "windows_with_any_reward": 8,
+      "windows_with_delivery_reward": 0
+    }
+  }
+}

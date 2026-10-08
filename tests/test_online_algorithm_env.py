@@ -8,6 +8,7 @@ from hackrl.online_algorithm_env import (
     DUAL,
     LEO,
     PQN,
+    accumulate_seen_goals,
     build_online_transitions,
     clone_training_branch,
     environment_adapter,
@@ -44,6 +45,7 @@ def test_transition_translation_keeps_commanded_and_all_goal_termination_separat
         goal_done=jnp.asarray([True, False]),
         world_done=jnp.asarray([False, True]),
         terminal_goals=jnp.asarray([[True, False], [False, False]]),
+        observed_goals=jnp.asarray([[True, False], [False, True]]),
     )
     pair = build_online_transitions(
         adapter,
@@ -56,7 +58,22 @@ def test_transition_translation_keeps_commanded_and_all_goal_termination_separat
     np.testing.assert_array_equal(pair.pqn.valid, [True, False])
     np.testing.assert_array_equal(pair.leo.world_done, [False, True])
     np.testing.assert_array_equal(pair.leo.terminal_goals, event.terminal_goals)
+    np.testing.assert_array_equal(pair.observed_goals, event.observed_goals)
     np.testing.assert_allclose(pair.pqn.next_map_channels, 1.0)
+
+
+def test_seen_goals_accumulate_across_workers_and_rollout_steps():
+    previous = jnp.asarray([True, False, False, False])
+    observed = jnp.asarray(
+        [
+            [[False, True, False, False], [False, False, False, False]],
+            [[False, False, True, False], [False, False, False, False]],
+        ]
+    )
+    np.testing.assert_array_equal(
+        accumulate_seen_goals(previous, observed),
+        [True, True, True, False],
+    )
 
 
 def test_clone_materializes_identical_independent_array_leaves():

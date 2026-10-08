@@ -70,6 +70,7 @@ class OnlineValueNetworks:
 class OnlineTransitionPair(struct.PyTreeNode):
     pqn: GoalQTransition
     leo: AllGoalTransition
+    observed_goals: jax.Array
 
 
 @dataclass(frozen=True)
@@ -161,12 +162,24 @@ def build_online_transitions(
         world_done=event.world_done,
         valid=valid,
     )
-    return OnlineTransitionPair(pqn=pqn, leo=leo)
+    return OnlineTransitionPair(
+        pqn=pqn,
+        leo=leo,
+        observed_goals=event.observed_goals,
+    )
 
 
 def _flatten_rollout(transition):
     return jax.tree.map(
         lambda value: value.reshape((-1,) + value.shape[2:]), transition
+    )
+
+
+def accumulate_seen_goals(seen_goals, rollout_observed_goals):
+    """Persist every goal observed by any worker during one rollout."""
+
+    return jnp.logical_or(
+        seen_goals, jnp.any(rollout_observed_goals, axis=(0, 1))
     )
 
 
@@ -292,6 +305,9 @@ def make_online_value_update(
         runner, (trajectory, epsilon) = jax.lax.scan(
             rollout_step, runner, None, length=env_config.num_steps
         )
+        seen_goals = accumulate_seen_goals(
+            runner.seen_goals, trajectory.observed_goals
+        )
         flat = _flatten_rollout(trajectory)
         if method == PQN:
             learner, learning = update_goal_q(
@@ -311,12 +327,36 @@ def make_online_value_update(
                 gamma=env_config.gamma,
             )
         runner = runner.replace(
-            train_state=learner, global_update=runner.global_update + 1
+            train_state=learner,
+            seen_goals=seen_goals,
+            global_update=runner.global_update + 1,
         )
+        commanded_goals = jnp.sum(
+            flat.pqn.goal_one_hot
+            * flat.pqn.valid.astype(jnp.float32)[:, None],
+            axis=0,
+        ).astype(jnp.int32)
+        goal_successes = jnp.sum(
+            flat.pqn.goal_one_hot
+            * (flat.pqn.reward > 0).astype(jnp.float32)[:, None],
+            axis=0,
+        ).astype(jnp.int32)
         metrics = {
             "learning": learning,
             "epsilon_start": epsilon[0],
             "epsilon_end": epsilon[-1],
+            "commanded_goals": {
+                str(index): commanded_goals[index]
+                for index in range(adapter.num_goals)
+            },
+            "goal_successes": {
+                str(index): goal_successes[index]
+                for index in range(adapter.num_goals)
+            },
+            "seen_goals": {
+                str(index): seen_goals[index].astype(jnp.int32)
+                for index in range(adapter.num_goals)
+            },
             "physical_transitions": jnp.asarray(
                 env_config.batch_size, dtype=jnp.int32
             ),
@@ -443,19 +483,41 @@ def make_sd_sac_collection(
             valid=adapter.event_valid(event),
             behavior_entropy=entropy,
         )
-        return stepped_runner, batch
+        return stepped_runner, (batch, event.observed_goals)
 
     def collect(runner, replay):
-        runner, trajectory = jax.lax.scan(
+        runner, (trajectory, observed_goals) = jax.lax.scan(
             rollout_step, runner, None, length=env_config.num_steps
         )
+        seen_goals = accumulate_seen_goals(runner.seen_goals, observed_goals)
         flat = _flatten_rollout(trajectory)
         replay = append_sd_sac_replay(replay, flat)
         state = record_sd_sac_environment_steps(
             runner.train_state, env_config.batch_size
         )
-        runner = runner.replace(train_state=state)
+        runner = runner.replace(train_state=state, seen_goals=seen_goals)
+        commanded_goals = jnp.sum(
+            flat.goal_one_hot * flat.valid.astype(jnp.float32)[:, None],
+            axis=0,
+        ).astype(jnp.int32)
+        goal_successes = jnp.sum(
+            flat.goal_one_hot
+            * (flat.reward > 0).astype(jnp.float32)[:, None],
+            axis=0,
+        ).astype(jnp.int32)
         metrics = {
+            "commanded_goals": {
+                str(index): commanded_goals[index]
+                for index in range(adapter.num_goals)
+            },
+            "goal_successes": {
+                str(index): goal_successes[index]
+                for index in range(adapter.num_goals)
+            },
+            "seen_goals": {
+                str(index): seen_goals[index].astype(jnp.int32)
+                for index in range(adapter.num_goals)
+            },
             "physical_transitions": jnp.asarray(
                 env_config.batch_size, dtype=jnp.int32
             ),
