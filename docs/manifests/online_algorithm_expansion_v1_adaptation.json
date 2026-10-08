@@ -2,7 +2,7 @@
   "schema_version": "hackrl_online_algorithm_expansion_v1_adaptation",
   "manifest_id": "online_algorithm_expansion_v1_adaptation",
   "parent": "docs/manifests/online_algorithm_expansion_v1_implementation.json",
-  "status": "implementation_and_focused_unit_tests_complete_no_environment_or_training_execution",
+  "status": "implementation_and_cpu_smoke_complete_gpu_blocked_no_training",
   "repository_baseline": {
     "local_parent_git_sha": "fd66882c984f4a24a8bc079b7535c7b57e92333b",
     "observed_remote_main_sha": "991f8bd13e1d36df72af5455aae2b5c828fd7f34",
@@ -102,7 +102,7 @@
       "tests/test_online_algorithm_env.py",
       "tests/test_online_algorithm_expansion_implementation_manifest.py"
     ],
-    "focused_result": "18 passed",
+    "focused_result": "19 implementation tests passed before smoke execution",
     "related_regression_result": "45 passed, 2 failed",
     "related_regression_failures": [
       "tests/test_dual_leo.py::test_checkpoint_restores_policy_teacher_optimizer_and_schedule_position",
@@ -110,12 +110,14 @@
     ],
     "failure_attribution": "the failing test and src/hackrl/dual_leo.py have no worktree diff; both failures reproduce alone and are outside the new module call graph",
     "causality_boundary": "unchanged files and isolated reproduction do not establish how the tests behave on a clean parent-SHA checkout; the failures remain unresolved legacy-path regressions, not proven pre-existing failures",
-    "environment_or_training_execution_started": false,
+    "environment_or_training_execution_started": true,
+    "execution_scope": "CPU smoke only: eight method x environment cells, eight physical transitions per cell, no checkpoint writes",
+    "cpu_smoke_result": "8/8 cells passed; 64/64 physical transitions; all states and reported metrics finite",
+    "gpu_smoke_result": "not started because PID 107, a non-HackRL beyondg GPU keepalive process, held 107997 MiB on the only H200",
     "checkpoint_written": false
   },
   "remaining_gates": [
-    "separate CPU smoke authority",
-    "separate GPU smoke authority after CPU smoke",
+    "GPU smoke after the conflicting non-HackRL compute process releases the H200",
     "reviewed normal-only candidate registry amendment before development",
     "capacity forecast and RAID path decision before checkpoint-writing execution",
     "no automatic development or main launch"

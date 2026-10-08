@@ -13,6 +13,7 @@ from hackrl.online_algorithm_env import (
     environment_adapter,
     frozen_evaluation_binding,
     OnlineValueNetworks,
+    rollout_phase_steps,
 )
 
 
@@ -74,6 +75,13 @@ def test_clone_materializes_identical_independent_array_leaves():
 def test_method_names_keep_dual_q_combination_distinct_from_bc():
     assert (PQN, LEO, DUAL) == ("GC-PQN", "LEO", "Dual LEO(PQN)")
     assert "BC" not in DUAL
+
+
+def test_rollout_schedule_counts_pending_physical_transitions():
+    schedule = SimpleNamespace(
+        environment_steps=jnp.asarray(1024), phase_steps=jnp.asarray(256)
+    )
+    assert int(rollout_phase_steps(jnp.asarray(1040), schedule)) == 272
 
 
 def test_q_evaluation_rejects_accidental_softmax_sampling():

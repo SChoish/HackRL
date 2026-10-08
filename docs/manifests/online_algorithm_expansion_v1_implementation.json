@@ -2,7 +2,7 @@
   "schema_version": "hackrl_online_algorithm_expansion_v1_implementation",
   "manifest_id": "online_algorithm_expansion_v1_implementation",
   "parent": "docs/manifests/online_algorithm_expansion_v1.json",
-  "status": "implementation_unit_tests_passed_awaiting_separate_smoke_authority",
+  "status": "implementation_and_cpu_smoke_passed_gpu_smoke_blocked",
   "understood_as": "Implement and unit-test reusable GC-PQN, LEO, Dual LEO(PQN), and independently specified GC-SD-SAC cores for TICK-CLAIM and PACK-RESTORE. Do not run CPU/GPU smoke, development, training, queues, or checkpoint-writing jobs in this stage.",
   "authority": {
     "implementation": true,
@@ -167,25 +167,30 @@
     "sha256": {
       "src/hackrl/online_value.py": "e21298c01eed683211d8c36f8395790003d72c396b335384f5a496bcb707dbfc",
       "src/hackrl/discrete_sac.py": "9acdecf457cb8c9dbde7d18811c2e062b9c14ac77ca0e4f09c6cd461e511e32e",
-      "src/hackrl/online_algorithm_env.py": "20144bf4586006a17a86f45ce13289fdb3cc4df96bf801beec508a86606d2b54",
+      "src/hackrl/online_algorithm_env.py": "0bb34577a672a491b860487c4afd1d280a2765594ad5cd9cd43f824764236f79",
       "tests/test_online_value.py": "9a8a3b1c918c8db800d67fcd07b6e0c9fb0c31b74bdd9ff939be613e21f12e7d",
       "tests/test_discrete_sac.py": "4469281d8ed80d0d11da44a6685ed5350672e7b7c590802099090dd5e01946af",
-      "tests/test_online_algorithm_env.py": "6ff01aa11609cb472649fe32aed1788fe89baa9474674e52213d3dbe94e97ef1",
+      "tests/test_online_algorithm_env.py": "e481fffe41cb64b801ae7d67de6dd790f8b24b95f418610e38c5efe6948561eb",
       "tests/test_online_algorithm_expansion_implementation_manifest.py": "4f030d7b8a716488552c5e08775464bbea9516fa9b3642c1b64e9c7762ce808d"
     }
   },
   "verification": {
-    "focused_implementation_tests": "18 passed",
+    "focused_implementation_tests": "19 passed",
     "related_regression_tests": "45 passed, 2 failed",
     "related_regression_failure_scope": "two exact-equality failures in the unchanged legacy Dual path; neither the test nor src/hackrl/dual_leo.py is modified, but no clean-baseline run at the parent SHA was performed, so this does not prove causal independence",
     "syntax_compile": "passed",
     "ruff": "not run because ruff is not installed and dependency changes are unauthorized",
-    "cpu_or_gpu_smoke": "not started"
+    "cpu_or_gpu_smoke": "CPU passed 8/8 cells and 64/64 transitions; GPU not started because a conflicting non-HackRL compute process holds 107997 MiB"
+  },
+  "subsequent_smoke_stage": {
+    "manifest": "docs/manifests/online_algorithm_expansion_v1_smoke.json",
+    "cpu": "passed",
+    "gpu": "not started; blocked by active non-HackRL GPU keepalive"
   },
   "phase_completion": {
     "implementation_started": true,
     "unit_tests_passed": true,
-    "cpu_or_gpu_smoke_started": false,
+    "cpu_or_gpu_smoke_started": true,
     "training_started": false
   }
 }

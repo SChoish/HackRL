@@ -1,0 +1,164 @@
+{
+  "schema_version": "hackrl_online_algorithm_expansion_v1_smoke",
+  "manifest_id": "online_algorithm_expansion_v1_smoke",
+  "parent": "docs/manifests/online_algorithm_expansion_v1_implementation.json",
+  "status": "cpu_passed_gpu_blocked_by_conflicting_process",
+  "understood_as": "Run the next sequential gates after implementation: first an eight-cell CPU minimal smoke, then an eight-cell 512x64 GPU one-update smoke only if CPU passes and an idle GPU is available.",
+  "authorization": {
+    "source": "user continuation instruction after the implementation handoff",
+    "cpu_smoke": true,
+    "gpu_smoke_after_cpu_pass": true,
+    "development": false,
+    "main": false,
+    "queue_launch": false,
+    "checkpoint_writes": false,
+    "dependency_changes": false,
+    "implementation_bugfixes": false,
+    "process_termination": false,
+    "temporary_logs_under_tmp": true
+  },
+  "execution_identity": {
+    "host": "ext_csv-box",
+    "base_git_sha": "3571f8891e47f8de6aabbc75c092e3e7ac7c7ec7",
+    "scope": "the base commit plus the exact runtime artifact hashes recorded below",
+    "result_invalidation": "a change to any shared runtime artifact invalidates the recorded CPU evidence and requires all eight CPU cells to pass again before GPU entry"
+  },
+  "cells": {
+    "methods": ["GC-PQN", "LEO", "Dual LEO(PQN)", "GC-SD-SAC"],
+    "environments": ["TICK-CLAIM", "PACK-RESTORE"],
+    "count": 8,
+    "kernel": "fixed",
+    "goal_mode": "workshop12",
+    "seed": 109
+  },
+  "cpu": {
+    "num_envs": 2,
+    "num_steps": 4,
+    "physical_transitions_per_cell": 8,
+    "physical_transitions_total": 64,
+    "hidden_sizes": {"PQN": 8, "LEO": 8, "SD-SAC": 8}
+  },
+  "gpu": {
+    "entry_gate": "all eight CPU cells pass and the selected GPU has no conflicting active compute process",
+    "process_isolation": "one fresh process per method x environment cell, executed sequentially",
+    "device_index": 0,
+    "device_uuid": "GPU-88f9a048-01dd-f24b-c1aa-cd5f04621b81",
+    "conflict_definition": "any other process on the selected device UUID that actively computes or holds device memory is conflicting",
+    "fresh_entry_check": "repeat the process, memory, and utilization check immediately before every cell; an earlier observation is only point-in-time evidence",
+    "noninterference": "never signal, terminate, suspend, or otherwise interfere with a conflicting process without separate explicit authority",
+    "num_envs": 512,
+    "num_steps": 64,
+    "physical_transitions_per_cell": 32768,
+    "physical_transitions_total": 262144,
+    "hidden_sizes": {"PQN": 1024, "LEO": 512, "SD-SAC": 1024},
+    "checkpoint_retention": false
+  },
+  "execution_contract": {
+    "workdir": "/home/ext_csv/HackRL",
+    "python": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
+    "order": "run the eight cells sequentially, with a fresh process for every method x environment pair",
+    "timeout_seconds_per_cell": 1800,
+    "success_exit_code": 0,
+    "cpu": {
+      "environment": {
+        "JAX_PLATFORMS": "cpu",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+      },
+      "command": "python scripts/smoke_online_algorithms.py --tier cpu --environment <tick|pack> --method <pqn|leo|dual|sd-sac>"
+    },
+    "gpu": {
+      "environment": {
+        "JAX_PLATFORMS": "gpu",
+        "CUDA_VISIBLE_DEVICES": "0",
+        "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
+      },
+      "command": "python scripts/smoke_online_algorithms.py --tier gpu --environment <tick|pack> --method <pqn|leo|dual|sd-sac>"
+    },
+    "output": "each cell must emit one JSON result on stdout and exit zero; stdout and stderr may be retained only under /tmp; no persistent run or checkpoint directory is created",
+    "replay_scope": "PQN, LEO, and Dual retain no rollout replay; SD-SAC may use only the declared transient in-memory replay, which is discarded at process exit"
+  },
+  "smoke_only_optimizer_inputs": {
+    "learning_rate": 0.0002,
+    "max_grad_norm": 1.0,
+    "epsilon_start": 1.0,
+    "epsilon_finish": 0.1,
+    "epsilon_decay_transitions": 16777216,
+    "sd_sac": {
+      "initial_alpha": 0.2,
+      "temperature_learning_rate": 0.0002,
+      "beta": 0.1,
+      "q_clip_range": 0.5,
+      "polyak_tau": 0.005,
+      "target_entropy_fraction_of_log_actions": 0.98,
+      "replay_capacity_rollouts": 2,
+      "replay_update_iterations": 1,
+      "maximum_replay_minibatch": 1024
+    },
+    "selection_boundary": "these values exist only to exercise finite forward, target, loss, optimizer, replay, and target-update paths; they are not development candidates and cannot populate the empty candidate registry without a reviewed amendment"
+  },
+  "pass_criteria": [
+    "every cell initializes on the requested backend",
+    "every cell collects exactly the declared physical transitions",
+    "every online method applies its declared update without retaining rollout replay",
+    "SD-SAC stores behavior entropy, has at least one valid replay transition, and applies one replay update iteration",
+    "all reported losses, parameters, optimizer states, target states, and counters are finite",
+    "no checkpoint, run directory, queue claim, or dependency mutation is created"
+  ],
+  "failure_rule": "stop the affected tier and preserve stdout and stderr under /tmp; this manifest does not authorize source edits, implementation fixes, dependency changes, or process termination; require a reviewed amendment before any such action; after any shared runtime code change, rerun all eight CPU cells before GPU entry; do not open development",
+  "runner": "scripts/smoke_online_algorithms.py",
+  "results": {
+    "cpu": {
+      "status": "passed",
+      "completed_utc": "2026-10-08T03:14:17Z",
+      "cells_passed": 8,
+      "cells_total": 8,
+      "physical_transitions": 64,
+      "checkpoint_written": false,
+      "finite_state_and_metrics": true,
+      "cells": [
+        {"environment": "TICK-CLAIM", "method": "GC-PQN", "loss": 0.029380548745393753, "wall_time_seconds": 13.977866555564106},
+        {"environment": "TICK-CLAIM", "method": "LEO", "loss": 0.2727336883544922, "wall_time_seconds": 14.032310616225004},
+        {"environment": "TICK-CLAIM", "method": "Dual LEO(PQN)", "pqn_loss": 0.029380548745393753, "leo_loss": 0.2727336883544922, "wall_time_seconds": 15.379966942593455},
+        {"environment": "TICK-CLAIM", "method": "GC-SD-SAC", "critic_1_loss": 0.09486067295074463, "critic_2_loss": 0.38976895809173584, "actor_loss": -0.5691026449203491, "valid_replay_transitions": 8, "wall_time_seconds": 15.830518526956439},
+        {"environment": "PACK-RESTORE", "method": "GC-PQN", "loss": 0.017439894378185272, "wall_time_seconds": 14.07758229970932},
+        {"environment": "PACK-RESTORE", "method": "LEO", "loss": 0.19872219860553741, "wall_time_seconds": 14.285215402022004},
+        {"environment": "PACK-RESTORE", "method": "Dual LEO(PQN)", "pqn_loss": 0.017439894378185272, "leo_loss": 0.19872219860553741, "wall_time_seconds": 15.800152807496488},
+        {"environment": "PACK-RESTORE", "method": "GC-SD-SAC", "critic_1_loss": 0.101082444190979, "critic_2_loss": 0.4610826075077057, "actor_loss": -0.5628751516342163, "valid_replay_transitions": 8, "wall_time_seconds": 16.37524010706693}
+      ]
+    },
+    "gpu": {
+      "status": "not_started",
+      "blocked_utc": "2026-10-08T03:14:17Z",
+      "last_rechecked_utc": "2026-10-08T03:24:05Z",
+      "reason": "entry gate requires no conflicting active compute process",
+      "observation": {
+        "host": "ext_csv-box",
+        "device_index": 0,
+        "device_uuid": "GPU-88f9a048-01dd-f24b-c1aa-cd5f04621b81",
+        "gpu": "NVIDIA H200",
+        "memory_total_mib": 143771,
+        "memory_used_mib": 107997,
+        "memory_free_mib": 35160,
+        "utilization_percent": 10,
+        "conflicting_pid": 107,
+        "process_marker": "--beyondg-gpu-keepalive",
+        "process_cwd": "/home/ext_csv/MPI_sweep/logs/beyondg"
+      },
+      "observation_scope": "point-in-time evidence only; the full GPU entry check must be repeated immediately before every future cell",
+      "process_terminated": false
+    }
+  },
+  "verification": {
+    "combined_focused_tests": "23 passed, 1 existing dependency deprecation warning",
+    "syntax_compile": "passed",
+    "json_parse": "passed",
+    "git_diff_check": "passed",
+    "gpu_recheck": "entry remains blocked by the same non-HackRL PID 107; no process was signaled or terminated"
+  },
+  "artifact_sha256": {
+    "src/hackrl/online_algorithm_env.py": "0bb34577a672a491b860487c4afd1d280a2765594ad5cd9cd43f824764236f79",
+    "tests/test_online_algorithm_env.py": "e481fffe41cb64b801ae7d67de6dd790f8b24b95f418610e38c5efe6948561eb",
+    "scripts/smoke_online_algorithms.py": "03baf05d29dd8a47747d332ec7fb35e30ad5234cb959dc66a32a7fc2c7c7b3cf",
+    "tests/test_online_algorithm_smoke_manifest.py": "dcb13d253bf651efb33ba98877d43a42e5e17171bd55ee1e2e2bce8dec6d6dfc"
+  }
+}

@@ -174,6 +174,13 @@ def _schedule_state(method, state):
     return state.pqn if method == DUAL else state
 
 
+def rollout_phase_steps(runner_environment_steps, schedule_state):
+    """Include physical transitions collected in the not-yet-updated rollout."""
+
+    pending = runner_environment_steps - schedule_state.environment_steps
+    return schedule_state.phase_steps + pending
+
+
 def _acting_q(method, networks, state, model_inputs):
     if method == PQN:
         return goal_q_apply(networks.pqn, state, *model_inputs)
@@ -263,7 +270,7 @@ def make_online_value_update(
         q_values = _acting_q(method, networks, runner.train_state, inputs)
         schedule = _schedule_state(method, runner.train_state)
         epsilon = epsilon_at_phase_step(
-            schedule.phase_steps,
+            rollout_phase_steps(runner.env_steps, schedule),
             start=epsilon_start,
             finish=epsilon_finish,
             decay_transitions=epsilon_decay_transitions,
