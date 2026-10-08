@@ -2,10 +2,10 @@
   "schema_version": "hackrl_online_algorithm_expansion_v1_smoke",
   "manifest_id": "online_algorithm_expansion_v1_smoke",
   "parent": "docs/manifests/online_algorithm_expansion_v1_implementation.json",
-  "status": "cpu_passed_gpu_blocked_by_conflicting_process",
+  "status": "passed",
   "understood_as": "Run the next sequential gates after implementation: first an eight-cell CPU minimal smoke, then an eight-cell 512x64 GPU one-update smoke only if CPU passes and an idle GPU is available.",
   "authorization": {
-    "source": "user continuation instruction after the implementation handoff",
+    "source": "user continuation instruction after the implementation handoff, followed by explicit instruction to stop the dummy GPU process and train",
     "cpu_smoke": true,
     "gpu_smoke_after_cpu_pass": true,
     "development": false,
@@ -14,7 +14,8 @@
     "checkpoint_writes": false,
     "dependency_changes": false,
     "implementation_bugfixes": false,
-    "process_termination": false,
+    "process_termination": true,
+    "process_termination_scope": "SIGTERM only for identity-checked processes carrying --beyondg-gpu-keepalive during the smoke and authorized development handoff; no authority for any other process",
     "temporary_logs_under_tmp": true
   },
   "execution_identity": {
@@ -68,7 +69,7 @@
     },
     "gpu": {
       "environment": {
-        "JAX_PLATFORMS": "gpu",
+        "JAX_PLATFORMS": "cuda",
         "CUDA_VISIBLE_DEVICES": "0",
         "XLA_PYTHON_CLIENT_PREALLOCATE": "false"
       },
@@ -104,7 +105,17 @@
     "all reported losses, parameters, optimizer states, target states, and counters are finite",
     "no checkpoint, run directory, queue claim, or dependency mutation is created"
   ],
-  "failure_rule": "stop the affected tier and preserve stdout and stderr under /tmp; this manifest does not authorize source edits, implementation fixes, dependency changes, or process termination; require a reviewed amendment before any such action; after any shared runtime code change, rerun all eight CPU cells before GPU entry; do not open development",
+  "failure_rule": "stop the affected tier and preserve stdout and stderr under /tmp; this manifest does not authorize source edits, implementation fixes, dependency changes, or any additional process termination; require a reviewed amendment before any such action; after any shared runtime code change, rerun all eight CPU cells before GPU entry; do not open development",
+  "amendments": [
+    {
+      "recorded_utc": "2026-10-08T03:31:23Z",
+      "authority": "explicit user instruction to stop the dummy and train",
+      "action": "verified PID 107 as --beyondg-gpu-keepalive, sent SIGTERM, and confirmed zero remaining GPU compute processes and zero MiB device use",
+      "contract_fix": "changed JAX_PLATFORMS from the generic gpu alias to the installed NVIDIA backend name cuda",
+      "reason": "the first TICK-CLAIM x GC-PQN attempt exited before model initialization because the generic alias attempted the unavailable ROCm backend",
+      "scope": "execution contract and manifest test only; no shared runtime code changed, so the passed CPU evidence remains valid"
+    }
+  ],
   "runner": "scripts/smoke_online_algorithms.py",
   "results": {
     "cpu": {
@@ -127,10 +138,11 @@
       ]
     },
     "gpu": {
-      "status": "not_started",
+      "status": "passed",
       "blocked_utc": "2026-10-08T03:14:17Z",
       "last_rechecked_utc": "2026-10-08T03:24:05Z",
-      "reason": "entry gate requires no conflicting active compute process",
+      "completed_utc": "2026-10-08T03:44:49Z",
+      "reason": "the dummy keepalive was explicitly terminated before each fresh process; all cells passed after the recorded cuda platform amendment",
       "observation": {
         "host": "ext_csv-box",
         "device_index": 0,
@@ -145,7 +157,35 @@
         "process_cwd": "/home/ext_csv/MPI_sweep/logs/beyondg"
       },
       "observation_scope": "point-in-time evidence only; the full GPU entry check must be repeated immediately before every future cell",
-      "process_terminated": false
+      "process_terminated": true,
+      "terminated_pid": 107,
+      "terminated_recreated_keepalive_pids": [53880, 56882, 59079, 61168, 63972, 67145, 70339, 72432, 75323],
+      "cells_passed": 8,
+      "cells_total": 8,
+      "physical_transitions": 262144,
+      "checkpoint_written": false,
+      "finite_state_and_metrics": true,
+      "cells": [
+        {"environment": "TICK-CLAIM", "method": "GC-PQN", "loss": 0.052334003150463104, "wall_time_seconds": 31.16143889632076},
+        {"environment": "TICK-CLAIM", "method": "LEO", "loss": 0.8709031343460083, "wall_time_seconds": 30.157301178202033},
+        {"environment": "TICK-CLAIM", "method": "Dual LEO(PQN)", "pqn_loss": 0.052329182624816895, "leo_loss": 0.8708686232566833, "wall_time_seconds": 37.750170262530446},
+        {"environment": "TICK-CLAIM", "method": "GC-SD-SAC", "critic_1_loss": 0.38278287649154663, "critic_2_loss": 0.4190891981124878, "actor_loss": -1.1732468605041504, "valid_replay_transitions": 32768, "wall_time_seconds": 33.75600810069591},
+        {"environment": "PACK-RESTORE", "method": "GC-PQN", "loss": 0.04002128541469574, "wall_time_seconds": 29.97273483686149},
+        {"environment": "PACK-RESTORE", "method": "LEO", "loss": 0.8222153782844543, "wall_time_seconds": 30.124383511021733},
+        {"environment": "PACK-RESTORE", "method": "Dual LEO(PQN)", "pqn_loss": 0.040020205080509186, "leo_loss": 0.822234570980072, "wall_time_seconds": 38.65017627552152},
+        {"environment": "PACK-RESTORE", "method": "GC-SD-SAC", "critic_1_loss": 0.48208415508270264, "critic_2_loss": 0.4388144016265869, "actor_loss": -1.1397310495376587, "valid_replay_transitions": 32768, "wall_time_seconds": 33.045684720389545}
+      ],
+      "failed_attempts": [
+        {
+          "recorded_utc": "2026-10-08T03:31:23Z",
+          "environment": "TICK-CLAIM",
+          "method": "GC-PQN",
+          "physical_transitions": 0,
+          "checkpoint_written": false,
+          "exit_code": 1,
+          "failure": "JAX_PLATFORMS=gpu attempted the unavailable rocm backend before model initialization"
+        }
+      ]
     }
   },
   "verification": {
@@ -153,12 +193,12 @@
     "syntax_compile": "passed",
     "json_parse": "passed",
     "git_diff_check": "passed",
-    "gpu_recheck": "entry remains blocked by the same non-HackRL PID 107; no process was signaled or terminated"
+    "gpu_recheck": "all eight 512x64 cells passed after each newly recreated dummy keepalive was identity-checked and terminated immediately before the fresh smoke process"
   },
   "artifact_sha256": {
     "src/hackrl/online_algorithm_env.py": "0bb34577a672a491b860487c4afd1d280a2765594ad5cd9cd43f824764236f79",
     "tests/test_online_algorithm_env.py": "e481fffe41cb64b801ae7d67de6dd790f8b24b95f418610e38c5efe6948561eb",
     "scripts/smoke_online_algorithms.py": "03baf05d29dd8a47747d332ec7fb35e30ad5234cb959dc66a32a7fc2c7c7b3cf",
-    "tests/test_online_algorithm_smoke_manifest.py": "dcb13d253bf651efb33ba98877d43a42e5e17171bd55ee1e2e2bce8dec6d6dfc"
+    "tests/test_online_algorithm_smoke_manifest.py": "c5e3cd2f9089b99aca6ef4e43f22c0051daa610992f9bf3b6a26ff0a7a05a316"
   }
 }

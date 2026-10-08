@@ -1,0 +1,250 @@
+{
+  "schema_version": "hackrl_online_algorithm_expansion_v1_development",
+  "manifest_id": "online_algorithm_expansion_v1_development",
+  "parent": "docs/manifests/online_algorithm_expansion_v1.json",
+  "smoke_manifest": "docs/manifests/online_algorithm_expansion_v1_smoke.json",
+  "status": "authorized_ready_to_execute",
+  "current_status_source_of_truth": "this manifest owns development authorization and status; the smoke manifest owns smoke completion; parent implementation/adaptation manifests are historical stage records",
+  "understood_as": "After explicitly stopping the dummy GPU keepalive, complete the frozen GPU smoke and then run only the preregistered fixed-normal development matrix. Main fixed/mutant adaptation remains closed until each method x environment gate is adjudicated.",
+  "authority": {
+    "source": "user instruction: stop the dummy and train",
+    "normal_only_development": true,
+    "checkpoint_writes": true,
+    "queue_launch": true,
+    "main_adaptation": false,
+    "dependency_changes": false,
+    "bug_metric_configuration_selection": false,
+    "additional_candidates_after_results": false
+  },
+  "execution": {
+    "run_id": "online_algorithm_expansion_v1_development",
+    "run_root": "/raid/ext_csv/HackRL/runs/online_algorithm_expansion_v1_development",
+    "clean_worktree_root": "/raid/ext_csv/HackRL/worktrees/online_algorithm_expansion_v1_development",
+    "python": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
+    "device_environment": {
+      "HACKRL_DEVICE": "cuda",
+      "JAX_PLATFORMS": "cuda",
+      "CUDA_VISIBLE_DEVICES": "0",
+      "XLA_PYTHON_CLIENT_PREALLOCATE": "false",
+      "HACKRL_DUMMY_KEEPALIVE_CLEARED": "1",
+      "PYTHONPATH": "/raid/ext_csv/HackRL/worktrees/online_algorithm_expansion_v1_development/src"
+    },
+    "runner": "scripts/run_online_algorithm_development.py",
+    "queue_wrapper": "scripts/run_online_algorithm_development_gpu_queue.sh",
+    "runner_lock": "/tmp/hackrl-online-algorithm-development-runner.lock",
+    "sequential_single_gpu_jobs": true,
+    "run_root_override": "forbidden; the runner must resolve exactly to the RAID path above",
+    "required_entry_checks": [
+      "the smoke manifest records CPU 8/8 and GPU 8/8 passed with no checkpoint writes",
+      "the queue wrapper identity-checks and stops only --beyondg-gpu-keepalive processes, then sets HACKRL_DUMMY_KEEPALIVE_CLEARED=1",
+      "the interpreter and repository root match the paths declared here",
+      "every imported hackrl project module resolves beneath the declared clean worktree",
+      "the JAX backend is gpu on CUDA_VISIBLE_DEVICES=0",
+      "the non-symlink run root itself is on the same device as /raid/ext_csv",
+      "a nonblocking single-runner lock is held"
+    ],
+    "checkpoint_updates": [0, 128, 256, 384, 512],
+    "resume": "resume only from a complete checkpoint whose state hash, candidate, environment, seed, update, and execution-source hashes match; preserve and stop on any existing invalid checkpoint directory",
+    "retention": "retain all five development checkpoints per job; never prune failed seeds or final states",
+    "main_launch": "forbidden and never automatic"
+  },
+  "common_training": {
+    "kernel": "fixed",
+    "goal_mode": "workshop12",
+    "learner_seeds": [110, 111],
+    "num_envs": 512,
+    "num_steps": 64,
+    "transitions_per_update": 32768,
+    "updates": 512,
+    "transitions_per_job": 16777216,
+    "log_interval_updates": 32,
+    "gamma": 0.995,
+    "max_grad_norm": 1.0,
+    "evaluation": {
+      "split": "validation",
+      "layouts": [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15],
+      "phases": [0, 1],
+      "natural_start_episodes": 32,
+      "common_setup_diagnostic_episodes": 32,
+      "action_selection": "deterministic greedy/mode",
+      "selection_metric": "fixed-normal natural-start delivery success",
+      "tie_breaker": "fixed-normal natural-start mean discounted return",
+      "exact_tie_breaker": "earlier candidate order in the frozen registry",
+      "threshold": 0.9,
+      "gate": "selected candidate must achieve at least 29/32 natural-start successes independently for seeds 110 and 111",
+      "record_episode_rows": true,
+      "evaluator_family_mapping": "natural_reset is the canonical evaluator label for the manifest's natural-start family",
+      "discounted_return_definition": "success * gamma^(length-1) for length >= 1, otherwise zero; the fixed normal delivery evaluator has unit reward on the success step",
+      "bug_and_mutant_metrics_persisted_or_used": false,
+      "selection_bias_boundary": "the same validation layouts select the candidate and adjudicate this operational gate, so a pass is not held-out evidence of generalization",
+      "oracle_boundary": "delivery success is scored by project-owned fixtures; independent kernel and scripted-oracle tests validate the encoded task contract, not an external scientific ground truth"
+    }
+  },
+  "candidate_registry": {
+    "frozen_before_any_development_result": true,
+    "shared_across_environments": true,
+    "selection_is_cell_local_by_method_and_environment": true,
+    "GC-PQN": [
+      {
+        "id": "pqn_lr2e4_eps10_full_v1",
+        "pqn_hidden_size": 1024,
+        "leo_hidden_size": 512,
+        "learning_rate": 0.0002,
+        "epsilon_start": 1.0,
+        "epsilon_finish": 0.1,
+        "epsilon_decay_transitions": 16777216,
+        "target": "current-network one-step TD with stop-gradient",
+        "replay": false
+      },
+      {
+        "id": "pqn_lr1e4_eps05_80pct_v1",
+        "pqn_hidden_size": 1024,
+        "leo_hidden_size": 512,
+        "learning_rate": 0.0001,
+        "epsilon_start": 1.0,
+        "epsilon_finish": 0.05,
+        "epsilon_decay_transitions": 13421772,
+        "target": "current-network one-step TD with stop-gradient",
+        "replay": false
+      }
+    ],
+    "LEO": [
+      {
+        "id": "leo_lr2e4_eps10_full_v1",
+        "pqn_hidden_size": 1024,
+        "leo_hidden_size": 512,
+        "learning_rate": 0.0002,
+        "epsilon_start": 1.0,
+        "epsilon_finish": 0.1,
+        "epsilon_decay_transitions": 16777216,
+        "per_goal_terminal_td": true,
+        "replay": false
+      },
+      {
+        "id": "leo_lr1e4_eps05_80pct_v1",
+        "pqn_hidden_size": 1024,
+        "leo_hidden_size": 512,
+        "learning_rate": 0.0001,
+        "epsilon_start": 1.0,
+        "epsilon_finish": 0.05,
+        "epsilon_decay_transitions": 13421772,
+        "per_goal_terminal_td": true,
+        "replay": false
+      }
+    ],
+    "Dual LEO(PQN)": [
+      {
+        "id": "dual_lr2e4_eps10_full_v1",
+        "pqn_hidden_size": 1024,
+        "leo_hidden_size": 512,
+        "learning_rate": 0.0002,
+        "epsilon_start": 1.0,
+        "epsilon_finish": 0.1,
+        "epsilon_decay_transitions": 16777216,
+        "acting": "0.7*Q_PQN + 0.3*Q_LEO",
+        "replay": false
+      },
+      {
+        "id": "dual_lr1e4_eps05_80pct_v1",
+        "pqn_hidden_size": 1024,
+        "leo_hidden_size": 512,
+        "learning_rate": 0.0001,
+        "epsilon_start": 1.0,
+        "epsilon_finish": 0.05,
+        "epsilon_decay_transitions": 13421772,
+        "acting": "0.7*Q_PQN + 0.3*Q_LEO",
+        "replay": false
+      }
+    ],
+    "GC-SD-SAC": [
+      {
+        "id": "sdsac_lr2e4_u1_v1",
+        "hidden_size": 1024,
+        "actor_learning_rate": 0.0002,
+        "critic_learning_rate": 0.0002,
+        "temperature_learning_rate": 0.0002,
+        "initial_alpha": 0.2,
+        "beta": 0.1,
+        "q_clip_range": 0.5,
+        "polyak_tau": 0.005,
+        "target_entropy_fraction_of_log_actions": 0.98,
+        "replay_capacity": 262144,
+        "replay_batch_size": 1024,
+        "replay_update_iterations_per_rollout": 1,
+        "sampled_transitions_per_physical_transition": 0.03125
+      },
+      {
+        "id": "sdsac_lr1e4_u4_v1",
+        "hidden_size": 1024,
+        "actor_learning_rate": 0.0001,
+        "critic_learning_rate": 0.0001,
+        "temperature_learning_rate": 0.0001,
+        "initial_alpha": 0.2,
+        "beta": 0.1,
+        "q_clip_range": 0.5,
+        "polyak_tau": 0.005,
+        "target_entropy_fraction_of_log_actions": 0.98,
+        "replay_capacity": 262144,
+        "replay_batch_size": 1024,
+        "replay_update_iterations_per_rollout": 4,
+        "sampled_transitions_per_physical_transition": 0.125
+      }
+    ]
+  },
+  "budget": {
+    "methods": 4,
+    "candidates_per_method": 2,
+    "environments": 2,
+    "learner_seeds": 2,
+    "jobs": 32,
+    "training_transitions": 536870912,
+    "maximum_evaluation_episodes": 2048,
+    "automatic_extension": false
+  },
+  "capacity_preflight": {
+    "observed_utc": "2026-10-08",
+    "home": {
+      "filesystem": "/dev/md0",
+      "total_bytes": 1888425144320,
+      "used_bytes": 1597486174208,
+      "available_bytes": 194936754176,
+      "reported_use_percent": 90,
+      "existing_run_bytes": 168433244729,
+      "decision": "rejected for this new run"
+    },
+    "raid": {
+      "filesystem": "/dev/md1",
+      "total_bytes": 30601613336576,
+      "used_bytes": 22026050383872,
+      "available_bytes": 7039298031616,
+      "reported_use_percent": 76,
+      "existing_run_bytes": 51075217498,
+      "decision": "selected"
+    },
+    "forecast": {
+      "value_checkpoint_upper_bound_bytes": 536870912,
+      "sd_sac_checkpoint_upper_bound_bytes": 6442450944,
+      "retained_value_checkpoints": 120,
+      "retained_sd_sac_checkpoints": 40,
+      "retained_checkpoint_bytes": 322122547200,
+      "active_predecessor_successor_overlap_bytes": 12884901888,
+      "evaluation_and_log_allowance_bytes": 8589934592,
+      "projected_peak_write_bytes": 343597383680,
+      "safety_reserve_bytes": 68719476736,
+      "required_free_bytes": 412316860416,
+      "reserve_rule": "max(8 GiB, 20% of projected peak writes)",
+      "raid_margin_after_requirement_bytes": 6626981171200
+    },
+    "runtime_enforcement": "conservatively require the full projected peak plus reserve at every job and checkpoint; do not reduce the requirement using arbitrary existing run-tree bytes",
+    "long_run_rule": "recheck before every job and checkpoint; stop at a complete resumable checkpoint if the reserve is eroded"
+  },
+  "selection_and_stop": {
+    "select_only_from_fixed_normal_development": true,
+    "failed_seed_included": true,
+    "one_cell_failure_does_not_block_other_cells": true,
+    "failed_cell_no_automatic_extension": true,
+    "main_requires_separate_result-backed manifest": true,
+    "nan_inf_or_hash_mismatch": "stop the affected job and preserve artifacts",
+    "capacity_failure": "stop before the next checkpoint write"
+  }
+}

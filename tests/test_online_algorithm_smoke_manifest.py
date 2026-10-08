@@ -19,7 +19,8 @@ def test_smoke_authority_excludes_training_and_checkpoint_writes():
     assert authority["checkpoint_writes"] is False
     assert authority["dependency_changes"] is False
     assert authority["implementation_bugfixes"] is False
-    assert authority["process_termination"] is False
+    assert authority["process_termination"] is True
+    assert "--beyondg-gpu-keepalive" in authority["process_termination_scope"]
     assert authority["temporary_logs_under_tmp"] is True
 
 
@@ -53,11 +54,12 @@ def test_smoke_execution_contract_is_sequential_reproducible_and_noninterfering(
     assert contract["timeout_seconds_per_cell"] == 1800
     assert contract["workdir"] == "/home/ext_csv/HackRL"
     assert contract["cpu"]["environment"]["JAX_PLATFORMS"] == "cpu"
-    assert contract["gpu"]["environment"]["JAX_PLATFORMS"] == "gpu"
+    assert contract["gpu"]["environment"]["JAX_PLATFORMS"] == "cuda"
     assert contract["gpu"]["environment"]["CUDA_VISIBLE_DEVICES"] == "0"
     assert "/tmp" in contract["output"]
     assert "transient in-memory replay" in contract["replay_scope"]
     assert "does not authorize source edits" in manifest["failure_rule"]
+    assert "additional process termination" in manifest["failure_rule"]
 
 
 def test_smoke_values_cannot_open_or_populate_development():
@@ -71,5 +73,11 @@ def test_smoke_values_cannot_open_or_populate_development():
     assert cpu["cells_passed"] == cpu["cells_total"] == 8
     assert cpu["physical_transitions"] == 64
     assert cpu["checkpoint_written"] is False
-    assert gpu["status"] == "not_started"
-    assert gpu["process_terminated"] is False
+    assert gpu["status"] == "passed"
+    assert gpu["process_terminated"] is True
+    assert gpu["terminated_pid"] == 107
+    assert gpu["failed_attempts"][0]["physical_transitions"] == 0
+    assert gpu["cells_passed"] == gpu["cells_total"] == 8
+    assert gpu["physical_transitions"] == 262144
+    assert gpu["checkpoint_written"] is False
+    assert gpu["finite_state_and_metrics"] is True
