@@ -1,0 +1,123 @@
+{
+  "schema_version": "hackrl_online_algorithm_expansion_v1_adaptation",
+  "manifest_id": "online_algorithm_expansion_v1_adaptation",
+  "parent": "docs/manifests/online_algorithm_expansion_v1_implementation.json",
+  "status": "implementation_and_focused_unit_tests_complete_no_environment_or_training_execution",
+  "repository_baseline": {
+    "local_parent_git_sha": "fd66882c984f4a24a8bc079b7535c7b57e92333b",
+    "observed_remote_main_sha": "991f8bd13e1d36df72af5455aae2b5c828fd7f34",
+    "remote_mutated": false
+  },
+  "source_adaptations": [
+    {
+      "source": "MichaelTMatthews/purejaxgcrl",
+      "sha": "eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+      "license": "MIT",
+      "target": "src/hackrl/online_value.py",
+      "retained_contracts": [
+        "online current-network one-step TD without replay or target networks",
+        "all-goal per-head pseudo-termination",
+        "separate PQN and LEO losses",
+        "Q_act = 0.7*Q_PQN + 0.3*Q_LEO"
+      ],
+      "local_differences": [
+        "HackRL structured map, numeric, and commanded-goal inputs",
+        "HackRL valid-transition and world-terminal masks",
+        "phase-local and lifetime physical-transition counters are explicit",
+        "Q(lambda) is excluded from the first comparison"
+      ]
+    },
+    {
+      "source": "mttga/purejaxql",
+      "sha": "47af6d7b35c89ddfe633aaf7341bdb8964cb7cce",
+      "license": "Apache-2.0",
+      "target": "src/hackrl/online_value.py",
+      "retained_contracts": [
+        "online rollout TD uses the current Q network",
+        "rollout batches are not retained as replay"
+      ],
+      "local_differences": [
+        "current JAX/Flax APIs are used without dependency changes",
+        "the official one-step default is selected rather than Q(lambda)"
+      ]
+    },
+    {
+      "source": "arXiv:1910.07207v2 and arXiv:2209.10081v4",
+      "license": "paper equations and pseudocode only",
+      "target": "src/hackrl/discrete_sac.py",
+      "retained_contracts": [
+        "exact categorical actor expectation",
+        "two local and two Polyak target critics",
+        "double-average target and actor Q aggregation",
+        "max-of-unclipped-and-Q-clipped critic loss",
+        "stored behavior entropy penalty",
+        "automatic log-alpha optimization"
+      ],
+      "local_differences": [
+        "target critic BatchRenorm statistics are hard-copied on each Polyak update",
+        "map observations are retained in replay as bfloat16 and restored as float32",
+        "replay samples uniformly with replacement from valid stored transitions",
+        "replay updates do not increment physical environment steps"
+      ]
+    }
+  ],
+  "prohibited_source_boundary": {
+    "source": "coldsummerday/SD-SAC@006809db08513fbeea2bfaecea1c03b59c3bb0d5",
+    "license_observed": "none",
+    "implementation_text_inspected_or_used": false
+  },
+  "environment_binding": {
+    "target": "src/hackrl/online_algorithm_env.py",
+    "canonical_reuse": [
+      "existing TICK-CLAIM and PACK-RESTORE reset distributions",
+      "canonical full action enums and invalid-action no-op behavior",
+      "existing command switching and per-goal terminal vectors",
+      "existing world termination and defect audit events",
+      "existing frozen evaluator through explicit evaluation network adapters"
+    ],
+    "evaluation_boundary": "online Q methods expose only epsilon-zero greedy evaluation; softmax sampling from raw Q values is rejected; SD-SAC exposes categorical mode and sample views",
+    "branch_boundary": "functional tree clone includes learner, optimizer, normalization, environment, RNG, replay, and replay-sampler state supplied by the caller"
+  },
+  "runtime_compatibility": {
+    "environment": "offrl",
+    "versions": {
+      "jax": "0.10.2",
+      "jaxlib": "0.10.2",
+      "flax": "0.12.7",
+      "optax": "0.2.8",
+      "chex": "0.1.92",
+      "craftax": "1.6.1"
+    },
+    "substitutions": [
+      "jax.tree.map replaces older tree-map entry points",
+      "Flax TrainState subclasses carry BatchRenorm and target state",
+      "no external checkpoint or replay dependency is introduced"
+    ],
+    "dependency_changes": false
+  },
+  "verification": {
+    "focused_command_scope": [
+      "tests/test_online_value.py",
+      "tests/test_discrete_sac.py",
+      "tests/test_online_algorithm_env.py",
+      "tests/test_online_algorithm_expansion_implementation_manifest.py"
+    ],
+    "focused_result": "18 passed",
+    "related_regression_result": "45 passed, 2 failed",
+    "related_regression_failures": [
+      "tests/test_dual_leo.py::test_checkpoint_restores_policy_teacher_optimizer_and_schedule_position",
+      "tests/test_dual_leo.py::test_split_arms_freeze_stats_and_keep_the_teacher_shuffle"
+    ],
+    "failure_attribution": "the failing test and src/hackrl/dual_leo.py have no worktree diff; both failures reproduce alone and are outside the new module call graph",
+    "causality_boundary": "unchanged files and isolated reproduction do not establish how the tests behave on a clean parent-SHA checkout; the failures remain unresolved legacy-path regressions, not proven pre-existing failures",
+    "environment_or_training_execution_started": false,
+    "checkpoint_written": false
+  },
+  "remaining_gates": [
+    "separate CPU smoke authority",
+    "separate GPU smoke authority after CPU smoke",
+    "reviewed normal-only candidate registry amendment before development",
+    "capacity forecast and RAID path decision before checkpoint-writing execution",
+    "no automatic development or main launch"
+  ]
+}

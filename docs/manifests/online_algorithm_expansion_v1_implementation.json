@@ -1,0 +1,191 @@
+{
+  "schema_version": "hackrl_online_algorithm_expansion_v1_implementation",
+  "manifest_id": "online_algorithm_expansion_v1_implementation",
+  "parent": "docs/manifests/online_algorithm_expansion_v1.json",
+  "status": "implementation_unit_tests_passed_awaiting_separate_smoke_authority",
+  "understood_as": "Implement and unit-test reusable GC-PQN, LEO, Dual LEO(PQN), and independently specified GC-SD-SAC cores for TICK-CLAIM and PACK-RESTORE. Do not run CPU/GPU smoke, development, training, queues, or checkpoint-writing jobs in this stage.",
+  "authority": {
+    "implementation": true,
+    "unit_tests": true,
+    "cpu_smoke": false,
+    "gpu_smoke": false,
+    "development": false,
+    "main": false,
+    "queue_launch": false,
+    "checkpoint_writes": false,
+    "dependency_changes": false
+  },
+  "research_interpretation": {
+    "primary": "test how all-goal value learning and combined Q action selection change defect exploitation",
+    "not_claimed": "this is not a replication of adaptation-time behavior cloning in Dual PPO",
+    "dual_definition": "two separately trained TD learners whose Q-values are combined for action selection"
+  },
+  "source_contracts": [
+    {
+      "source": "MichaelTMatthews/purejaxgcrl",
+      "sha": "eafccd995ac2736df5fbc05ac4bb6b5d58cfcce7",
+      "license": "MIT",
+      "consulted_paths": [
+        "pqn.py",
+        "leo.py",
+        "dual_leo_pqn.py",
+        "models/pqn_models_gc.py",
+        "sweeps/craftax/pqn.yaml",
+        "sweeps/craftax/leo.yaml",
+        "sweeps/craftax/dual_leo_pqn.yaml"
+      ],
+      "adaptation_boundary": "adapt equations and contracts to HackRL structured inputs, terminal masks, and state containers; retain attribution; do not vendor files"
+    },
+    {
+      "source": "mttga/purejaxql",
+      "sha": "47af6d7b35c89ddfe633aaf7341bdb8964cb7cce",
+      "license": "Apache-2.0",
+      "consulted_paths": [
+        "purejaxql/pqn_craftax.py"
+      ],
+      "adaptation_boundary": "use as a conformance reference for online current-network TD and Q(lambda), without replay or a target network"
+    },
+    {
+      "source": "arXiv:1910.07207v2 and arXiv:2209.10081v4",
+      "license": "paper descriptions only; no implementation license inferred",
+      "adaptation_boundary": "implement GC-SD-SAC independently from equations and pseudocode"
+    },
+    {
+      "source": "coldsummerday/SD-SAC@006809db08513fbeea2bfaecea1c03b59c3bb0d5",
+      "license": "no explicit license found at audit time",
+      "use": "provenance boundary only; implementation text remains excluded"
+    }
+  ],
+  "method_contracts": {
+    "GC-PQN": {
+      "replay": false,
+      "target_network": false,
+      "target_source": "current online network with stop-gradient",
+      "q_lambda": false,
+      "q_lambda_boundary": "the first comparison uses the official one-step default; Q(lambda) is not implemented or eligible as a hidden candidate dimension",
+      "evaluation": "greedy commanded-goal Q"
+    },
+    "LEO": {
+      "replay": false,
+      "target_network": false,
+      "learning": "one TD target per goal and physical transition, masked by that goal's achievement or world termination",
+      "evaluation": "greedy commanded-goal slice of the all-goal Q tensor"
+    },
+    "Dual LEO(PQN)": {
+      "pqn_and_leo_losses": "separate",
+      "acting_mode": "linear_combination",
+      "acting_equation": "Q_act = 0.7*Q_PQN + 0.3*Q_LEO",
+      "leo_weight": 0.3,
+      "anneal": false,
+      "schedule_restart_on_adaptation": false,
+      "training_behavior": "epsilon-greedy over Q_act",
+      "evaluation_behavior": "greedy over the same Q_act",
+      "behavior_cloning": false
+    },
+    "GC-SD-SAC": {
+      "implementation_source": "independent paper-based implementation",
+      "actor": "goal-conditioned categorical policy",
+      "critic_target": "reward plus discounted nonterminal exact categorical expectation of average target-Q minus alpha*log-policy",
+      "actor_q_aggregation": "arithmetic mean of the two local critics",
+      "entropy_penalty": "beta/2 times squared difference between stored behavior entropy and current entropy",
+      "q_clip": "maximum of unclipped and target-reference-clipped squared TD errors for each critic",
+      "terminal_mask": "goal achievement or world termination",
+      "temperature": "automatic log-alpha optimization against a frozen target entropy"
+    }
+  },
+  "exploration_schedule_contract": {
+    "state": "phase-local physical-transition counter stored separately from the lifetime counter",
+    "pretraining": "candidate must freeze epsilon start, finish, and decay fraction before normal-only development",
+    "adaptation": "phase-local counter restarts at zero in each symmetric fixed/mutant branch; schedule values remain identical across branches",
+    "evaluation": "epsilon is exactly zero",
+    "dual_mix": "fixed 0.3 LEO weight has no schedule and therefore no restart"
+  },
+  "normal_gate_denominator": {
+    "split": "validation",
+    "start": "natural",
+    "layouts": "indices 0..15",
+    "phases": [0, 1],
+    "episodes_per_learner_seed": 32,
+    "action_selection": "deterministic greedy",
+    "success": "delivery/count_ge_3 achieved before the 128-step world horizon",
+    "threshold": ">= 0.90 independently for seeds 110 and 111",
+    "integer_requirement": ">= 29 successes out of 32",
+    "common_setup": "diagnostic only and excluded from the gate denominator",
+    "claim_boundary": "an operational gate for this fixture, not proof of general learnability"
+  },
+  "evaluation_and_smoke_budget": {
+    "episode_horizon_upper_bound": 128,
+    "development_per_candidate_seed_cell": {
+      "greedy_natural_episodes": 32,
+      "greedy_common_setup_diagnostic_episodes": 32,
+      "episodes": 64,
+      "maximum_physical_transitions": 8192
+    },
+    "maximum_development": {
+      "candidate_seed_cells": 64,
+      "episodes": 4096,
+      "maximum_physical_transitions": 524288
+    },
+    "main_per_seed_cell": {
+      "adaptation_branches": 2,
+      "evaluation_checkpoints": 8,
+      "counterfactual_kernels": 2,
+      "greedy_episodes_per_call": 64,
+      "sample_episodes_per_call": 256,
+      "episodes": 10240,
+      "maximum_physical_transitions": 1310720
+    },
+    "full_main": {
+      "seed_cells": 24,
+      "episodes": 245760,
+      "maximum_physical_transitions": 31457280
+    },
+    "cpu_smoke_future_stage": {
+      "cells": 8,
+      "physical_transitions_per_cell": 8,
+      "physical_transitions": 64
+    },
+    "gpu_smoke_future_stage": {
+      "cells": 8,
+      "physical_transitions_per_cell": 32768,
+      "physical_transitions": 262144,
+      "checkpoint_retention": false
+    },
+    "budget_scope": "evaluation and smoke budgets are additional to the training-transition totals in the parent manifest"
+  },
+  "unit_test_gates": [
+    "PQN current-network one-step targets match hand calculations and expose no replay/target/Q(lambda) state",
+    "LEO per-goal terminal masks and losses match hand calculations",
+    "Dual Q combination and phase/schedule semantics match the frozen equation",
+    "SD-SAC categorical expectation, entropy, double-average target, Q-clip, terminal mask, actor penalty, and alpha loss match hand calculations",
+    "all losses and gradients are finite on deterministic synthetic batches",
+    "manifest arithmetic and the 29-of-32 gate are mechanically checked"
+  ],
+  "implementation_artifacts": {
+    "adaptation_record": "docs/manifests/online_algorithm_expansion_v1_adaptation.json",
+    "cycle_memo": "docs/manifests/online_algorithm_expansion_v1_implementation_memo.md",
+    "sha256": {
+      "src/hackrl/online_value.py": "e21298c01eed683211d8c36f8395790003d72c396b335384f5a496bcb707dbfc",
+      "src/hackrl/discrete_sac.py": "9acdecf457cb8c9dbde7d18811c2e062b9c14ac77ca0e4f09c6cd461e511e32e",
+      "src/hackrl/online_algorithm_env.py": "20144bf4586006a17a86f45ce13289fdb3cc4df96bf801beec508a86606d2b54",
+      "tests/test_online_value.py": "9a8a3b1c918c8db800d67fcd07b6e0c9fb0c31b74bdd9ff939be613e21f12e7d",
+      "tests/test_discrete_sac.py": "4469281d8ed80d0d11da44a6685ed5350672e7b7c590802099090dd5e01946af",
+      "tests/test_online_algorithm_env.py": "6ff01aa11609cb472649fe32aed1788fe89baa9474674e52213d3dbe94e97ef1",
+      "tests/test_online_algorithm_expansion_implementation_manifest.py": "4f030d7b8a716488552c5e08775464bbea9516fa9b3642c1b64e9c7762ce808d"
+    }
+  },
+  "verification": {
+    "focused_implementation_tests": "18 passed",
+    "related_regression_tests": "45 passed, 2 failed",
+    "related_regression_failure_scope": "two exact-equality failures in the unchanged legacy Dual path; neither the test nor src/hackrl/dual_leo.py is modified, but no clean-baseline run at the parent SHA was performed, so this does not prove causal independence",
+    "syntax_compile": "passed",
+    "ruff": "not run because ruff is not installed and dependency changes are unauthorized",
+    "cpu_or_gpu_smoke": "not started"
+  },
+  "phase_completion": {
+    "implementation_started": true,
+    "unit_tests_passed": true,
+    "cpu_or_gpu_smoke_started": false,
+    "training_started": false
+  }
+}
