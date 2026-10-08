@@ -49,6 +49,19 @@ python -m report_figures.render_tick_craft_pixel \
 ```
 
 출력은 presentation/analysis PNG, GIF, MP4와 핵심 이벤트 정지 화면이다.
+설명용으로는 새 `explainer.mp4`를 먼저 사용한다. 목표와 물체 A–D의 역할을
+7초 동안 소개하고, 보통 전이는 1초, 수확·기록·재건·제작·납품 같은 핵심
+전이는 4초 동안 보여준다. 마지막 결과 요약도 7초다. 물체 표식은 계속 남고,
+각 커널의 실제 이벤트에 따라 관련 물체 테두리와 상태 변화 설명이 바뀐다.
+예를 들어 정상 재건은 총량 `3 → 3`, 중복 재건은 `3 → 4`로 설명한다.
+설명은 영어이며, 통계적 평균 대신 해당 에피소드의 결과만 표시한다.
+
+`--step-seconds 1.5 --event-seconds 5`로 설명 영상의 읽는 시간을 늘릴 수 있다.
+재생 정지는 기록된 상태를 반복하며 환경 틱이나 새로운 중간 상태를 만들지 않는다.
+`explainer_timeline.json`에 원본 trace 해시, 전이 인덱스, 프레임 구간과 재생 시간이
+남는다. `explainer.gif`, 도입·요약·전이별 PNG도 함께 생성한다.
+기존 presentation/analysis 영상은 틱당 1초로 낮췄다.
+
 기존 영상은 자동으로 고쳐지지 않는다. provenance/selection이 없는 기존
 trace는 해당 필드를 `unrecorded`/`not recorded`로 표시하므로, 최종 발표용은
 새 recorder로 trace부터 다시 만드는 것을 권한다.
@@ -100,7 +113,7 @@ python -m report_figures.plots
 ## 검증
 
 ```bash
-JAX_PLATFORMS=cpu MPLBACKEND=Agg python -m pytest tests/test_report_rendering.py -q
+JAX_PLATFORMS=cpu MPLBACKEND=Agg python -m pytest tests/test_report_rendering.py tests/test_report_explainer.py -q
 ```
 
 회귀 검사는 실제 커널 지형, 관측 범위, 같은 행동열의 실제 전이, 음성/빈 trace,

@@ -337,7 +337,7 @@ def _render(trace, environment, index, analysis):
     return canvas.resize((BASE_W * SCALE, (height + FOOTER_H) * SCALE), Image.Resampling.NEAREST)
 
 
-def _write_video(frames, directory, stem, fps=2):
+def _write_video(frames, directory, stem, fps=1):
     arrays = [np.asarray(frame) for frame in frames]
     imageio.mimsave(directory / f"{stem}.gif", arrays, duration=1000 / fps, loop=0)
     imageio.mimsave(
@@ -365,7 +365,7 @@ def _key_steps(trace, environment, final):
     return (*keys, ("final", final))
 
 
-def render_environment(environment, trace_path=None, output=None):
+def render_environment(environment, trace_path=None, output=None, *, step_seconds=1., event_seconds=4.):
     spec = SPECS[environment]
     trace_path = Path(trace_path or spec["trace"])
     trace = json.loads(trace_path.read_text())
@@ -383,6 +383,9 @@ def render_environment(environment, trace_path=None, output=None):
         analysis.append(a)
     _write_video(presentation, output, "presentation")
     _write_video(analysis, output, "analysis")
+    from report_figures.explainer import write_explainer
+    timeline = write_explainer(trace, environment, presentation, output, step_seconds=step_seconds, event_seconds=event_seconds)
+    print("explainer", timeline["duration_seconds"], "seconds", flush=True)
     for label, index in _key_steps(trace, environment, final):
         presentation[index].save(output / f"key_{label}.png")
         analysis[index].save(output / f"key_{label}_analysis.png")
@@ -395,11 +398,13 @@ def main():
     parser.add_argument("--environment", choices=("tick", "craft"))
     parser.add_argument("--trace", type=Path)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--step-seconds", type=float, default=1.0)
+    parser.add_argument("--event-seconds", type=float, default=4.0)
     args = parser.parse_args()
     if (args.trace or args.output) and not args.environment:
         parser.error("--trace/--output requires --environment")
     for environment in (args.environment,) if args.environment else ("tick", "craft"):
-        render_environment(environment, args.trace, args.output)
+        render_environment(environment, args.trace, args.output, step_seconds=args.step_seconds, event_seconds=args.event_seconds)
 
 
 if __name__ == "__main__":
