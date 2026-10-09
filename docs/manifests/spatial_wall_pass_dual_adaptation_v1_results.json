@@ -1,0 +1,301 @@
+{
+  "schema_version": "hackrl_spatial_wall_pass_dual_adaptation_results_v1",
+  "run_id": "spatial_wall_pass_dual_adaptation_v1",
+  "status": "complete",
+  "completed_utc": "2026-10-09T11:54:24Z",
+  "manifest_created_utc": "2026-10-09T12:01:27Z",
+  "execution": {
+    "code_sha": "c5f313e685cbc71537708d98924499d3ee8f3ad6",
+    "started_utc": "2026-10-09T11:08:31Z",
+    "finished_utc": "2026-10-09T11:54:24Z",
+    "elapsed_seconds": 2753,
+    "runner_exit_status": 0,
+    "keepalive_guard_exit_status": 0,
+    "jobs_completed": 4,
+    "total_transitions": 536870912
+  },
+  "canonical_artifacts": {
+    "contract": "docs/manifests/spatial_wall_pass_dual_adaptation_v1.json",
+    "prelaunch_validation": "docs/manifests/spatial_wall_pass_dual_adaptation_v1_validation.json",
+    "raw_result": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_adaptation_v1/aggregate_result.json",
+    "raw_result_sha256": "93ea0dad13be5b9f20301a326f059afacd010c254d49b6809880bc841e0bbd70",
+    "run_manifest": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_adaptation_v1/run_manifest.json",
+    "run_manifest_sha256": "b3b5f928e933b2697a5a15d472db21f9674ad9d7fe42cd10cb46364b2369e12d",
+    "role_note": "The raw aggregate is the canonical machine result. The run manifest is an immutable launch record and therefore retains status=started. This file records a compact derived interpretation without replacing the preregistered contract or prelaunch validation."
+  },
+  "definitions": {
+    "Dual": "A goal-conditioned PPO policy trained with behavior cloning from an adapting, all-normal-goal teacher.",
+    "GC": "The goal-conditioned PPO baseline without the teacher pathway.",
+    "fixed_kernel": "A dash is rejected when its intermediate cell is a wall.",
+    "mutant_kernel": "A dash checks the destination but omits the intermediate-wall collision check.",
+    "mode": "Argmax action selection; one natural-start episode for each of 16 validation layouts.",
+    "sample": "Categorical policy sampling; 64 keyed repetitions for each of 16 validation layouts, or 1024 episodes per seed, kernel, and checkpoint.",
+    "wall_pass": "A successful dash whose intermediate cell is a wall.",
+    "beneficial_use": "The episode crosses a wall, then picks up the item after that crossing, and finally delivers that item.",
+    "adaptation_update_zero": "The frozen evaluation of the pretrained global-update-512 source checkpoint before any adaptation gradient update."
+  },
+  "pairing_and_integrity": {
+    "same_seed_start_state_sha256": {
+      "130": "6aab0ce15d32eb80bd9f62746a490e0ffed79f5c57312ff1955442d296f59447",
+      "131": "8cddb2b6c38d2933659efe1001767516eda24f4e0fb058dc22f6b815d12753f1"
+    },
+    "fixed_mutant_start_states_identical_within_seed": true,
+    "all_saved_evaluations_runner_state_immutable": true,
+    "final_checkpoint_state_sha256": {
+      "dual_fixed_seed_130": "fa5b10553122d3ebac8d781aabb6d3c45f7bed4a9cea81cb6ec3733467e69361",
+      "dual_fixed_seed_131": "526f893732a6c6798d0373d39133b8890d9de7a8bf96820217023cf01937e2bb",
+      "dual_mutant_seed_130": "698019bb17c7c9560b5a8415f85ec6051ad0e7b8d784024a598ad7a0c0219c5d",
+      "dual_mutant_seed_131": "ed98846858d45e4c42b5bdad43811f1cb93e98c5f365a79a03e8e4888ca497a5"
+    }
+  },
+  "final_evaluation": {
+    "fixed_continue_both_seeds_both_kernels": {
+      "identical_in_fixed_and_mutant_kernels": true,
+      "mode": {
+        "success_rate": 1.0,
+        "wall_pass_rate": 0.0,
+        "beneficial_use_rate": 0.0,
+        "mean_success_length": 14.0,
+        "mean_discounted_return": 0.9369146928798039
+      },
+      "sample": {
+        "success_rate": 1.0,
+        "wall_pass_rate": 0.0,
+        "beneficial_use_rate": 0.0,
+        "mean_success_length": 14.0,
+        "mean_discounted_return": 0.9369146928798036
+      }
+    },
+    "mutant_adapt_on_mutant": {
+      "mode_both_seeds": {
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842,
+        "mean_first_wall_pass_step": 2.0,
+        "mean_dash_count": 2.0
+      },
+      "sample_seed_130": {
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.001953125,
+        "mean_discounted_return": 0.9655112414691989
+      },
+      "sample_seed_131": {
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.965520646809484
+      }
+    },
+    "mutant_adapt_same_policy_on_fixed": {
+      "mode_both_seeds": {
+        "success_rate": 0.0,
+        "wall_pass_rate": 0.0,
+        "beneficial_use_rate": 0.0,
+        "mean_length": 64.0,
+        "mean_success_length": null,
+        "mean_discounted_return": 0.0,
+        "mean_dash_count": 63.0
+      },
+      "sample_both_seeds": {
+        "success_rate": 0.0,
+        "wall_pass_rate": 0.0,
+        "beneficial_use_rate": 0.0,
+        "mean_length": 64.0,
+        "mean_success_length": null,
+        "mean_discounted_return": 0.0,
+        "mean_dash_count_range": [
+          62.9970703125,
+          62.998046875
+        ]
+      }
+    }
+  },
+  "paired_effects": {
+    "mutant_adapt_minus_fixed_continue_on_mutant_mode_both_seeds": {
+      "success_rate": 0.0,
+      "wall_pass_rate": 1.0,
+      "beneficial_use_rate": 1.0,
+      "mean_success_length": -6.0,
+      "mean_discounted_return": 0.02860595392968035
+    },
+    "mutant_adapt_minus_fixed_continue_on_mutant_sample": {
+      "seed_130": {
+        "success_rate": 0.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": -5.998046875,
+        "mean_discounted_return": 0.02859654858939531
+      },
+      "seed_131": {
+        "success_rate": 0.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": -6.0,
+        "mean_discounted_return": 0.02860595392968046
+      }
+    },
+    "mutant_adapt_same_policy_mutant_minus_fixed_mode_both_seeds": {
+      "success_rate": 1.0,
+      "mean_discounted_return": 0.9655206468094842,
+      "mean_success_length": null,
+      "meaning": "The mutant-adapted policy depends on the defect: it succeeds in the mutant kernel and fails in the repaired kernel. This is not merely a six-step efficiency difference."
+    }
+  },
+  "learning_curve": {
+    "mutant_adapt_mode_both_seeds": [
+      {
+        "adaptation_update": 0,
+        "success_rate": 1.0,
+        "wall_pass_rate": 0.0,
+        "beneficial_use_rate": 0.0,
+        "mean_success_length": 14.0,
+        "mean_discounted_return": 0.9369146928798039
+      },
+      {
+        "adaptation_update": 32,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 0.25,
+        "mean_success_length": 10.25,
+        "mean_discounted_return": 0.9547127595517
+      },
+      {
+        "adaptation_update": 128,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842
+      },
+      {
+        "adaptation_update": 256,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842
+      },
+      {
+        "adaptation_update": 512,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842
+      },
+      {
+        "adaptation_update": 1024,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842
+      },
+      {
+        "adaptation_update": 2048,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842
+      },
+      {
+        "adaptation_update": 4096,
+        "success_rate": 1.0,
+        "wall_pass_rate": 1.0,
+        "beneficial_use_rate": 1.0,
+        "mean_success_length": 8.0,
+        "mean_discounted_return": 0.9655206468094842
+      }
+    ],
+    "fixed_continue_seed_131_transient": {
+      "adaptation_update": 512,
+      "mode_success_rate": 0.0,
+      "sample_success_rate": 0.931640625,
+      "sample_wall_pass_rate": 0.353515625,
+      "sample_beneficial_use_rate": 0.12890625,
+      "sample_mean_success_length": 37.25366876310272,
+      "recovered_by_update": 1024,
+      "final_mode_and_sample_success_rate": 1.0,
+      "meaning": "Fixed continuation was not uniformly stable at every checkpoint even though both final fixed policies recovered the normal 14-step path."
+    }
+  },
+  "route_check": {
+    "mode": "Within each seed, all 16 validation layouts used a beneficial first wall pass. Eight symmetry-equivalent origin/action/destination signatures occurred twice each per seed.",
+    "sample": "Within each seed, all 1024 sampled episodes used a beneficial wall pass. The same eight route signatures occurred 128 times each per seed.",
+    "directions_observed": [
+      "DASH_UP",
+      "DASH_DOWN",
+      "DASH_LEFT",
+      "DASH_RIGHT"
+    ],
+    "conclusion": "The final policy organized wall crossing into the authored shortcut across all validation symmetries rather than producing unrelated crossings."
+  },
+  "storage": {
+    "destination": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_adaptation_v1",
+    "retained_bytes_at_completion": 1648751661,
+    "completion_capacity_measured_utc": "2026-10-09T11:54:22Z",
+    "home_free_bytes": 183880318976,
+    "raid_free_bytes": 7661355479040,
+    "required_free_bytes": 10737418240,
+    "safety_reserve_bytes": 8589934592,
+    "projected_remaining_write_bytes_at_completion": 2147483648,
+    "required_free_bytes_formula": "projected_remaining_write_bytes_at_completion + safety_reserve_bytes",
+    "capacity_guard_passed": true
+  },
+  "recovery_record": {
+    "pre_gradient_failed_code_sha": "4cfa8bce6245ab43daddb33c2689065e20410f51",
+    "gradient_updates_applied": 0,
+    "archived_at": "/raid/ext_csv/HackRL/runs/_archive/spatial_wall_pass_dual_adaptation_v1_pre_gradient_failure_20261009T110048Z",
+    "reason": "The first production update-0 evaluation omitted the branch config argument.",
+    "resolution": "The failure was archived, the evaluator was fixed and regression-tested, and production restarted from the unchanged update-512 source checkpoints."
+  },
+  "verification": {
+    "raw_artifact_crosscheck": "pass",
+    "json_parse": "pass",
+    "cpu_regression_command": "JAX_PLATFORMS=cpu PYTHONPATH=src /home/ext_csv/miniconda3/envs/offrl/bin/python -m pytest -q tests/test_spatial_wall_pass_dual_adaptation.py",
+    "cpu_regression_passed": 4,
+    "cpu_regression_failed": 0,
+    "cpu_regression_warnings": 1,
+    "cpu_regression_seconds": 20.23,
+    "warning": "tensorflow_probability uses deprecated jax.core.pytype_aval_mappings"
+  },
+  "leakage_audit": {
+    "fired_patterns": [
+      {
+        "pattern": "verifier_equals_designer",
+        "impact": "The environment author also defined the wall-pass and beneficial-use instrumentation."
+      },
+      {
+        "pattern": "shared_pool_bias",
+        "impact": "The 16 validation layouts are symmetry transforms from one authored fixture family, so they do not establish transfer to independently designed maps."
+      },
+      {
+        "pattern": "designer_defined_proxy",
+        "impact": "Beneficial-use is a semantic label supplied by the environment, not external ground truth."
+      }
+    ],
+    "independent_anchors": [
+      "Natural-start goal success",
+      "Discounted return",
+      "Successful episode length",
+      "Same frozen policy evaluated in the repaired kernel"
+    ],
+    "independence_fix": "Replicate with preregistered new learner seeds and an independently authored map or defect family; retain outcome metrics and the repaired-kernel counterfactual rather than relying on instrumentation labels alone."
+  },
+  "result_statement": "In both tested Dual development seeds, mutant adaptation changed the initial 14-step mode detour into an 8-step, always-beneficial wall-pass strategy while preserving mutant-kernel task success. At the final checkpoint, fixed continuation used the 14-step detour and no wall pass; one fixed seed had a documented transient failure at update 512. The adapted policies failed completely when the defect was removed, so the learned strategy is defect-dependent rather than a generally robust navigation improvement.",
+  "scope_and_limits": [
+    "This is strong first evidence from two development seeds, not an independent-seed replication.",
+    "GC adaptation was not run because GC failed the preregistered fixed learnability gate; this result does not establish Dual superiority over GC for this defect.",
+    "The 16 validation layouts are authored symmetry transforms of the same fixture family, not independently designed spatial tasks.",
+    "Wall-pass and beneficial-use labels are designer-defined instrumentation; success, discounted return, episode length, and same-policy fixed-kernel failure provide separate behavioral and payoff checks.",
+    "Evaluation episodes are not independent learning replicates.",
+    "No map, model-size, algorithm, budget, or extra-seed sweep was added after observing the result."
+  ],
+  "next_gate": "Freeze this configuration. If the spatial result is carried forward, use a preregistered independent-seed replication and keep the repaired-kernel robustness loss as a co-primary outcome."
+}
