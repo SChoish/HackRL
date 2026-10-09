@@ -49,6 +49,29 @@ def test_replication_manifest_freezes_seed_budget_and_denominators():
     assert len(manifest["evaluation"]["report_two_denominators"]) == 2
 
 
+def test_replication_provenance_covers_every_child_execution_source():
+    replication = _replication()
+    fixed = _fixed()
+    adaptation = _adaptation()
+    child_sources = set(fixed.REPLICATION_EXECUTION_SOURCES) | set(
+        adaptation.REPLICATION_EXECUTION_SOURCES
+    )
+    assert child_sources <= set(replication.EXECUTION_SOURCES)
+
+
+def test_manifest_validation_rejects_critical_training_drift(
+    tmp_path, monkeypatch
+):
+    module = _replication()
+    manifest = json.loads(module.MANIFEST.read_text(encoding="utf-8"))
+    manifest["training"]["num_envs"] = 256
+    changed = tmp_path / "changed_manifest.json"
+    changed.write_text(json.dumps(manifest), encoding="utf-8")
+    monkeypatch.setattr(module, "MANIFEST", changed)
+    with pytest.raises(RuntimeError, match="replication manifest changed"):
+        module.validate_manifest()
+
+
 def test_replication_fixed_contract_is_dual_only_and_uses_new_seeds():
     settings = _fixed()._contract_settings("replication")
     assert settings["seeds"] == (132, 133, 134, 135, 136)
@@ -148,6 +171,38 @@ def test_adaptation_accepts_only_preregistered_replication_gate(tmp_path):
         module.configure_replication(path)
 
 
+def test_adaptation_rejects_a_different_code_commit(tmp_path, monkeypatch):
+    module = _adaptation()
+    gate = {
+        "schema_version": (
+            "hackrl_spatial_wall_pass_dual_replication_gate_v1"
+        ),
+        "status": "complete",
+        "execution_code_sha": "pretraining-sha",
+        "all_seeds": [132, 133, 134, 135, 136],
+        "passing_seeds": [132],
+        "pretrain_root": (
+            "/raid/ext_csv/HackRL/runs/"
+            "spatial_wall_pass_dual_replication_v1/pretraining"
+        ),
+        "adaptation_root": (
+            "/raid/ext_csv/HackRL/runs/"
+            "spatial_wall_pass_dual_replication_v1/adaptation"
+        ),
+        "final_checkpoint_state_sha256": {"132": "hash132"},
+        "method_gate": {
+            "dual": {"eligible_for_future_adaptation": True}
+        },
+        "decision": {"mutant_training_started_at_gate_time": False},
+    }
+    path = tmp_path / "gate.json"
+    path.write_text(json.dumps(gate), encoding="utf-8")
+    module.configure_replication(path)
+    monkeypatch.setattr(module, "_git", lambda *args: "different-sha")
+    with pytest.raises(RuntimeError, match="code commit differs"):
+        module.validate_contract()
+
+
 def test_result_keeps_all_seed_and_normal_pass_denominators_separate(
     tmp_path, monkeypatch
 ):
@@ -214,3 +269,52 @@ def test_result_keeps_all_seed_and_normal_pass_denominators_separate(
     assert result["defect_dependency_rate_given_normal_gate"] == pytest.approx(
         1 / 3
     )
+
+
+def test_zero_normal_gate_passes_still_produces_a_complete_result(
+    tmp_path, monkeypatch
+):
+    module = _replication()
+    monkeypatch.setattr(module, "RUN_ROOT", tmp_path)
+    monkeypatch.setattr(module, "ADAPTATION_ROOT", tmp_path / "adaptation")
+    monkeypatch.setattr(module, "_git", lambda *args: "test-sha")
+    gate = {
+        "passing_seeds": [],
+        "cells": [
+            {
+                "seed": seed,
+                "passes_normal_gate": False,
+                "fixed_mode_success_rate": 0.0,
+                "fixed_sample_success_rate": 0.0,
+            }
+            for seed in module.SEEDS
+        ],
+    }
+    result = module.summarize(gate, None)
+    assert result["status"] == "complete"
+    assert result["all_seed_denominator"] == 5
+    assert result["normal_gate_pass_count"] == 0
+    assert result["normal_gate_pass_rate"] == 0.0
+    assert result["exploit_count_all_seeds"] == 0
+    assert result["exploit_rate_given_normal_gate"] is None
+    assert result["defect_dependency_rate_given_normal_gate"] is None
+    assert result["actual_jobs"] == 5
+    assert result["actual_transitions"] == 83_886_080
+    assert (tmp_path / "result.json").exists()
+
+
+def test_production_queue_rejects_direct_python_launch(
+    tmp_path, monkeypatch
+):
+    module = _replication()
+    monkeypatch.setattr(module, "RUN_ROOT", tmp_path)
+    for name in (
+        "HACKRL_DEVICE",
+        "JAX_PLATFORMS",
+        "CUDA_VISIBLE_DEVICES",
+        "HACKRL_DUMMY_KEEPALIVE_CLEARED",
+        "HACKRL_GPU_GUARD_ACTIVE",
+    ):
+        monkeypatch.delenv(name, raising=False)
+    with pytest.raises(RuntimeError, match="must use the GPU entrypoint"):
+        module.run_queue()
