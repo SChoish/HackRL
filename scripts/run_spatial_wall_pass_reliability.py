@@ -102,7 +102,13 @@ def capacity(event):
 def templates(seed):
     c=config(seed)
     net,template,teacher,lt,mb=old._initialize_templates(c)
-    old._validate_branch_config(source(seed),c)
+    # The attached plan intentionally changes evaluation repeats 64 -> 8.
+    # Validate every inherited learning field using the original evaluation
+    # count, then enforce this sole evaluation-budget difference explicitly.
+    source_config=json.loads((source(seed)/"config.json").read_text())
+    assert source_config["sample_repeats_per_state"]==64
+    assert c.sample_repeats_per_state==8
+    old._validate_branch_config(source(seed),replace(c,sample_repeats_per_state=64))
     r,l=load_dual_checkpoint(source(seed),template,lt)
     assert int(r.global_update)==512
     inherited=old._command_only_digest(r,l)
