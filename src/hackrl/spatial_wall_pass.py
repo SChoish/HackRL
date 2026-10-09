@@ -133,6 +133,10 @@ MODEL_FEATURE_NAMES = (
     "delivered_total_signed",
     "item_site_visible",
     "ground_item_visible",
+    "camp_delta_row_signed",
+    "camp_delta_column_signed",
+    "item_delta_row_signed",
+    "item_delta_column_signed",
 )
 
 GOAL_IDS = (
@@ -190,6 +194,8 @@ class SpatialWallPassObservation:
     delivered_total: jax.Array
     item_site_visible: jax.Array
     ground_item_visible: jax.Array
+    camp_delta: jax.Array
+    item_delta: jax.Array
 
 
 def _split_offsets(split: SpatialWallPassSplit) -> jax.Array:
@@ -460,7 +466,7 @@ def spatial_wall_pass_step(
 
 
 def normal_reference_actions(layout_index: jax.Array) -> jax.Array:
-    """Constructive 14-action fixed path; no shortest-path claim."""
+    """Constructive 14-action fixed shortest path."""
 
     canonical = jnp.asarray(
         (
@@ -562,6 +568,8 @@ def observe_spatial_wall_pass(
         delivered_total=state.delivered_total,
         item_site_visible=jnp.any(role_channels[..., ROLE_ITEM_SITE]),
         ground_item_visible=jnp.any(role_channels[..., ROLE_GROUND_ITEM]),
+        camp_delta=state.camp_position - state.player_position,
+        item_delta=state.item_position - state.player_position,
     )
 
 
@@ -598,6 +606,10 @@ def encode_spatial_wall_pass_observation(
                     _signed_count(observation.delivered_total),
                     observation.item_site_visible,
                     observation.ground_item_visible,
+                    _signed_count(observation.camp_delta[0]),
+                    _signed_count(observation.camp_delta[1]),
+                    _signed_count(observation.item_delta[0]),
+                    _signed_count(observation.item_delta[1]),
                 ),
                 dtype=jnp.float32,
             ),
@@ -614,28 +626,17 @@ def _adjacent_roles(role_channels: jax.Array) -> jax.Array:
     ]
 
 
-def _role_ahead(
-    role_channels: jax.Array, role_index: int, direction: jax.Array
-) -> jax.Array:
-    rows = jnp.broadcast_to(
-        jnp.arange(VIEW_ROWS, dtype=jnp.int32)[:, None],
-        (VIEW_ROWS, VIEW_COLUMNS),
-    )
-    columns = jnp.broadcast_to(
-        jnp.arange(VIEW_COLUMNS, dtype=jnp.int32)[None, :],
-        (VIEW_ROWS, VIEW_COLUMNS),
-    )
-    center_row, center_column = VIEW_CENTER
-    ahead = jax.lax.switch(
+def _delta_ahead(delta: jax.Array, direction: jax.Array) -> jax.Array:
+    return jax.lax.switch(
         jnp.clip(direction - 1, 0, 3),
         (
-            lambda: columns < center_column,
-            lambda: columns > center_column,
-            lambda: rows < center_row,
-            lambda: rows > center_row,
+            lambda value: value[1] < 0,
+            lambda value: value[1] > 0,
+            lambda value: value[0] < 0,
+            lambda value: value[0] > 0,
         ),
+        delta,
     )
-    return jnp.any(jnp.logical_and(role_channels[..., role_index], ahead))
 
 
 def spatial_wall_pass_goal_vector(
@@ -656,8 +657,8 @@ def spatial_wall_pass_goal_vector(
             item_site_visible,
             jnp.logical_and(item_site_visible, ground_item_visible),
             jnp.logical_and(item_site_visible, jnp.logical_not(ground_item_visible)),
-            _role_ahead(observation.role_channels, ROLE_ITEM_SITE, observation.direction),
-            _role_ahead(observation.role_channels, ROLE_CAMP, observation.direction),
+            _delta_ahead(observation.item_delta, observation.direction),
+            _delta_ahead(observation.camp_delta, observation.direction),
             observation.delivered_total >= 1,
         ),
         dtype=jnp.bool_,

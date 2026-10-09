@@ -1,0 +1,303 @@
+{
+  "anti_tuning": [
+    "Do not change geometry, reward, horizon, seeds, budgets, evaluation denominators, or pass threshold after viewing learning or mutant outcomes.",
+    "Do not launch mutant training until the fixed gate is adjudicated."
+  ],
+  "checkpoint_evaluation": {
+    "action_selection": [
+      "mode",
+      "sample"
+    ],
+    "adaptation_update": 0,
+    "discounted_return_formula": "success * 0.995 ** (episode_length - 1)",
+    "episode_counts_are_not_independent_learning_replicates": true,
+    "kernels": [
+      "fixed",
+      "mutant"
+    ],
+    "mode_schedule": "one episode for each of 16 validation layouts",
+    "mutant_adaptation_updates_at_every_pretraining_checkpoint": 0,
+    "pretraining_update_field": "0, 32, 128, 256, or 512",
+    "primary": [
+      "success_rate",
+      "mean_success_length",
+      "mean_discounted_return"
+    ],
+    "same_frozen_policy": true,
+    "sample_schedule": "64 keyed repetitions for each of 16 validation layouts",
+    "secondary": [
+      "dash_use_rate",
+      "clear_dash_rate",
+      "wall_pass_rate",
+      "first_wall_pass_step",
+      "beneficial_use_rate",
+      "wall_pass_without_benefit_rate"
+    ],
+    "successful_length_denominator": "successful episodes only; null if there are none"
+  },
+  "definitions": {
+    "adaptation_zero": "No mutant or fixed-continuation gradient update has occurred; pretraining_update is recorded separately.",
+    "beneficial_use": "The delivered item was collected after at least one wall-pass trigger in that episode.",
+    "fixed": "Kernel where a two-cell dash requires a clear intermediate cell and a valid destination.",
+    "mode": "Argmax over PPO policy logits at every action.",
+    "mutant": "Same kernel except the intermediate wall predicate is omitted for a two-cell dash.",
+    "natural_start": "Authored player, camp, item, inventory, timer, and layout state from the selected split; no curriculum state injection.",
+    "sample": "Categorical sampling from PPO policy logits using preregistered deterministic episode keys."
+  },
+  "environment": {
+    "candidate_id": "SPATIAL-WALL-PASS",
+    "evaluation_split": "validation",
+    "evaluation_start": "natural",
+    "evaluation_variants": [
+      "fixed",
+      "mutant"
+    ],
+    "excluded": [
+      "variant",
+      "wall-pass event/count",
+      "item provenance",
+      "beneficial-use flags",
+      "oracle state"
+    ],
+    "fixture_id": "spatial_wall_pass_room_v1",
+    "geometry_frozen_before_learning": true,
+    "horizon": 64,
+    "public_navigation_information": [
+      "7x9 terrain and role channels",
+      "signed camp relative coordinates",
+      "signed item relative coordinates"
+    ],
+    "reward": "sparse delivery reward only",
+    "training_split": "train",
+    "training_start": "natural",
+    "training_variant": "fixed"
+  },
+  "exact_paths_frozen_before_learning": {
+    "fixed": {
+      "actions": [
+        "UP",
+        "DASH_UP",
+        "DASH_RIGHT",
+        "DASH_RIGHT",
+        "DOWN",
+        "DASH_DOWN",
+        "PICKUP",
+        "LEFT",
+        "UP",
+        "DASH_UP",
+        "DASH_LEFT",
+        "DASH_LEFT",
+        "DASH_DOWN",
+        "DELIVER"
+      ],
+      "explored_physical_states": 87,
+      "length": 14
+    },
+    "fixed_mutant_shortest_gap_ticks": 6,
+    "method": "exact BFS over canonical physical-state projection",
+    "mutant": {
+      "actions": [
+        "RIGHT",
+        "DASH_RIGHT",
+        "RIGHT",
+        "PICKUP",
+        "LEFT",
+        "DASH_LEFT",
+        "LEFT",
+        "DELIVER"
+      ],
+      "explored_physical_states": 87,
+      "length": 8
+    }
+  },
+  "execution": {
+    "dual_teacher": "src/hackrl/dual_leo.py",
+    "environment_and_observation": "src/hackrl/spatial_wall_pass.py",
+    "ppo_adapter": "src/hackrl/spatial_wall_pass_gc.py",
+    "queue": "scripts/run_spatial_wall_pass_fixed_gate_queue.sh",
+    "runner": "scripts/run_spatial_wall_pass_fixed_gate.py",
+    "runtime_provenance": "Each cell refuses dirty or untracked execution sources and records the commit SHA, source hashes, package versions, JAX backend/devices, and full config in run_manifest.json."
+  },
+  "fixed_gate": {
+    "cells": [
+      "gc_seed_130",
+      "dual_seed_130",
+      "gc_seed_131",
+      "dual_seed_131"
+    ],
+    "checkpoint_updates": [
+      0,
+      32,
+      128,
+      256,
+      512
+    ],
+    "development_seeds": [
+      130,
+      131
+    ],
+    "discount": 0.995,
+    "entropy_coefficient": 0.005,
+    "failure_rule": "If only one method passes, only that method may advance; no clean cross-method exploitation comparison is claimed.",
+    "gae_lambda": 0.95,
+    "minibatch_size": 1024,
+    "mode_denominator": 16,
+    "mode_effective_minimum": "15/16 (93.75%) because the preregistered threshold is 90%",
+    "num_envs": 512,
+    "pass_rule": "For a method, both seeds must have final fixed validation mode and sample success rate >= 0.90.",
+    "ppo_epochs": 1,
+    "ppo_learning_rate": 0.0002,
+    "rollout_steps": 64,
+    "sample_denominator": 1024,
+    "sample_layouts": 16,
+    "sample_repeats_per_layout": 64,
+    "total_cells": 4,
+    "total_transitions": 67108864,
+    "transitions_per_cell": 16777216,
+    "updates": 512
+  },
+  "future_adaptation_if_gate_passes": {
+    "branches": [
+      "fixed_continue",
+      "mutant_adapt"
+    ],
+    "checkpoint_updates": [
+      0,
+      32,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "opened": false,
+    "same_policy_two_kernel_evaluation_required": true,
+    "same_pretraining_checkpoint_required": true,
+    "storage_note": "The current four-cell storage forecast covers only fixed pretraining. Any later branch phase must perform a new retained-checkpoint, overlap, artifact, log, and reserve forecast before launch.",
+    "updates": 4096
+  },
+  "interpretation_guards": [
+    "A wall crossing is reported separately from a delivery that benefited from it.",
+    "Mutant evaluation at update 0 measures accidental availability use, not adaptation.",
+    "The validation layouts are transforms of one fixture and are not an independent defect-family test.",
+    "Two development seeds are an operational learning gate, not a general performance estimate."
+  ],
+  "leakage_audit": {
+    "canonical_kernel_audit": "docs/manifests/spatial_wall_pass_v1.json#leakage_audit",
+    "mitigations": [
+      "Use natural-start success, successful length, discounted return, and same-frozen-policy two-kernel comparisons as payoff evidence.",
+      "Report trigger and beneficial-use diagnostics separately from payoff.",
+      "Treat this as an internal synthetic mechanism test, not independent defect-family or external-world validation."
+    ],
+    "patterns_that_fire": {
+      "shared_pool_bias": "Training and validation layouts are transforms of the same canonical fixture.",
+      "tautology": "The designer-defined wall-pass and beneficial-use labels cannot by themselves establish task value.",
+      "verifier_equals_designer": "Kernel, fixture, BFS validator, and oracle remain in one repository/author scope."
+    }
+  },
+  "methods": {
+    "dual": {
+      "actor_critic_parameters": 2640696,
+      "bc_policy_coefficient": "0.1 at global update 0, linearly decayed to 0 across the locked 512+4096=4608 update horizon.",
+      "bc_value_coefficient": 0.0,
+      "learner": "the same goal-conditioned PPO with adapting Dual LEO teacher and BC",
+      "teacher": true,
+      "teacher_epochs": 2,
+      "teacher_input": "The same public map channels and numeric features as PPO; no variant, trigger, provenance, beneficial-use, or oracle field.",
+      "teacher_input_normalization": "BatchRenorm with checkpointed running statistics.",
+      "teacher_learning_rate": 0.0002,
+      "teacher_minibatch_size": 512,
+      "teacher_outputs": "Q values for all 12 public normal goal heads and 23 actions.",
+      "teacher_parameters": 1460494
+    },
+    "gc": {
+      "actor_critic_parameters": 2640696,
+      "learner": "goal-conditioned PPO",
+      "teacher": false
+    }
+  },
+  "normal_goal_contract": {
+    "count": 12,
+    "defect_specific_goal": false,
+    "evaluation_schedule": "Evaluation fixes the delivery/count_ge_1 goal and runs each of the 16 validation layouts; this is independent of the 12-head training sampler.",
+    "fixed_delivery_command_during_pretraining": false,
+    "note": "All 12 public normal heads, including delivery, may be sampled; no wall-pass or bug-access objective is supplied.",
+    "source": "GOAL_IDS in src/hackrl/spatial_wall_pass.py",
+    "training_schedule": "Each of 512 training workers repeatedly samples a currently false goal from all 12 preregistered public normal heads; goals are training commands, not evaluation episodes."
+  },
+  "operational_failure_rules": [
+    "Do not replace seeds 130 or 131. Numerical or infrastructure failures are resumed from the latest valid committed checkpoint and remain logged.",
+    "A completed cell with low normal success is a fixed-gate learning failure and is included; an incomplete/corrupt cell is an implementation or operational failure, not scientific evidence.",
+    "The queue does not open mutant training automatically. Gate adjudication is a separate recorded action after all four summaries exist.",
+    "No automatic budget extension, extra seed, geometry change, or hyperparameter search is authorized by this manifest."
+  ],
+  "queue": {
+    "gate": "open_fixed_gate_only",
+    "order": [
+      "gc_seed_130",
+      "dual_seed_130",
+      "gc_seed_131",
+      "dual_seed_131"
+    ],
+    "training_started": false
+  },
+  "research_question": "Can each validated PPO method learn stable normal item retrieval and return before testing whether wall-pass availability changes its route?",
+  "run_id": "spatial_wall_pass_fixed_learnability_v1",
+  "schema_version": "hackrl_spatial_wall_pass_fixed_learnability_v1",
+  "single_source_roles": {
+    "kernel_and_observation_contract": "docs/manifests/spatial_wall_pass_v1.json",
+    "runtime_status_and_capacity": "each RAID cell run_manifest.json, capacity_checks.json, updates.json, and summary.json",
+    "this_file": "immutable preregistration snapshot for the four fixed learnability cells"
+  },
+  "status": "ready_to_launch_fixed_gate",
+  "storage": {
+    "checkpoint_policy": "Every cell records serialized checkpoint size, five retained checkpoints, predecessor/successor overlap, 512 MiB eval/log allowance, and max(8 GiB, 20% projected writes) reserve before launch and every 64 updates.",
+    "decision": "Use RAID only; the projected four-cell writes plus reserve are far below measured RAID free space. Home reports 90% used in df and is excluded.",
+    "destination": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_fixed_learnability_v1",
+    "four_cell_safety_reserve_bytes": 8589934592,
+    "home": {
+      "free_bytes": 186761973760,
+      "utilization": 0.8502645495128587
+    },
+    "measured_utc": "2026-10-09T02:27:47Z",
+    "projected_cell_writes_including_overlap_and_allowance": {
+      "dual": 883499593,
+      "gc": 760796551
+    },
+    "projected_four_cell_writes_bytes": 3288592288,
+    "raid": {
+      "free_bytes": 7955525550080,
+      "utilization": 0.6898271222902121
+    },
+    "required_four_cell_free_bytes": 11878526880,
+    "serialized_checkpoint_bytes": {
+      "dual": 49518383,
+      "gc": 31989377
+    }
+  },
+  "understood_as": "Run only the fixed natural-start normal-learning gate for existing GC-PPO and Dual before any mutant adaptation; evaluate every frozen checkpoint in both kernels to measure adaptation-zero wall passing without using mutant outcomes to tune the environment.",
+  "verification": {
+    "completed_utc": "2026-10-09T06:04:43Z",
+    "cpu_focused_tests": "16 passed, 1 warning in 142.83s",
+    "gpu_smoke": {
+      "dual": {
+        "compile_and_first_update_seconds": 15.155,
+        "passed": true,
+        "steady_transitions_per_second": 177669.0,
+        "steady_update_seconds": 0.18443,
+        "updates": 2
+      },
+      "gc": {
+        "compile_and_first_update_seconds": 7.6462,
+        "passed": true,
+        "steady_transitions_per_second": 417624.1,
+        "steady_update_seconds": 0.07846,
+        "updates": 2
+      },
+      "note": "Smoke evaluations used one repeat per layout and did not write checkpoints; the checkpoint-producing gate keeps the preregistered 64 sample repeats.",
+      "shape": "512 environments x 64 steps"
+    },
+    "parameter_counts_rechecked_from_initialized_models": true
+  }
+}

@@ -6,6 +6,7 @@ from __future__ import annotations
 import argparse
 import hashlib
 import json
+from collections import deque
 from pathlib import Path
 
 import jax
@@ -95,7 +96,47 @@ def _run(split, layout_index, actions, variant):
     }
 
 
+def _physical_key(state):
+    return (
+        tuple(int(value) for value in np.asarray(state.player_position)),
+        bool(state.item_present),
+        bool(state.carrying_item),
+        int(state.delivered_total),
+    )
+
+
+def _shortest_delivery(variant):
+    """Exact BFS on the finite canonical physical-state projection."""
+
+    initial = make_spatial_wall_pass_state(0)
+    queue = deque(((initial, ()),))
+    seen = {_physical_key(initial)}
+    while queue:
+        state, actions = queue.popleft()
+        if int(state.delivered_total) >= 1:
+            return {
+                "length": len(actions),
+                "actions": [
+                    SpatialWallPassAction(value).name for value in actions
+                ],
+                "explored_physical_states": len(seen),
+            }
+        for action in SpatialWallPassAction:
+            next_state, _ = spatial_wall_pass_step_with_transition(
+                state, int(action), variant
+            )
+            key = _physical_key(next_state)
+            if key not in seen:
+                seen.add(key)
+                queue.append((next_state, actions + (int(action),)))
+    raise AssertionError("delivery is unreachable")
+
+
 def validate():
+    fixed_shortest = _shortest_delivery(SpatialWallPassVariant.FIXED)
+    mutant_shortest = _shortest_delivery(SpatialWallPassVariant.MUTANT)
+    assert fixed_shortest["length"] == 14
+    assert mutant_shortest["length"] == 8
     layouts = []
     normal = []
     exploit = []
@@ -186,8 +227,10 @@ def validate():
         "exploit_replays": len(exploit),
         "normal_reference_length": 14,
         "mutant_exploit_reference_length": 8,
-        "normal_reference_is_shortest_path_claim": False,
-        "mutant_exploit_is_shortest_path_claim": False,
+        "fixed_shortest_path": fixed_shortest,
+        "mutant_shortest_path": mutant_shortest,
+        "normal_reference_is_shortest_path_claim": True,
+        "mutant_exploit_is_shortest_path_claim": True,
         "normal_successes": sum(row["success"] for row in normal),
         "fixed_counterfactual_successes": sum(
             row["success"]
