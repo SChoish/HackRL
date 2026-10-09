@@ -297,16 +297,19 @@ def initialize_spatial_wall_pass_gc(config):
     return network, runner
 
 
-def step_spatial_wall_pass_gc_workers(runner, actions, config):
+def step_spatial_wall_pass_gc_workers(runner, actions, config, *, transition_override=None):
     variant = SpatialWallPassVariant(config.variant)
     before = runner.env_state
     valid = runner.command_active
     actions = jnp.where(valid, actions, jnp.asarray(int(SpatialWallPassAction.NOOP)))
-    stepped, transitions = jax.vmap(
-        lambda state, action: spatial_wall_pass_step_with_transition(
-            state, action, variant
-        )
-    )(before, actions)
+    if transition_override is None:
+        stepped, transitions = jax.vmap(
+            lambda state, action: spatial_wall_pass_step_with_transition(
+                state, action, variant
+            )
+        )(before, actions)
+    else:
+        stepped, transitions = transition_override
     terminal_goals = jax.vmap(_goals)(stepped)
     achieved = jnp.take_along_axis(
         terminal_goals, runner.current_goal[:, None], axis=1
@@ -608,6 +611,9 @@ def evaluate_spatial_wall_pass_gc_frozen(
     record_episodes=False,
     horizon=64,
     initial_states=None,
+    diagnose_blocked_dash=False,
+    record_paths=False,
+    seed_stride=None,
 ):
     """Frozen natural-start delivery evaluation on one kernel."""
 
@@ -634,7 +640,7 @@ def evaluate_spatial_wall_pass_gc_frozen(
     seeds = (
         int(seed_base)
         + 1000 * int(learner_seed)
-        + repeats_per_state * layout_indices
+        + (repeats_per_state if seed_stride is None else seed_stride) * layout_indices
         + repeat_indices
     )
     keys = jax.vmap(jax.random.PRNGKey)(seeds)
@@ -729,6 +735,15 @@ def evaluate_spatial_wall_pass_gc_frozen(
                     transitions.delivered, stepped.delivered_after_wall_pass
                 ),
             )
+            path_record = None
+            if diagnose_blocked_dash or record_paths:
+                _, mutant_transition = jax.vmap(
+                    lambda item, action: spatial_wall_pass_step_with_transition(
+                        item, action, SpatialWallPassVariant.MUTANT
+                    )
+                )(state, actions)
+                blocked = active & mutant_transition.crossed_wall & (~transitions.dash_succeeded)
+                path_record = (state.player_position, stepped.player_position, actions, blocked)
             return (
                 _tree_where(active, stepped, state),
                 jnp.logical_or(done, just_done),
@@ -747,11 +762,11 @@ def evaluate_spatial_wall_pass_gc_frozen(
                 first_wall_pass_destination,
                 jnp.logical_or(beneficial_use, beneficial),
                 split_keys[:, 0],
-            ), None
+            ), path_record
 
         zeros_bool = jnp.zeros((episode_count,), dtype=jnp.bool_)
         zeros_int = jnp.zeros((episode_count,), dtype=jnp.int32)
-        final, _ = jax.lax.scan(
+        final, paths = jax.lax.scan(
             eval_step,
             (
                 initial,
@@ -774,9 +789,9 @@ def evaluate_spatial_wall_pass_gc_frozen(
             ),
             jnp.arange(horizon, dtype=jnp.int32),
         )
-        return final
+        return final, paths
 
-    final = jax.jit(rollout)(parameters)
+    final, paths = jax.jit(rollout)(parameters)
     (
         _,
         _,
@@ -893,6 +908,40 @@ def evaluate_spatial_wall_pass_gc_frozen(
             }
             for index in range(episode_count)
         ]
+    if paths is not None:
+        before_pos, after_pos, actions, blocked = jax.device_get(paths)
+        diagnostics = []
+        for i in range(episode_count):
+            n = int(length[i])
+            hits = np.flatnonzero(blocked[:n, i])
+            first = int(hits[0]) if len(hits) else None
+            retries = 0
+            if first is not None:
+                same = np.all(before_pos[:n, i] == before_pos[first, i], axis=-1)
+                same &= actions[:n, i] == actions[first, i]
+                retries = int(same[first + 1:].sum())
+            diagnostic = {
+                "first_blocked_dash_step": None if first is None else first + 1,
+                "blocked_dash_count": int(len(hits)),
+                "same_position_action_retries_after_first_block": retries,
+                "success_after_first_block": bool(first is not None and success[i]),
+            }
+            diagnostics.append(diagnostic)
+            if record_episodes:
+                result["episode_records"][i].update(diagnostic)
+                if record_paths:
+                    result["episode_records"][i]["path"] = [
+                        {"step": t + 1, "from": before_pos[t, i].tolist(),
+                         "to": after_pos[t, i].tolist(), "action": int(actions[t, i]),
+                         "blocked_dash": bool(blocked[t, i])} for t in range(n)]
+        blocked_episodes = [d for d in diagnostics if d["first_blocked_dash_step"] is not None]
+        result["blocked_episode_count"] = len(blocked_episodes)
+        result["success_after_block_rate_given_block"] = (
+            float(np.mean([d["success_after_first_block"] for d in blocked_episodes]))
+            if blocked_episodes else None)
+        result["mean_retries_given_block"] = (
+            float(np.mean([d["same_position_action_retries_after_first_block"] for d in blocked_episodes]))
+            if blocked_episodes else None)
     return result
 
 

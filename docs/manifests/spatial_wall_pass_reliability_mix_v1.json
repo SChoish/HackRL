@@ -1,0 +1,122 @@
+{
+  "schema_version": "hackrl_spatial_reliability_v1",
+  "run_id": "spatial_wall_pass_reliability_mix_v1",
+  "seeds": [
+    132,
+    133,
+    134,
+    135,
+    136
+  ],
+  "fixed_probabilities": [
+    0.01,
+    0.03,
+    0.1
+  ],
+  "jobs": 15,
+  "updates": 4096,
+  "transitions_per_job": 134217728,
+  "total_transitions": 2013265920,
+  "pretraining_updates": 512,
+  "training_source_sha": "9b6278273d31b211790c68f9cfcc9a55b6542f79",
+  "source_root": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_replication_v1",
+  "run_root": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_reliability_mix_v1",
+  "schedule": {
+    "num_envs": 512,
+    "num_steps": 64,
+    "ppo_epochs": 1,
+    "minibatch_size": 1024,
+    "learning_rate": 0.0002,
+    "teacher_epochs": 2,
+    "teacher_minibatch": 512,
+    "teacher_lr": 0.0002,
+    "bc_horizon": 4608,
+    "pretrained_global_update": 512,
+    "policy_width": 512,
+    "teacher_width": 512
+  },
+  "evaluation": {
+    "updates": [
+      0,
+      32,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096
+    ],
+    "kernels": [
+      "fixed",
+      "mutant"
+    ],
+    "layouts": 16,
+    "mode_repeats": 1,
+    "sample_repeats": 8,
+    "horizon": 64,
+    "new_branch_episode_budget": 34560,
+    "reused_endpoint_final_episode_budget": 2880,
+    "primary": "Final natural-start mode, all five paired seeds: mutant wall-pass and success, fixed success; same-policy discounted return and path.",
+    "diagnostic": "A blocked wall dash is an actual fixed no-move transition that would cross a wall under mutant. Record first block, repeated same-state same-action attempts, success after block, full mode paths. Sample diagnostics keep per-episode counts.",
+    "seed_unit": "Five existing training seeds, paired intervention, not independent replication.",
+    "sample_rng": "seed = 61000 + 1000*learner_seed + 64*layout_index + repeat; repeat 0..7; exact subset of historic 64-repeat evaluation",
+    "total_episode_budget": 37440,
+    "max_physical_transitions": 2396160
+  },
+  "mixture": {
+    "sampling": "Independent Bernoulli fixed probability once on branch reset and each world reset; held for full world; goal switch cannot resample.",
+    "rng": "Per-worker keys derived by fold_in(PRNGKey(seed), 0x534D4958); not policy, sampler, or teacher RNG. Same uniform streams across q.",
+    "observation": "Kernel id and mixture RNG/counters are never passed to actor or teacher.",
+    "world_duration": "Existing collector resets at tick 64, including inactive padding after delivery. Preserve this contract. Report started/completed world counts, all transitions, and active valid transitions separately.",
+    "initial_state": "All five source checkpoints verified tick=0; preserve source env, policy, critic, Adam, teacher, BatchRenorm, and existing RNG; existing command_delivery change only.",
+    "resume": "Checkpoint includes kernel flag, per-worker RNG and all counters alongside full inherited state."
+  },
+  "baselines": {
+    "q0": "Existing mutant_adapt",
+    "q1": "Existing fixed_continue",
+    "eligibility": "Source SHA, config, origin source hash and commanded full-state digest must match. q=0 and q=1 one-update equivalence checks compare original and mixed paths at full 512x64 before reuse; maximum abs difference <=1e-6, identical original RNG/env/optimizer step counts.",
+    "break_even_q": 0.029627490643734378,
+    "interpretation": "Break-even of the two fixed existing strategies, not an optimal mixed-policy threshold."
+  },
+  "smoke": {
+    "seed": 132,
+    "full_shape": [
+      512,
+      64
+    ],
+    "q": [
+      0,
+      1,
+      0.01,
+      0.03,
+      0.1
+    ],
+    "updates_each": 1,
+    "additional_original_endpoint_updates": 2,
+    "total_diagnostic_transitions": 393216,
+    "no_scientific_checkpoints": true,
+    "executed_updates_with_resume_checks": 12
+  },
+  "storage": {
+    "destination": "raid",
+    "retained_checkpoint_count": 120,
+    "overlap_count": 2,
+    "artifact_allowance_per_job_bytes": 536870912,
+    "reserve_min_bytes": 8589934592,
+    "reserve_fraction": 0.2,
+    "capacity_recheck_updates": 64,
+    "chosen_run_root": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_reliability_mix_v1"
+  },
+  "stop_rules": {
+    "automatic_extension": false,
+    "ratio_additions": false,
+    "seed_replacement": false,
+    "architecture_change": false
+  },
+  "document_reconciliation": {
+    "user_plan": "2026-10-10 KST v1 attached plan",
+    "termination": "Inspected source: training world ends at tick 64 only; delivery masks remaining commanded samples. Frozen evaluation ends on success. Preserve both existing rules rather than introduce early-reset training.",
+    "authorization": "User explicitly approved: 검증 통과 후 15 jobs 실행",
+    "baseline_evaluation": "Sample 8 uses the first 8 historic RNG streams per layout; exact raw episode parity required."
+  }
+}
