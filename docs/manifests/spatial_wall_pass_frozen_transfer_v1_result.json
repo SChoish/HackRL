@@ -1,0 +1,306 @@
+{
+  "schema_version": "hackrl_spatial_frozen_transfer_result_v1",
+  "status": "complete",
+  "evaluation_execution_sha": "7461628658b7394d18a0cd508e8000f08abd9a06",
+  "training_execution_sha": "9b6278273d31b211790c68f9cfcc9a55b6542f79",
+  "completed_utc": "2026-10-09T15:41:35Z",
+  "policy_count": 10,
+  "learner_seeds": [
+    132,
+    133,
+    134,
+    135,
+    136
+  ],
+  "new_layout_episode_count": 7800,
+  "original_mode_control_episode_count": 320,
+  "training_calls": 0,
+  "checkpoint_hashes_unchanged": true,
+  "original_mode_parity_all_policies_both_kernels": true,
+  "contract_sha256": "775b8397cec53d2364500f7deb1fbf5fa051bfbe60c25d1b01f8b71d8cf3447d",
+  "raw_result_path": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_frozen_transfer_v1/result.json",
+  "raw_result_sha256": "487ea908804044dd08cb92eed84d0661ad3dd38dcf942c9e65bdc3120d28ee36",
+  "rows": [
+    {
+      "fixture": "crossing_shift_left",
+      "category": "crossing_location",
+      "fixed_shortest": 10,
+      "mutant_shortest": 6,
+      "fixed_continue": {
+        "mode": {
+          "fixed_success_mean": 0.6,
+          "mutant_success_mean": 0.6,
+          "mutant_wall_pass_mean": 0.2,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [
+            132,
+            135,
+            136
+          ],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.7,
+          "mutant_success_mean": 0.884375,
+          "mutant_wall_pass_mean": 0.396875,
+          "same_policy_mutant_minus_fixed_return_mean": 0.17116473491535789
+        }
+      },
+      "mutant_adapt": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.6,
+          "mutant_wall_pass_mean": 0.6,
+          "same_policy_mutant_minus_fixed_return_mean": 0.5812580093481687,
+          "successful_mutant_seeds": [
+            132,
+            133,
+            135
+          ],
+          "successful_wall_pass_seeds": [
+            132,
+            133,
+            135
+          ]
+        },
+        "sample": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.6,
+          "mutant_wall_pass_mean": 0.603125,
+          "same_policy_mutant_minus_fixed_return_mean": 0.581106827160698
+        }
+      }
+    },
+    {
+      "fixture": "crossing_shift_right",
+      "category": "crossing_location",
+      "fixed_shortest": 10,
+      "mutant_shortest": 6,
+      "fixed_continue": {
+        "mode": {
+          "fixed_success_mean": 0.8,
+          "mutant_success_mean": 1.0,
+          "mutant_wall_pass_mean": 0.2,
+          "same_policy_mutant_minus_fixed_return_mean": 0.19117791567151193,
+          "successful_mutant_seeds": [
+            132,
+            133,
+            134,
+            135,
+            136
+          ],
+          "successful_wall_pass_seeds": [
+            135
+          ]
+        },
+        "sample": {
+          "fixed_success_mean": 0.88125,
+          "mutant_success_mean": 0.9875,
+          "mutant_wall_pass_mean": 0.11875,
+          "same_policy_mutant_minus_fixed_return_mean": 0.10224424789052997
+        }
+      },
+      "mutant_adapt": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.4,
+          "mutant_wall_pass_mean": 0.4,
+          "same_policy_mutant_minus_fixed_return_mean": 0.34041605994354107,
+          "successful_mutant_seeds": [
+            133,
+            135
+          ],
+          "successful_wall_pass_seeds": [
+            133,
+            135
+          ]
+        },
+        "sample": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.54375,
+          "mutant_wall_pass_mean": 0.55,
+          "same_policy_mutant_minus_fixed_return_mean": 0.5107958093381539
+        }
+      }
+    },
+    {
+      "fixture": "relocated_endpoints",
+      "category": "start_and_goal",
+      "fixed_shortest": 13,
+      "mutant_shortest": 11,
+      "fixed_continue": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.0,
+          "mutant_wall_pass_mean": 0.2,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.64375,
+          "mutant_success_mean": 0.778125,
+          "mutant_wall_pass_mean": 0.15625,
+          "same_policy_mutant_minus_fixed_return_mean": 0.12305043679901835
+        }
+      },
+      "mutant_adapt": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.6,
+          "mutant_wall_pass_mean": 1.0,
+          "same_policy_mutant_minus_fixed_return_mean": 0.5659247705013379,
+          "successful_mutant_seeds": [
+            132,
+            134,
+            136
+          ],
+          "successful_wall_pass_seeds": [
+            132,
+            134,
+            136
+          ]
+        },
+        "sample": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.853125,
+          "mutant_wall_pass_mean": 0.94375,
+          "same_policy_mutant_minus_fixed_return_mean": 0.7860243061216303
+        }
+      }
+    },
+    {
+      "fixture": "bent_wall_endpoints",
+      "category": "start_and_goal",
+      "fixed_shortest": 10,
+      "mutant_shortest": 10,
+      "fixed_continue": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.0,
+          "mutant_wall_pass_mean": 0.2,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.303125,
+          "mutant_success_mean": 0.503125,
+          "mutant_wall_pass_mean": 0.334375,
+          "same_policy_mutant_minus_fixed_return_mean": 0.16917724683911048
+        }
+      },
+      "mutant_adapt": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.0,
+          "mutant_wall_pass_mean": 0.0,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.44375,
+          "mutant_wall_pass_mean": 0.621875,
+          "same_policy_mutant_minus_fixed_return_mean": 0.3875205266701331
+        }
+      }
+    },
+    {
+      "fixture": "north_same_side",
+      "category": "wall_pass_detour",
+      "fixed_shortest": 4,
+      "mutant_shortest": 4,
+      "fixed_continue": {
+        "mode": {
+          "fixed_success_mean": 0.6,
+          "mutant_success_mean": 0.6,
+          "mutant_wall_pass_mean": 0.0,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [
+            132,
+            135,
+            136
+          ],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.634375,
+          "mutant_success_mean": 0.628125,
+          "mutant_wall_pass_mean": 0.00625,
+          "same_policy_mutant_minus_fixed_return_mean": -0.005842545201156746
+        }
+      },
+      "mutant_adapt": {
+        "mode": {
+          "fixed_success_mean": 0.4,
+          "mutant_success_mean": 0.4,
+          "mutant_wall_pass_mean": 0.2,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [
+            132,
+            136
+          ],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.79375,
+          "mutant_success_mean": 0.84375,
+          "mutant_wall_pass_mean": 0.16875,
+          "same_policy_mutant_minus_fixed_return_mean": 0.04629568976566314
+        }
+      }
+    },
+    {
+      "fixture": "south_same_side",
+      "category": "wall_pass_detour",
+      "fixed_shortest": 4,
+      "mutant_shortest": 4,
+      "fixed_continue": {
+        "mode": {
+          "fixed_success_mean": 0.0,
+          "mutant_success_mean": 0.0,
+          "mutant_wall_pass_mean": 0.0,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.7375,
+          "mutant_success_mean": 0.7375,
+          "mutant_wall_pass_mean": 0.0,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0
+        }
+      },
+      "mutant_adapt": {
+        "mode": {
+          "fixed_success_mean": 0.6,
+          "mutant_success_mean": 0.6,
+          "mutant_wall_pass_mean": 0.0,
+          "same_policy_mutant_minus_fixed_return_mean": 0.0,
+          "successful_mutant_seeds": [
+            132,
+            135,
+            136
+          ],
+          "successful_wall_pass_seeds": []
+        },
+        "sample": {
+          "fixed_success_mean": 0.675,
+          "mutant_success_mean": 0.675,
+          "mutant_wall_pass_mean": 0.009375,
+          "same_policy_mutant_minus_fixed_return_mean": 8.739393399175288e-05
+        }
+      }
+    }
+  ],
+  "interpretation": [
+    "Partial frozen-policy transfer across the six preregistered layouts; no uniform new-geometry success.",
+    "Some fixed-continued policies also cross walls on unseen layouts without mutant adaptation.",
+    "Normal routing failures confound exploit-specific transfer failure; mode and sample remain separate.",
+    "No claim of general planning, optimal route selection, or loss of normal movement competence.",
+    "A wall-pass provenance flag is not evidence of economic benefit; use paired kernel success and return.",
+    "Seed is the independent training replicate; episodes and layouts are not additional learner seeds."
+  ]
+}
