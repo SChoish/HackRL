@@ -607,23 +607,28 @@ def evaluate_spatial_wall_pass_gc_frozen(
     split=SpatialWallPassSplit.VALIDATION.value,
     record_episodes=False,
     horizon=64,
+    initial_states=None,
 ):
     """Frozen natural-start delivery evaluation on one kernel."""
 
     variant = SpatialWallPassVariant(variant)
     split = SpatialWallPassSplit(split)
-    layouts = jnp.arange(16, dtype=jnp.int32)
-    base = jax.vmap(
-        lambda index: make_spatial_wall_pass_state(
-            index, split=split, start=SpatialWallPassStart.NATURAL
-        )
-    )(layouts)
+    if initial_states is None:
+        layouts = jnp.arange(16, dtype=jnp.int32)
+        base = jax.vmap(
+            lambda index: make_spatial_wall_pass_state(
+                index, split=split, start=SpatialWallPassStart.NATURAL
+            )
+        )(layouts)
+    else:
+        base = initial_states
+        layouts = jnp.arange(base.player_position.shape[0], dtype=jnp.int32)
     initial = jax.tree.map(
         lambda value: jnp.repeat(value, repeats_per_state, axis=0), base
     )
     layout_indices = jnp.repeat(layouts, repeats_per_state)
     repeat_indices = jnp.tile(
-        jnp.arange(repeats_per_state, dtype=jnp.int32), 16
+        jnp.arange(repeats_per_state, dtype=jnp.int32), len(layouts)
     )
     episode_count = int(layout_indices.shape[0])
     seeds = (

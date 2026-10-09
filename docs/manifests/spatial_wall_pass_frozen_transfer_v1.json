@@ -1,0 +1,281 @@
+{
+  "schema_version": "hackrl_spatial_frozen_transfer_v1",
+  "run_id": "spatial_wall_pass_frozen_transfer_v1",
+  "status": "locked_before_policy_evaluation",
+  "training_execution_sha": "9b6278273d31b211790c68f9cfcc9a55b6542f79",
+  "seeds": [
+    132,
+    133,
+    134,
+    135,
+    136
+  ],
+  "branches": [
+    "fixed_continue",
+    "mutant_adapt"
+  ],
+  "kernels": [
+    "fixed",
+    "mutant"
+  ],
+  "adaptation_update": 4096,
+  "horizon": 64,
+  "discount": 0.995,
+  "mode_repeats": 1,
+  "sample_repeats": 64,
+  "seed_base": {
+    "mode": 60000,
+    "sample": 61000
+  },
+  "floor": {
+    "row_min": 6,
+    "row_max": 12,
+    "column_min": 6,
+    "column_max": 12,
+    "removed": [
+      [
+        12,
+        12
+      ]
+    ]
+  },
+  "fixtures": [
+    {
+      "id": "crossing_shift_left",
+      "category": "crossing_location",
+      "walls": [
+        [
+          7,
+          8
+        ],
+        [
+          8,
+          8
+        ],
+        [
+          9,
+          8
+        ],
+        [
+          10,
+          8
+        ]
+      ],
+      "camp": [
+        9,
+        6
+      ],
+      "start": [
+        9,
+        7
+      ],
+      "item": [
+        9,
+        11
+      ]
+    },
+    {
+      "id": "crossing_shift_right",
+      "category": "crossing_location",
+      "walls": [
+        [
+          8,
+          10
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          10
+        ],
+        [
+          11,
+          10
+        ]
+      ],
+      "camp": [
+        9,
+        6
+      ],
+      "start": [
+        9,
+        7
+      ],
+      "item": [
+        9,
+        11
+      ]
+    },
+    {
+      "id": "relocated_endpoints",
+      "category": "start_and_goal",
+      "walls": [
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          11,
+          9
+        ]
+      ],
+      "camp": [
+        7,
+        6
+      ],
+      "start": [
+        7,
+        7
+      ],
+      "item": [
+        10,
+        12
+      ]
+    },
+    {
+      "id": "bent_wall_endpoints",
+      "category": "start_and_goal",
+      "walls": [
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          10,
+          10
+        ]
+      ],
+      "camp": [
+        11,
+        6
+      ],
+      "start": [
+        11,
+        7
+      ],
+      "item": [
+        7,
+        11
+      ]
+    },
+    {
+      "id": "north_same_side",
+      "category": "wall_pass_detour",
+      "walls": [
+        [
+          7,
+          9
+        ],
+        [
+          8,
+          9
+        ],
+        [
+          9,
+          9
+        ],
+        [
+          10,
+          9
+        ],
+        [
+          11,
+          9
+        ]
+      ],
+      "camp": [
+        9,
+        6
+      ],
+      "start": [
+        9,
+        7
+      ],
+      "item": [
+        7,
+        7
+      ]
+    },
+    {
+      "id": "south_same_side",
+      "category": "wall_pass_detour",
+      "walls": [
+        [
+          7,
+          10
+        ],
+        [
+          8,
+          10
+        ],
+        [
+          9,
+          10
+        ],
+        [
+          10,
+          10
+        ]
+      ],
+      "camp": [
+        9,
+        6
+      ],
+      "start": [
+        9,
+        7
+      ],
+      "item": [
+        11,
+        7
+      ]
+    }
+  ],
+  "protocol": {
+    "sequence": [
+      "commit fixtures and evaluation contract before any policy outputs on new layouts",
+      "enumerate exact shortest paths for fixed, mutant, and mutant with/without wall crossing; validate independent transitions against kernel",
+      "require fixed and mutant reachability within 64; detour fixtures require forced-crossing route strictly longer",
+      "hash all ten frozen checkpoints and record evaluation execution SHA before inference",
+      "reproduce original 16-layout mode metrics before accepting new-layout results",
+      "evaluate all seeds, branches, kernels; no optimizer calls; preserve checkpoint hashes",
+      "report each fixture and seed; mode primary, sample secondary; pair kernel comparisons per policy"
+    ],
+    "economic_benefit": "Compare same-policy kernel success and discounted return. A delivery after wall crossing is only a provenance label, not proof of positive value.",
+    "interpretation": "If fixed-continued policies also fail a new layout, general routing transfer failure confounds exploit-specific transfer. Six hand-authored fixtures are a bounded transfer probe, not a random-map population estimate.",
+    "selection": "No changes or replacements based on policy performance; preserve all fixtures and all five seeds.",
+    "no_training": true
+  },
+  "storage": {
+    "root": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_frozen_transfer_v1",
+    "checkpoint_writes": false,
+    "artifact_budget_bytes": 1073741824,
+    "reserve_bytes": 8589934592
+  }
+}
