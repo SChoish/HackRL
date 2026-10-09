@@ -1,0 +1,85 @@
+{
+  "schema_version": "hackrl_spatial_wall_pass_dual_adaptation_validation_v1",
+  "run_id": "spatial_wall_pass_dual_adaptation_v1",
+  "status": "pass_after_pre_gradient_recovery",
+  "recorded_utc": "2026-10-09T11:07:15Z",
+  "static_contract": {
+    "status": "pass",
+    "jobs": 4,
+    "adaptation_updates_per_job": 4096,
+    "total_transitions": 536870912,
+    "gc_adaptation_included": false,
+    "source_checkpoint_hashes_match_gate_adjudication": true,
+    "bc_policy_coefficient_at_adaptation_start": 0.08888889104127884
+  },
+  "cpu_tests": {
+    "command": "JAX_PLATFORMS=cpu PYTHONPATH=src python -m pytest -q tests/test_spatial_wall_pass.py tests/test_spatial_wall_pass_gc.py tests/test_spatial_wall_pass_dual_adaptation.py",
+    "passed": 20,
+    "failed": 0,
+    "warnings": 1,
+    "seconds": 112.32,
+    "warning": "tensorflow_probability uses deprecated jax.core.pytype_aval_mappings"
+  },
+  "gpu_smoke": {
+    "device": "NVIDIA H200",
+    "shape": "512 environments x 64 steps",
+    "seed": 130,
+    "start_state_sha256": {
+      "fixed": "6aab0ce15d32eb80bd9f62746a490e0ffed79f5c57312ff1955442d296f59447",
+      "mutant": "6aab0ce15d32eb80bd9f62746a490e0ffed79f5c57312ff1955442d296f59447"
+    },
+    "identical_start_state": true,
+    "adaptation_zero_evaluation": {
+      "runner_state_immutable": true,
+      "fixed_mode_success_rate": 1.0,
+      "mutant_mode_success_rate": 1.0,
+      "mutant_mode_wall_pass_rate": 0.0,
+      "mutant_mode_beneficial_use_rate": 0.0,
+      "mutant_sample_wall_pass_rate": 0.02734375,
+      "mutant_sample_beneficial_use_rate": 0.0009765625
+    },
+    "fixed": {
+      "global_update_before": 512,
+      "global_update_after": 513,
+      "teacher_step_before": 65536,
+      "teacher_step_after": 65664,
+      "bc_policy_coefficient": 0.08888889104127884,
+      "valid_transitions": 7769,
+      "compile_and_update_seconds": 11.008258544839919
+    },
+    "mutant": {
+      "global_update_before": 512,
+      "global_update_after": 513,
+      "teacher_step_before": 65536,
+      "teacher_step_after": 65664,
+      "bc_policy_coefficient": 0.08888889104127884,
+      "valid_transitions": 7757,
+      "compile_and_update_seconds": 5.9712018892169
+    },
+    "runner_exit_status": 0,
+    "keepalive_guard_exit_status": 0,
+    "keepalive_identity_check": "Only processes carrying the standalone --beyondg-gpu-keepalive marker were terminated."
+  },
+  "pre_gradient_recovery": {
+    "failed_execution_code_sha": "4cfa8bce6245ab43daddb33c2689065e20410f51",
+    "failure": "The first production update-0 evaluation referenced config without receiving it.",
+    "gradient_updates_applied": 0,
+    "saved_global_update": 512,
+    "archive": "/raid/ext_csv/HackRL/runs/_archive/spatial_wall_pass_dual_adaptation_v1_pre_gradient_failure_20261009T110048Z",
+    "repair": [
+      "Pass the branch config into the evaluator.",
+      "Recover a checkpoint whose evaluation artifact is missing.",
+      "Add a regression test for configured learner-seed forwarding.",
+      "Run the production-shape update-0 two-kernel evaluation in the GPU smoke."
+    ]
+  },
+  "storage": {
+    "home_utilization": 0.90,
+    "raid_free_bytes": 7663881908224,
+    "projected_peak_remaining_write_bytes": 3831113022,
+    "safety_reserve_bytes": 8589934592,
+    "destination": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_adaptation_v1",
+    "decision": "pass: use RAID"
+  },
+  "meaning": "The smoke verifies branch identity, frozen two-kernel evaluation, and one update at the production rollout shape. It is not a learning result."
+}

@@ -1,0 +1,158 @@
+{
+  "schema_version": "hackrl_spatial_wall_pass_dual_adaptation_v1",
+  "run_id": "spatial_wall_pass_dual_adaptation_v1",
+  "status": "ready_to_launch_adaptation",
+  "research_question": "Does a Dual policy that learned the normal detour turn rare stochastic wall crossings into a beneficial shortcut after mutant adaptation?",
+  "understood_as": "Branch only the two passing Dual development checkpoints into fixed continuation and mutant adaptation, keep the locked 4096-update contract, evaluate each policy in both kernels, and do not launch GC adaptation.",
+  "source_gate": {
+    "path": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_fixed_learnability_v1/gate_adjudication.json",
+    "execution_code_sha": "6c476ea0f0c38d5c32a12d48b77200507b444b2c",
+    "dual_eligible": true,
+    "gc_eligible": false,
+    "mutant_training_previously_started": false
+  },
+  "source_checkpoints": {
+    "130": {
+      "path": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_fixed_learnability_v1/dual_seed_130/checkpoints/update_512",
+      "state_sha256": "a84951adbac8a4df878d1729b4aa2d107a763133cabe5e906e37874f8f589fb5"
+    },
+    "131": {
+      "path": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_fixed_learnability_v1/dual_seed_131/checkpoints/update_512",
+      "state_sha256": "f36df5a4a86af54bdc67d5590f53818e6ce105cae2d4fba11d177852eab375cc"
+    }
+  },
+  "branches": {
+    "jobs": [
+      "dual_fixed_seed_130",
+      "dual_mutant_seed_130",
+      "dual_fixed_seed_131",
+      "dual_mutant_seed_131"
+    ],
+    "order": [
+      "fixed_continue_seed_130",
+      "mutant_adapt_seed_130",
+      "fixed_continue_seed_131",
+      "mutant_adapt_seed_131"
+    ],
+    "same_seed_pairing": true,
+    "identical_start_state_required": [
+      "PPO parameters",
+      "critic parameters",
+      "PPO Adam state",
+      "teacher parameters",
+      "teacher Adam state",
+      "teacher BatchRenorm state",
+      "environment state",
+      "RNG state"
+    ],
+    "only_training_kernel_differs_within_seed": true,
+    "adaptation_command": "delivery/count_ge_1",
+    "gc_adaptation": false
+  },
+  "training": {
+    "method": "Dual PPO with adapting all-goal teacher and policy BC",
+    "pretraining_updates_inherited": 512,
+    "adaptation_updates": 4096,
+    "num_envs": 512,
+    "rollout_steps": 64,
+    "transitions_per_job": 134217728,
+    "total_jobs": 4,
+    "total_transitions": 536870912,
+    "ppo_learning_rate": 0.0002,
+    "ppo_epochs": 1,
+    "minibatch_size": 1024,
+    "entropy_coefficient": 0.005,
+    "discount": 0.995,
+    "gae_lambda": 0.95,
+    "policy_hidden_size": 512,
+    "teacher_hidden_size": 512,
+    "teacher_learning": true,
+    "teacher_goal_heads": "all 12 normal goals",
+    "teacher_imitation": true,
+    "bc_schedule": "0.1 at global update 0, linearly decayed to 0 at global update 4608; adaptation begins at global update 512 with coefficient 0.0888889",
+    "checkpoint_adaptation_updates": [
+      0,
+      32,
+      128,
+      256,
+      512,
+      1024,
+      2048,
+      4096
+    ]
+  },
+  "evaluation": {
+    "start": "natural",
+    "split": "validation",
+    "layouts": 16,
+    "kernels": [
+      "fixed",
+      "mutant"
+    ],
+    "same_frozen_policy_across_kernels": true,
+    "action_selection": {
+      "mode": "one episode per validation layout",
+      "sample": "64 keyed repetitions per validation layout"
+    },
+    "primary": [
+      "natural-start goal success rate",
+      "wall-pass rate",
+      "beneficial-use rate",
+      "same-policy mutant-minus-fixed discounted return"
+    ],
+    "secondary": [
+      "successful episode length",
+      "sample evaluation",
+      "first wall-pass step",
+      "first wall-pass origin, action, intermediate cell, and destination"
+    ],
+    "discounted_return_formula": "success * 0.995 ** (episode_length - 1)",
+    "length_guard": "Do not interpret shorter mean successful length without success rate; failures are not included in mean_success_length.",
+    "trigger_payoff_separation": "A wall crossing and a delivery benefiting from a wall crossing are distinct outcomes.",
+    "episode_counts_are_not_independent_learning_replicates": true
+  },
+  "storage": {
+    "measured_utc": "2026-10-09T10:40:05Z",
+    "destination": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_adaptation_v1",
+    "serialized_checkpoint_bytes": 49518511,
+    "retained_checkpoint_count": 32,
+    "active_predecessor_successor_overlap_count": 2,
+    "evaluation_and_log_allowance_bytes": 2147483648,
+    "projected_peak_remaining_write_bytes": 3831113022,
+    "safety_reserve_bytes": 8589934592,
+    "required_free_bytes": 12421047614,
+    "home": {
+      "free_bytes": 185131458560,
+      "utilization": 0.90,
+      "decision": "excluded for new large checkpoint run"
+    },
+    "raid": {
+      "free_bytes": 7663881908224,
+      "utilization": 0.74,
+      "decision": "selected"
+    },
+    "recheck_every_updates": 64
+  },
+  "execution": {
+    "runner": "scripts/run_spatial_wall_pass_dual_adaptation.py",
+    "gpu_entrypoint": "scripts/run_spatial_wall_pass_dual_adaptation_gpu.sh",
+    "result": "/raid/ext_csv/HackRL/runs/spatial_wall_pass_dual_adaptation_v1/aggregate_result.json",
+    "resume": "Each cell resumes only from a complete retained checkpoint whose global update and config match.",
+    "gpu_keepalive": "Stop only the identity-checked dummy, then guard the owned runner against dummy recreation."
+  },
+  "completion_rule": "All four preregistered branches reach adaptation update 4096 and have frozen two-kernel mode and sample evaluations at every checkpoint.",
+  "followup_rule": "If beneficial shortcut use appears, freeze this configuration before any independent-seed replication. Do not add map, model-size, algorithm, or budget sweeps to this development run.",
+  "interpretation_guards": [
+    "These are two development seeds, not an independent replication.",
+    "GC is absent because it failed the fixed method gate; this run cannot establish Dual-versus-GC superiority on spatial wall pass.",
+    "A higher wall-pass rate without beneficial use or payoff improvement is not strong evidence of an exploit strategy.",
+    "Adaptation update 0 is a no-gradient baseline, not mutant learning."
+  ],
+  "queue": {
+    "training_started": false,
+    "automatic_extension": false,
+    "extra_seeds": false,
+    "geometry_changes": false,
+    "reward_changes": false
+  }
+}

@@ -648,6 +648,10 @@ def evaluate_spatial_wall_pass_gc_frozen(
                 wall_pass_seen,
                 wall_pass_count,
                 first_wall_pass,
+                first_wall_pass_action,
+                first_wall_pass_from,
+                first_wall_pass_intermediate,
+                first_wall_pass_destination,
                 beneficial_use,
                 action_keys,
             ) = carry
@@ -690,10 +694,29 @@ def evaluate_spatial_wall_pass_gc_frozen(
                 ),
             )
             wall_pass = jnp.logical_and(active, transitions.crossed_wall)
+            first_wall_pass_now = jnp.logical_and(first_wall_pass < 0, wall_pass)
             first_wall_pass = jnp.where(
-                jnp.logical_and(first_wall_pass < 0, wall_pass),
+                first_wall_pass_now,
                 step_index + 1,
                 first_wall_pass,
+            )
+            first_wall_pass_action = jnp.where(
+                first_wall_pass_now, actions, first_wall_pass_action
+            )
+            first_wall_pass_from = jnp.where(
+                first_wall_pass_now[:, None],
+                state.player_position,
+                first_wall_pass_from,
+            )
+            first_wall_pass_intermediate = jnp.where(
+                first_wall_pass_now[:, None],
+                transitions.intermediate_position,
+                first_wall_pass_intermediate,
+            )
+            first_wall_pass_destination = jnp.where(
+                first_wall_pass_now[:, None],
+                transitions.destination_position,
+                first_wall_pass_destination,
             )
             beneficial = jnp.logical_and(
                 active,
@@ -713,6 +736,10 @@ def evaluate_spatial_wall_pass_gc_frozen(
                 jnp.logical_or(wall_pass_seen, wall_pass),
                 wall_pass_count + wall_pass.astype(jnp.int32),
                 first_wall_pass,
+                first_wall_pass_action,
+                first_wall_pass_from,
+                first_wall_pass_intermediate,
+                first_wall_pass_destination,
                 jnp.logical_or(beneficial_use, beneficial),
                 split_keys[:, 0],
             ), None
@@ -733,6 +760,10 @@ def evaluate_spatial_wall_pass_gc_frozen(
                 zeros_bool,
                 zeros_int,
                 jnp.full((episode_count,), -1, dtype=jnp.int32),
+                jnp.full((episode_count,), -1, dtype=jnp.int32),
+                jnp.full((episode_count, 2), -1, dtype=jnp.int32),
+                jnp.full((episode_count, 2), -1, dtype=jnp.int32),
+                jnp.full((episode_count, 2), -1, dtype=jnp.int32),
                 zeros_bool,
                 keys,
             ),
@@ -753,6 +784,10 @@ def evaluate_spatial_wall_pass_gc_frozen(
         wall_pass_seen,
         wall_pass_count,
         first_wall_pass,
+        first_wall_pass_action,
+        first_wall_pass_from,
+        first_wall_pass_intermediate,
+        first_wall_pass_destination,
         beneficial_use,
         _,
     ) = jax.device_get(final)
@@ -765,6 +800,14 @@ def evaluate_spatial_wall_pass_gc_frozen(
     wall_pass_seen = np.asarray(wall_pass_seen, dtype=bool)
     wall_pass_count = np.asarray(wall_pass_count, dtype=np.int32)
     first_wall_pass = np.asarray(first_wall_pass, dtype=np.int32)
+    first_wall_pass_action = np.asarray(first_wall_pass_action, dtype=np.int32)
+    first_wall_pass_from = np.asarray(first_wall_pass_from, dtype=np.int32)
+    first_wall_pass_intermediate = np.asarray(
+        first_wall_pass_intermediate, dtype=np.int32
+    )
+    first_wall_pass_destination = np.asarray(
+        first_wall_pass_destination, dtype=np.int32
+    )
     beneficial_use = np.asarray(beneficial_use, dtype=bool)
     returns = np.where(
         length >= 1,
@@ -814,6 +857,33 @@ def evaluate_spatial_wall_pass_gc_frozen(
                 "wall_pass": bool(wall_pass_seen[index]),
                 "wall_pass_count": int(wall_pass_count[index]),
                 "first_wall_pass_step": int(first_wall_pass[index]),
+                "first_wall_pass_action": (
+                    None
+                    if first_wall_pass_action[index] < 0
+                    else int(first_wall_pass_action[index])
+                ),
+                "first_wall_pass_action_name": (
+                    None
+                    if first_wall_pass_action[index] < 0
+                    else SpatialWallPassAction(
+                        int(first_wall_pass_action[index])
+                    ).name
+                ),
+                "first_wall_pass_from": (
+                    None
+                    if first_wall_pass[index] < 0
+                    else first_wall_pass_from[index].tolist()
+                ),
+                "first_wall_pass_intermediate": (
+                    None
+                    if first_wall_pass[index] < 0
+                    else first_wall_pass_intermediate[index].tolist()
+                ),
+                "first_wall_pass_destination": (
+                    None
+                    if first_wall_pass[index] < 0
+                    else first_wall_pass_destination[index].tolist()
+                ),
                 "beneficial_use": bool(beneficial_use[index]),
             }
             for index in range(episode_count)
