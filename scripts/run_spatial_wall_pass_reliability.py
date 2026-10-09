@@ -2,6 +2,7 @@
 """Locked 15-job episode-kernel reliability experiment; resumable RAID state."""
 import argparse
 from dataclasses import replace
+import gc as python_gc
 import hashlib
 import json
 import os
@@ -299,14 +300,15 @@ def queue():
     smoke_record=json.loads((ROOT/"smoke.json").read_text())
     assert smoke_record["status"]=="passed" and smoke_record["provenance"]==p
     capacity("queue_start")
+    # The existing GPU guard protects a single process. Keep every GPU call
+    # in this process; validate all historic endpoints before any new training.
     for seed in SEEDS:
-        command=[sys.executable,__file__,"--endpoints",str(seed)]
-        with (ROOT/f"endpoints_seed_{seed}.log").open("a") as log:
-            subprocess.run(command,check=True,stdout=log,stderr=subprocess.STDOUT)
-        for q in PROBS:
-            command=[sys.executable,__file__,"--cell",str(seed),str(q)]
-            with (ROOT/f"{cell_name(seed,q)}.log").open("a") as log:
-                subprocess.run(command,check=True,stdout=log,stderr=subprocess.STDOUT)
+        endpoint_evaluations(seed)
+        print(json.dumps({"event":"endpoints_verified","seed":seed}),flush=True)
+        jax.clear_caches(); python_gc.collect()
+    for seed,q in jobs():
+        run_cell(seed,q)
+        jax.clear_caches(); python_gc.collect()
     cells={cell_name(s,q):json.loads((ROOT/cell_name(s,q)/"summary.json").read_text()) for s,q in jobs()}
     assert all(c["status"]=="complete" for c in cells.values())
     capacity("complete")
