@@ -90,6 +90,15 @@ EXECUTION_SOURCES = (
     Path("tests/test_spatial_wall_pass_gc.py"),
     Path("tests/test_spatial_wall_pass_dual_adaptation.py"),
 )
+REPLICATION_EXECUTION_SOURCES = EXECUTION_SOURCES + (
+    Path("scripts/run_spatial_wall_pass_fixed_gate.py"),
+    Path("scripts/run_spatial_wall_pass_dual_replication.py"),
+    Path("scripts/run_spatial_wall_pass_dual_replication_gpu.sh"),
+    Path("docs/manifests/spatial_wall_pass_dual_replication_v1.json"),
+    Path("tests/test_spatial_wall_pass_dual_replication.py"),
+)
+REPLICATION_ALL_SEEDS = (132, 133, 134, 135, 136)
+IS_REPLICATION = False
 
 
 def _git(*arguments):
@@ -155,6 +164,62 @@ def _runtime_record():
             for name in ("jax", "jaxlib", "flax", "optax", "distrax")
         },
     }
+
+
+def configure_replication(gate_path):
+    global RUN_ID
+    global RUN_ROOT
+    global PRETRAIN_ROOT
+    global GATE_ADJUDICATION
+    global SEEDS
+    global EXPECTED_SOURCE_EXECUTION_SHA
+    global EXPECTED_SOURCE_STATE_SHA256
+    global EXECUTION_SOURCES
+    global IS_REPLICATION
+
+    gate_path = Path(gate_path).resolve()
+    gate = json.loads(gate_path.read_text(encoding="utf-8"))
+    if gate.get("schema_version") != (
+        "hackrl_spatial_wall_pass_dual_replication_gate_v1"
+    ):
+        raise RuntimeError("replication gate schema mismatch")
+    if gate.get("status") != "complete":
+        raise RuntimeError("replication pretraining gate is incomplete")
+    all_seeds = tuple(int(seed) for seed in gate.get("all_seeds", ()))
+    passing = tuple(int(seed) for seed in gate.get("passing_seeds", ()))
+    if all_seeds != REPLICATION_ALL_SEEDS:
+        raise RuntimeError("replication all-seed set changed")
+    if not passing or any(seed not in all_seeds for seed in passing):
+        raise RuntimeError("replication passing-seed set is invalid")
+    expected_root = (
+        Path("/raid/ext_csv/HackRL/runs")
+        / "spatial_wall_pass_dual_replication_v1"
+    )
+    pretrain_root = Path(gate["pretrain_root"]).resolve()
+    adaptation_root = Path(gate["adaptation_root"]).resolve()
+    if pretrain_root != (expected_root / "pretraining").resolve():
+        raise RuntimeError("replication pretraining root changed")
+    if adaptation_root != (expected_root / "adaptation").resolve():
+        raise RuntimeError("replication adaptation root changed")
+    state_hashes = {
+        int(seed): value
+        for seed, value in gate.get(
+            "final_checkpoint_state_sha256", {}
+        ).items()
+    }
+    if set(state_hashes) != set(passing):
+        raise RuntimeError("replication checkpoint hash set is incomplete")
+
+    RUN_ID = "spatial_wall_pass_dual_replication_v1"
+    RUN_ROOT = adaptation_root
+    PRETRAIN_ROOT = pretrain_root
+    GATE_ADJUDICATION = gate_path
+    SEEDS = passing
+    EXPECTED_SOURCE_EXECUTION_SHA = gate["execution_code_sha"]
+    EXPECTED_SOURCE_STATE_SHA256 = state_hashes
+    EXECUTION_SOURCES = REPLICATION_EXECUTION_SOURCES
+    IS_REPLICATION = True
+    return gate
 
 
 def jobs():
@@ -302,23 +367,40 @@ def _validate_source_checkpoint(seed):
 
 def validate_contract():
     gate = json.loads(GATE_ADJUDICATION.read_text(encoding="utf-8"))
+    started_at_gate = (
+        gate.get("decision", {}).get(
+            "mutant_training_started_at_gate_time"
+        )
+        if IS_REPLICATION
+        else gate.get("decision", {}).get("mutant_training_started")
+    )
     if (
         gate.get("status") != "complete"
         or gate.get("execution_code_sha") != EXPECTED_SOURCE_EXECUTION_SHA
         or not gate.get("method_gate", {})
         .get("dual", {})
         .get("eligible_for_future_adaptation")
-        or gate.get("decision", {}).get("mutant_training_started") is not False
+        or started_at_gate is not False
     ):
         raise RuntimeError("fixed gate does not authorize Dual adaptation")
+    if (
+        IS_REPLICATION
+        and _git("rev-parse", "HEAD") != EXPECTED_SOURCE_EXECUTION_SHA
+    ):
+        raise RuntimeError(
+            "adaptation code commit differs from replication pretraining"
+        )
     source_records = {
         str(seed): _validate_source_checkpoint(seed) for seed in SEEDS
     }
     planned = jobs()
-    if len(planned) != 4:
-        raise RuntimeError("adaptation contract must contain exactly four jobs")
+    expected_jobs = 2 * len(SEEDS)
+    if len(planned) != expected_jobs:
+        raise RuntimeError(
+            f"adaptation contract must contain {expected_jobs} jobs"
+        )
     total_transitions = len(planned) * ADAPT_UPDATES * 512 * 64
-    if total_transitions != 536_870_912:
+    if total_transitions != expected_jobs * 134_217_728:
         raise RuntimeError("transition budget mismatch")
     return {
         "run_id": RUN_ID,
@@ -352,10 +434,21 @@ def _provenance(runtime, contract):
         "run_id": RUN_ID,
         "status": "started",
         "understood_as": (
-            "Branch Dual seeds 130 and 131 from their exact passing update-512 "
-            "checkpoints into fixed continuation and mutant adaptation, retain "
-            "the locked 4096-update budget and evaluation schedule, evaluate "
-            "every policy in both kernels, and do not launch GC adaptation."
+            (
+                "For the preregistered independent seeds that passed the fixed "
+                "normal gate, branch each exact update-512 checkpoint into "
+                "fixed continuation and mutant adaptation; keep the locked "
+                "4096-update budget and evaluation schedule, and evaluate "
+                "every frozen policy in both kernels."
+            )
+            if IS_REPLICATION
+            else (
+                "Branch Dual seeds 130 and 131 from their exact passing "
+                "update-512 checkpoints into fixed continuation and mutant "
+                "adaptation, retain the locked 4096-update budget and "
+                "evaluation schedule, evaluate every policy in both kernels, "
+                "and do not launch GC adaptation."
+            )
         ),
         "execution_code_sha": _git("rev-parse", "HEAD"),
         "execution_source_sha256": {
@@ -614,7 +707,14 @@ def run_cell(job):
     cell = _cell(job)
     cell.mkdir(parents=True, exist_ok=True)
     summary_path = cell / "summary.json"
-    if summary_path.is_file() and _checkpoint_valid(job, ADAPT_UPDATES):
+    final_evaluation_path = (
+        _checkpoint(job, ADAPT_UPDATES) / "evaluation.json"
+    )
+    if (
+        summary_path.is_file()
+        and _checkpoint_valid(job, ADAPT_UPDATES)
+        and _evaluation_complete(final_evaluation_path, ADAPT_UPDATES)
+    ):
         recorded = json.loads(summary_path.read_text(encoding="utf-8"))
         if recorded.get("status") == "complete":
             print(f"[skip] {job['id']} complete", flush=True)
@@ -909,8 +1009,16 @@ def summarize():
         "interpretation_guards": [
             "Wall-pass triggering is separate from beneficial delivery.",
             "Mean successful length is interpreted only with success rate.",
-            "These two development seeds are first evidence, not an independent replication.",
-            "GC adaptation was not run because GC failed its preregistered method gate.",
+            (
+                "These are preregistered independent learner seeds; the "
+                "validation layouts remain transforms of one fixture family."
+                if IS_REPLICATION
+                else (
+                    "These two development seeds are first evidence, not an "
+                    "independent replication."
+                )
+            ),
+            "GC adaptation is not part of this Dual-only replication.",
         ],
     }
     _write_json(RUN_ROOT / "aggregate_result.json", result)
@@ -926,7 +1034,7 @@ def smoke():
         job = next(
             item
             for item in jobs()
-            if item["seed"] == 130 and item["variant"] == variant
+            if item["seed"] == SEEDS[0] and item["variant"] == variant
         )
         config = _job_config(job)
         (
@@ -975,7 +1083,7 @@ def smoke():
     return {
         "status": "pass",
         "shape": "512x64",
-        "seed": 130,
+        "seed": SEEDS[0],
         "identical_start_state_sha256": start_hashes,
         "adaptation_zero_evaluation": adaptation_zero_evaluation,
         "variants": outputs,
@@ -1007,7 +1115,10 @@ def main():
     parser.add_argument("--validate-only", action="store_true")
     parser.add_argument("--smoke", action="store_true")
     parser.add_argument("--run-queue", action="store_true")
+    parser.add_argument("--replication-gate")
     args = parser.parse_args()
+    if args.replication_gate:
+        configure_replication(args.replication_gate)
     selected = sum((args.validate_only, args.smoke, args.run_queue))
     if selected != 1:
         raise SystemExit("choose exactly one of --validate-only, --smoke, --run-queue")

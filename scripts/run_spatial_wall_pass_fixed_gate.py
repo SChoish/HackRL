@@ -50,6 +50,13 @@ from hackrl.spatial_wall_pass_gc import (
 REPOSITORY = Path(__file__).resolve().parents[1]
 RUN_ID = "spatial_wall_pass_fixed_learnability_v1"
 RUN_ROOT = Path("/raid/ext_csv/HackRL/runs") / RUN_ID
+REPLICATION_RUN_ID = "spatial_wall_pass_dual_replication_v1"
+REPLICATION_SEEDS = (132, 133, 134, 135, 136)
+REPLICATION_PRETRAIN_ROOT = (
+    Path("/raid/ext_csv/HackRL/runs")
+    / REPLICATION_RUN_ID
+    / "pretraining"
+)
 EXECUTION_SOURCES = (
     Path("scripts/run_spatial_wall_pass_fixed_gate.py"),
     Path("scripts/run_spatial_wall_pass_fixed_gate_queue.sh"),
@@ -61,6 +68,12 @@ EXECUTION_SOURCES = (
     Path("docs/manifests/spatial_wall_pass_fixed_learnability_v1.json"),
     Path("tests/test_spatial_wall_pass.py"),
     Path("tests/test_spatial_wall_pass_gc.py"),
+)
+REPLICATION_EXECUTION_SOURCES = EXECUTION_SOURCES + (
+    Path("scripts/run_spatial_wall_pass_dual_replication.py"),
+    Path("scripts/run_spatial_wall_pass_dual_replication_gpu.sh"),
+    Path("docs/manifests/spatial_wall_pass_dual_replication_v1.json"),
+    Path("tests/test_spatial_wall_pass_dual_replication.py"),
 )
 GIB = 1024**3
 MINIMUM_RESERVE_BYTES = 8 * GIB
@@ -207,8 +220,33 @@ def _append_capacity_record(destination, record, event):
     _write_json(path, history)
 
 
-def _provenance(method, config, runtime, parameter_counts):
-    relative = [str(path) for path in EXECUTION_SOURCES]
+def _contract_settings(contract_name):
+    if contract_name == "development":
+        return {
+            "run_id": RUN_ID,
+            "root": RUN_ROOT,
+            "seeds": (130, 131),
+            "methods": ("gc", "dual"),
+            "sources": EXECUTION_SOURCES,
+            "phase": "fixed_learnability_gate",
+        }
+    if contract_name == "replication":
+        return {
+            "run_id": REPLICATION_RUN_ID,
+            "root": REPLICATION_PRETRAIN_ROOT,
+            "seeds": REPLICATION_SEEDS,
+            "methods": ("dual",),
+            "sources": REPLICATION_EXECUTION_SOURCES,
+            "phase": "independent_seed_pretraining",
+        }
+    raise ValueError(f"unknown fixed-training contract: {contract_name}")
+
+
+def _provenance(
+    method, config, runtime, parameter_counts, contract_name="development"
+):
+    settings = _contract_settings(contract_name)
+    relative = [str(path) for path in settings["sources"]]
     dirty = _git("status", "--porcelain", "--", *relative)
     if dirty:
         raise RuntimeError("execution sources must be committed before launch:\n" + dirty)
@@ -219,7 +257,9 @@ def _provenance(method, config, runtime, parameter_counts):
     return {
         "schema_version": "hackrl_spatial_wall_pass_fixed_run_v1",
         "status": "started",
-        "run_id": RUN_ID,
+        "run_id": settings["run_id"],
+        "phase": settings["phase"],
+        "contract_name": contract_name,
         "method": method,
         "execution_code_sha": _git("rev-parse", "HEAD"),
         "execution_source_sha256": {
@@ -355,7 +395,10 @@ def _host_metrics(metrics, update):
     return result
 
 
-def _assert_preregistered_contract(method, config, destination):
+def _assert_preregistered_contract(
+    method, config, destination, contract_name="development"
+):
+    settings = _contract_settings(contract_name)
     expected = {
         "variant": "fixed",
         "seed": config.seed,
@@ -379,8 +422,14 @@ def _assert_preregistered_contract(method, config, destination):
         "sample_repeats_per_state": 64,
         "checkpoint_updates": CHECKPOINT_UPDATES,
     }
-    if config.seed not in {130, 131}:
-        raise ValueError("checkpoint-producing gate seed must be 130 or 131")
+    if config.seed not in settings["seeds"]:
+        raise ValueError(
+            f"seed {config.seed} is not registered for {contract_name}"
+        )
+    if method not in settings["methods"]:
+        raise ValueError(
+            f"method {method} is not registered for {contract_name}"
+        )
     mismatches = {
         name: (getattr(config, name), value)
         for name, value in expected.items()
@@ -388,14 +437,16 @@ def _assert_preregistered_contract(method, config, destination):
     }
     if mismatches:
         raise ValueError(f"checkpoint-producing run differs from preregistration: {mismatches}")
-    expected_destination = (RUN_ROOT / f"{method}_seed_{config.seed}").resolve()
+    expected_destination = (
+        settings["root"] / f"{method}_seed_{config.seed}"
+    ).resolve()
     if destination.resolve() != expected_destination:
         raise ValueError(
             f"gate destination must be {expected_destination}, got {destination.resolve()}"
         )
 
 
-def run_cell(method, config, log_dir=None):
+def run_cell(method, config, log_dir=None, contract_name="development"):
     if method not in {"gc", "dual"}:
         raise ValueError("method must be gc or dual")
     config.validate()
@@ -403,7 +454,9 @@ def run_cell(method, config, log_dir=None):
         raise ValueError("this gate trains fixed normal12 only")
     destination = None if log_dir is None else Path(log_dir)
     if destination is not None:
-        _assert_preregistered_contract(method, config, destination)
+        _assert_preregistered_contract(
+            method, config, destination, contract_name
+        )
     runtime = _runtime_record()
     expected_backend = "gpu" if REQUESTED_DEVICE == "cuda" else "cpu"
     if runtime["jax_backend"] != expected_backend:
@@ -433,7 +486,9 @@ def run_cell(method, config, log_dir=None):
 
     if destination is not None:
         capacity = _capacity_record(destination, method, runner, teacher_state, config)
-        provenance = _provenance(method, config, runtime, counts)
+        provenance = _provenance(
+            method, config, runtime, counts, contract_name
+        )
         destination.mkdir(parents=True, exist_ok=True)
         _append_capacity_record(destination, capacity, "start_or_resume")
         manifest_path = destination / "run_manifest.json"
@@ -542,7 +597,12 @@ def run_cell(method, config, log_dir=None):
 def parse_args():
     parser = argparse.ArgumentParser()
     parser.add_argument("--method", choices=("gc", "dual"), required=True)
-    parser.add_argument("--seed", type=int, choices=(130, 131), required=True)
+    parser.add_argument("--seed", type=int, required=True)
+    parser.add_argument(
+        "--contract",
+        choices=("development", "replication"),
+        default="development",
+    )
     parser.add_argument("--num-envs", type=int, default=512)
     parser.add_argument("--num-steps", type=int, default=64)
     parser.add_argument("--num-updates", type=int, default=512)
@@ -558,6 +618,15 @@ def parse_args():
 
 def main():
     args = parse_args()
+    settings = _contract_settings(args.contract)
+    if args.seed not in settings["seeds"]:
+        raise SystemExit(
+            f"seed {args.seed} is not registered for {args.contract}"
+        )
+    if args.method not in settings["methods"]:
+        raise SystemExit(
+            f"method {args.method} is not registered for {args.contract}"
+        )
     config = SpatialWallPassGCConfig(
         variant=SpatialWallPassVariant.FIXED.value,
         seed=args.seed,
@@ -583,7 +652,9 @@ def main():
             int(item) for item in args.checkpoint_updates.split(",") if item
         ),
     )
-    summary = run_cell(args.method, config, args.log_dir)
+    summary = run_cell(
+        args.method, config, args.log_dir, contract_name=args.contract
+    )
     print(
         json.dumps(
             {
