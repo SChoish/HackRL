@@ -169,15 +169,16 @@ def _gae(trajectory, last_value, gamma, gae_lambda):
     return advantages, advantages + trajectory.value
 
 
-def init_dual_leo_teacher(config, map_example, numeric_example, num_goals, num_actions):
+def init_dual_leo_teacher(config, map_example, numeric_example, num_goals, num_actions, *, network=None):
     """Initialize the teacher without consuming the PPO initialization RNG."""
 
     teacher_hidden_size = int(getattr(config, "teacher_hidden_size", LEO_HIDDEN_SIZE))
-    network = DualLeoQ(
-        num_goals=num_goals,
-        num_actions=num_actions,
-        hidden_size=teacher_hidden_size,
-    )
+    if network is None:
+        network = DualLeoQ(
+            num_goals=num_goals,
+            num_actions=num_actions,
+            hidden_size=teacher_hidden_size,
+        )
     variables = network.init(
         jax.random.fold_in(jax.random.PRNGKey(int(config.seed)), 17),
         map_example[:1],
@@ -238,6 +239,7 @@ def make_dual_leo_update(
     learn_teacher=True,
     imitate_teacher=True,
     teacher_goal_indices=None,
+    runner_inputs=None,
 ):
     """One PPO update plus the all-goal teacher update.
 
@@ -270,12 +272,15 @@ def make_dual_leo_update(
     teacher_target_head_count = len(teacher_goal_indices)
     leo_epochs = LEO_EPOCHS
     bc_horizon = BC_HORIZON_UPDATES
+    # Optional history-aware observation adapter; old callers are unchanged.
+    if runner_inputs is None:
+        runner_inputs = lambda runner: batch_inputs(runner.env_state, runner.current_goal)
 
     def update(gc_runner, leo_state):
         def rollout_step(carry, _):
             runner, leo = carry
             command_goal = runner.current_goal
-            model_inputs = batch_inputs(runner.env_state, command_goal)
+            model_inputs = runner_inputs(runner)
             policy, value = ppo_network.apply(runner.train_state.params, *model_inputs)
             q_values, _ = _teacher_q(
                 teacher_network, leo, model_inputs[0], model_inputs[1], train=False
@@ -319,7 +324,7 @@ def make_dual_leo_update(
         seen_goals = jnp.logical_or(
             gc_runner.seen_goals, jnp.any(observed_goals, axis=(0, 1))
         )
-        last_inputs = batch_inputs(gc_runner.env_state, gc_runner.current_goal)
+        last_inputs = runner_inputs(gc_runner)
         _, last_value = ppo_network.apply(gc_runner.train_state.params, *last_inputs)
         last_value = jnp.where(gc_runner.command_active, last_value, 0.0)
         advantages, targets = _gae(trajectory, last_value, config.gamma, config.gae_lambda)
