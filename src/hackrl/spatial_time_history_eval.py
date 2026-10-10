@@ -8,7 +8,7 @@ from hackrl import spatial_time_history as h
 from hackrl.spatial_recovery_probe import intervention_step, records_from_trace, summarize
 
 
-def make_rollout(network, stochastic, repeats):
+def make_rollout(network, stochastic, repeats, *, history_api=h):
     layouts = jnp.repeat(jnp.arange(16, dtype=jnp.int32), repeats)
     repeat_ids = jnp.tile(jnp.arange(repeats, dtype=jnp.int32), 16)
     n = 16 * repeats
@@ -23,7 +23,7 @@ def make_rollout(network, stochastic, repeats):
 
         def step(carry, t):
             state, history, done, used, keys = carry
-            pi, _ = network.apply(params, *h.pack_inputs(state, goals, history))
+            pi, _ = network.apply(params, *history_api.pack_inputs(state, goals, history))
             splits = jax.vmap(lambda k: jax.random.split(k, 2))(keys)
             if stochastic:
                 choice = jax.vmap(lambda logits, key: distrax.Categorical(logits=logits).sample(seed=key))(
@@ -45,20 +45,20 @@ def make_rollout(network, stochastic, repeats):
                          dash=active & tr.dash_requested,
                          clear_dash=active & tr.dash_succeeded & ~tr.crossed_wall,
                          history_valid=history.valid, previous_action=history.action)
-            history = h.advance_history(history, state, action, controlled, active & (out.tick >= 64))
+            history = history_api.advance_history(history, state, action, controlled, active & (out.tick >= 64))
             return (gc._tree_where(active, out, state), history, done | delivered | (out.tick >= 64),
                     used | (active & next_used), jnp.where(controlled[:, None], splits[:, 0], keys)), trace
 
-        _, trace = jax.lax.scan(step, (initial, h.empty_history(initial), jnp.zeros(n, bool),
+        _, trace = jax.lax.scan(step, (initial, history_api.empty_history(initial), jnp.zeros(n, bool),
                                       jnp.zeros(n, bool), keys), jnp.arange(64, dtype=jnp.int32))
         return trace
     return rollout
 
 
-def evaluate(network, params, seed):
+def evaluate(network, params, seed, *, history_api=h):
     result = {}
     for selection, repeats in (('mode', 1), ('sample', 8)):
-        rollout = make_rollout(network, selection == 'sample', repeats)
+        rollout = make_rollout(network, selection == 'sample', repeats, history_api=history_api)
         result[selection] = {}
         for delay in (*range(9), 10, 12):
             for kernel in ('fixed', 'mutant', 'mutant_block_once'):
