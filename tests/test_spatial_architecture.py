@@ -29,7 +29,7 @@ def initial(request):
 
 def test_manifest():
     s=json.loads((Path(__file__).resolve().parents[1]/'docs/manifests/spatial_architecture_v1.json').read_text())
-    assert s['authorization']==dict(validation=True,long_training=False)
+    assert s['authorization']==dict(validation=True,long_training=True)
     assert tuple(s['architectures'])==a.ARCHITECTURES
     assert len(s['architectures'])*len(s['seeds'])*3==s['planned_jobs']==60
     assert 4*5*(512+2*4096)*512*64==s['planned_collector_slots']

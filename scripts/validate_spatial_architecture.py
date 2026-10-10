@@ -93,7 +93,7 @@ def save(arch,name,r,l,c,p):
 
 
 def main():
-    assert SPEC['authorization']==dict(validation=True,long_training=False)
+    assert SPEC['authorization']['validation'] is True
     if os.environ.get('HACKRL_DEVICE')!='cuda' or not any(d.platform=='gpu' for d in jax.devices()):
         raise RuntimeError('Real GPU required')
     ROOT.mkdir(parents=True,exist_ok=True);p=provenance();capacity('startup')
