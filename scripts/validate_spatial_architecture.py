@@ -132,7 +132,7 @@ def main():
             restored,rl=load_dual_checkpoint(cp,start,l2)
             af=jax.jit(a.make_update(model,teacher,cc,mb,adaptation=True,probability=probability))
             (out,leo,metrics),compile_seconds=execute(af,start,l2,arch+'_'+label)
-            resumed,steady_seconds=execute(af,restored,rl,arch+'_'+label+'_restored')
+            resumed,restored_seconds=execute(af,restored,rl,arch+'_'+label+'_restored')
             difference=shared.parent.compare_trees((out,leo,metrics),resumed)
             assert exposure(out)['collector_slots']==32768 and int(out.global_update)==513
             assert int(out.train_state.step-start.train_state.step)==int(metrics['ppo_applied_minibatches'])
@@ -147,7 +147,8 @@ def main():
             write(evaluation_path,dict(diagnostic_only=True,results=evaluations))
             branch=dict(fixed_episode_probability=probability,normal_checkpoint_sha256=sha(normal_cp/'state.msgpack'),
                 parent_full_state_hash=fork_hash,resume_max_abs=difference,exposure=exposure(out),counters=shared.counters(out,leo),
-                first_update_including_compile_seconds=compile_seconds,restored_steady_update_seconds=steady_seconds,
+                first_update_including_compile_seconds=compile_seconds,
+                restored_update_seconds_including_possible_recompile=restored_seconds,
                 diagnostic_evaluation_episodes=episodes,evaluation_state_immutable=True,evaluation_sha256=sha(evaluation_path))
             branches.append(branch);print(json.dumps(dict(architecture=arch,branch=branch)),flush=True)
         record=dict(architecture=arch,status='passed',parameter_counts=counts,normal_resume_max_abs=normal_difference,
