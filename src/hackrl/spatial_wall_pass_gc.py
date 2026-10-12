@@ -297,7 +297,7 @@ def initialize_spatial_wall_pass_gc(config):
     return network, runner
 
 
-def step_spatial_wall_pass_gc_workers(runner, actions, config, *, transition_override=None):
+def step_spatial_wall_pass_gc_workers(runner, actions, config, *, transition_override=None, reset_override=None):
     variant = SpatialWallPassVariant(config.variant)
     before = runner.env_state
     valid = runner.command_active
@@ -319,7 +319,7 @@ def step_spatial_wall_pass_gc_workers(runner, actions, config, *, transition_ove
     done = jnp.logical_or(
         jnp.logical_or(goal_done, world_done), jnp.logical_not(valid)
     )
-    reset_states = jax.vmap(reset_spatial_wall_pass_worker)(
+    reset_states = reset_override if reset_override is not None else jax.vmap(reset_spatial_wall_pass_worker)(
         jnp.arange(config.num_envs, dtype=jnp.int32)
     )
     reset_goals = jax.vmap(_goals)(reset_states)

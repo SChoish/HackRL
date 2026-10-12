@@ -50,7 +50,7 @@ def attach_mixture(runner, seed, probability):
     return MixedRunner(**{f.name: getattr(runner, f.name)
                          for f in fields(gc.SpatialWallPassGCRunnerState)}, mixture=mix)
 
-def mixed_step(runner, actions, config, probability):
+def mixed_step(runner, actions, config, probability, *, reset_override=None):
     actions = jnp.where(runner.command_active, actions, 0)
     def step(kernel):
         return jax.vmap(lambda s,a: spatial_wall_pass_step_with_transition(s,a,kernel))(
@@ -59,7 +59,7 @@ def mixed_step(runner, actions, config, probability):
     mutant = step(SpatialWallPassVariant.MUTANT)
     stepped = gc._tree_where(runner.mixture.fixed, fixed, mutant)
     new_runner, event = gc.step_spatial_wall_pass_gc_workers(
-        runner, actions, config, transition_override=stepped)
+        runner, actions, config, transition_override=stepped, reset_override=reset_override)
     mix = runner.mixture
     new_keys, new_fixed = draw(mix.keys, probability)
     # Only a world reset commits a draw; a goal switch cannot change a kernel.

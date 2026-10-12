@@ -14,8 +14,8 @@ def make_rollout(network, stochastic=False, repeats=1):
     def rollout(params, learner_seed, fixed, delay, initial16, map_ids16):
         initial=jax.tree.map(lambda x:jnp.repeat(x,repeats,axis=0),initial16)
         ids=jnp.repeat(map_ids16,repeats)
-        repeat_ids=jnp.tile(jnp.arange(repeats,dtype=jnp.int32),16)
-        n=16*repeats
+        repeat_ids=jnp.tile(jnp.arange(repeats,dtype=jnp.int32),map_ids16.shape[0])
+        n=map_ids16.shape[0]*repeats
         goals=jnp.full(n,gc.DELIVERY_GOAL_INDEX,jnp.int32)
         seeds=(61000 if stochastic else 60000)+1000*learner_seed
         seeds=seeds+(64 if stochastic else 1)*ids+repeat_ids

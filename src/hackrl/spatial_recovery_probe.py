@@ -75,7 +75,8 @@ def make_rollout(network, stochastic, repeats):
 
 def records_from_trace(trace, repeats, delay):
     records = []
-    for i in range(16*repeats):
+    assert trace['active'].shape[1] % repeats == 0
+    for i in range(trace['active'].shape[1]):
         n = int(trace['active'][:, i].sum())
         actions = trace['action'][:n, i]
         before = trace['position'][:n, i]; after = trace['next_position'][:n, i]
