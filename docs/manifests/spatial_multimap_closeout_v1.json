@@ -1,0 +1,14 @@
+{
+  "understood_as": "Close the failed multimap gate with one frozen training-map evaluation of all three final development learners, distinguishing incomplete acquisition from out-of-training-layout transfer. No new learning or final-test inference.",
+  "training_sha": "83eec3079a0c0887bfe7c995c37b727c687dab78",
+  "source_root": "/raid/ext_csv/HackRL/runs/spatial_multimap_v1",
+  "output_root": "/raid/ext_csv/HackRL/runs/spatial_multimap_closeout_v1",
+  "seeds": [140, 141, 142],
+  "checkpoint_update": 512,
+  "evaluation": "Reuse the unchanged training-run Evaluator: fixed kernel, delivery goal, delay0, original64-tick horizon, empty initial history. All36 train maps, mode1 and sample8 repeats per map, same deterministic evaluation RNG formula as development. Each map has equal weight. Reuse hash-verified final development evaluations on18 maps; do not rerun or select checkpoints.",
+  "budget": {"new_mode_episodes":108,"new_sample_episodes":864,"new_total_episodes":972,"new_controlled_ticks_upper_bound":62208,"optimizer_updates":0,"checkpoint_writes":0,"test_episodes":0},
+  "integrity": "Verify all original run source hashes, the locked panel hash, gate failure and final checkpoint/evaluation hashes. Compare full restored learner/optimizer/normalization state hashes before and after evaluation. Source file hashes must remain unchanged. Save raw train episodes, per-map and per-seed train/development aggregates in a separate RAID output root. Record execution SHA. No changes to the original run.",
+  "rng": "Original spatial_layout_eval.make_rollout: sample key seed61000+1000*learner_seed+64*split_local_map_index+repeat_index; mode uses60000+1000*learner_seed+map_index. Map indices follow maps_locked.json order within split. These are the unchanged deterministic seed rules, not paired spatial episodes across different train/development maps.",
+  "restart": "Only a complete seed_<seed>.json evaluation result with matching seed_<seed>.integrity.json SHA256, current execution SHA and original checkpoint SHA may be reused. No partial-episode reuse. An unreceipted seed result or technical failure closes automatic relaunch. verified_complete.json is written only after all972 episodes are covered, per-map repeat sets checked, all source hashes rechecked and aggregate_result.json saved; this receipt closes the watcher queue. No training entrypoint is invoked.",
+  "interpretation": "Descriptive closure, not another gate or tuning pass. Report raw map and seed variation and train-minus-development differences. Do not infer exploration, optimization, representation or data sufficiency as causes. Gain-stratum/family summaries are descriptive because map features are not independently matched. Training-map success is not held-out generalization. Main20 and final-test evaluation remain closed regardless of this result."
+}
