@@ -714,14 +714,15 @@ def make_pack_restore_gc_update(network, config):
     return update
 
 
-def _evaluation_states(split, repeats, source_growth_period):
+def _evaluation_states(split, repeats, source_growth_period, natural_only=False):
     layouts = jnp.tile(jnp.arange(16, dtype=jnp.int32), 2)
     phases = jnp.repeat(jnp.arange(2, dtype=jnp.int32), 16)
     batches = []
     labels = []
-    for start_index, start in enumerate(
-        (PackRestoreStart.NATURAL, PackRestoreStart.COMMON_SETUP)
-    ):
+    starts = (PackRestoreStart.NATURAL,) if natural_only else (
+        PackRestoreStart.NATURAL, PackRestoreStart.COMMON_SETUP
+    )
+    for start_index, start in enumerate(starts):
         batches.append(
             jax.vmap(
                 lambda layout, phase: make_pack_restore_state(
@@ -734,13 +735,11 @@ def _evaluation_states(split, repeats, source_growth_period):
             )(layouts, phases)
         )
         labels.extend([start_index] * 32)
-    combined = jax.tree.map(
-        lambda left, right: jnp.concatenate((left, right), axis=0), batches[0], batches[1]
-    )
+    combined = jax.tree.map(lambda *values: jnp.concatenate(values, axis=0), *batches)
     combined = jax.tree.map(lambda value: jnp.repeat(value, repeats, axis=0), combined)
     labels = jnp.repeat(jnp.asarray(labels, dtype=jnp.int32), repeats)
-    state_indices = jnp.repeat(jnp.tile(jnp.arange(32, dtype=jnp.int32), 2), repeats)
-    repeat_indices = jnp.tile(jnp.arange(repeats, dtype=jnp.int32), 64)
+    state_indices = jnp.repeat(jnp.tile(jnp.arange(32, dtype=jnp.int32), len(starts)), repeats)
+    repeat_indices = jnp.tile(jnp.arange(repeats, dtype=jnp.int32), 32 * len(starts))
     return combined, labels, state_indices, repeat_indices
 
 
@@ -786,13 +785,14 @@ def evaluate_pack_restore_gc_frozen(
     learner_seed,
     source_growth_period=TRAINING_SOURCE_GROWTH_PERIOD,
     record_episodes=False,
+    natural_only=False,
 ):
     """Evaluate deliver_3 on one kernel without changing the learner."""
 
     variant = PackRestoreVariant(variant)
     split = PackRestoreSplit(split)
     initial, start_labels, state_indices, repeat_indices = _evaluation_states(
-        split, repeats_per_state, source_growth_period
+        split, repeats_per_state, source_growth_period, natural_only=natural_only
     )
     episode_count = int(start_labels.shape[0])
     seeds = seed_base + 1000 * learner_seed + 4 * state_indices + repeat_indices
@@ -894,6 +894,7 @@ def evaluate_pack_restore_gc_frozen(
         int(seed_base),
         int(learner_seed),
         int(source_growth_period),
+        bool(natural_only),
     )
     compiled = _FROZEN_EVAL_CACHE.get(cache_key)
     if compiled is None:
@@ -952,8 +953,9 @@ def evaluate_pack_restore_gc_frozen(
         "repeats_per_state": repeats_per_state,
         "overall": aggregate(np.ones((episode_count,), dtype=bool)),
         "natural_reset": aggregate(labels == 0),
-        "common_setup": aggregate(labels == 1),
     }
+    if not natural_only:
+        result["common_setup"] = aggregate(labels == 1)
     if record_episodes:
         result["episode_records"] = _episode_records(
             start_labels,
