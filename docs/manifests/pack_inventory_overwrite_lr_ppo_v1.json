@@ -1,0 +1,203 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_lr_ppo_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_lr_ppo_v1",
+  "status": "frozen_before_launch",
+  "understood_as": "Starting independently from each seed-35--39 PACK S Dual fixed-continuation actor-critic and inherited Adam state, train PPO for exactly 32 updates under overwrite probabilities 0.05 and 0.30 at either the inherited learning rate or exactly one quarter of it. Within each seed, all four branches share the same fresh worker state and RNG streams; branches at the same overwrite probability also see the same slot-indexed defect uniforms and threshold. Change no other PPO, environment, reward, observation, action, horizon, teacher, or BC setting. Evaluate deterministic mode and sampled actions at updates 0, 2, 8, and 32. Measure actor drift on a frozen panel of all active states from the source policy's deterministic normal-kernel trajectories. Compare lower versus inherited learning rate within seed, with p=0.05 expected target return as primary, and do not extend the budget or add a learning-rate sweep.",
+  "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+  "source_checkpoint": "adapt_4096",
+  "source_global_update": 4608,
+  "execution_sources": [
+    "docs/manifests/pack_inventory_overwrite_lr_ppo_v1.json",
+    "scripts/run_pack_inventory_overwrite_lr_ppo.py",
+    "scripts/summarize_pack_inventory_overwrite_lr_ppo.py",
+    "scripts/run_pack_inventory_overwrite_ppo.py",
+    "src/hackrl/pack_restore.py",
+    "src/hackrl/pack_restore_gc.py",
+    "src/hackrl/pack_inventory_overwrite_rare.py",
+    "src/hackrl/dual_leo.py"
+  ],
+  "research_question": "Can a fourfold lower PPO learning rate preserve normal task behavior while retaining useful overwrite-risk reduction, especially when the harmful defect fires with probability 0.05?",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1",
+  "prerequisites": {
+    "prior_result": "docs/manifests/pack_inventory_overwrite_stochastic_ppo_v1_results.json",
+    "prior_result_sha256": "5eceabb11aba5eacd5e3a1087edff7a5e9771cb43f3ac74cca9937b0dc1979fa",
+    "prior_raw_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_stochastic_ppo_v1/result.json",
+    "prior_raw_result_sha256": "6f4e8740934a548c4794ee792088bca593bb68f3889f3ead97de537ea57bed1b",
+    "reference_paths": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1/reference_paths.json",
+    "reference_paths_sha256": "a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a"
+  },
+  "source": {
+    "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+    "checkpoint": "adapt_4096",
+    "global_update": 4608,
+    "policy_history": "Dual fixed-continuation; this experiment compares two subsequent PPO step sizes and is not a Dual-versus-PPO comparison."
+  },
+  "seeds": [35, 36, 37, 38, 39],
+  "conditions": {
+    "p05_lr1": {
+      "kernel": "inventory_overwrite",
+      "overwrite_probability": 0.05,
+      "learning_rate_multiplier": 1.0,
+      "ppo_updates": 32,
+      "role": "Primary standard-learning-rate branch at low defect frequency."
+    },
+    "p05_lr025": {
+      "kernel": "inventory_overwrite",
+      "overwrite_probability": 0.05,
+      "learning_rate_multiplier": 0.25,
+      "ppo_updates": 32,
+      "role": "Primary single-intervention preservation branch at low defect frequency."
+    },
+    "p30_lr1": {
+      "kernel": "inventory_overwrite",
+      "overwrite_probability": 0.30,
+      "learning_rate_multiplier": 1.0,
+      "ppo_updates": 32,
+      "role": "Standard-learning-rate adaptation control at higher defect frequency."
+    },
+    "p30_lr025": {
+      "kernel": "inventory_overwrite",
+      "overwrite_probability": 0.30,
+      "learning_rate_multiplier": 0.25,
+      "ppo_updates": 32,
+      "role": "Lower-learning-rate control for slowed necessary adaptation."
+    }
+  },
+  "intervention_interpretation": "The 0.25 multiplier is one preregistered intervention intended to reduce policy-update magnitude; it is not claimed optimal. PPO clipping does not by itself guarantee preservation of normal task performance. Actor KL and argmax changes test whether the intervention actually reduced behavioral movement on the frozen source-visitation panel.",
+  "branch_initialization": {
+    "restored": [
+      "actor parameters",
+      "critic parameters",
+      "PPO Adam moments and optimizer step"
+    ],
+    "optimizer_transform": "The restored Adam state is attached to a branch optimizer using either the inherited learning rate or exactly 0.25 times that rate.",
+    "not_restored": [
+      "teacher parameters or teacher Adam state",
+      "source environment state",
+      "source action RNG",
+      "source worker RNG"
+    ],
+    "fresh_state": "Within each seed, all four branches begin from initialize_pack_restore_gc on the same balanced 512-worker natural-start panel.",
+    "paired_rng": "Initial policy RNG, environment reset RNG, sampler RNG, worker states, actor-critic, Adam state, and slot-indexed independent Bernoulli uniforms are byte-identical within seed. Learning rate and overwrite threshold are the only branch differences.",
+    "defect_stream": "A separate deterministic key is derived from learner seed and absolute physical collector-slot index; probability is only the threshold and is not observed by the policy."
+  },
+  "optimization": {
+    "num_envs": 512,
+    "num_steps": 64,
+    "updates": 32,
+    "collector_slots_per_update": 32768,
+    "collector_slots_per_job": 1048576,
+    "update_epochs": 1,
+    "minibatch_size": 1024,
+    "scheduled_optimizer_applications_per_job": 1024,
+    "source_learning_rate": 0.0002,
+    "branch_learning_rates": [0.0002, 0.00005],
+    "adam_restored": true,
+    "ppo_clipping_unchanged": true,
+    "entropy_unchanged": true,
+    "batching_unchanged": true,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "probability_in_observation": false,
+    "reward_changes": false,
+    "horizon_changes": false,
+    "collector_slots_per_block": 32768,
+    "discount_changes": false,
+    "collector_slots_per_condition_seed": 1048576,
+    "observation_changes": false,
+    "action_space_changes": false,
+    "loss_penalty_added": false,
+    "early_termination_added": false
+  },
+  "budget": {
+    "jobs": 20,
+    "total_jobs": 20,
+    "collector_slots": 20971520,
+    "total_collector_slots": 20971520,
+    "evaluation_cost_is_separate": true,
+    "automatic_extension": false,
+    "probability_sweep": false,
+    "learning_rate_sweep": false,
+    "hyperparameter_sweep": false,
+    "teacher_fallback": false
+  },
+  "evaluation": {
+    "adaptation_updates": [0, 2, 8, 32],
+    "collector_slots": [0, 65536, 262144, 1048576],
+    "split": "validation",
+    "start": "natural_reset",
+    "states": 32,
+    "horizon_ticks": 128,
+    "fixed_mode_repeats_per_state": 1,
+    "normal_sample_repeats_per_state": 4,
+    "stochastic_sample_repeats_per_state": 4,
+    "sample_episodes_per_seed_checkpoint_kernel": 128,
+    "sample_reported_separately": true,
+    "exact_mode_formula": "For each deterministic fixed-kernel path i, record fixed success s_i, length T_i, and the unrestricted count k_i of valid harvests with positive pre-harvest inventory. Success is mean[s_i(1-p)^k_i], return is mean[s_i gamma^(T_i-1)(1-p)^k_i], and overwrite-loss probability is mean[1-(1-p)^k_i]. Existing fixed-kernel failure is distinct from overwrite loss.",
+    "behavior_drift_anchor": "For each seed, freeze every active observation-goal state visited by the update-zero source policy's deterministic fixed-kernel trajectories from all 32 natural validation starts, up to success or the 128-tick horizon. Weight each active state equally. At every checkpoint compute mean D_KL(source actor || current actor) and argmax action-change rate on exactly this frozen panel.",
+    "primary_contrast": "At p=0.05 and update 32, paired by seed: exact mode expected discounted return of lr=0.25x minus lr=1x.",
+    "secondary_contrasts": [
+      "same paired contrast at p=0.30",
+      "each final branch minus its same-seed update-zero source baseline at the matching p",
+      "normal-kernel mode success and discounted return",
+      "risky-harvest path count and exact overwrite-loss probability",
+      "source-panel actor KL and argmax action-change rate",
+      "sampled-action success and discounted return"
+    ],
+    "cross_probability_note": "Raw loss rates are not compared across probabilities as if exposure and event opportunity were equal."
+  },
+  "metrics": {
+    "primary": "paired p=0.05 exact mode expected discounted return difference, lr0.25 minus lr1",
+    "task": [
+      "exact target-kernel success rate and expected discounted return",
+      "normal-kernel mode success rate and discounted return",
+      "sampled-action success rate and discounted return",
+      "final minus update-zero target return"
+    ],
+    "adaptation_harm": [
+      "cumulative lost grain",
+      "physical loss events",
+      "loss episode rate"
+    ],
+    "opportunity": [
+      "overwrite trigger events",
+      "overwrite fire events",
+      "fixed-mode risky-harvest count distribution"
+    ],
+    "behavior_change": [
+      "mean source-to-current categorical KL on frozen source states",
+      "argmax action-change count and rate on frozen source states"
+    ],
+    "accounting": [
+      "collector slots",
+      "physical transitions",
+      "valid PPO samples",
+      "optimizer applications",
+      "empty minibatches"
+    ],
+    "success_rule": "A lower loss rate or smaller KL alone is not success. Interpret target return together with normal-task preservation and risky exposure."
+  },
+  "statistics": {
+    "independent_unit": "learner seed",
+    "paired_by": "seed, source checkpoint, overwrite probability, worker state, and RNG streams",
+    "report": "All five paired seed differences and their mean; no significance claim from five seeds.",
+    "sign_tolerance": 1e-12,
+    "episode_count_is_not_an_independent_replication_unit": true
+  },
+  "checkpoint_storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "capacity_measured_utc": "2026-10-13",
+    "home_free_bytes_at_preflight": 160728625152,
+    "raid_free_bytes_at_preflight": 7864337453056,
+    "prior_10_job_run_bytes": 1289027584,
+    "retained_checkpoints_per_job": [0, 2, 8, 32],
+    "retained_checkpoint_count": 80,
+    "projected_additional_bytes": 4294967296,
+    "projected_peak_writes_bytes": 5368709120,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 13958643712,
+    "retention": "Retain updates 0, 2, 8, and 32 plus evaluations. Keep at most one additional rolling resume checkpoint per active job and remove its predecessor only after the successor receipt is complete.",
+    "concurrency": 1
+  },
+  "stop_rule": "Finish the fixed 32-update budget, preserve positive or negative results, and do not add learning rates, probabilities, updates, curricula, teachers, BC, entropy changes, or architecture changes."
+}
