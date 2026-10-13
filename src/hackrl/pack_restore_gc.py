@@ -36,6 +36,7 @@ from hackrl.pack_restore import (
     _VIEW_ROWS,
     conservation_increased,
     encode_pack_restore_observation,
+    inventory_overwrite_trigger,
     make_pack_restore_state,
     observe_pack_restore,
     pack_restore_goal_vector,
@@ -746,7 +747,17 @@ def _evaluation_states(split, repeats, source_growth_period, natural_only=False)
 _FROZEN_EVAL_CACHE = {}
 
 
-def _episode_records(start_labels, state_indices, repeat_indices, success, length, violation_seen, grain):
+def _episode_records(
+    start_labels,
+    state_indices,
+    repeat_indices,
+    success,
+    length,
+    violation_seen,
+    grain,
+    loss_seen,
+    lost_grain,
+):
     records = []
     labels = np.asarray(start_labels)
     states = np.asarray(state_indices)
@@ -755,6 +766,8 @@ def _episode_records(start_labels, state_indices, repeat_indices, success, lengt
     length = np.asarray(length)
     violation = np.asarray(violation_seen)
     grain = np.asarray(grain)
+    loss = np.asarray(loss_seen)
+    lost = np.asarray(lost_grain)
     for index in range(int(labels.shape[0])):
         state_index = int(states[index])
         records.append(
@@ -768,6 +781,8 @@ def _episode_records(start_labels, state_indices, repeat_indices, success, lengt
                 "length": int(length[index]),
                 "violation": bool(violation[index]),
                 "excess_grain_delivered": int(grain[index]),
+                "loss": bool(loss[index]),
+                "lost_grain": int(lost[index]),
             }
         )
     return records
@@ -811,6 +826,11 @@ def evaluate_pack_restore_gc_frozen(
             first_violation,
             opportunity_count,
             violation_delivery,
+            loss_seen,
+            loss_count,
+            lost_grain_total,
+            first_loss,
+            overwrite_trigger_seen,
             action_keys,
         ) = carry
         goals = jnp.full((episode_count,), DELIVER_3_GOAL_INDEX, dtype=jnp.int32)
@@ -832,6 +852,9 @@ def evaluate_pack_restore_gc_frozen(
         )
         created = jax.vmap(physical_grain_total)(stepped) - jax.vmap(physical_grain_total)(state)
         violation = jnp.logical_and(active, created > 0)
+        lost = jnp.where(active, jnp.maximum(-created, 0), 0)
+        loss = lost > 0
+        overwrite_trigger = jnp.logical_and(active, jax.vmap(inventory_overwrite_trigger)(state, actions))
         achieved = jax.vmap(pack_restore_goal_vector)(stepped)[:, DELIVER_3_GOAL_INDEX]
         world_done = jax.vmap(pack_restore_world_done)(stepped)
         just_success = jnp.logical_and(active, achieved)
@@ -842,6 +865,9 @@ def evaluate_pack_restore_gc_frozen(
         grain_delivered = jnp.minimum(jnp.maximum(delivered, 0), balance_before)
         first_violation = jnp.where(
             jnp.logical_and(first_violation < 0, violation), step_index + 1, first_violation
+        )
+        first_loss = jnp.where(
+            jnp.logical_and(first_loss < 0, loss), step_index + 1, first_loss
         )
         return (
             _tree_where(active, stepped, state),
@@ -857,6 +883,11 @@ def evaluate_pack_restore_gc_frozen(
                 jnp.int32
             ),
             jnp.logical_or(violation_delivery, jnp.logical_and(active, grain_delivered > 0)),
+            jnp.logical_or(loss_seen, loss),
+            loss_count + loss.astype(jnp.int32),
+            lost_grain_total + lost,
+            first_loss,
+            jnp.logical_or(overwrite_trigger_seen, overwrite_trigger),
             next_action_keys,
         ), None
 
@@ -873,6 +904,11 @@ def evaluate_pack_restore_gc_frozen(
         zeros_int,
         jnp.full((episode_count,), -1, dtype=jnp.int32),
         zeros_int,
+        zeros_bool,
+        zeros_bool,
+        zeros_int,
+        zeros_int,
+        jnp.full((episode_count,), -1, dtype=jnp.int32),
         zeros_bool,
         keys,
     )
@@ -913,6 +949,11 @@ def evaluate_pack_restore_gc_frozen(
         first_violation,
         opportunity_count,
         violation_delivery,
+        loss_seen,
+        loss_count,
+        lost_grain_total,
+        first_loss,
+        overwrite_trigger_seen,
         _,
     ) = jax.device_get(final)
 
@@ -924,6 +965,11 @@ def evaluate_pack_restore_gc_frozen(
         returns = np.where(lengths >= 1, successes * (DISCOUNT ** (lengths - 1)), 0.0)
         opportunity = np.asarray(opportunity_count)[mask]
         violations = np.asarray(violation_seen)[mask]
+        losses = np.asarray(loss_seen)[mask]
+        loss_first = np.asarray(first_loss)[mask]
+        loss_first = loss_first[loss_first >= 0]
+        lost = np.asarray(lost_grain_total)[mask]
+        triggers = np.asarray(overwrite_trigger_seen)[mask]
         return {
             "episodes": int(np.sum(mask)),
             "success_rate": float(np.mean(successes)),
@@ -942,6 +988,15 @@ def evaluate_pack_restore_gc_frozen(
             "mean_first_violation_step": (
                 float(np.mean(hit_first)) if hit_first.size else None
             ),
+            "loss_episode_rate": float(np.mean(losses)),
+            "repeated_loss_episode_rate": float(
+                np.mean(np.asarray(loss_count)[mask] >= 2)
+            ),
+            "mean_lost_grain": float(np.mean(lost)),
+            "mean_first_loss_step": (
+                float(np.mean(loss_first)) if loss_first.size else None
+            ),
+            "overwrite_trigger_episode_rate": float(np.mean(triggers)),
             "completed_rate": float(np.mean(np.asarray(done)[mask])),
         }
 
@@ -965,6 +1020,8 @@ def evaluate_pack_restore_gc_frozen(
             length,
             violation_seen,
             violation_grain_delivered_total,
+            loss_seen,
+            lost_grain_total,
         )
     return result
 

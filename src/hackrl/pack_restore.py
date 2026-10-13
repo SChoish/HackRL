@@ -1,8 +1,11 @@
 """PACK-RESTORE workshop kernel.
 
 The fixed and mutant variants share every transition except the initial
-contents of a storage rebuilt from a structure record. The record is metadata.
-It is not grain, and it is excluded from the conservation sum.
+contents of a storage rebuilt from a structure record. The inventory-overwrite
+variant instead shares fixed rebuild semantics and changes only a valid
+harvest: the carried inventory becomes one rather than increasing by one. The
+record is metadata. It is not grain, and it is excluded from the conservation
+sum.
 
 source_growth_period 0 is the close-source v1 fixture: a facing DO takes one
 grain immediately. A positive period is the shared v2 production cost. The
@@ -26,6 +29,7 @@ from hackrl.tick_claim import TickClaimSplit as PackRestoreSplit
 class PackRestoreVariant(str, Enum):
     FIXED = "fixed"
     MUTANT = "mutant"
+    INVENTORY_OVERWRITE = "inventory_overwrite"
 
 
 class PackRestorePhase(IntEnum):
@@ -439,7 +443,12 @@ def pack_restore_step(state, action, variant) -> PackRestoreState:
     carried = state.carried_grain
     carried = jnp.where(can_store, carried - 1, carried)
     carried = jnp.where(can_withdraw, carried + 1, carried)
-    carried = jnp.where(can_harvest, carried + 1, carried)
+    harvested_carried = (
+        jnp.asarray(1, dtype=jnp.int32)
+        if variant is PackRestoreVariant.INVENTORY_OVERWRITE
+        else carried + 1
+    )
+    carried = jnp.where(can_harvest, harvested_carried, carried)
     source = jnp.where(can_harvest, state.source_grain - 1, state.source_grain)
     anchor_grain = state.anchor_grain
     unpack_grain = state.unpack_grain
@@ -520,6 +529,33 @@ def conservation_increased(before, after) -> jax.Array:
     """Independent violation: the physical sum grew. Reward is not consulted."""
 
     return physical_grain_total(after) > physical_grain_total(before)
+
+
+def inventory_overwrite_trigger(state: PackRestoreState, action) -> jax.Array:
+    """Whether this action destroys the inventory under the overwrite kernel.
+
+    This mechanical oracle does not inspect rewards or success. A trigger is a
+    valid harvest with a non-empty carried inventory.
+    """
+
+    action = jnp.asarray(action, dtype=jnp.int32)
+    front = state.player_position + _DIRECTION_DELTAS[
+        jnp.clip(state.player_direction, 0, 4)
+    ]
+    source_ripe = jnp.logical_or(
+        state.source_growth_period == 0,
+        state.source_age >= state.source_growth_period,
+    )
+    return jnp.logical_and(
+        state.carried_grain > 0,
+        jnp.logical_and(
+            action == int(PackRestoreAction.DO),
+            jnp.logical_and(
+                jnp.all(front == state.source_position),
+                jnp.logical_and(state.source_grain > 0, source_ripe),
+            ),
+        ),
+    )
 
 
 def same_action_effect_gap(before, action) -> jax.Array:

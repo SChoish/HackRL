@@ -1,0 +1,191 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_results_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_v1_results",
+  "status": "all_no_learning_gates_passed_training_not_started",
+  "decision": "The harmful-defect task is eligible for the separately specified PPO comparison. This result does not authorize or start training.",
+  "experiment_identity": {
+    "task": "Test whether a frozen normally successful PACK policy is harmed when a valid harvest overwrites all carried grain with one, before any adaptation learning.",
+    "fixed_kernel": "A valid harvest maps carried c to c+1 and decrements the ripe source r to r-1.",
+    "harmful_kernel": "The inventory_overwrite variant uses fixed rebuild semantics and changes only a valid harvest, mapping carried c to 1 while decrementing r to r-1.",
+    "trigger_B": "The chosen action is DO, the faced source is ripe and has r>0, and pre-harvest carried inventory c>0.",
+    "physical_loss": "A nonnegative episode sum of max(physical_grain_total(before)-physical_grain_total(after),0); at B the one-step loss must equal c.",
+    "task_success": "delivery/count_ge_3 before the unchanged 128-tick horizon.",
+    "source_policies": "Five frozen PACK S Dual actor-critics after continued fixed-kernel learning; teachers are not executed and no learner or optimizer state is updated.",
+    "seed_role": "30-34 identify the five frozen policy checkpoints, not 160 independent replications.",
+    "evaluation_design": "5 policy seeds x 32 paired natural validation starts (16 layouts x 2 initial phases) x 2 kernels x 1 deterministic mode episode = 320 episodes.",
+    "start_pairing": "Within each policy seed, fixed and harmful evaluation use the same layout and initial phase; all starts and seeds are retained."
+  },
+  "preregistration": {
+    "path": "docs/manifests/pack_inventory_overwrite_v1.json",
+    "sha256": "bf2804aee0dc24314de66cc5b808c9887be8d22b6525deaef1fda7791e9adddb",
+    "recorded_before_policy_evaluation": true,
+    "strict_gate": "Every seed must have zero fixed loss, positive harmful loss, lower harmful success, and lower harmful discounted return."
+  },
+  "execution_provenance": {
+    "git_head": "d2c5ca33c26e56ef65d3acd1a1e73e235ba537ba",
+    "source_state": "Uncommitted experiment sources were content-hashed before execution and verified unchanged at completion.",
+    "source_and_checkpoint_hash_index": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/run_manifest.json",
+    "checkpoint_template": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed/seed{30..34}/checkpoints/adapt_4096",
+    "runtime": "conda environment offrl; JAX GPU backend; NVIDIA H200",
+    "command": "PYTHONPATH=src HACKRL_DEVICE=cuda python scripts/validate_pack_inventory_overwrite.py",
+    "completion_receipt": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/verified_complete.json"
+  },
+  "next_step_control": {
+    "ppo_plan_status": "The comparison was described by the user but no executable training manifest or runner was created in this unit.",
+    "launch_authorized": false,
+    "required_before_launch": "Create and approve a separate training manifest that freezes branches, exact update budget, evaluation points, restore checks, capacity forecast, and stop rules."
+  },
+  "canonical_raw_result": {
+    "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/result.json",
+    "sha256": "986f66cd0b489ea6663663e2476639f605f8250cfa25a67d628cc52f3cdbc57f",
+    "evaluation_episodes": 320,
+    "optimizer_updates": 0,
+    "collector_slots": 0,
+    "checkpoint_writes": 0,
+    "training_started": false,
+    "source_hashes_unchanged": true
+  },
+  "three_gates": {
+    "actual_damage_each_seed": {
+      "passed": true,
+      "criterion": "Every seed 30-34 has zero fixed loss, positive harmful loss, lower harmful success, and lower harmful discounted return.",
+      "fixed_aggregate": {
+        "success_rate": 1.0,
+        "mean_discounted_return": 0.9088730011642243,
+        "loss_episode_rate": 0.0,
+        "mean_lost_grain": 0.0,
+        "mean_length": 20.0625
+      },
+      "harmful_aggregate": {
+        "success_rate": 0.275,
+        "mean_discounted_return": 0.2500179719351958,
+        "loss_episode_rate": 0.725,
+        "mean_lost_grain": 0.7875,
+        "mean_length": 98.3
+      },
+      "paired_seed_rows": [
+        {
+          "seed": 30,
+          "fixed_success": 1.0,
+          "harmful_success": 0.4375,
+          "fixed_return": 0.9091562615825302,
+          "harmful_return": 0.39775586444235694,
+          "harmful_mean_lost_grain": 0.5625
+        },
+        {
+          "seed": 31,
+          "fixed_success": 1.0,
+          "harmful_success": 0.0625,
+          "fixed_return": 0.9083081821544894,
+          "harmful_return": 0.056822266348908135,
+          "harmful_mean_lost_grain": 1.0625
+        },
+        {
+          "seed": 32,
+          "fixed_success": 1.0,
+          "harmful_success": 0.0625,
+          "fixed_return": 0.9091562615825302,
+          "harmful_return": 0.056822266348908135,
+          "harmful_mean_lost_grain": 1.0
+        },
+        {
+          "seed": 33,
+          "fixed_success": 1.0,
+          "harmful_success": 0.25,
+          "fixed_return": 0.908588038919041,
+          "harmful_return": 0.22728906539563254,
+          "harmful_mean_lost_grain": 0.875
+        },
+        {
+          "seed": 34,
+          "fixed_success": 1.0,
+          "harmful_success": 0.5625,
+          "fixed_return": 0.9091562615825302,
+          "harmful_return": 0.5114003971401733,
+          "harmful_mean_lost_grain": 0.4375
+        }
+      ]
+    },
+    "zero_loss_alternative_exists": {
+      "passed": true,
+      "natural_starts": 32,
+      "successful_starts": 32,
+      "zero_loss_starts": 32,
+      "same_starts_successful_and_zero_loss": 32,
+      "maximum_path_length": 39,
+      "horizon": 128,
+      "raw_path_evidence": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/reference_paths.json",
+      "firewall": "Reference actions were used only for feasibility replay and never entered policy initialization, data, reward, action masking, selection, or optimization."
+    },
+    "transition_locality": {
+      "passed": true,
+      "enumerated_transitions": 1752,
+      "triggered_transitions": 6,
+      "outside_trigger_transitions": 1746,
+      "summed_trigger_loss": 12,
+      "rebuild_actions_checked": 24,
+      "outside_trigger_full_state_mismatches": 0,
+      "trigger_unexpected_field_mismatches": 0,
+      "trigger_contract": "At all six B transitions only carried_grain differs: fixed c'=c+1, harmful c'=1, both r'=r-1, and harmful physical loss equals c. All 24 actions from a rebuild-ready state match fixed semantics.",
+      "raw_evidence": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/transition_locality.json",
+      "oracle": "Independent precondition check plus physical_grain_total(before)-physical_grain_total(after); reward and success are not consulted."
+    }
+  },
+  "interpretation": {
+    "supported": "The fixed policies are not already robust to this overwrite defect, the defect causes physical loss and paired performance degradation for every predeclared seed, a zero-loss successful ordering exists for every natural validation start, and the implemented kernel difference is local to B.",
+    "not_yet_tested": "Whether PPO adaptation changes the action order, restores performance, reduces cumulative deployment loss, or preserves normal-kernel performance.",
+    "not_claimed": [
+      "within-episode recovery after grain has already been destroyed",
+      "teacher-guided adaptation",
+      "reward-free TTT performance",
+      "sample-policy performance",
+      "generalization beyond the five policies and 32 natural validation starts"
+    ]
+  },
+  "leakage_audit": {
+    "status": "passed_with_dependencies_disclosed",
+    "model_as_judge": "not fired; all success and loss outcomes come from environment state and algebraic invariants",
+    "reward_as_only_oracle": "not fired; physical loss is measured independently and success/return remain separate",
+    "selective_retention": "not fired; all seeds 30-34 and all 32 starts per kernel are retained",
+    "adaptive_thresholds": "not fired; strict per-seed criteria were recorded before policy evaluation",
+    "reference_path_contamination": "not fired; reference actions are firewalled from all learning inputs",
+    "paired_dependence": "fired and disclosed; the unit is five paired policies with repeated fixed start states, not 160 independent policy replications",
+    "same_implementation_verification": "mitigated; the transition branch is checked against a separately coded trigger predicate and pre/post physical conservation, while reachability is established by replay on the actual kernel"
+  },
+  "capacity": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "home_utilization_at_start": "91%",
+    "raid_free_bytes_at_start": 8047431770112,
+    "projected_additional_bytes": 268435456,
+    "safety_reserve_bytes": 8589934592,
+    "actual_gate_artifact_bytes_at_end": 294539,
+    "checkpoint_writes": 0
+  },
+  "verification": {
+    "focused_tests": "16 passed",
+    "full_pack_regression_tests": "49 passed",
+    "full_pack_test_scope": [
+      "tests/test_pack_inventory_overwrite.py",
+      "tests/test_pack_restore.py",
+      "tests/test_pack_restore_common_state_teacher_analysis.py",
+      "tests/test_pack_restore_delivery_only_teacher.py",
+      "tests/test_pack_restore_gc.py",
+      "tests/test_pack_restore_pretrained_teacher_freeze.py",
+      "tests/test_pack_restore_scale_bc.py",
+      "tests/test_pack_teacher_transplant.py"
+    ],
+    "test_scope": [
+      "tests/test_pack_inventory_overwrite.py",
+      "tests/test_pack_restore.py",
+      "tests/test_pack_teacher_transplant.py"
+    ],
+    "execution_spec": "docs/manifests/pack_inventory_overwrite_v1.json",
+    "run_manifest": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/run_manifest.json",
+    "completion_receipt": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/verified_complete.json"
+  },
+  "literature_check": {
+    "arxiv_2007_04309": "Verified as Self-Supervised Policy Adaptation during Deployment, a reward-free deployment-adaptation paper; background only.",
+    "arxiv_2410_20750": "Verified as ODRL: A Benchmark for Off-Dynamics Reinforcement Learning; background only.",
+    "scope": "Neither source establishes the novelty or outcome of this local overwrite-defect experiment."
+  }
+}

@@ -1,0 +1,103 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_v1",
+  "status": "implementation_and_no_learning_validation_only",
+  "understood_as": "Implement one harmful PACK kernel whose only difference from fixed is c'=1 on a valid harvest with c>0, then run exactly three no-learning gates: paired damage of the frozen normal policies, a zero-loss three-delivery reference path from every natural start, and transition locality with loss exactly c. Do not start PPO, BC, teacher updates, checkpoint writing, hyperparameter sweeps, or automatic extensions.",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate",
+  "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+  "source_checkpoint": "adapt_4096",
+  "source_global_update": 4608,
+  "seeds": [
+    30,
+    31,
+    32,
+    33,
+    34
+  ],
+  "kernel_contract": {
+    "base": "PACK fixed kernel; mutant record-rebuild grain duplication is disabled",
+    "variant": "inventory_overwrite",
+    "trigger": "valid DO harvest and carried_grain c > 0",
+    "fixed_transition": "carried_grain'=c+1; source_grain'=r-1",
+    "harmful_transition": "carried_grain'=1; source_grain'=r-1",
+    "all_other_updates": "identical to fixed",
+    "oracle": "physical_grain_total(before)-physical_grain_total(after)=c at B; zero kernel gap outside B",
+    "reward_changes": false,
+    "horizon_changes": false,
+    "discount_changes": false,
+    "observation_changes": false,
+    "action_space_changes": false,
+    "defect_indicator_added": false,
+    "early_termination_added": false,
+    "loss_penalty_added": false
+  },
+  "evaluation": {
+    "split": "validation",
+    "start": "natural_reset",
+    "layouts": 16,
+    "phases": 2,
+    "episodes_per_seed_kernel": 32,
+    "selection": "mode",
+    "seed_base": 23000,
+    "kernels": [
+      "fixed",
+      "inventory_overwrite"
+    ],
+    "paired_by": "seed, layout, phase",
+    "total_episodes": 320,
+    "success": "delivery/count_ge_3 before unchanged tick-128 termination",
+    "discounted_return": "success * 0.995**(length-1), zero on failure",
+    "loss": "sum max(physical_grain_total(before)-physical_grain_total(after),0)",
+    "failure_handling": "retain every seed and episode; never select on observed damage"
+  },
+  "gates": {
+    "actual_damage": "For every predeclared seed 30-34: fixed mean loss is zero, harmful mean loss is positive, and harmful success rate and mean discounted return are both strictly below paired fixed evaluation.",
+    "alternative_exists": "For all 32 natural validation starts, replay a reference path that delivers exactly three within 128 ticks with zero trigger and zero lost grain. The path is feasibility evidence only.",
+    "transition_locality": "Enumerate all 24 actions across synthetic carried/source/ripeness/facing controls plus fixed rebuild-ready controls. Outside B full next states match; at B only carried_grain differs and harmful physical loss equals pre-harvest c."
+  },
+  "reference_path_firewall": {
+    "policy_initialization": false,
+    "training_data": false,
+    "behavior_cloning": false,
+    "reward_shaping": false,
+    "action_mask": false,
+    "policy_selection": false
+  },
+  "source_policy": {
+    "description": "PACK S Dual final actor-critic after continued fixed-kernel learning",
+    "teacher_used_for_actions": false,
+    "actor_critic_frozen": true,
+    "optimizer_frozen": true,
+    "full_state_hashed_before_after": true,
+    "checkpoint_files_hashed_before_after": true
+  },
+  "execution_budget": {
+    "optimizer_updates": 0,
+    "collector_slots": 0,
+    "checkpoint_writes": 0,
+    "learning_branches": 0,
+    "automatic_extension": false
+  },
+  "deferred_training_design": {
+    "status": "not_started_even_if_all_gates_pass",
+    "conditions": [
+      "frozen harmful",
+      "normal PPO continuation",
+      "harmful PPO adaptation"
+    ],
+    "seeds": [
+      30,
+      31,
+      32,
+      33,
+      34
+    ],
+    "teacher_updates": 0,
+    "bc_updates": 0
+  },
+  "literature_scope": {
+    "arxiv_2007_04309": "Related background for reward-free self-supervised deployment adaptation; not evidence for this defect or for PPO.",
+    "arxiv_2410_20750": "Related background for off-dynamics RL evaluation; not evidence for novelty of this local defect.",
+    "claim_limit": "Do not claim exploration guidance, teacher error correction, novel TTT, or reduced adaptation harm from this no-learning gate."
+  }
+}
