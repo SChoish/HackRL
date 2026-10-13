@@ -1,0 +1,92 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_policy_panel_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_policy_panel_v1",
+  "status": "frozen_before_no_learning_run",
+  "understood_as": "Before launching rare-defect learning, extend the exact finite-panel expected-return calculation to three frozen learned policy families: the original fixed-continuation source policy, the prior normal-kernel PPO continuation, and the prior deterministic p=1 overwrite-adapted PPO policy. Evaluate every seed 30-34 on the same 32 natural starts, derive each policy's return curve from its own fixed-kernel mode paths without assuming k is zero or one, compare all policies and the scripted zero-loss reference at p=0.05 and p=0.30, and perform no learning, policy selection, or checkpoint mutation.",
+  "research_question": "Does the behavior learned under deterministic p=1 overwrite retain a return advantage when overwrite is rare, and how does it compare with the original and normal-continuation policies before new p=0.05 or p=0.30 learning begins?",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1",
+  "prerequisites": {
+    "rare_regime_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_rare_v1/gate/result.json",
+    "rare_regime_result_sha256": "e3439dc683b867beda042697085b5a22c9dc6d5dbf845430c619216ea98f642a",
+    "rare_regime_required_status": "all_no_learning_regime_gates_passed_training_not_started",
+    "deterministic_ppo_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_ppo_v1/result.json",
+    "deterministic_ppo_result_sha256": "2fdf8bab9bd752a64bdd7ed9469bd98bd9aa7dbc780065dff9f710673013f4d0",
+    "deterministic_ppo_required_status": "complete_fixed_budget_no_automatic_extension",
+    "reference_paths": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/reference_paths.json",
+    "reference_paths_sha256": "a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a"
+  },
+  "seeds": [30, 31, 32, 33, 34],
+  "policies": {
+    "original": {
+      "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+      "checkpoint": "adapt_4096",
+      "global_update": 4608,
+      "role": "Original normal policy and common initialization for later stochastic learning."
+    },
+    "normal_continue": {
+      "root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_ppo_v1/normal_continue",
+      "checkpoint": "adapt_32",
+      "global_update": 4640,
+      "training_kernel": "fixed",
+      "role": "Control for 32 additional PPO updates without overwrite exposure."
+    },
+    "p1_adapt": {
+      "root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_ppo_v1/harmful_adapt",
+      "checkpoint": "adapt_32",
+      "global_update": 4640,
+      "training_kernel": "inventory_overwrite",
+      "role": "Policy learned under deterministic overwrite p=1; evaluation baseline only, never a source for the new p=0.05 or p=0.30 branches."
+    },
+    "zero_loss_reference": {
+      "role": "Shared 32-start scripted feasible path with no risky harvest; comparison evidence only and not a claim of global optimality."
+    }
+  },
+  "exact_computation": {
+    "panel": "Each learned policy family uses five seeds by the same 32 natural validation starts. Within a family every seed-start pair has weight 1/160.",
+    "mode": "Deterministic actor argmax.",
+    "path_statistic": "For each successful fixed-kernel path record its length T_i and number k_i of valid harvests with positive pre-harvest carried inventory.",
+    "formula": "J_pi(p)=(1/n)*sum_i gamma^(T_i-1)*(1-p)^k_i over successful fixed paths; the analogous unweighted polynomial gives expected success. No restriction on observed k_i is imposed.",
+    "discount": 0.995,
+    "arithmetic": "IEEE-754 binary64 grouped polynomial evaluation and bisection; no Monte Carlo estimate enters mode curves.",
+    "report_probabilities": [0.0, 0.01, 0.05, 0.1, 0.2, 0.3, 0.5, 1.0],
+    "learning_probabilities_of_interest": [0.05, 0.3],
+    "crossover_interpretation": "Any equality point is specific to two panel-average curves. It is not an optimal-avoidance threshold and does not establish that either compared policy is optimal."
+  },
+  "validation_gates": {
+    "all_fixed_success": "Every learned policy must succeed on every fixed-kernel mode start before its exact stochastic curve is used.",
+    "formula_endpoints": "For every policy seed and family aggregate, p=0 and p=1 formulas must match direct fixed and deterministic-overwrite evaluation within 1e-12.",
+    "reference_replay": "The 32 reference paths must exactly match the pinned prior artifact and remain zero-trigger.",
+    "checkpoint_identity": "All input checkpoint files are hashed before and after evaluation and must remain unchanged.",
+    "execution_source_identity": "The run executes from a clean committed worktree whose source hashes remain unchanged."
+  },
+  "outputs": {
+    "per_policy_seed": "Direct endpoint evaluations, T_i, k_i, curve coefficients, selected p values, and return crossover against the shared reference.",
+    "policy_comparison": "At p=0.05 and p=0.30, success, return, loss-episode probability, risky-harvest path distribution, and pairwise return differences.",
+    "training_decision": "Diagnostic evidence only. The separate frozen stochastic-PPO manifest controls any later learning launch."
+  },
+  "execution_budget": {
+    "learned_policy_endpoint_episodes": 960,
+    "reference_episodes": 32,
+    "optimizer_updates": 0,
+    "collector_slots": 0,
+    "checkpoint_writes": 0,
+    "training_started": false,
+    "automatic_extension": false
+  },
+  "interpretation": {
+    "supported": "Finite-panel expected mode return of the three frozen policy families under the stated independent Bernoulli overwrite model.",
+    "not_claimed": [
+      "that the reference or p=1-adapted policy is optimal",
+      "that a new stochastic branch will acquire the p=1 policy's behavior",
+      "that p=0.05 or p=0.30 is an optimal deployment probability",
+      "generalization beyond the policies, starts, and independent event model",
+      "statistical significance from five learned-policy seeds"
+    ]
+  },
+  "storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "projected_additional_bytes": 134217728,
+    "safety_reserve_bytes": 8589934592,
+    "checkpoint_writes": 0
+  }
+}
