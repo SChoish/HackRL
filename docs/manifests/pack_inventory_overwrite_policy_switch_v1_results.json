@@ -1,0 +1,719 @@
+{
+  "decimal_audit": {
+    "domain": "Decimal, 50 digits",
+    "formula": "mean(success * 0.995^(length-1) * (1-p)^executed_risk_count)",
+    "maximum_absolute_difference": "2.4459506622476507740756797834605394E-16",
+    "passed": true,
+    "probabilities": [
+      0.0,
+      0.05,
+      0.3,
+      1.0
+    ],
+    "tolerance": "1E-14"
+  },
+  "decision": "Persistent switching preserved fixed-kernel success and slightly improved mean p=0.05 return over the source policy, but retained 82 of the source policy's 94 risky starts. At the first switch, the adapted policy still selected a risky harvest in 82 of 94 switched episodes. The frozen p=1 policy's avoidance therefore did not transfer as a reliable local replacement at the source policy's risky states; persistent switching mainly prevented repeated one-step loops in six seed-39 starts.",
+  "design": {
+    "direct_kernels": [
+      "fixed",
+      "inventory_overwrite_p1"
+    ],
+    "episodes": 1280,
+    "execution_modes": [
+      "source",
+      "adapted",
+      "one_step",
+      "persistent"
+    ],
+    "learning_updates": 0,
+    "maximum_environment_steps": 163840,
+    "natural_starts_per_seed": 32,
+    "seeds": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ]
+  },
+  "gates": {
+    "adapted_p05_matches_pinned_result": true,
+    "all_1280_direct_episodes_recorded": true,
+    "all_endpoint_checks_pass": true,
+    "no_learning_updates": true,
+    "source_p05_matches_pinned_result": true
+  },
+  "interpretation": {
+    "limitation": "The mean p=0.05 advantage over source is small (+0.00206), positive in two seeds and exactly zero in three. This is not evidence of a population-level effect.",
+    "mechanism": "Only 12 of 94 first switch actions were safe. The adapted-only policy reached just six risky starts by changing earlier trajectory decisions; late oracle switching cannot reproduce most of that avoidance.",
+    "persistent_specific": "Persistent and one-step switching have the same 82 risky starts. Persistent improves over one-step by eliminating repeated fixed-kernel loops, with shorter paths in six seed-39 starts.",
+    "primary": "Persistent switching has the highest mean p=0.05 return among the four frozen execution modes in this five-seed panel, while retaining 100% fixed-kernel success."
+  },
+  "modes": {
+    "adapted": {
+      "always_fire_kernel": {
+        "episodes": 160,
+        "loss_episode_rate": 0.0375,
+        "mean_discounted_return": 0.8487186175384343,
+        "success_rate": 0.9375
+      },
+      "exact": {
+        "p00": {
+          "expected_discounted_return": 0.8824201383496733,
+          "overwrite_loss_episode_probability": 0.0,
+          "overwrite_probability": 0.0,
+          "success_rate": 0.975
+        },
+        "p05": {
+          "expected_discounted_return": 0.8807350623091112,
+          "overwrite_loss_episode_probability": 0.00187499999999996,
+          "overwrite_probability": 0.05,
+          "success_rate": 0.973125
+        },
+        "p100": {
+          "expected_discounted_return": 0.8487186175384343,
+          "overwrite_loss_episode_probability": 0.03749999999999998,
+          "overwrite_probability": 1.0,
+          "success_rate": 0.9375
+        },
+        "p30": {
+          "expected_discounted_return": 0.8723096821063016,
+          "overwrite_loss_episode_probability": 0.011249999999999982,
+          "overwrite_probability": 0.3,
+          "success_rate": 0.96375
+        }
+      },
+      "fixed_kernel": {
+        "adapted_policy_steps": 3774,
+        "episodes": 160,
+        "executed_risk_count": 6,
+        "failed_path_count": 4,
+        "mean_discounted_return": 0.8824201383496734,
+        "mean_length": 23.5875,
+        "repeated_compact_state_action_count": 458,
+        "risky_start_count": 6,
+        "source_risk_proposal_count": 6,
+        "success_rate": 0.975,
+        "switch_count": 0
+      },
+      "maximum_decimal_audit_difference": "2.4459506622476507740756797834605394E-16",
+      "per_seed": [
+        {
+          "fixed_adapted_policy_steps": 1108,
+          "fixed_mean_discounted_return": 0.790421817625272,
+          "fixed_mean_length": 34.625,
+          "fixed_repeated_compact_state_action_count": 458,
+          "fixed_risky_start_count": 0,
+          "fixed_success_rate": 0.875,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.790421817625272,
+          "p05_success_rate": 0.875,
+          "seed": 35
+        },
+        {
+          "fixed_adapted_policy_steps": 662,
+          "fixed_mean_discounted_return": 0.9060691162293555,
+          "fixed_mean_length": 20.6875,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 2,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.9033259626614366,
+          "p05_success_rate": 0.996875,
+          "seed": 36
+        },
+        {
+          "fixed_adapted_policy_steps": 662,
+          "fixed_mean_discounted_return": 0.9060550871704783,
+          "fixed_mean_length": 20.6875,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 4,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.9003728605355875,
+          "p05_success_rate": 0.99375,
+          "seed": 37
+        },
+        {
+          "fixed_adapted_policy_steps": 648,
+          "fixed_mean_discounted_return": 0.9080226573688694,
+          "fixed_mean_length": 20.25,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 0,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.9080226573688694,
+          "p05_success_rate": 1.0,
+          "seed": 38
+        },
+        {
+          "fixed_adapted_policy_steps": 694,
+          "fixed_mean_discounted_return": 0.9015320133543911,
+          "fixed_mean_length": 21.6875,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 0,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.9015320133543911,
+          "p05_success_rate": 1.0,
+          "seed": 39
+        }
+      ],
+      "switch_diagnostic": {
+        "episodes_with_switch": 0,
+        "first_switch_risky_action_count": 0,
+        "first_switch_safe_action_count": 0,
+        "risky_switch_event_count": 0,
+        "safe_switch_event_count": 0
+      }
+    },
+    "one_step": {
+      "always_fire_kernel": {
+        "episodes": 160,
+        "loss_episode_rate": 0.5125,
+        "mean_discounted_return": 0.44022960938591016,
+        "success_rate": 0.4875
+      },
+      "exact": {
+        "p00": {
+          "expected_discounted_return": 0.9060017266479101,
+          "overwrite_loss_episode_probability": 0.0,
+          "overwrite_probability": 0.0,
+          "success_rate": 1.0
+        },
+        "p05": {
+          "expected_discounted_return": 0.8827131207848101,
+          "overwrite_loss_episode_probability": 0.02562500000000001,
+          "overwrite_probability": 0.05,
+          "success_rate": 0.974375
+        },
+        "p100": {
+          "expected_discounted_return": 0.44022960938591016,
+          "overwrite_loss_episode_probability": 0.5125,
+          "overwrite_probability": 1.0,
+          "success_rate": 0.4875
+        },
+        "p30": {
+          "expected_discounted_return": 0.7662700914693101,
+          "overwrite_loss_episode_probability": 0.15375000000000005,
+          "overwrite_probability": 0.3,
+          "success_rate": 0.84625
+        }
+      },
+      "fixed_kernel": {
+        "adapted_policy_steps": 114,
+        "episodes": 160,
+        "executed_risk_count": 82,
+        "failed_path_count": 0,
+        "mean_discounted_return": 0.9060017266479102,
+        "mean_length": 20.7125,
+        "repeated_compact_state_action_count": 48,
+        "risky_start_count": 82,
+        "source_risk_proposal_count": 114,
+        "success_rate": 1.0,
+        "switch_count": 114
+      },
+      "maximum_decimal_audit_difference": "1.7965081461358256436272480735544088E-16",
+      "per_seed": [
+        {
+          "fixed_adapted_policy_steps": 14,
+          "fixed_mean_discounted_return": 0.9077441998881406,
+          "fixed_mean_length": 20.3125,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 12,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 14,
+          "p05_expected_discounted_return": 0.8907117255500552,
+          "p05_success_rate": 0.98125,
+          "seed": 35
+        },
+        {
+          "fixed_adapted_policy_steps": 18,
+          "fixed_mean_discounted_return": 0.908588038919041,
+          "fixed_mean_length": 20.125,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 18,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 18,
+          "p05_expected_discounted_return": 0.8830464301952069,
+          "p05_success_rate": 0.9718749999999999,
+          "seed": 36
+        },
+        {
+          "fixed_adapted_policy_steps": 16,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 16,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 16,
+          "p05_expected_discounted_return": 0.8864273550429669,
+          "p05_success_rate": 0.975,
+          "seed": 37
+        },
+        {
+          "fixed_adapted_policy_steps": 24,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 24,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 24,
+          "p05_expected_discounted_return": 0.8750629017731852,
+          "p05_success_rate": 0.9624999999999999,
+          "seed": 38
+        },
+        {
+          "fixed_adapted_policy_steps": 42,
+          "fixed_mean_discounted_return": 0.8953638712673089,
+          "fixed_mean_length": 23.125,
+          "fixed_repeated_compact_state_action_count": 48,
+          "fixed_risky_start_count": 12,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 42,
+          "p05_expected_discounted_return": 0.8783171913626364,
+          "p05_success_rate": 0.98125,
+          "seed": 39
+        }
+      ],
+      "switch_diagnostic": {
+        "episodes_with_switch": 94,
+        "first_switch_risky_action_count": 82,
+        "first_switch_safe_action_count": 12,
+        "risky_switch_event_count": 82,
+        "safe_switch_event_count": 32
+      }
+    },
+    "persistent": {
+      "always_fire_kernel": {
+        "episodes": 160,
+        "loss_episode_rate": 0.5125,
+        "mean_discounted_return": 0.4418601370863094,
+        "success_rate": 0.4875
+      },
+      "exact": {
+        "p00": {
+          "expected_discounted_return": 0.9076322543483093,
+          "overwrite_loss_episode_probability": 0.0,
+          "overwrite_probability": 0.0,
+          "success_rate": 1.0
+        },
+        "p05": {
+          "expected_discounted_return": 0.8843436484852094,
+          "overwrite_loss_episode_probability": 0.02562500000000001,
+          "overwrite_probability": 0.05,
+          "success_rate": 0.974375
+        },
+        "p100": {
+          "expected_discounted_return": 0.4418601370863094,
+          "overwrite_loss_episode_probability": 0.5125,
+          "overwrite_probability": 1.0,
+          "success_rate": 0.4875
+        },
+        "p30": {
+          "expected_discounted_return": 0.7679006191697093,
+          "overwrite_loss_episode_probability": 0.15375000000000005,
+          "overwrite_probability": 0.3,
+          "success_rate": 0.84625
+        }
+      },
+      "fixed_kernel": {
+        "adapted_policy_steps": 292,
+        "episodes": 160,
+        "executed_risk_count": 82,
+        "failed_path_count": 0,
+        "mean_discounted_return": 0.9076322543483093,
+        "mean_length": 20.3375,
+        "repeated_compact_state_action_count": 0,
+        "risky_start_count": 82,
+        "source_risk_proposal_count": 94,
+        "success_rate": 1.0,
+        "switch_count": 94
+      },
+      "maximum_decimal_audit_difference": "1.5622269155564904242091154799273288E-16",
+      "per_seed": [
+        {
+          "fixed_adapted_policy_steps": 40,
+          "fixed_mean_discounted_return": 0.9077441998881406,
+          "fixed_mean_length": 20.3125,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 12,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 14,
+          "p05_expected_discounted_return": 0.8907117255500552,
+          "p05_success_rate": 0.98125,
+          "seed": 35
+        },
+        {
+          "fixed_adapted_policy_steps": 56,
+          "fixed_mean_discounted_return": 0.908588038919041,
+          "fixed_mean_length": 20.125,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 18,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 18,
+          "p05_expected_discounted_return": 0.8830464301952069,
+          "p05_success_rate": 0.9718749999999999,
+          "seed": 36
+        },
+        {
+          "fixed_adapted_policy_steps": 48,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 16,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 16,
+          "p05_expected_discounted_return": 0.8864273550429669,
+          "p05_success_rate": 0.975,
+          "seed": 37
+        },
+        {
+          "fixed_adapted_policy_steps": 80,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 24,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 24,
+          "p05_expected_discounted_return": 0.8750629017731852,
+          "p05_success_rate": 0.9624999999999999,
+          "seed": 38
+        },
+        {
+          "fixed_adapted_policy_steps": 68,
+          "fixed_mean_discounted_return": 0.9035165097693048,
+          "fixed_mean_length": 21.25,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 12,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 22,
+          "p05_expected_discounted_return": 0.8864698298646323,
+          "p05_success_rate": 0.98125,
+          "seed": 39
+        }
+      ],
+      "switch_diagnostic": {
+        "episodes_with_switch": 94,
+        "first_switch_risky_action_count": 82,
+        "first_switch_safe_action_count": 12,
+        "risky_switch_event_count": 82,
+        "safe_switch_event_count": 12
+      }
+    },
+    "source": {
+      "always_fire_kernel": {
+        "episodes": 160,
+        "loss_episode_rate": 0.5875,
+        "mean_discounted_return": 0.3750269579027937,
+        "success_rate": 0.4125
+      },
+      "exact": {
+        "p00": {
+          "expected_discounted_return": 0.9089857947834834,
+          "overwrite_loss_episode_probability": 0.0,
+          "overwrite_probability": 0.0,
+          "success_rate": 1.0
+        },
+        "p05": {
+          "expected_discounted_return": 0.8822878529394489,
+          "overwrite_loss_episode_probability": 0.02937500000000004,
+          "overwrite_probability": 0.05,
+          "success_rate": 0.970625
+        },
+        "p100": {
+          "expected_discounted_return": 0.3750269579027937,
+          "overwrite_loss_episode_probability": 0.5875,
+          "overwrite_probability": 1.0,
+          "success_rate": 0.4125
+        },
+        "p30": {
+          "expected_discounted_return": 0.7487981437192766,
+          "overwrite_loss_episode_probability": 0.17625000000000002,
+          "overwrite_probability": 0.3,
+          "success_rate": 0.82375
+        }
+      },
+      "fixed_kernel": {
+        "adapted_policy_steps": 0,
+        "episodes": 160,
+        "executed_risk_count": 94,
+        "failed_path_count": 0,
+        "mean_discounted_return": 0.9089857947834835,
+        "mean_length": 20.0375,
+        "repeated_compact_state_action_count": 0,
+        "risky_start_count": 94,
+        "source_risk_proposal_count": 94,
+        "success_rate": 1.0,
+        "switch_count": 0
+      },
+      "maximum_decimal_audit_difference": "1.6694553110622966400140628824429881E-16",
+      "per_seed": [
+        {
+          "fixed_adapted_policy_steps": 0,
+          "fixed_mean_discounted_return": 0.9088721502507856,
+          "fixed_mean_length": 20.0625,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 14,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.888998562595255,
+          "p05_success_rate": 0.9781249999999999,
+          "seed": 35
+        },
+        {
+          "fixed_adapted_policy_steps": 0,
+          "fixed_mean_discounted_return": 0.908588038919041,
+          "fixed_mean_length": 20.125,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 18,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.8830464301952069,
+          "p05_success_rate": 0.9718749999999999,
+          "seed": 36
+        },
+        {
+          "fixed_adapted_policy_steps": 0,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 16,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.8864273550429669,
+          "p05_success_rate": 0.975,
+          "seed": 37
+        },
+        {
+          "fixed_adapted_policy_steps": 0,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 24,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.8750629017731852,
+          "p05_success_rate": 0.9624999999999999,
+          "seed": 38
+        },
+        {
+          "fixed_adapted_policy_steps": 0,
+          "fixed_mean_discounted_return": 0.9091562615825302,
+          "fixed_mean_length": 20.0,
+          "fixed_repeated_compact_state_action_count": 0,
+          "fixed_risky_start_count": 22,
+          "fixed_success_rate": 1.0,
+          "fixed_switch_count": 0,
+          "p05_expected_discounted_return": 0.8779040150906305,
+          "p05_success_rate": 0.965625,
+          "seed": 39
+        }
+      ],
+      "switch_diagnostic": {
+        "episodes_with_switch": 0,
+        "first_switch_risky_action_count": 0,
+        "first_switch_safe_action_count": 0,
+        "risky_switch_event_count": 0,
+        "safe_switch_event_count": 0
+      }
+    }
+  },
+  "non_claims": [
+    "The oracle switch is not autonomous defect detection.",
+    "The result does not prove that earlier learned switching would fail.",
+    "The exact p=0.05 and p=0.30 values are finite-panel expectations from deterministic fixed paths, not fresh stochastic rollouts.",
+    "Five Dual-history learner seeds do not establish a population frequency or significance result."
+  ],
+  "one_step_vs_persistent_paths": {
+    "different_fixed_action_paths": 14,
+    "persistent_shorter_path_keys": [
+      {
+        "seed": 39,
+        "state_index": 6
+      },
+      {
+        "seed": 39,
+        "state_index": 14
+      },
+      {
+        "seed": 39,
+        "state_index": 18
+      },
+      {
+        "seed": 39,
+        "state_index": 22
+      },
+      {
+        "seed": 39,
+        "state_index": 26
+      },
+      {
+        "seed": 39,
+        "state_index": 30
+      }
+    ],
+    "persistent_shorter_paths": 6
+  },
+  "paired_p05_return_contrasts": {
+    "adapted_minus_source": {
+      "left": "adapted",
+      "mean_difference": -0.001552790630337575,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": -0.09857674496998303,
+          "seed": 35
+        },
+        {
+          "difference": 0.02027953246622971,
+          "seed": 36
+        },
+        {
+          "difference": 0.013945505492620636,
+          "seed": 37
+        },
+        {
+          "difference": 0.032959755595684204,
+          "seed": 38
+        },
+        {
+          "difference": 0.023627998263760608,
+          "seed": 39
+        }
+      ],
+      "right": "source",
+      "signs": {
+        "equal_within_tolerance": 0,
+        "negative": 1,
+        "positive": 4
+      }
+    },
+    "one_step_minus_source": {
+      "left": "one_step",
+      "mean_difference": 0.0004252678453612102,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": 0.0017131629548001737,
+          "seed": 35
+        },
+        {
+          "difference": 0.0,
+          "seed": 36
+        },
+        {
+          "difference": 0.0,
+          "seed": 37
+        },
+        {
+          "difference": 0.0,
+          "seed": 38
+        },
+        {
+          "difference": 0.00041317627200587737,
+          "seed": 39
+        }
+      ],
+      "right": "source",
+      "signs": {
+        "equal_within_tolerance": 3,
+        "negative": 0,
+        "positive": 2
+      }
+    },
+    "persistent_minus_one_step": {
+      "left": "persistent",
+      "mean_difference": 0.0016305277003991758,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": 0.0,
+          "seed": 35
+        },
+        {
+          "difference": 0.0,
+          "seed": 36
+        },
+        {
+          "difference": 0.0,
+          "seed": 37
+        },
+        {
+          "difference": 0.0,
+          "seed": 38
+        },
+        {
+          "difference": 0.00815263850199588,
+          "seed": 39
+        }
+      ],
+      "right": "one_step",
+      "signs": {
+        "equal_within_tolerance": 4,
+        "negative": 0,
+        "positive": 1
+      }
+    },
+    "persistent_minus_source": {
+      "left": "persistent",
+      "mean_difference": 0.002055795545760386,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": 0.0017131629548001737,
+          "seed": 35
+        },
+        {
+          "difference": 0.0,
+          "seed": 36
+        },
+        {
+          "difference": 0.0,
+          "seed": 37
+        },
+        {
+          "difference": 0.0,
+          "seed": 38
+        },
+        {
+          "difference": 0.008565814774001757,
+          "seed": 39
+        }
+      ],
+      "right": "source",
+      "signs": {
+        "equal_within_tolerance": 3,
+        "negative": 0,
+        "positive": 2
+      }
+    }
+  },
+  "provenance": {
+    "aggregation_head": "272e3d04067c8fd58091656486fcda1e621f0b40",
+    "aggregation_script": {
+      "path": "scripts/summarize_pack_inventory_overwrite_policy_switch.py",
+      "sha256": "d00333d69e95db0f38ed58c4c055264031152e4e50b9d77bcc1b23f47ae43086"
+    },
+    "complete_marker": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/complete.json",
+      "sha256": "eaa73ea05f9b4897f10a16e5e0ab87b9242de7129960ded2f8246bdff0378aa5"
+    },
+    "design_manifest": {
+      "path": "docs/manifests/pack_inventory_overwrite_policy_switch_v1.json",
+      "sha256": "135d9a0d9d76f496bb4a3e64947a2f5f48326e75f826d3f7e82732b9c9d5dfcd"
+    },
+    "execution_head": "14ad736d6e5dded971694274ccdd5813bd3fe5e5",
+    "raw_result": {
+      "bytes": 37491942,
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/result.json",
+      "sha256": "78a7eabf856046788e1319584bed0826aecbb9876922044a3a8b5ea67f381685"
+    },
+    "run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/run_manifest.json",
+      "sha256": "6fd8502571b46e4c65b8ed979979d1507f319dc7b46217f2b122c054aabaa6bd"
+    }
+  },
+  "schema_version": "hackrl_pack_inventory_overwrite_policy_switch_compact_result_v1",
+  "status": "complete_no_learning"
+}

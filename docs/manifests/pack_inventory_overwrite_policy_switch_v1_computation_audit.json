@@ -1,0 +1,96 @@
+{
+  "checks": [
+    "All 1,280 direct episodes were recorded.",
+    "Exact p=0 and p=1 success and return matched direct endpoint kernels for every seed and mode.",
+    "Pre-overwrite deterministic histories matched between fixed and always-fire kernels.",
+    "Pinned source and adapted p=0.05 results were reproduced.",
+    "Independent Decimal recomputation differed by at most 2.4459506622476507740756797834605394E-16.",
+    "All five seeds and every failed fixed-kernel path were retained."
+  ],
+  "claim_id": "pack_inventory_overwrite_policy_switch_v1_finite_panel",
+  "command": [
+    "PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/evaluate_pack_inventory_overwrite_policy_switch.py --run",
+    "/home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_policy_switch.py --write"
+  ],
+  "environment": {
+    "hardware": "CPU backend; Intel(R) Xeon(R) Platinum 8480C; Linux-6.8.0-55-generic-x86_64-with-glibc2.39",
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2 / jaxlib 0.10.2",
+      "NumPy 2.5.0"
+    ]
+  },
+  "mathematics": {
+    "assertion_tested": "For each frozen deterministic execution mode on 5 learner seeds x 32 natural starts, recompute exact expected success and discounted return at overwrite probabilities 0, 0.05, 0.30, and 1 from the recorded fixed-kernel paths.",
+    "bounds": {
+      "direct_episodes": 1280,
+      "direct_kernels": 2,
+      "evaluated_probabilities": [
+        0.0,
+        0.05,
+        0.3,
+        1.0
+      ],
+      "execution_modes": 4,
+      "horizon_ticks": 128,
+      "learner_seeds": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "maximum_environment_steps": 163840,
+      "natural_starts_per_seed": 32
+    },
+    "coefficient_domain": "Decimal arithmetic at 50 digits for the independent aggregate; binary64/JAX values in the recorded run.",
+    "conventions": "Discount 0.995; terminal success reward represented by 0.995^(T-1); independent overwrite survival (1-p)^k; one physical grain loss makes the three-grain goal impossible.",
+    "inputs": [
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/result.json",
+        "sha256": "78a7eabf856046788e1319584bed0826aecbb9876922044a3a8b5ea67f381685"
+      },
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/run_manifest.json",
+        "sha256": "6fd8502571b46e4c65b8ed979979d1507f319dc7b46217f2b122c054aabaa6bd"
+      },
+      {
+        "path": "docs/manifests/pack_inventory_overwrite_policy_switch_v1.json",
+        "sha256": "135d9a0d9d76f496bb4a3e64947a2f5f48326e75f826d3f7e82732b9c9d5dfcd"
+      }
+    ],
+    "non_claims": [
+      "The oracle switch is not autonomous defect detection.",
+      "The result does not prove that earlier learned switching would fail.",
+      "The exact p=0.05 and p=0.30 values are finite-panel expectations from deterministic fixed paths, not fresh stochastic rollouts.",
+      "Five Dual-history learner seeds do not establish a population frequency or significance result."
+    ]
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_policy_switch_v1_results.json",
+      "sha256": "1e9223861403b80d368c0d12e160e5048546ae0a492fa9650b2e5a0fad21326a"
+    }
+  ],
+  "randomness": {
+    "generator": "",
+    "seed": null,
+    "used": false
+  },
+  "repository": {
+    "commit": "272e3d04067c8fd58091656486fcda1e621f0b40",
+    "dirty": false
+  },
+  "residual_risks": [
+    "The policy network and simulator implementation were not independently reimplemented.",
+    "The intermediate-probability result relies on the proved-by-environment property that any overwrite loss makes the delivery goal impossible.",
+    "Schema version 1 does not machine-verify the external RAID input paths."
+  ],
+  "result": "Implementation and finite assertion verified in the stated five-seed, 32-start panel.",
+  "run": {
+    "exit_status": 0,
+    "runtime_seconds": 55.09672474861145,
+    "started_at": "2026-10-13T16:58:37.175213+00:00"
+  },
+  "schema_version": 1
+}
