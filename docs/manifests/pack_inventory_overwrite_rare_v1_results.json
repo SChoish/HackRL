@@ -1,0 +1,184 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_rare_results_v1",
+  "manifest_id": "pack_inventory_overwrite_rare_v1_results",
+  "status": "complete_no_learning_training_not_started",
+  "recorded_utc": "2026-10-13T04:16:29Z",
+  "decision": "The preregistered no-learning stochastic-overwrite analysis is complete. In the uniform average over all 160 seed-start pairs, the existing frozen policies have higher expected discounted return than the zero-loss reference below per-transition overwrite probability p=0.12177352054141011, and the reference has higher expected return above it. This aggregate boundary is not a guarantee for every seed. Rare-defect PPO training remains unstarted and requires a separate frozen design.",
+  "canonical_artifacts": {
+    "contract": "docs/manifests/pack_inventory_overwrite_rare_v1.json",
+    "contract_sha256": "95c523a897353e704bd9c3097788dbfa4993630abf2077722a943439e53fcb0c",
+    "repository": "git@github.com:SChoish/HackRL.git",
+    "execution_head": "0bb131c2445a1b44af171c7c87435567f6ad1aaf",
+    "run_manifest": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_rare_v1/gate/run_manifest.json",
+    "run_manifest_sha256": "09f84ec8e76dc2e3735c3e7bb9c5a422201811349c8303b65b767274d893e516",
+    "raw_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_rare_v1/gate/result.json",
+    "raw_result_sha256": "e3439dc683b867beda042697085b5a22c9dc6d5dbf845430c619216ea98f642a",
+    "risk_profiles": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_rare_v1/gate/risk_profiles.json",
+    "risk_profiles_sha256": "9d8b12de8070a21c49f8e84515fc346d1b26e0abf412a6ab3cb65be84079d7d0",
+    "completion_receipt": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_rare_v1/gate/verified_complete.json",
+    "completion_receipt_sha256": "ca5c61ec4dab0689114814a4c54218eb9ec3fcec62a4c64586e0a31dc14b7e65",
+    "pinned_reference_paths": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/reference_paths.json",
+    "pinned_reference_paths_sha256": "a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a",
+    "role_note": "The RAID result and risk-profile files are the canonical machine-readable evidence. This file is a compact derived interpretation; absolute RAID paths require access to the originating system."
+  },
+  "experiment_identity": {
+    "question": "Before learning, when does a rare stochastic inventory overwrite make the slower zero-loss ordering preferable in expected discounted return to the frozen existing policy?",
+    "source_policies": "Each of seeds 30-34 uses its own PACK S Dual-history final fixed-continuation actor-critic at checkpoint adapt_4096 and global update 4608, evaluated greedily without updates.",
+    "panel": "A uniform mean over 160 pairs: five frozen learner seeds by the same 32 natural validation starts, comprising 16 layouts in each of two initial inventory phases. Every seed and start is retained; this mean is not a randomized deployment policy.",
+    "stochastic_event": "p in [0,1] is the independent Bernoulli overwrite probability per physical transition. A keyed draw is consumed on every transition, but only a valid harvest with pre-harvest carried grain c>0 changes state, replacing carried inventory by one and destroying exactly c grain.",
+    "zero_loss_reference": "Zero-loss means zero physical grain destruction. The scripted feasible ordering never harvests while carrying grain. It is comparison evidence, not a learned policy and not a claim of global optimality.",
+    "path_lengths": "Across the 160 pairs, existing fixed paths have mean length 20.0625 and range 20-23; reference paths have mean length 38.5 and range 38-39.",
+    "discounted_return": "success * 0.995^(episode_length-1); failed episodes return zero.",
+    "lifecycle": "This completed analysis is design input only. It does not authorize or start a rare-defect learning run."
+  },
+  "exact_computation": {
+    "derivation": "Before the first overwrite the stochastic and fixed trajectories coincide. The environment starts with exactly three physical grain, the goal requires all three, and no other resource-generation defect is enabled, so destroyed grain cannot be replaced and any overwrite makes success impossible. Therefore a fixed-success path with k risky harvests has success probability (1-p)^k and expected return R_fixed*(1-p)^k.",
+    "arithmetic": "Binary64 polynomial evaluation and bisection; no Monte Carlo estimate enters the regime map or crossover.",
+    "aggregation": "Each of the 160 seed-start pairs has weight 1/160. Every observed fixed path had k=0 or k=1; the formula and implementation allow general nonnegative integer k.",
+    "per_seed_comparison": "Each seed's 32 fixed-policy paths are compared with the same 32-start scripted-reference mean.",
+    "aggregate_risk_count_distribution": {
+      "0": 44,
+      "1": 116
+    },
+    "aggregate_success": "0.275 + 0.725*(1-p) = 1 - 0.725*p",
+    "aggregate_expected_return": "0.25001797193519576 + 0.6588550292290284*(1-p)",
+    "reference_expected_return": 0.8286419047284275,
+    "aggregate_crossover_probability": 0.12177352054141011,
+    "aggregate_crossover_interval": [
+      0.12177352054095536,
+      0.12177352054186485
+    ],
+    "crossover_interval_width": 9.094947017729282e-13,
+    "crossover_interval_kind": "Deterministic binary64 bisection enclosure, not a statistical confidence interval.",
+    "regimes": {
+      "p_below_crossover": "The uniform 160-pair existing-policy panel mean has higher expected discounted return.",
+      "p_above_crossover": "The zero-loss scripted reference has higher expected discounted return on this finite panel.",
+      "at_crossover": "The two panel-average expected returns are equal within the stated binary64 bisection interval."
+    }
+  },
+  "selected_grid_points": [
+    {
+      "p": 0.0,
+      "existing_success": 1.0,
+      "existing_expected_return": 0.9088730011642241,
+      "reference_expected_return": 0.8286419047284275,
+      "existing_minus_reference": 0.08023109643579662
+    },
+    {
+      "p": 0.05,
+      "existing_success": 0.96375,
+      "existing_expected_return": 0.8759302497027728,
+      "reference_expected_return": 0.8286419047284275,
+      "existing_minus_reference": 0.04728834497434531
+    },
+    {
+      "p": 0.1,
+      "existing_success": 0.9275,
+      "existing_expected_return": 0.8429874982413212,
+      "reference_expected_return": 0.8286419047284275,
+      "existing_minus_reference": 0.014345593512893773
+    },
+    {
+      "p": 0.2,
+      "existing_success": 0.855,
+      "existing_expected_return": 0.7771019953184184,
+      "reference_expected_return": 0.8286419047284275,
+      "existing_minus_reference": -0.05153990941000908
+    },
+    {
+      "p": 1.0,
+      "existing_success": 0.275,
+      "existing_expected_return": 0.25001797193519576,
+      "reference_expected_return": 0.8286419047284275,
+      "existing_minus_reference": -0.5786239327932317
+    }
+  ],
+  "per_seed": [
+    {
+      "seed": 30,
+      "risk_count_0": 14,
+      "risk_count_1": 18,
+      "crossover_probability": 0.1574389799156961
+    },
+    {
+      "seed": 31,
+      "risk_count_0": 2,
+      "risk_count_1": 30,
+      "crossover_probability": 0.09356147406242599
+    },
+    {
+      "seed": 32,
+      "risk_count_0": 2,
+      "risk_count_1": 30,
+      "crossover_probability": 0.09446338794941767
+    },
+    {
+      "seed": 33,
+      "risk_count_0": 8,
+      "risk_count_1": 24,
+      "crossover_probability": 0.11734368801035089
+    },
+    {
+      "seed": 34,
+      "risk_count_0": 18,
+      "risk_count_1": 14,
+      "crossover_probability": 0.20242154560537529
+    }
+  ],
+  "validation": {
+    "all_gates_passed": true,
+    "kernel_panel": {
+      "states": 73,
+      "transitions": 1752,
+      "triggered": 6,
+      "outside_trigger": 1746,
+      "all_mismatch_counts": 0,
+      "summed_trigger_loss": 12,
+      "mismatch_categories": ["independent oracle", "forced false", "forced true", "p=0", "p=1", "same-key reproducibility"]
+    },
+    "formula_endpoints": "For every seed and the aggregate, p=0 matches direct fixed-kernel mode evaluation and p=1 matches direct deterministic-overwrite mode evaluation within 1e-12 for success and return.",
+    "reference_replay": "All 32 paths succeeded with zero trigger and matched the pinned prior artifact identified in canonical_artifacts exactly.",
+    "source_integrity": "Execution-source and all source-checkpoint hashes were unchanged during the completed run.",
+    "tests": "Four new rare-overwrite unit tests passed. Five existing focused tests passed in the combined run; the one GPU-resource failure was rerun on CPU and passed."
+  },
+  "accounting": {
+    "policy_episodes": 320,
+    "policy_episode_breakdown": "160 direct fixed-kernel endpoint rollouts plus 160 direct deterministic-overwrite endpoint rollouts; intermediate p values are analytic.",
+    "reference_episodes": 32,
+    "optimizer_updates": 0,
+    "collector_slots": 0,
+    "checkpoint_writes": 0,
+    "training_started": false,
+    "runtime_seconds": 275.1572325229645
+  },
+  "interpretation": {
+    "supported": "The zero-destruction reference is not uniformly higher-return when the event is rare. In the uniform 160-pair panel average, the existing policies' shorter successful paths offset their stochastic failure risk until per-transition event probability reaches about 12.18%.",
+    "heterogeneity": "Per-seed crossovers range from 9.36% to 20.24%, reflecting different fractions of natural starts whose fixed paths contain a risky harvest.",
+    "next_design_use": "A later learning experiment may preregister probabilities from distinct sides or neighborhoods of this measured aggregate crossover, but this result neither chooses nor authorizes those runs.",
+    "not_claimed": [
+      "that the scripted zero-loss reference is globally optimal",
+      "that PPO will learn either ordering or achieve the analytic mixture",
+      "that the aggregate crossover applies to unseen policies, starts, or correlated defect processes",
+      "that five learner seeds establish statistical significance",
+      "that lower loss alone defines successful adaptation",
+      "that the calculation includes adaptation-time damage"
+    ]
+  },
+  "leakage_audit": {
+    "status": "internal_mechanistic_result_with_designer_verifier_dependency_disclosed",
+    "independent_trigger_oracle": "The trigger oracle is based on pre-action geometry, source state, and carried inventory and does not consult reward, success, or the stochastic-kernel branch.",
+    "endpoint_control": "The exact formula is checked against direct fixed and deterministic-overwrite environment rollouts at p=0 and p=1.",
+    "shared_implementation": "Partially fired. Endpoint rollouts and the analytic evaluator share the internally authored environment and evaluation stack; the independent trigger oracle and physical-total checks reduce circularity but do not supply external ground truth.",
+    "selection_control": "All preregistered seeds and starts are retained; no p is selected from a favorable learning outcome because no learning occurred.",
+    "verifier_equals_designer": "Fired. Environment, evaluator, reference, and analytic code are internally authored, so the claim is limited to this implemented system rather than external validity."
+  },
+  "capacity": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "home_utilization_at_completion": "91%",
+    "raid_free_bytes_at_completion": 7926044872704,
+    "retained_run_bytes_at_completion": 702368,
+    "projected_additional_bytes": 67108864,
+    "safety_reserve_bytes": 8589934592,
+    "capacity_guard_passed": true
+  }
+}

@@ -1,0 +1,80 @@
+{
+  "schema_version": 1,
+  "claim_id": "pack_inventory_overwrite_rare_v1_exact_regime_map",
+  "repository": {
+    "commit": "0bb131c2445a1b44af171c7c87435567f6ad1aaf",
+    "dirty": false
+  },
+  "command": "env HACKRL_DEVICE=cuda XLA_PYTHON_CLIENT_PREALLOCATE=false PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python -u scripts/validate_pack_inventory_overwrite_rare.py",
+  "environment": {
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2",
+      "NumPy 2.5.0",
+      "Linux 6.8.0-55-generic x86_64"
+    ],
+    "hardware": "NVIDIA H200 143771 MiB, driver 580.173.02; run manifest reports JAX device cuda:0"
+  },
+  "mathematics": {
+    "assertion_tested": "For five frozen greedy PACK policies on all 32 natural validation starts, a fixed-success trajectory with k risky harvests has stochastic-overwrite success probability (1-p)^k and expected discounted return R_fixed*(1-p)^k; compare the resulting 160-start polynomial with the p-invariant zero-trigger reference and locate their panel-average return equality point on [0,1].",
+    "coefficient_domain": "Integer episode counts and risk counts; fixed path returns are binary64 values 0.995^(length-1); grouped polynomial coefficients, evaluation, and bisection use IEEE-754 binary64.",
+    "conventions": "p is the independent Bernoulli overwrite probability per physical transition, with a draw consumed on every step but a state change only at trigger B. Trigger B is a valid harvest with pre-harvest carried grain c>0. Any fire destroys exactly c grain. A failed episode has return zero. The aggregate is an equal-weight mean over 160 seed-start pairs, and the reference is a feasible scripted path rather than an optimality oracle.",
+    "inputs": [
+      "docs/manifests/pack_inventory_overwrite_rare_v1.json at sha256 95c523a897353e704bd9c3097788dbfa4993630abf2077722a943439e53fcb0c",
+      "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed seeds 30-34 checkpoint adapt_4096, with per-file hashes in the canonical run manifest",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/reference_paths.json at sha256 a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a"
+    ],
+    "bounds": {
+      "learner_seeds": [
+        30,
+        34
+      ],
+      "learner_seed_count": 5,
+      "natural_starts_per_seed": 32,
+      "policy_episode_count": 320,
+      "reference_episode_count": 32,
+      "probability_interval": [
+        0.0,
+        1.0
+      ],
+      "crossover_absolute_interval_width": 9.094947017729282e-13,
+      "required_endpoint_tolerance": 1e-12
+    },
+    "non_claims": [
+      "The scripted zero-loss reference is not claimed to be globally optimal.",
+      "The finite-panel crossover is not claimed to generalize to unseen policies, starts, or correlated defects.",
+      "No PPO learning, adaptation-time damage estimate, or statistical-significance claim is part of this computation.",
+      "No bounded computation is presented as a universal theorem about overwrite-defect environments."
+    ]
+  },
+  "randomness": {
+    "used": false,
+    "generator": "No random sample enters the polynomial or crossover. Fixed JAX PRNGKey values are used only to verify same-key reproducibility and exact p=0/p=1 stochastic-kernel endpoints.",
+    "seed": null
+  },
+  "run": {
+    "started_at": "2026-10-13T04:10:41.948739Z",
+    "runtime_seconds": 275.1572325229645,
+    "exit_status": 0
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_rare_v1_results.json",
+      "sha256": "3462a38e05bdef89c5658a165542a48028fe7c8134bcd7dc42a7f1fd7b545d19"
+    }
+  ],
+  "checks": [
+    "Enumerated 73 states and all 24 actions for 1,752 transitions; forced false, forced true, p=0, p=1, independent-trigger-oracle, and same-key checks all had zero mismatches.",
+    "For every seed and the aggregate, formula values at p=0 and p=1 matched direct fixed and deterministic-overwrite rollouts within 1e-12 for success and discounted return.",
+    "All 32 reference paths replayed with success, zero trigger, zero loss, and exact equality to the pinned prior artifact.",
+    "All five preregistered seeds and all 32 starts were retained; source and checkpoint hashes were unchanged through completion.",
+    "The aggregate crossover was bracketed and bisected to interval [0.12177352054095536, 0.12177352054186485]."
+  ],
+  "result": "All no-learning gates passed. The aggregate existing-policy expected return is 0.25001797193519576 + 0.6588550292290284*(1-p), the reference expected return is 0.8286419047284275, and equality occurs at p=0.12177352054141011 within a 9.094947017729282e-13 interval. Training was not started.",
+  "residual_risks": [
+    "Environment, evaluator, trigger oracle, reference, and analytic implementation are internally authored; endpoint and locality cross-checks reduce implementation risk but do not provide external validity.",
+    "Binary64 is sufficient for the reported 1e-12 bracket in this well-conditioned linear aggregate, but the v1 manifest records no independently rerun higher-precision calculation.",
+    "The five policies are related by a common training recipe, and 160 episodes are a finite deterministic panel rather than 160 independent learned-policy replications.",
+    "Only independent Bernoulli events are modeled; temporal correlation or state-dependent probabilities could change the regime boundary."
+  ]
+}
