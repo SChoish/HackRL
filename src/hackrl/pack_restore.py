@@ -558,6 +558,55 @@ def inventory_overwrite_trigger(state: PackRestoreState, action) -> jax.Array:
     )
 
 
+def pack_restore_step_inventory_overwrite_event(
+    state: PackRestoreState,
+    action,
+    overwrite_event,
+) -> tuple[PackRestoreState, jax.Array]:
+    """Apply one fixed step, optionally firing overwrite at trigger B.
+
+    ``overwrite_event`` is a caller-supplied Bernoulli outcome. It affects the
+    next state only when :func:`inventory_overwrite_trigger` is true. Keeping
+    the event outside the state transition lets callers maintain a defect RNG
+    stream that is separate from policy and reset randomness.
+    """
+
+    trigger = inventory_overwrite_trigger(state, action)
+    fired = jnp.logical_and(trigger, jnp.asarray(overwrite_event, dtype=jnp.bool_))
+    fixed = pack_restore_step(state, action, PackRestoreVariant.FIXED)
+    harmful = pack_restore_step(
+        state, action, PackRestoreVariant.INVENTORY_OVERWRITE
+    )
+    stepped = jax.tree.map(
+        lambda harmful_value, fixed_value: jnp.where(
+            fired, harmful_value, fixed_value
+        ),
+        harmful,
+        fixed,
+    )
+    return stepped, fired
+
+
+def pack_restore_step_inventory_overwrite_stochastic(
+    state: PackRestoreState,
+    action,
+    defect_key,
+    overwrite_probability,
+) -> tuple[PackRestoreState, jax.Array]:
+    """Draw one Bernoulli event and apply the stochastic overwrite kernel.
+
+    A draw is made on every call, including outside trigger B. The caller owns
+    key splitting, which keeps RNG consumption independent of whether the
+    current state happens to reach the trigger.
+    """
+
+    event = jax.random.bernoulli(
+        defect_key,
+        p=jnp.asarray(overwrite_probability, dtype=jnp.float32),
+    )
+    return pack_restore_step_inventory_overwrite_event(state, action, event)
+
+
 def same_action_effect_gap(before, action) -> jax.Array:
     """Mutant physical total minus fixed physical total after one shared action."""
 

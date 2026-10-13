@@ -791,6 +791,7 @@ def _episode_records(
     grain,
     loss_seen,
     lost_grain,
+    overwrite_trigger_count,
     first_harvest,
     first_delivery,
     first_storage,
@@ -808,6 +809,7 @@ def _episode_records(
     grain = np.asarray(grain)
     loss = np.asarray(loss_seen)
     lost = np.asarray(lost_grain)
+    trigger_count = np.asarray(overwrite_trigger_count)
     first_harvest = np.asarray(first_harvest)
     first_delivery = np.asarray(first_delivery)
     first_storage = np.asarray(first_storage)
@@ -829,6 +831,7 @@ def _episode_records(
                 "excess_grain_delivered": int(grain[index]),
                 "loss": bool(loss[index]),
                 "lost_grain": int(lost[index]),
+                "overwrite_trigger_count": int(trigger_count[index]),
                 "first_harvest_step": int(first_harvest[index]),
                 "first_delivery_step": int(first_delivery[index]),
                 "first_storage_step": int(first_storage[index]),
@@ -897,6 +900,7 @@ def evaluate_pack_restore_gc_frozen(
             lost_grain_total,
             first_loss,
             overwrite_trigger_seen,
+            overwrite_trigger_count,
             first_harvest,
             first_delivery,
             first_storage,
@@ -983,6 +987,7 @@ def evaluate_pack_restore_gc_frozen(
             lost_grain_total + lost,
             first_loss,
             jnp.logical_or(overwrite_trigger_seen, overwrite_trigger),
+            overwrite_trigger_count + overwrite_trigger.astype(jnp.int32),
             first_harvest,
             first_delivery,
             first_storage,
@@ -1011,6 +1016,7 @@ def evaluate_pack_restore_gc_frozen(
         zeros_int,
         jnp.full((episode_count,), -1, dtype=jnp.int32),
         zeros_bool,
+        zeros_int,
         jnp.full((episode_count,), -1, dtype=jnp.int32),
         jnp.full((episode_count,), -1, dtype=jnp.int32),
         jnp.full((episode_count,), -1, dtype=jnp.int32),
@@ -1061,6 +1067,7 @@ def evaluate_pack_restore_gc_frozen(
         lost_grain_total,
         first_loss,
         overwrite_trigger_seen,
+        overwrite_trigger_count,
         first_harvest,
         first_delivery,
         first_storage,
@@ -1083,6 +1090,7 @@ def evaluate_pack_restore_gc_frozen(
         loss_first = loss_first[loss_first >= 0]
         lost = np.asarray(lost_grain_total)[mask]
         triggers = np.asarray(overwrite_trigger_seen)[mask]
+        trigger_counts = np.asarray(overwrite_trigger_count)[mask]
         harvest_first = np.asarray(first_harvest)[mask]
         delivery_first = np.asarray(first_delivery)[mask]
         storage_first = np.asarray(first_storage)[mask]
@@ -1125,6 +1133,7 @@ def evaluate_pack_restore_gc_frozen(
                 float(np.mean(loss_first)) if loss_first.size else None
             ),
             "overwrite_trigger_episode_rate": float(np.mean(triggers)),
+            "mean_overwrite_trigger_count": float(np.mean(trigger_counts)),
             "deliver_before_first_harvest_rate": float(np.mean(deliver_before)),
             "store_before_first_harvest_rate": float(np.mean(store_before)),
             "protect_before_first_harvest_rate": float(np.mean(protect_before)),
@@ -1158,6 +1167,7 @@ def evaluate_pack_restore_gc_frozen(
             violation_grain_delivered_total,
             loss_seen,
             lost_grain_total,
+            overwrite_trigger_count,
             first_harvest,
             first_delivery,
             first_storage,

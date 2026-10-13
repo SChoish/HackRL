@@ -1,0 +1,104 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_rare_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_rare_v1",
+  "status": "frozen_before_no_learning_run",
+  "understood_as": "Preserve the completed deterministic-overwrite PPO experiment, introduce a stochastic overwrite event that changes only whether the existing inventory-overwrite transition fires at trigger B, and perform no learning. For the five predeclared source policies and all 32 natural validation starts, derive the exact expected mode success and discounted return as functions of event probability p, compare them with the zero-trigger reference path, locate the return crossover without selecting a favorable p, and validate kernel locality, endpoints, reproducibility, and source integrity before any rare-defect PPO design is opened.",
+  "research_question": "When overwrite damage is rare, where does the expected-return advantage change from the faster existing policy to the slower zero-loss ordering, before accounting for the cost of learning that ordering?",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_rare_v1/gate",
+  "prerequisites": {
+    "deterministic_gate_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/result.json",
+    "deterministic_gate_result_sha256": "986f66cd0b489ea6663663e2476639f605f8250cfa25a67d628cc52f3cdbc57f",
+    "reference_paths": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_v1/gate/reference_paths.json",
+    "reference_paths_sha256": "a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a",
+    "required_gate_status": "all_no_learning_gates_passed_training_not_started"
+  },
+  "source_policies": {
+    "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+    "checkpoint": "adapt_4096",
+    "global_update": 4608,
+    "seeds": [30, 31, 32, 33, 34],
+    "policy": "Final PACK S Dual-history actor-critic after fixed-kernel continuation; teacher parameters are loaded only to verify the source checkpoint and are never executed.",
+    "selection": "All five fixed seeds are retained. No seed is selected by damage, risk count, crossover, or return."
+  },
+  "stochastic_kernel_contract": {
+    "trigger_B": "The action is DO, the faced source is ripe with positive remaining grain, and pre-harvest carried grain c is positive.",
+    "event": "At every environment step, a caller-supplied defect key yields one Bernoulli(p) draw. The draw changes state only when B is true.",
+    "event_true_at_B": "Apply the existing deterministic inventory-overwrite transition: carried c becomes 1 and source remaining r becomes r-1.",
+    "event_false_at_B": "Apply the fixed transition: carried c becomes c+1 and source remaining r becomes r-1.",
+    "outside_B": "Apply the fixed transition for either event value and every p.",
+    "loss_at_fire": "The one-step decrease in total physical grain is exactly c.",
+    "endpoint_p0": "Bitwise state equality with the fixed kernel for every checked state and action.",
+    "endpoint_p1": "Bitwise state equality with the deterministic inventory-overwrite kernel for every checked state and action.",
+    "rng_schedule": "The caller supplies a distinct defect RNG stream. A draw is consumed on every physical transition so RNG consumption does not depend on whether B is reached.",
+    "unchanged": [
+      "initial state distribution",
+      "reward and goal",
+      "128-tick horizon",
+      "discount factor 0.995",
+      "observation",
+      "action space",
+      "source growth period",
+      "rebuild semantics"
+    ],
+    "defect_indicator_added": false,
+    "loss_penalty_added": false,
+    "early_termination_added": false
+  },
+  "exact_computation": {
+    "mode": "deterministic argmax policy evaluated along the fixed-kernel trajectory",
+    "panel": "5 learner seeds x 32 natural validation starts",
+    "risk_count_k": "Number of valid harvests with carried c>0 before fixed-kernel success.",
+    "derivation": "Before the first overwrite event, the stochastic trajectory equals the fixed trajectory. Because initial physical grain equals the delivery goal, any overwrite makes success impossible. Thus a fixed-success episode with k risky harvests succeeds with probability (1-p)^k and has expected discounted return R_fixed*(1-p)^k.",
+    "reference": "The existing scripted reference path succeeds on every natural start with k=0, so its expected return is independent of p. It is feasibility and comparison evidence only and never enters policy initialization, learning data, reward, masking, or selection.",
+    "arithmetic": "IEEE-754 binary64 for polynomial evaluation and bisection; integer episode lengths and risk counts; no Monte Carlo estimate enters the result.",
+    "crossover": "For each seed and the aggregate 160-episode panel, bisect the monotone difference J_existing(p)-J_reference on [0,1] to absolute interval width at most 1e-12. Report no crossing rather than extrapolating if the endpoints do not bracket one.",
+    "endpoint_tolerance": 1e-12,
+    "report_probabilities": [0.0, 0.001, 0.0025, 0.005, 0.01, 0.02, 0.05, 0.1, 0.2, 0.5, 1.0]
+  },
+  "validation_gates": {
+    "kernel_locality": "Forced false events match fixed, forced true events match deterministic overwrite, and both match fixed outside B across the enumerated transition panel.",
+    "rng_reproducibility": "Identical state, action, p, and key give identical fire decision and next state; p=0 and p=1 match their deterministic endpoints.",
+    "policy_fixed_success": "Every source policy succeeds on all 32 fixed-kernel mode starts.",
+    "formula_endpoints": "The exact formula at p=0 matches direct fixed evaluation and at p=1 matches direct deterministic-overwrite evaluation within 1e-12 for success and discounted return.",
+    "reference_replay": "All 32 reference paths succeed without entering B or losing physical grain and match the pinned prior reference artifact.",
+    "source_integrity": "Execution-source and source-checkpoint hashes are unchanged at completion."
+  },
+  "outputs": {
+    "risk_profiles": "Per seed-start fixed return, path length, k, and grouped success/return polynomial coefficients.",
+    "regime_map": "Expected success, expected return, loss probability, reference return, and return difference at each reporting p.",
+    "crossovers": "Per-seed and aggregate return equality points, if bracketed.",
+    "kernel_validation": "Locality, endpoints, event loss, and deterministic-key checks.",
+    "computation_manifest": "A mathbox computation-audit record validated after the run."
+  },
+  "execution_budget": {
+    "optimizer_updates": 0,
+    "collector_slots": 0,
+    "checkpoint_writes": 0,
+    "learning_branches": 0,
+    "automatic_extension": false,
+    "maximum_policy_episodes": 320,
+    "maximum_reference_episodes": 32
+  },
+  "interpretation": {
+    "pass": "The finite regime map and crossover are valid for the five frozen source policies and 32 natural starts under the stated stochastic event model; they may be used to preregister a later learning comparison.",
+    "failure": "Do not open rare-defect PPO learning until the kernel, endpoint, reference, or integrity failure is corrected and the no-learning computation is rerun.",
+    "not_claimed": [
+      "that a policy will learn the return-optimal ordering",
+      "that the scripted reference is globally optimal",
+      "that lower physical loss is always higher return",
+      "that expected return captures adaptation-time damage",
+      "generalization beyond these policies, starts, or the Bernoulli event model",
+      "statistical significance from five learner seeds"
+    ]
+  },
+  "deferred_training": {
+    "status": "not_started_even_if_all_gates_pass",
+    "next_decision": "Choose later PPO probabilities from qualitatively distinct sides or neighborhoods of the measured crossover, not by maximizing a favorable observed adaptation effect. Freeze a separate learning manifest before launch."
+  },
+  "storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "projected_additional_bytes": 67108864,
+    "safety_reserve_bytes": 8589934592,
+    "checkpoint_writes": 0
+  }
+}
