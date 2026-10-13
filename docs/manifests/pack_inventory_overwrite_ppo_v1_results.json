@@ -1,0 +1,294 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_ppo_results_v1",
+  "manifest_id": "pack_inventory_overwrite_ppo_v1_results",
+  "status": "complete_fixed_budget_no_automatic_extension",
+  "recorded_utc": "2026-10-13T03:00:43Z",
+  "decision": "The predeclared PPO adaptation comparison is complete. Harmful-kernel PPO produced substantial but incomplete aggregate recovery, reduced fixed-budget exposure loss relative to frozen harmful deployment, and preserved fixed-kernel success. No sweep, curriculum, teacher, BC, or budget extension was added.",
+  "canonical_artifacts": {
+    "contract": "docs/manifests/pack_inventory_overwrite_ppo_v1.json",
+    "contract_sha256": "f46c0dacd4dc1990fa336146a302f8758c0813c6624e29c8210191fb8a462cf9",
+    "repository": "git@github.com:SChoish/HackRL.git",
+    "execution_head": "327e113e3681d46986bab1100ceb8b5e7061fd6b",
+    "run_manifest": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_ppo_v1/run_manifest.json",
+    "run_manifest_sha256": "77cfa28b44636a6a36180179deccb162a7d480a6959da126ea248c725443b54a",
+    "raw_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_ppo_v1/result.json",
+    "raw_result_sha256": "2fdf8bab9bd752a64bdd7ed9469bd98bd9aa7dbc780065dff9f710673013f4d0",
+    "completion_receipt": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_ppo_v1/verified_complete.json",
+    "completion_receipt_sha256": "c85f3157a90c51cf52ecc998b58b61ac8ede09a2077d0f71410d25d4aca262ac",
+    "role_note": "The raw result is the canonical machine-readable source. This file is a compact, derived interpretation and does not replace the preregistered contract."
+  },
+  "definitions": {
+    "fixed_or_normal_kernel": "The non-defective PACK kernel; fixed and normal refer to the same kernel in this result.",
+    "harmful_kernel": "On a valid harvest with c carried grain, set carried grain to 1 rather than c+1 while decrementing source grain by 1 exactly as in the fixed kernel. All other specified transitions are unchanged.",
+    "task_success": "Deliver at least 3 grain before the unchanged 128-tick horizon. The world starts with exactly the 3 physical grain required by the goal, so any physical loss makes that episode unsalvageable.",
+    "physical_loss": "The positive decrease in total physical grain across a transition, summed within an episode; it is computed independently of reward and success.",
+    "discounted_return": "success * 0.995^(episode_length-1); failed episodes have return 0.",
+    "protect_before_first_harvest": "An episode-level indicator that either a delivery or storage event occurs before its first harvest. Every reported strategy rate is an unconditional fraction of all episodes in that evaluation panel.",
+    "collector_slot": "One worker position in a 512-worker by 64-step collection block, including post-success loss-masked NOOP positions.",
+    "valid_ppo_sample": "A command-active transition admitted to PPO; it is reported separately from collector slots and physical transitions.",
+    "PACK_S": "The small policy tier: hidden size 512 and 2,644,057 joint actor-critic parameters.",
+    "Dual_history": "The source actor-critic was previously trained with PPO plus behavior-cloning guidance from an adapting teacher; teacher and BC pathways are disabled in this experiment."
+  },
+  "experiment_identity": {
+    "question": "Can reward-based PPO adaptation change the action order and recover performance after a local inventory-overwrite defect makes the previously successful collect-then-deliver behavior destructive, and how much grain is lost during adaptation?",
+    "source_policy": "The final actor-critic and PPO Adam state from PACK S Dual fixed continuation, seeds 30-34.",
+    "conditions": {
+      "frozen_harmful": "No updates in the inventory-overwrite kernel.",
+      "normal_continue": "PPO continuation in the fixed kernel.",
+      "harmful_adapt": "PPO adaptation in the inventory-overwrite kernel."
+    },
+    "pairing": "Within each learner seed, all conditions start from byte-identical actor-critic, Adam, worker, sampler, action-RNG, and reset-RNG state; the external kernel and update permission are the intended differences.",
+    "independent_unit": "learner seed",
+    "seeds": [30, 31, 32, 33, 34],
+    "primary_view": "Deterministic mode on the same 32 natural validation starts per seed and condition, evaluated in the harmful kernel. Condition aggregates are arithmetic means of five equal-size seed rates, equivalent here to pooling 160 episodes.",
+    "primary_contrast": "harmful_adapt minus normal_continue, paired by seed",
+    "evaluation_protocol": "At each of 4 checkpoints, every condition-seed policy is evaluated in both kernels. Each kernel uses 32 mode episodes and 128 sample episodes (32 states x 4 keyed repeats), for 320 episodes per job-checkpoint and 19,200 total. Start panels and the seed formula for sample action keys are shared across conditions within learner seed.",
+    "decision_rule": "No binary effect-size threshold or significance claim was preregistered. The fixed-budget result is classified from success, return, physical loss, normal retention, action traces, and all five paired seed points without extending or selecting runs.",
+    "policy_history_scope": "This tests PPO adaptation of policies with Dual training history. It is not a Dual-versus-pure-PPO pretraining comparison."
+  },
+  "primary_final_mode_harmful_kernel": {
+    "frozen_harmful": {
+      "success_rate": 0.275,
+      "mean_discounted_return": 0.2500179719351958,
+      "loss_episode_rate": 0.725,
+      "mean_lost_grain": 0.775,
+      "mean_length": 98.3,
+      "protect_before_first_harvest_rate": 0.225
+    },
+    "normal_continue": {
+      "success_rate": 0.35,
+      "mean_discounted_return": 0.3182046915538856,
+      "loss_episode_rate": 0.65,
+      "mean_lost_grain": 0.6875,
+      "mean_length": 90.2,
+      "protect_before_first_harvest_rate": 0.2375
+    },
+    "harmful_adapt": {
+      "success_rate": 0.8,
+      "mean_discounted_return": 0.7255700450464981,
+      "loss_episode_rate": 0.2,
+      "mean_lost_grain": 0.2,
+      "mean_length": 41.9875,
+      "protect_before_first_harvest_rate": 0.6
+    },
+    "paired_harmful_adapt_minus_normal_continue_mean": {
+      "success_rate": 0.45,
+      "mean_discounted_return": 0.4073653534926126,
+      "loss_episode_rate": -0.45,
+      "mean_lost_grain": -0.4875,
+      "mean_length": -48.2125,
+      "protect_before_first_harvest_rate": 0.3625
+    }
+  },
+  "paired_seed_points": [
+    {
+      "seed": 30,
+      "normal_continue_success": 0.4375,
+      "harmful_adapt_success": 1.0,
+      "success_difference": 0.5625,
+      "return_difference": 0.5102682063803878,
+      "loss_episode_rate_difference": -0.5625
+    },
+    {
+      "seed": 31,
+      "normal_continue_success": 0.0625,
+      "harmful_adapt_success": 0.5,
+      "success_difference": 0.4375,
+      "return_difference": 0.39775586444235694,
+      "loss_episode_rate_difference": -0.4375
+    },
+    {
+      "seed": 32,
+      "normal_continue_success": 0.0625,
+      "harmful_adapt_success": 0.625,
+      "success_difference": 0.5625,
+      "return_difference": 0.5091360156206026,
+      "loss_episode_rate_difference": -0.5625
+    },
+    {
+      "seed": 33,
+      "normal_continue_success": 0.5625,
+      "harmful_adapt_success": 1.0,
+      "success_difference": 0.4375,
+      "return_difference": 0.39407377448016434,
+      "loss_episode_rate_difference": -0.4375
+    },
+    {
+      "seed": 34,
+      "normal_continue_success": 0.625,
+      "harmful_adapt_success": 0.875,
+      "success_difference": 0.25,
+      "return_difference": 0.2255929065395511,
+      "loss_episode_rate_difference": -0.25
+    }
+  ],
+  "learning_curve_mode_harmful_kernel": [
+    {
+      "collector_slots": 0,
+      "normal_continue_success": 0.275,
+      "harmful_adapt_success": 0.275,
+      "harmful_adapt_return": 0.2500179719351958,
+      "harmful_adapt_loss_episode_rate": 0.725
+    },
+    {
+      "collector_slots": 65536,
+      "normal_continue_success": 0.275,
+      "harmful_adapt_success": 0.3375,
+      "harmful_adapt_return": 0.3068402382841039,
+      "harmful_adapt_loss_episode_rate": 0.6625
+    },
+    {
+      "collector_slots": 262144,
+      "normal_continue_success": 0.2625,
+      "harmful_adapt_success": 0.4625,
+      "harmful_adapt_return": 0.4203714105605541,
+      "harmful_adapt_loss_episode_rate": 0.5375
+    },
+    {
+      "collector_slots": 1048576,
+      "normal_continue_success": 0.35,
+      "harmful_adapt_success": 0.8,
+      "harmful_adapt_return": 0.7255700450464981,
+      "harmful_adapt_loss_episode_rate": 0.2
+    }
+  ],
+  "sample_policy_final_harmful_kernel": {
+    "normal_continue": {
+      "success_rate": 0.328125,
+      "mean_discounted_return": 0.2982675322166161,
+      "loss_episode_rate": 0.671875
+    },
+    "harmful_adapt": {
+      "success_rate": 0.78125,
+      "mean_discounted_return": 0.7082681236143611,
+      "loss_episode_rate": 0.21875
+    },
+    "interpretation": "The recovery is also present under sampled action selection; the primary mode and secondary sample results are reported separately."
+  },
+  "normal_kernel_retention_final": {
+    "normal_continue_mode": {
+      "success_rate": 1.0,
+      "mean_discounted_return": 0.9088730011642243,
+      "mean_length": 20.0625
+    },
+    "harmful_adapt_mode": {
+      "success_rate": 1.0,
+      "mean_discounted_return": 0.9071180369446982,
+      "mean_length": 20.45
+    },
+    "harmful_adapt_sample": {
+      "success_rate": 1.0,
+      "mean_discounted_return": 0.9065110067697925,
+      "mean_length": 20.584375
+    },
+    "interpretation": "All adapted policies retain normal-kernel task success, with a small aggregate increase in path length and reduction in discounted return."
+  },
+  "deployment_exposure": {
+    "per_condition_seed_collector_slots": 1048576,
+    "per_condition_seed_completed_world_episodes": 8192,
+    "frozen_harmful_final_mean": {
+      "cumulative_lost_grain": 6664.0,
+      "loss_episode_rate": 0.703564453125,
+      "goal_successes": 2426.6
+    },
+    "harmful_adapt_final_mean": {
+      "cumulative_lost_grain": 3675.0,
+      "loss_episode_rate": 0.4173583984375,
+      "goal_successes": 4771.8
+    },
+    "harmful_adapt_avoided_loss_vs_frozen_over_full_budget": {
+      "five_seed_total_lost_grain_difference": -14945,
+      "mean_lost_grain_difference_per_seed": -2989.0
+    },
+    "harmful_adapt_cumulative_damage_curve": [
+      {
+        "collector_slots": 65536,
+        "mean_cumulative_lost_grain": 421.2,
+        "five_seed_total_lost_grain": 2106,
+        "loss_episode_rate": 0.708203125
+      },
+      {
+        "collector_slots": 262144,
+        "mean_cumulative_lost_grain": 1497.6,
+        "five_seed_total_lost_grain": 7488,
+        "loss_episode_rate": 0.65439453125
+      },
+      {
+        "collector_slots": 1048576,
+        "mean_cumulative_lost_grain": 3675.0,
+        "five_seed_total_lost_grain": 18375,
+        "loss_episode_rate": 0.4173583984375
+      }
+    ],
+    "interpretation": "PPO reduced later damage but adaptation was not cost-free: the harmful-adapt branches destroyed 18,375 grain across the five fixed-budget deployments."
+  },
+  "strategy_trace": {
+    "harmful_adapt_final_mode": {
+      "deliver_before_first_harvest_rate": 0.6,
+      "store_before_first_harvest_rate": 0.0,
+      "protect_before_first_harvest_rate": 0.6,
+      "successful_zero_loss_rate": 0.8,
+      "no_loss_failure_rate": 0.0
+    },
+    "normal_continue_final_mode": {
+      "deliver_before_first_harvest_rate": 0.2375,
+      "store_before_first_harvest_rate": 0.0,
+      "protect_before_first_harvest_rate": 0.2375,
+      "successful_zero_loss_rate": 0.35,
+      "no_loss_failure_rate": 0.0
+    },
+    "interpretation": "The observed protection shift used earlier delivery rather than storage. Every final harmful-kernel success was zero-loss, and there were no zero-loss failures in these mode evaluations."
+  },
+  "accounting": {
+    "jobs_completed": 15,
+    "collector_slots": 15728640,
+    "physical_transitions": 15728640,
+    "valid_ppo_samples": 3499342,
+    "optimizer_applications": 7878,
+    "evaluation_episodes": 19200,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "scheduled_optimizer_applications_are_not_reported_as_actual": true,
+    "automatic_extension": false
+  },
+  "interpretation": {
+    "supported": "Within this five-seed paired experiment, defect-exposed PPO improved harmful-kernel success and return relative to normal continuation for every seed and retained normal-kernel success. In aggregate, the action trace shifted toward protection before harvesting and loss declined.",
+    "recovery_reference": "Harmful-adapt mode success rose from the common update-0 value 0.275 to 0.8, exceeded final normal continuation by 0.45, and remained below fixed-kernel success 1.0.",
+    "qualification": "Recovery was substantial but incomplete: the final mean mode success was 0.8, with seed results ranging from 0.5 to 1.0, and the adaptation process incurred physical loss.",
+    "not_claimed": [
+      "statistical significance from five learner seeds",
+      "generalization beyond these five Dual-history policies and the natural validation starts",
+      "that PPO repairs already-destroyed grain within the same episode",
+      "that teacher guidance or BC is required or beneficial here",
+      "that reward-free TTT has the same information conditions or would match PPO",
+      "that normal behavior is cost-free after adaptation"
+    ]
+  },
+  "leakage_audit": {
+    "status": "internal_mechanistic_result_with_designer_verifier_dependency_disclosed",
+    "independent_physical_oracle": "Physical loss is computed from pre/post physical grain totals and does not consult reward or success.",
+    "selection_control": "All predeclared seeds and starts are retained; no seed, checkpoint, or condition was selected by outcome.",
+    "verifier_equals_designer": "Fired. The project evaluator and environment implementation are internally authored, so the claim is limited to this implemented system rather than external benchmark validity.",
+    "replication_unit": "The unit is five paired learner seeds, not the 19,200 evaluation episodes."
+  },
+  "capacity": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "home_utilization_at_completion": "91%",
+    "raid_free_bytes_at_completion": 7926872186880,
+    "retained_run_bytes_at_completion": 1291874677,
+    "projected_peak_writes_bytes": 4294967296,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 12884901888,
+    "capacity_guard_passed": true
+  },
+  "verification": {
+    "all_15_job_summaries_complete": true,
+    "paired_branch_starts_byte_identical": true,
+    "source_checkpoint_hashes_verified": true,
+    "execution_source_hashes_verified": true,
+    "fixed_kernel_physical_loss_zero": true,
+    "frozen_optimizer_applications_zero": true,
+    "focused_experiment_tests": "6 passed",
+    "full_pack_regression_tests": "55 passed with one pre-existing TFP/JAX deprecation warning"
+  }
+}
