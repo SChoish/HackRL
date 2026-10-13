@@ -1,3 +1,5 @@
+from decimal import Decimal
+import hashlib
 import importlib.util
 import json
 from pathlib import Path
@@ -178,3 +180,35 @@ def test_run_manifest_materializes_full_execution_contract(monkeypatch):
         "behavior_drift_anchor"
     ]
     assert run_manifest["new_training_job_count"] == 10
+
+
+def test_compact_result_and_decimal_audit_match_canonical_raw_result():
+    compact_path = (
+        REPOSITORY
+        / "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_results.json"
+    )
+    audit_path = (
+        REPOSITORY
+        / "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_computation_audit.json"
+    )
+    compact = json.loads(compact_path.read_text(encoding="utf-8"))
+    audit = json.loads(audit_path.read_text(encoding="utf-8"))
+    raw_path = Path(compact["provenance"]["raw_result"]["path"])
+    raw = json.loads(raw_path.read_text(encoding="utf-8"))
+    assert hashlib.sha256(raw_path.read_bytes()).hexdigest() == compact[
+        "provenance"
+    ]["raw_result"]["sha256"]
+    assert hashlib.sha256(audit_path.read_bytes()).hexdigest() == compact[
+        "provenance"
+    ]["computation_audit"]["sha256"]
+    assert compact["cross_probability_return_matrix"] == raw[
+        "cross_probability_return_matrix"
+    ]
+    assert audit["all_numeric_checks_within_tolerance"] is True
+    assert len(audit["inputs"]["direct_input_sha256"]) == 70
+    assert audit["execution"]["git_head"] == compact["provenance"][
+        "computation_audit"
+    ]["audit_head"]
+    assert Decimal(
+        audit["maximum_absolute_difference_from_binary64_result"]
+    ) <= Decimal(audit["tolerance"])

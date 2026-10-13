@@ -1,0 +1,385 @@
+{
+  "all_numeric_checks_within_tolerance": true,
+  "collection_checks": {
+    "p00_lr1": {
+      "matches_raw_result": true,
+      "totals": {
+        "collector_slots": 5242880,
+        "cumulative_lost_grain": 0,
+        "empty_minibatches": 2560,
+        "optimizer_applications": 2560,
+        "overwrite_fire_events": 0,
+        "overwrite_trigger_events": 24997,
+        "physical_loss_events": 0,
+        "physical_transitions": 5242880,
+        "valid_ppo_samples": 820920
+      }
+    },
+    "p100_lr1": {
+      "matches_raw_result": true,
+      "totals": {
+        "collector_slots": 5242880,
+        "cumulative_lost_grain": 15045,
+        "empty_minibatches": 3,
+        "optimizer_applications": 5117,
+        "overwrite_fire_events": 14103,
+        "overwrite_trigger_events": 14103,
+        "physical_loss_events": 14103,
+        "physical_transitions": 5242880,
+        "valid_ppo_samples": 2236799
+      }
+    }
+  },
+  "execution": {
+    "argv": [
+      "scripts/audit_pack_inventory_overwrite_train_probability_transfer.py"
+    ],
+    "documented_command": "env PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/audit_pack_inventory_overwrite_train_probability_transfer.py",
+    "git_head": "c0a27be4bcca4febd0522cc907ee8932f58dfa14",
+    "git_status_short": [
+      " M tests/test_pack_inventory_overwrite_train_probability_transfer.py",
+      "?? docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_computation_audit.json",
+      "?? docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_results.json"
+    ],
+    "python_executable": "/home/ext_csv/miniconda3/envs/offrl/bin/python",
+    "python_version": "3.12.13 | packaged by Anaconda, Inc. | (main, Mar 19 2026, 20:20:58) [GCC 14.3.0]"
+  },
+  "generated_unix": 1791907462.9469573,
+  "inputs": {
+    "audit_script_sha256": "f5911a145be86f44b8710315302a444e0916d07f0838235f387993e95663c1d8",
+    "direct_input_sha256": {
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed35/checkpoints/adapt_32/config.json": "64d0bb6e4c793c8b883869516aeae19a7e0e2e26f0b12ffbd9150e1dde5bbd7f",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed35/evaluations/adapt_32.json": "fc3615baffa21132a80f74343d209a2c39564609b809c1740a3f6be7b8a53aa7",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed36/checkpoints/adapt_32/config.json": "4d555d59ac750f27a1d4293fc93d60230842aa0a30b761e6b4c707bfb5271d5b",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed36/evaluations/adapt_32.json": "3a23005fabfc1b6e9168b63b5851ac84ec2fb7544bdec2565c30f7238723d04e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed37/checkpoints/adapt_32/config.json": "3ea92da14680c51b717ed1b1e3ad277629614711d9f6ebef4bedcc24b637e178",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed37/evaluations/adapt_32.json": "870937fb02eb123441e9f3d75e125c7cec9e48e7b82a74552d5e4f3e87fa41d8",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed38/checkpoints/adapt_32/config.json": "1f7e1b8aeef132be4e68a6de0ee4effdb0c7c3efaf2821c55d6ec685d8224d42",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed38/evaluations/adapt_32.json": "af6bb725637be399b90fb2ac950f51fc12bffdf89e77e1bf9f4fe721250d9247",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed39/checkpoints/adapt_32/config.json": "f2ccd022c9134ffe59391057c74e9df29070ebfe31de44547ecd61f998bb0672",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed39/evaluations/adapt_32.json": "899048053eed8ddfc97afbf9283a64c2e259832a197da14b2a43bf09d24caf7d",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed35/checkpoints/adapt_32/config.json": "6382e28d57823b2b71ee0d99c00fe106b34a37b779c455cedfbe43d4cd7a70c6",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed35/evaluations/adapt_32.json": "e63ed0668295af59c211e6bcf38b77f596fac6f7c8959c711b9741e72eb0bffc",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed36/checkpoints/adapt_32/config.json": "4a2a9967fac277b656d0be7bf49af0f28573749316cb45c5564873c86ddd254d",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed36/evaluations/adapt_32.json": "08ef6fc517ccb418502b2e207d4f85f6cdff31d04b4a4c0faf08e4fcca529902",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed37/checkpoints/adapt_32/config.json": "40da7ca143e3377ebce0ed2b782fb91dca35d81879f09c9c66758b57318ce1eb",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed37/evaluations/adapt_32.json": "a05e698c025ad24634c49cf7f1e3a620fa7dadc4ca02689ea410bbc5edfc0718",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed38/checkpoints/adapt_32/config.json": "dc02cf5f70dd36c57c333b39dd39763f968a772446ece737c517ae0e0d1e992c",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed38/evaluations/adapt_32.json": "4a44ff65162309dcc49a698fbe59a5bb605ee9cea7ba3aa1343ac9a19d00d805",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed39/checkpoints/adapt_32/config.json": "6721a62ea1e1bccadbfe75615e8ce9b3afb9f14580c8617843e7f6a8cf76c35e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed39/evaluations/adapt_32.json": "d701f4c72b537bb1cd9029c3a84bc01d94c257046bdc3618ff38ce8a2a9dc5d6",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed35/checkpoints/adapt_32/config.json": "e4e0dca5d312933468f7420921961e1a9caae50f6c7e668ce3287deb310d6351",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed35/evaluations/adapt_32.json": "a642f8b69d68a16acddb0ae95ec634153edc885d99d54d7d34d8246c91d79153",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed36/checkpoints/adapt_32/config.json": "e42a829de8daa51a483291fba22725858f5aea3e3f95952f827c6099ebf09d6d",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed36/evaluations/adapt_32.json": "4d0128abb3c74d57f8d14c32c5fe32f246bab6c1cbf02cf18202ada18b55fbce",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed37/checkpoints/adapt_32/config.json": "5f53634272ee2a66ad526c2032163b96607d598b582b66d003827a3865ba7c66",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed37/evaluations/adapt_32.json": "776b3f94720bfea9b512403909ff3fc49ca723806349da6e72bf9b9e8628b9f1",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed38/checkpoints/adapt_32/config.json": "a67a6a29faf7e57300d3fa328e4f7b54b996b92dd9f9b7cb680deb92c10d0d1f",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed38/evaluations/adapt_32.json": "6244309074813dc9f880f57fa5fee1ae19f99d2d869624ea1aed6a6a34e541be",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed39/checkpoints/adapt_32/config.json": "7cd72953dc63f4502d54454e2abf8acc62fa229d374f34daa18db4ede6f2328e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed39/evaluations/adapt_32.json": "926861ef63cb27c00221d631225d6fd4f857fef6a51aef7dcdc03b5d35cf7713",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed35/checkpoints/adapt_32/config.json": "b102fa8e52fb376c92e6a2ab4027f767579df0aa186603c3d45c2829722e7ad3",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed35/evaluations/adapt_32.json": "749b444d0b7f2296c4830f267b93b9ff088d8a672025f53b5e4faf55b884128f",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed36/checkpoints/adapt_32/config.json": "ccd4367fe6a98ec2b85a269a6a20bc7fc2678b005af0be94de714a36e3112f54",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed36/evaluations/adapt_32.json": "0755cd4a5a079ff443e450c8b65636a3a220e6f47b56e48bd597783a088a705e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed37/checkpoints/adapt_32/config.json": "c02b0d748b30fa60c955c905b83b897da9ec3de523315415e199ea45f0c8c955",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed37/evaluations/adapt_32.json": "6325a0279176b74b54f89d25db4dec476d667bca6d1b154509d3e0dfe6320ff8",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed38/checkpoints/adapt_32/config.json": "62ba5b6529aa567688107f58a47d276d643abc0e49df9430f323d71776325cf1",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed38/evaluations/adapt_32.json": "939ee965b17766651a83704929573ae6b207f9a9ecb4152f94f09667c272b3e1",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed39/checkpoints/adapt_32/config.json": "41bc5f09a81133fe4652f3fce3c9a5f00048d02929bbf5ce2804dff4f381a4e1",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed39/evaluations/adapt_32.json": "c26400bddebff5cca5ba1c46160b54afcfec5252afab0fb038ad03b9e0515826",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed35/checkpoints/adapt_32/config.json": "22c290476f8a4d206daa52c51730379ec58cab9a03f6f5cdde670b409f5ccef4",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed35/evaluations/adapt_32.json": "c8d96ee0ac042f8c2a26df9bed1cfb567a45a80ff6a4feac72b527961803b88a",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed35/summary.json": "68f056951fe3c6f59a0f71cad88210faaebfe3fe87dd8695407c5fe07b26018b",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed36/checkpoints/adapt_32/config.json": "fb7f3cc6330d8a15f26385d7e7c5afb5025603fb9987ec92bd958278feb8001c",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed36/evaluations/adapt_32.json": "ae7242d02019f32a90405dafc7c72b774d070731eca6a541a76ffab95f7b2192",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed36/summary.json": "40c12af9b2a42924367924c42cf674fc61d252f79d133f021b29901509276943",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed37/checkpoints/adapt_32/config.json": "9cc91dd28edfb3a73bbfbe7a8c65d3c8feac5c642df59acf2577552256c0f6b2",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed37/evaluations/adapt_32.json": "c8f865716447f6debe77ca1965b7388729aa0b43c388adef4d0c3b75c057b534",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed37/summary.json": "8ad17246628a17c851d3a7110a8a4d30b9b65b2657188d4803bd4350fbee2d12",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed38/checkpoints/adapt_32/config.json": "57c55d69f8dc2f5a0b8eccf6fa81fb016bfc4415f8fb7e2620c46bb06c3cf597",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed38/evaluations/adapt_32.json": "2b559f12d8894b71d831287c0dc9cfce837d8fbafcc1d701a04c902c07068f8e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed38/summary.json": "38ae45368845b4aab391c4bccee6500226e9ca08c050e9122f27ca139b71563b",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed39/checkpoints/adapt_32/config.json": "225d7895a6e442697e4132d693b00392532e1b081f952a6fb955522bdcac7e63",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed39/evaluations/adapt_32.json": "a8192b65221c729cb3af3cd339dd796bf5d068027bc2d18cb2d39b540078842f",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p00_lr1/seed39/summary.json": "9a462152978e4691e726b573b235c43012213090e2782597c2e1ed9578485edd",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed35/checkpoints/adapt_32/config.json": "3dfb06557e8842a7a22ea79bb5d09d6eb7024eddcfa33dccfec83a8528cf8307",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed35/evaluations/adapt_32.json": "039cf22c9c4db59a134b164b98c47cb4096ca27c0ce9f53c813141f131e24593",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed35/summary.json": "f889aa39ff3629e86ee127e9d58647a5267534f10805bdc77d043355d4f43c77",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed36/checkpoints/adapt_32/config.json": "109d8d06c824ee59a344643c9799be9a0fbcd79c9f1f7d005e05484543e45c11",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed36/evaluations/adapt_32.json": "c3b992235fbda998c74b4090ca788869c07a046be8555c7d8e93d89d66b0eb6e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed36/summary.json": "7bd3d833e12edb762b4e8f997041ef6272a3aac7ad17c0ca50e38bd3dd01e754",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed37/checkpoints/adapt_32/config.json": "f9e9cef6b97c3f45fdfac228e990cb2191a86bf1abe75cbef498b8414af0f471",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed37/evaluations/adapt_32.json": "2712c3cfd99d9281e46bb3647c0b30211fc75a0c909a2b4c76fabcee01af78b2",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed37/summary.json": "307057d7e61e24ebc72012caaa467dd10cbcaacaa74b2c62e55b6b6745216931",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed38/checkpoints/adapt_32/config.json": "178044b076c40fa5ea4a021f43a91281b19d2faad57c5519c47ec0756a32698a",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed38/evaluations/adapt_32.json": "1759850dbaaeafd458531f263ec3046753e2c483397aa7d1249018cd84d073d4",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed38/summary.json": "b8f93b013bbed3b7b1ecfab6476858293d40a1252bd05c7c12594c0941573673",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed39/checkpoints/adapt_32/config.json": "398a119111248a36594fd35c1689d3f9ce712ba72a7be12e3f9b0cfeb24df5c7",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed39/evaluations/adapt_32.json": "bdb215e806c7bbaaec27de156042e652b3ad49c59ede356a2248ca5ac061f67d",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1/seed39/summary.json": "5435f45bbac1d4959f7a1cff301a08afc1fa9bbea0f92a6bbf2db01f0130d757"
+    },
+    "raw_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/result.json",
+    "raw_result_sha256": "5e7444899a162d27e8425b42522fd13086d8c7d17e33f2e820096ba1de47f1c7",
+    "run_manifest_sha256": "b75fc7e867f52f004149e0df7f393705e477fdfdd340800f5d1f0d84dee86c2e",
+    "training_complete_sha256": "a7ac55436b20a525f5f8f40475574fdf98834929a39d7f61402b9b02cb01968a"
+  },
+  "maximum_absolute_difference_from_binary64_result": "0.00000000000000028079904770065535240645839720319734047956443283984850912924999492",
+  "method": "Independent Decimal arithmetic over every one of 30 final-policy risk profiles and all 32 natural starts; no project exact-evaluation helper or aggregate value is used in the recomputation.",
+  "panel": {
+    "conditions": [
+      "p00_lr1",
+      "p05_lr1",
+      "p30_lr1",
+      "p100_lr1",
+      "p05_lr025",
+      "p30_lr025"
+    ],
+    "learner_seeds": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ],
+    "natural_starts_per_seed": 32,
+    "policy_start_paths": 960,
+    "probabilities": {
+      "p00": "0",
+      "p05": "0.05",
+      "p100": "1",
+      "p30": "0.30"
+    }
+  },
+  "precision_decimal_digits": 80,
+  "recomputed_matrix": {
+    "p00_lr1": {
+      "p00": {
+        "expected_discounted_return": "0.9089857947834835577635085064777460789968792111909389495849609375",
+        "overwrite_incident_probability": "0",
+        "success_rate": "1.0"
+      },
+      "p05": {
+        "expected_discounted_return": "0.881719630275959985519161469106154752122674517217695713043212890625",
+        "overwrite_incident_probability": "0.030000",
+        "success_rate": "0.970000"
+      },
+      "p100": {
+        "expected_discounted_return": "0.3636625046330121128765677590459195415127853317260742187500000",
+        "overwrite_incident_probability": "0.6000",
+        "success_rate": "0.4000"
+      },
+      "p30": {
+        "expected_discounted_return": "0.74538880773834212429742628224819811775165104735147953033447265625",
+        "overwrite_incident_probability": "0.18000",
+        "success_rate": "0.82000"
+      }
+    },
+    "p05_lr025": {
+      "p00": {
+        "expected_discounted_return": "0.9089857947834835577635085064777460789968792111909389495849609375",
+        "overwrite_incident_probability": "0",
+        "success_rate": "1.0"
+      },
+      "p05": {
+        "expected_discounted_return": "0.884560743593405392651009654723700998540743152621805667877197265625",
+        "overwrite_incident_probability": "0.026875",
+        "success_rate": "0.973125"
+      },
+      "p100": {
+        "expected_discounted_return": "0.4204847709819202555135314713968444698741580398082733154296875",
+        "overwrite_incident_probability": "0.5375",
+        "success_rate": "0.4625"
+      },
+      "p30": {
+        "expected_discounted_return": "0.76243548764301456708851539595347559626006285977613925933837890625",
+        "overwrite_incident_probability": "0.16125",
+        "success_rate": "0.83875"
+      }
+    },
+    "p05_lr1": {
+      "p00": {
+        "expected_discounted_return": "0.87025584205786552977710481435917935868602827874485578983683809930599645184209992",
+        "overwrite_incident_probability": "0",
+        "success_rate": "0.9625"
+      },
+      "p05": {
+        "expected_discounted_return": "0.85115409417228408079904770065535240645839720319734047956443283984850912924999492",
+        "overwrite_incident_probability": "0.02246875",
+        "success_rate": "0.94128125"
+      },
+      "p100": {
+        "expected_discounted_return": "0.499017114952529097316985645629316050522067582330167412757873535156250000000000",
+        "overwrite_incident_probability": "0.4375",
+        "success_rate": "0.5500"
+      },
+      "p30": {
+        "expected_discounted_return": "0.75649768873961045804831658782148151924566241608099691465260185506107251628946994",
+        "overwrite_incident_probability": "0.133875",
+        "success_rate": "0.836125"
+      }
+    },
+    "p100_lr1": {
+      "p00": {
+        "expected_discounted_return": "0.88242013834967339328376341129503658608126834538927015224536510184407234191894532",
+        "overwrite_incident_probability": "0",
+        "success_rate": "0.975"
+      },
+      "p05": {
+        "expected_discounted_return": "0.88073506230911144459506622476507740756797834605317807205738613288849592208862304",
+        "overwrite_incident_probability": "0.001875",
+        "success_rate": "0.973125"
+      },
+      "p100": {
+        "expected_discounted_return": "0.848718617538434419509819680695853015815468358667428548485785722732543945312500",
+        "overwrite_incident_probability": "0.0375",
+        "success_rate": "0.9375"
+      },
+      "p30": {
+        "expected_discounted_return": "0.87230968210630170115158029211528151500152834937271767111749128811061382293701172",
+        "overwrite_incident_probability": "0.01125",
+        "success_rate": "0.96375"
+      }
+    },
+    "p30_lr025": {
+      "p00": {
+        "expected_discounted_return": "0.9089857947834835577635085064777460789968792111909389495849609375",
+        "overwrite_incident_probability": "0",
+        "success_rate": "1.0"
+      },
+      "p05": {
+        "expected_discounted_return": "0.888538302237828962635597114588265743526039242187559604644775390625",
+        "overwrite_incident_probability": "0.022500",
+        "success_rate": "0.977500"
+      },
+      "p100": {
+        "expected_discounted_return": "0.5000359438703916552052806686881393695800798311233520507812500",
+        "overwrite_incident_probability": "0.4500",
+        "success_rate": "0.5500"
+      },
+      "p30": {
+        "expected_discounted_return": "0.78630083950955598699604015514086406617183939717066287994384765625",
+        "overwrite_incident_probability": "0.13500",
+        "success_rate": "0.86500"
+      }
+    },
+    "p30_lr1": {
+      "p00": {
+        "expected_discounted_return": "0.897451158825986949348918057689070073164162358313792943954467773437500000000000",
+        "overwrite_incident_probability": "0",
+        "success_rate": "0.9875"
+      },
+      "p05": {
+        "expected_discounted_return": "0.884961610476930352370277774473408686179100546734148561954498291015625000000000",
+        "overwrite_incident_probability": "0.013750",
+        "success_rate": "0.973750"
+      },
+      "p100": {
+        "expected_discounted_return": "0.647660191844855009776112393375842333462926126720905303955078125000000000000000",
+        "overwrite_incident_probability": "0.2750",
+        "success_rate": "0.7125"
+      },
+      "p30": {
+        "expected_discounted_return": "0.822513868731647367477076358395101751253791488835926651954650878906250000000000",
+        "overwrite_incident_probability": "0.08250",
+        "success_rate": "0.90500"
+      }
+    }
+  },
+  "recomputed_p05_comparisons": {
+    "p00_vs_p05_direct": {
+      "mean_right_minus_left": "0.030565536103675904720113768450802345664277314020355233478780050776490870750005076",
+      "per_seed_right_minus_left": [
+        "-0.00572191698793552660132829038816961389859768964481532573699951171875",
+        "-0.0000794020144393055158173271675463737217689731879563629627227783203125",
+        "0.06416623628288744308094223068427729804498216352940951252100596677307935375002538",
+        "0.102986103190203134032316785978089157150976975617468208074569702148437500000000",
+        "-0.008523339952336221395544556852638739254205906212329864501953125"
+      ]
+    },
+    "p100_vs_p00_standard": {
+      "mean_right_minus_left": "-0.00098456796684854092409524434107734455469617116451764098582675773650407791137695",
+      "per_seed_right_minus_left": [
+        "-0.098576744969983084522178030946701049330790609219693244993686676025390625000000",
+        "0.01743841914878431157152713571222370960744185873410301695997463073581457138061525",
+        "0.0167866188100660066753405869776487925574057408369628898836672306060791015625",
+        "0.035800868913129575268418986966700251114082874727189540863037109375",
+        "0.0236279982637604863864150995847415732783792790988495923578739166259765625"
+      ]
+    },
+    "p100_vs_p05_direct": {
+      "mean_right_minus_left": "0.029580968136827363796018524109725001109581142855837592492953293039986792838628126",
+      "per_seed_right_minus_left": [
+        "-0.104298661957918611123506321334870663229388298864508570730686187744140625000000",
+        "0.01735901713434500605570980854467733588567288554614665399725185241550207138061525",
+        "0.08095285509295344975628281766192609060238790436637240240467319737915845531252538",
+        "0.138786972103332709300735772944789408265059850344657748937606811523437500000000",
+        "0.0151046583114242649908705427321028340241733728865197278559207916259765625"
+      ]
+    },
+    "p100_vs_p05_quarter_rate": {
+      "mean_right_minus_left": "-0.00382568128429394805594342995862359097276480656862759581981113273650407791137695",
+      "per_seed_right_minus_left": [
+        "-0.101417858287428491654026216564247295748859244623803199827671051025390625000000",
+        "0.01743841914878431157152713571222370960744185873410301695997463073581457138061525",
+        "0.0139455054926205995434924013601025461393371054328529350496828556060791015625",
+        "0.032959755595684168136570801349154004696014239323079586029052734375",
+        "0.0179457716288696721227187283496490804422420082906296826899051666259765625"
+      ]
+    },
+    "p100_vs_p30_direct": {
+      "mean_right_minus_left": "-0.00422654816781890777521154970833127861112220068097048989711215812712907791137695",
+      "per_seed_right_minus_left": [
+        "-0.061912177608350105485677195552266739305614869329654277861118316650390625000000",
+        "0.00607396587900268304413439324203872393516731711766319762403713073581457138061525",
+        "-0.0048356030645193281664117334600464771511451571901308186315000057220458984375",
+        "0.024436415643347946741026244496515265441808333110749721527099609375",
+        "0.0151046583114242649908705427321028340241733728865197278559207916259765625"
+      ]
+    },
+    "p100_vs_p30_quarter_rate": {
+      "mean_right_minus_left": "-0.00780323992871751804053088982318833595806089613438153258738925773650407791137695",
+      "per_seed_right_minus_left": [
+        "-0.104258971604873898785874402181793542166927880027913154661655426025390625000000",
+        "0.01175619251389349730783076447713121677130458792588310729200588073581457138061525",
+        "0.0111043921751751924116442157425562997212684700287429802156984806060791015625",
+        "0.027277528960793353872874430114061511859876968514859676361083984375",
+        "0.0151046583114242649908705427321028340241733728865197278559207916259765625"
+      ]
+    },
+    "p30_vs_p00_standard": {
+      "mean_right_minus_left": "0.003241980200970366851116305367253934056426029516452848911285400390625000000000",
+      "per_seed_right_minus_left": [
+        "-0.036664567361632979036500835394434310025175739890038967132568359375000000000000",
+        "0.01136445326978162852739274247018498567227454161643981933593750000",
+        "0.021622221874585334841752320437695269708550898027093708515167236328125",
+        "0.011364453269781628527392742470184985672274541616439819335937500",
+        "0.008523339952336221395544556852638739254205906212329864501953125"
+      ]
+    },
+    "p30_vs_p05_direct": {
+      "mean_right_minus_left": "0.033807516304646271571230073818056279720703343536808082390065451167115870750005076",
+      "per_seed_right_minus_left": [
+        "-0.042386484349568505637829125782603923923773429534854292869567871093750000000000",
+        "0.0112850512553423230115754153026386119505055684284834563732147216796875",
+        "0.08578845815747277792269455112197256775353306155650322103617320310120435375002538",
+        "0.114350556459984762559709528448274142823251517233908027410507202148437500000000",
+        "0.000000000000000000000000000000000000000000000000000000000000"
+      ]
+    },
+    "p30_vs_p05_quarter_rate": {
+      "mean_right_minus_left": "0.003977558644423569984587459864564744985296089565753936767578125000",
+      "per_seed_right_minus_left": [
+        "0.002841113317445407131848185617546246418068635404109954833984375000",
+        "0.00568222663489081426369637123509249283613727080821990966796875000",
+        "0.002841113317445407131848185617546246418068635404109954833984375",
+        "0.00568222663489081426369637123509249283613727080821990966796875",
+        "0.002841113317445407131848185617546246418068635404109954833984375"
+      ]
+    }
+  },
+  "schema_version": "hackrl_pack_inventory_overwrite_train_probability_transfer_computation_audit_v1",
+  "scope_limit": "This audits arithmetic and recorded accounting, not the simulator, checkpoint semantics, or the causal interpretation of training probability.",
+  "status": "pass",
+  "tolerance": "1e-15"
+}

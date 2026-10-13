@@ -1,0 +1,221 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_train_probability_transfer_compact_result_v1",
+  "status": "complete_fixed_budget_no_automatic_extension",
+  "status_definition": "Complete means that all preregistered jobs and integrity gates finished; it is not a scientific acceptance verdict.",
+  "decision": "Within this fixed five-seed panel, p=1 training degraded mean p=0.05 performance less than direct p=0.05 standard-rate training, but did not outperform the pre-continuation source checkpoint, p=0.30 standard-rate training, either preregistered quarter-rate comparator, or the p=0 continuation. The contrast identifies the complete configured training-probability intervention, not exposure count alone, and does not support a monotonic benefit from increasing training probability to 1.",
+  "provenance": {
+    "design_manifest": {
+      "path": "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1.json",
+      "sha256": "032b0dbe41634bb60d51d202df0d66e0c1c3be4a54bd32dbdbd05cb08c8f897f"
+    },
+    "execution_head": "36c43b8a142151c75e3809aa58657be33a3bc3ec",
+    "aggregation_head": "fc32aae46b291c91f0c433d28c30fe2ed0a17305",
+    "raw_result": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/result.json",
+      "sha256": "5e7444899a162d27e8425b42522fd13086d8c7d17e33f2e820096ba1de47f1c7"
+    },
+    "run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/run_manifest.json",
+      "sha256": "b75fc7e867f52f004149e0df7f393705e477fdfdd340800f5d1f0d84dee86c2e"
+    },
+    "training_completion": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/training_complete.json",
+      "sha256": "a7ac55436b20a525f5f8f40475574fdf98834929a39d7f61402b9b02cb01968a"
+    },
+    "computation_audit": {
+      "path": "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_computation_audit.json",
+      "sha256": "3f5978ac357e6e214c3e426faadf9d170fa33191d17aa2e663a2d4f498d173a0",
+      "audit_head": "c0a27be4bcca4febd0522cc907ee8932f58dfa14",
+      "script": "scripts/audit_pack_inventory_overwrite_train_probability_transfer.py",
+      "script_sha256": "f5911a145be86f44b8710315302a444e0916d07f0838235f387993e95663c1d8"
+    },
+    "aggregation_source": {
+      "path": "scripts/summarize_pack_inventory_overwrite_train_probability_transfer.py",
+      "execution_time_sha256": "859cabaeed38ce49c98c266bb1b6da12ba9942392f8e452f08148cee12fc62be",
+      "aggregation_time_sha256": "d7cbff80df7dc1fbbcb3e8fcadad10ca0e4e2f8bd143d07c6bdef13709037b2b"
+    }
+  },
+  "evidence_scope": {
+    "prospective": "The p=0 and p=1 standard-rate branches, five seeds each, were fixed before launch and newly trained.",
+    "retrospective": "The p=0.05 and p=0.30 standard- and quarter-rate policies were reused from the pinned prior experiment. The p=0.30-to-p=0.05 transfer clue was known before this launch.",
+    "cross_probability_evaluation": "Every number in the exact mode matrices is a finite-panel formula evaluation of deterministic normal-kernel paths, not a new stochastic rollout.",
+    "independent_unit": "learner seed; all five seed values are retained and no significance claim is made."
+  },
+  "design": {
+    "seeds": [35, 36, 37, 38, 39],
+    "new_training_probabilities": [0.0, 1.0],
+    "reused_training_probabilities": [0.05, 0.30],
+    "learning_rate": 0.0002,
+    "updates_per_new_job": 32,
+    "collector_slots_per_new_job": 1048576,
+    "new_jobs": 10,
+    "new_collector_slots": 10485760,
+    "evaluation_probabilities": [0.0, 0.05, 0.30, 1.0],
+    "natural_starts_per_seed": 32,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "automatic_extension": false
+  },
+  "source_baseline": {
+    "p05_exact_success_rate": 0.9706249999999998,
+    "p05_exact_expected_discounted_return": 0.8822878529394489,
+    "normal_kernel_success_rate": 1.0,
+    "normal_kernel_return": 0.9089857947834835,
+    "risky_starts": 94
+  },
+  "p05_evaluation": {
+    "p00_lr1": {
+      "exact_success_rate": 0.97,
+      "exact_expected_discounted_return": 0.8817196302759598,
+      "return_minus_source": -0.0005682226634891041,
+      "normal_success_rate": 1.0,
+      "normal_return": 0.9089857947834835,
+      "risky_starts": 96
+    },
+    "p05_lr1": {
+      "exact_success_rate": 0.94128125,
+      "exact_expected_discounted_return": 0.8511540941722838,
+      "return_minus_source": -0.031133758767165065,
+      "normal_success_rate": 0.9625,
+      "normal_return": 0.8702558420578654,
+      "risky_starts": 70
+    },
+    "p30_lr1": {
+      "exact_success_rate": 0.9737500000000001,
+      "exact_expected_discounted_return": 0.8849616104769302,
+      "return_minus_source": 0.002673757537481336,
+      "normal_success_rate": 0.9875,
+      "normal_return": 0.8974511588259869,
+      "risky_starts": 44
+    },
+    "p100_lr1": {
+      "exact_success_rate": 0.9731249999999999,
+      "exact_expected_discounted_return": 0.8807350623091115,
+      "return_minus_source": -0.0015527906303374195,
+      "normal_success_rate": 0.975,
+      "normal_return": 0.8824201383496734,
+      "risky_starts": 6
+    },
+    "p05_lr025": {
+      "exact_success_rate": 0.9731249999999999,
+      "exact_expected_discounted_return": 0.8845607435934053,
+      "return_minus_source": 0.0022728906539564164,
+      "normal_success_rate": 1.0,
+      "normal_return": 0.9089857947834835,
+      "risky_starts": 86
+    },
+    "p30_lr025": {
+      "exact_success_rate": 0.9775,
+      "exact_expected_discounted_return": 0.8885383022378288,
+      "return_minus_source": 0.006250449298379923,
+      "normal_success_rate": 1.0,
+      "normal_return": 0.9089857947834835,
+      "risky_starts": 72
+    }
+  },
+  "cross_probability_return_matrix": {
+    "p00_lr1": {"p00": 0.9089857947834835, "p05": 0.8817196302759598, "p30": 0.7453888077383419, "p100": 0.3636625046330121},
+    "p05_lr1": {"p00": 0.8702558420578654, "p05": 0.8511540941722838, "p30": 0.7564976887396103, "p100": 0.499017114952529},
+    "p30_lr1": {"p00": 0.8974511588259869, "p05": 0.8849616104769302, "p30": 0.8225138687316473, "p100": 0.6476601918448549},
+    "p100_lr1": {"p00": 0.8824201383496734, "p05": 0.8807350623091115, "p30": 0.8723096821063017, "p100": 0.8487186175384343},
+    "p05_lr025": {"p00": 0.9089857947834835, "p05": 0.8845607435934053, "p30": 0.7624354876430145, "p100": 0.42048477098192016},
+    "p30_lr025": {"p00": 0.9089857947834833, "p05": 0.8885383022378288, "p30": 0.7863008395095559, "p100": 0.5000359438703915}
+  },
+  "paired_p05_return_contrasts": {
+    "p100_minus_p05_standard": {
+      "mean": 0.029580968136827403,
+      "signs": {"positive": 4, "equal": 0, "negative": 1},
+      "per_seed": [
+        {"seed": 35, "difference": -0.10429866195791848},
+        {"seed": 36, "difference": 0.017359017134345067},
+        {"seed": 37, "difference": 0.08095285509295336},
+        {"seed": 38, "difference": 0.1387869721033328},
+        {"seed": 39, "difference": 0.015104658311424268}
+      ]
+    },
+    "p100_minus_p30_standard": {
+      "mean": -0.004226548167818911,
+      "signs": {"positive": 3, "equal": 0, "negative": 2}
+    },
+    "p100_minus_p05_quarter_rate": {
+      "mean": -0.003825681284293925,
+      "signs": {"positive": 4, "equal": 0, "negative": 1}
+    },
+    "p100_minus_p30_quarter_rate": {
+      "mean": -0.007803239928717498,
+      "signs": {"positive": 4, "equal": 0, "negative": 1}
+    },
+    "p30_minus_p05_quarter_rate": {
+      "mean": 0.0039775586444235735,
+      "per_seed": [0.0028411133174454095, 0.005682226634890819, 0.0028411133174455205, 0.005682226634890819, 0.0028411133174452985]
+    },
+    "p30_minus_p00_standard": {
+      "mean": 0.0032419802009703734,
+      "per_seed": [-0.03666456736163304, 0.011364453269781638, 0.02162222187458529, 0.011364453269781638, 0.00852333995233634]
+    },
+    "p100_minus_p00_standard": {
+      "mean": -0.0009845679668485374,
+      "per_seed": [-0.09857674496998303, 0.0174384191487843, 0.016786618810065934, 0.0358008689131295, 0.023627998263760608]
+    }
+  },
+  "new_training_collection": {
+    "p00_lr1": {
+      "collector_slots": 5242880,
+      "valid_ppo_samples": 820920,
+      "optimizer_applications": 2560,
+      "empty_minibatches": 2560,
+      "cumulative_lost_grain": 0,
+      "loss_episodes": 0,
+      "overwrite_triggers": 24997,
+      "overwrite_fires": 0
+    },
+    "p100_lr1": {
+      "collector_slots": 5242880,
+      "valid_ppo_samples": 2236799,
+      "optimizer_applications": 5117,
+      "empty_minibatches": 3,
+      "cumulative_lost_grain": 15045,
+      "loss_episodes": 13003,
+      "overwrite_triggers": 14103,
+      "overwrite_fires": 14103
+    }
+  },
+  "p100_per_seed": [
+    {"seed": 35, "p05_return": 0.790421817625272, "normal_success": 0.875, "normal_return": 0.790421817625272, "risky_starts": 0, "training_lost_grain": 2271},
+    {"seed": 36, "p05_return": 0.9033259626614366, "normal_success": 1.0, "normal_return": 0.9060691162293555, "risky_starts": 2, "training_lost_grain": 3050},
+    {"seed": 37, "p05_return": 0.9003728605355875, "normal_success": 1.0, "normal_return": 0.9060550871704783, "risky_starts": 4, "training_lost_grain": 2976},
+    {"seed": 38, "p05_return": 0.9080226573688694, "normal_success": 1.0, "normal_return": 0.9080226573688694, "risky_starts": 0, "training_lost_grain": 3377},
+    {"seed": 39, "p05_return": 0.9015320133543911, "normal_success": 1.0, "normal_return": 0.9015320133543911, "risky_starts": 0, "training_lost_grain": 3371}
+  ],
+  "interpretation": {
+    "supported": [
+      "Relative to the degraded p=0.05 standard-rate branch, both p=0.30 and p=1 training transferred better to p=0.05 evaluation within this fixed budget.",
+      "Increasing training probability from 0.30 to 1 did not improve mean p=0.05 return at the standard rate; p=1 was lower by 0.00423.",
+      "The p=1 policy nearly eliminated risky starts but lost 2.5 percentage points of normal-kernel success and remained below the untrained source by 0.00155 return at p=0.05.",
+      "The retrospective p=0.30 quarter-rate condition had the highest tested p=0.05 mean return, 0.88854, while preserving 100% normal-kernel success."
+    ],
+    "heterogeneity": "The p=1-minus-direct-p=0.05 contrast was positive in four seeds but strongly negative in seed 35, whose p=1 final policy also had only 87.5% normal-kernel success. Every negative p=1 mean contrast reverses when seed 35 is omitted, so the condition ranking is descriptive and unstable.",
+    "training_harm": "The five p=1 jobs lost 15,045 grain during collection, versus 6,789 for prior p=0.30 standard-rate training and 1,279 for prior direct p=0.05 standard-rate training. These totals reflect different event probabilities and training objectives, not event-count-only causal effects.",
+    "not_claimed": [
+      "that p=0.30 is globally optimal or that probabilities between tested points are ordered",
+      "that frequent training helps beyond preventing degradation in the direct standard-rate branch",
+      "that event count alone caused the transfer result",
+      "that five learner seeds establish statistical significance",
+      "that the analytic matrix is an independent stochastic rollout",
+      "that lower risk exposure alone constitutes successful adaptation"
+    ]
+  },
+  "validation": {
+    "raw_result_gates": "All 21 recorded integrity gates passed.",
+    "focused_tests": "20 related CPU tests passed with one dependency deprecation warning.",
+    "decimal_recomputation": "All 30 final policies, 32 starts, and four evaluation probabilities were recomputed with 80-digit Decimal arithmetic from 70 directly hashed input files. Maximum difference from the binary64 result was 2.8079904770065535e-16.",
+    "post_training_aggregation_fix": "The first aggregation attempt stopped before writing a result because it required exact source/new config key equality. The aggregation source was then changed to allow only the preregistered inventory_overwrite_probability key absent from the fixed source config; all non-intervention fields remained equality-checked. Execution-time and aggregation-time source hashes are recorded separately.",
+    "shared_implementation_limit": "The independent arithmetic audit does not independently validate simulator dynamics, checkpoint semantics, or the causal interpretation."
+  },
+  "capacity": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "retained_run_size": "1.3 GiB",
+    "raid_free_at_completion": "about 7.2 TiB",
+    "safety_reserve_preserved": true
+  }
+}
