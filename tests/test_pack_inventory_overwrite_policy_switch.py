@@ -23,6 +23,10 @@ EVALUATOR = _load_script(
     "evaluate_pack_inventory_overwrite_policy_switch_test",
     "scripts/evaluate_pack_inventory_overwrite_policy_switch.py",
 )
+SUMMARY = _load_script(
+    "summarize_pack_inventory_overwrite_policy_switch_test",
+    "scripts/summarize_pack_inventory_overwrite_policy_switch.py",
+)
 MANIFEST = json.loads(
     (
         REPOSITORY
@@ -104,3 +108,23 @@ def test_execution_source_set_covers_manifest_evaluator_and_kernel_dependencies(
         "src/hackrl/pack_inventory_overwrite_rare.py",
         "src/hackrl/dual_leo.py",
     }
+
+
+def test_decimal_audit_reproduces_all_recorded_probability_points():
+    raw = json.loads(SUMMARY.RAW_PATH.read_text(encoding="utf-8"))
+    for mode in MANIFEST["execution_modes"]:
+        summary = SUMMARY.mode_summary(raw, mode)
+        assert float(summary["maximum_decimal_audit_difference"]) <= 1e-14
+
+
+def test_switch_summary_preserves_the_load_bearing_counts():
+    raw = json.loads(SUMMARY.RAW_PATH.read_text(encoding="utf-8"))
+    one_step = SUMMARY.mode_summary(raw, "one_step")
+    persistent = SUMMARY.mode_summary(raw, "persistent")
+    assert one_step["fixed_kernel"]["risky_start_count"] == 82
+    assert persistent["fixed_kernel"]["risky_start_count"] == 82
+    assert one_step["switch_diagnostic"]["first_switch_safe_action_count"] == 12
+    assert persistent["switch_diagnostic"]["first_switch_risky_action_count"] == 82
+    paths = SUMMARY.path_comparison(raw)
+    assert paths["persistent_shorter_paths"] == 6
+    assert {row["seed"] for row in paths["persistent_shorter_path_keys"]} == {39}
