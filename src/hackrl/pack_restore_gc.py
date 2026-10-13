@@ -41,6 +41,7 @@ from hackrl.pack_restore import (
     observe_pack_restore,
     pack_restore_goal_vector,
     pack_restore_step,
+    pack_restore_step_inventory_overwrite_stochastic,
     physical_grain_total,
     pack_restore_world_done,
     reset_pack_restore,
@@ -58,6 +59,7 @@ DISCOUNT = 0.995
 @dataclass(frozen=True)
 class PackRestoreGCConfig:
     variant: str = PackRestoreVariant.FIXED.value
+    inventory_overwrite_probability: float = 1.0
     seed: int = 0
     num_envs: int = 512
     num_steps: int = 64
@@ -96,6 +98,10 @@ class PackRestoreGCConfig:
     def validate(self) -> None:
         PackRestoreVariant(self.variant)
         PackRestoreSplit(self.evaluation_split)
+        if not 0.0 <= self.inventory_overwrite_probability <= 1.0:
+            raise ValueError(
+                "inventory_overwrite_probability must lie in [0, 1]"
+            )
         if self.num_envs <= 0 or self.num_steps <= 0 or self.num_updates <= 0:
             raise ValueError("num_envs, num_steps, and num_updates must be positive")
         if self.update_epochs <= 0 or self.minibatch_size <= 0:
@@ -221,6 +227,7 @@ class PackRestoreGCTransition(struct.PyTreeNode):
     physical_loss: jax.Array
     lost_grain: jax.Array
     overwrite_trigger: jax.Array
+    overwrite_fired: jax.Array
     harvest_event: jax.Array
     storage_event: jax.Array
     delivered_amount: jax.Array
@@ -269,6 +276,18 @@ def _tree_where(mask, when_true, when_false):
         return jnp.where(expanded, left, right)
 
     return jax.tree.map(choose, when_true, when_false)
+
+
+_DEFECT_STREAM_SALT = 1_947_651_227
+
+
+def pack_restore_defect_keys(seed, absolute_transitions):
+    """Derive a defect-only RNG stream from stable physical slot indices."""
+
+    root = jax.random.fold_in(jax.random.PRNGKey(seed), _DEFECT_STREAM_SALT)
+    return jax.vmap(lambda index: jax.random.fold_in(root, index))(
+        absolute_transitions
+    )
 
 
 def sample_false_seen_goal(key, seen_goals, achieved_goals):
@@ -402,9 +421,26 @@ def step_pack_restore_gc_workers(runner, actions, config):
     valid_transition = runner.command_active
     actions = jnp.where(valid_transition, actions, jnp.asarray(int(PackRestoreAction.NOOP)))
     opportunity = jax.vmap(_trigger_ready)(before)
-    stepped = jax.vmap(lambda state, action: pack_restore_step(state, action, variant))(
-        before, actions
-    )
+    if variant == PackRestoreVariant.INVENTORY_OVERWRITE:
+        absolute_transitions = runner.env_steps + jnp.arange(
+            config.num_envs, dtype=jnp.int32
+        )
+        defect_keys = pack_restore_defect_keys(config.seed, absolute_transitions)
+        stepped, overwrite_fired = jax.vmap(
+            lambda state, action, key: (
+                pack_restore_step_inventory_overwrite_stochastic(
+                    state,
+                    action,
+                    key,
+                    config.inventory_overwrite_probability,
+                )
+            )
+        )(before, actions, defect_keys)
+    else:
+        stepped = jax.vmap(
+            lambda state, action: pack_restore_step(state, action, variant)
+        )(before, actions)
+        overwrite_fired = jnp.zeros((config.num_envs,), dtype=jnp.bool_)
     created = jax.vmap(physical_grain_total)(stepped) - jax.vmap(physical_grain_total)(before)
     violation = jnp.logical_and(valid_transition, created > 0)
     lost_grain = jnp.where(valid_transition, jnp.maximum(-created, 0), 0)
@@ -525,6 +561,7 @@ def step_pack_restore_gc_workers(runner, actions, config):
         physical_loss=physical_loss,
         lost_grain=lost_grain,
         overwrite_trigger=overwrite_trigger,
+        overwrite_fired=jnp.logical_and(valid_transition, overwrite_fired),
         harvest_event=harvest_event,
         storage_event=storage_event,
         delivered_amount=jnp.where(valid_transition, delivered_amount, 0),
@@ -730,6 +767,7 @@ def make_pack_restore_gc_update(network, config):
             "physical_loss_events": jnp.sum(trajectory.physical_loss),
             "lost_grain": jnp.sum(trajectory.lost_grain),
             "overwrite_trigger_events": jnp.sum(trajectory.overwrite_trigger),
+            "overwrite_fire_events": jnp.sum(trajectory.overwrite_fired),
             "harvest_events": jnp.sum(trajectory.harvest_event),
             "storage_events": jnp.sum(trajectory.storage_event),
             "delivery_events": jnp.sum(trajectory.delivered_amount > 0),
@@ -867,6 +905,7 @@ def evaluate_pack_restore_gc_frozen(
     repeats_per_state,
     seed_base,
     learner_seed,
+    overwrite_probability=1.0,
     source_growth_period=TRAINING_SOURCE_GROWTH_PERIOD,
     record_episodes=False,
     natural_only=False,
@@ -875,6 +914,8 @@ def evaluate_pack_restore_gc_frozen(
 
     variant = PackRestoreVariant(variant)
     split = PackRestoreSplit(split)
+    if not 0.0 <= overwrite_probability <= 1.0:
+        raise ValueError("overwrite_probability must lie in [0, 1]")
     initial, start_labels, state_indices, repeat_indices = _evaluation_states(
         split, repeats_per_state, source_growth_period, natural_only=natural_only
     )
@@ -923,9 +964,25 @@ def evaluate_pack_restore_gc_frozen(
             actions = jnp.argmax(policy.logits, axis=-1)
         active = jnp.logical_not(done)
         actions = jnp.where(active, actions, int(PackRestoreAction.NOOP))
-        stepped = jax.vmap(lambda item, action: pack_restore_step(item, action, variant))(
-            state, actions
-        )
+        if variant == PackRestoreVariant.INVENTORY_OVERWRITE:
+            absolute_transitions = step_index * episode_count + jnp.arange(
+                episode_count, dtype=jnp.int32
+            )
+            defect_keys = pack_restore_defect_keys(
+                seed_base + 1000 * learner_seed,
+                absolute_transitions,
+            )
+            stepped, _ = jax.vmap(
+                lambda item, action, key: (
+                    pack_restore_step_inventory_overwrite_stochastic(
+                        item, action, key, overwrite_probability
+                    )
+                )
+            )(state, actions, defect_keys)
+        else:
+            stepped = jax.vmap(
+                lambda item, action: pack_restore_step(item, action, variant)
+            )(state, actions)
         created = jax.vmap(physical_grain_total)(stepped) - jax.vmap(physical_grain_total)(state)
         violation = jnp.logical_and(active, created > 0)
         lost = jnp.where(active, jnp.maximum(-created, 0), 0)
@@ -1042,6 +1099,7 @@ def evaluate_pack_restore_gc_frozen(
         int(repeats_per_state),
         int(seed_base),
         int(learner_seed),
+        float(overwrite_probability),
         int(source_growth_period),
         bool(natural_only),
     )
@@ -1148,6 +1206,7 @@ def evaluate_pack_restore_gc_frozen(
     labels = np.asarray(start_labels)
     result = {
         "variant": variant.value,
+        "overwrite_probability": float(overwrite_probability),
         "split": split.value,
         "stochastic": stochastic,
         "repeats_per_state": repeats_per_state,
@@ -1197,6 +1256,7 @@ def _normalize_pack_restore_gc_payload(recorded):
             raise ValueError("legacy and policy hidden sizes disagree")
         payload.setdefault("policy_hidden_size", legacy_width)
     payload.setdefault("teacher_hidden_size", 512)
+    payload.setdefault("inventory_overwrite_probability", 1.0)
     return payload
 
 

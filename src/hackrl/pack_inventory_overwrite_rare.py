@@ -243,6 +243,8 @@ def _start_crossover(fixed_return: float, reference_return: float, risk_count: i
 def build_risk_profile(
     fixed_episode_records: list[dict],
     reference_episodes: list[dict],
+    *,
+    require_all_fixed_success: bool = True,
 ) -> dict:
     """Build the exact finite-panel polynomial from fixed mode trajectories."""
 
@@ -257,14 +259,17 @@ def build_risk_profile(
     for record in fixed_episode_records:
         state_index = int(record["state_index"])
         reference = references[state_index]
-        if not bool(record["success"]):
+        fixed_success = bool(record["success"])
+        if require_all_fixed_success and not fixed_success:
             raise AssertionError("fixed mode policy failed before stochastic analysis")
         if int(record["repeat"]) != 0:
             raise AssertionError("mode risk profile must use one repeat per state")
         risk_count = int(record["overwrite_trigger_count"])
         fixed_length = int(record["length"])
         reference_length = int(reference["length"])
-        fixed_return = DISCOUNT ** (fixed_length - 1)
+        fixed_return = (
+            DISCOUNT ** (fixed_length - 1) if fixed_success else 0.0
+        )
         reference_return = DISCOUNT ** (reference_length - 1)
         episodes.append(
             {
@@ -272,6 +277,7 @@ def build_risk_profile(
                 "layout": int(record["layout"]),
                 "phase": int(record["phase"]),
                 "fixed_length": fixed_length,
+                "fixed_success": float(fixed_success),
                 "fixed_return": fixed_return,
                 "risk_count": risk_count,
                 "reference_length": reference_length,
@@ -282,7 +288,8 @@ def build_risk_profile(
             }
         )
     episodes.sort(key=lambda row: row["state_index"])
-    success_coefficients = _coefficients(episodes, None)
+    success_coefficients = _coefficients(episodes, "fixed_success")
+    no_overwrite_coefficients = _coefficients(episodes, None)
     return_coefficients = _coefficients(episodes, "fixed_return")
     reference_return = math.fsum(
         float(row["reference_return"]) for row in episodes
@@ -294,6 +301,7 @@ def build_risk_profile(
             for power in sorted({int(row["risk_count"]) for row in episodes})
         },
         "success_polynomial_by_survival_power": success_coefficients,
+        "no_overwrite_polynomial_by_survival_power": no_overwrite_coefficients,
         "return_polynomial_by_survival_power": return_coefficients,
         "reference_success_rate": 1.0,
         "reference_mean_discounted_return": reference_return,
@@ -304,7 +312,8 @@ def build_risk_profile(
 
 def combine_risk_profiles(profiles: list[dict]) -> dict:
     episodes = [row for profile in profiles for row in profile["episodes"]]
-    success_coefficients = _coefficients(episodes, None)
+    success_coefficients = _coefficients(episodes, "fixed_success")
+    no_overwrite_coefficients = _coefficients(episodes, None)
     return_coefficients = _coefficients(episodes, "fixed_return")
     reference_return = math.fsum(
         float(row["reference_return"]) for row in episodes
@@ -316,6 +325,7 @@ def combine_risk_profiles(profiles: list[dict]) -> dict:
             for power in sorted({int(row["risk_count"]) for row in episodes})
         },
         "success_polynomial_by_survival_power": success_coefficients,
+        "no_overwrite_polynomial_by_survival_power": no_overwrite_coefficients,
         "return_polynomial_by_survival_power": return_coefficients,
         "reference_success_rate": 1.0,
         "reference_mean_discounted_return": reference_return,
@@ -332,11 +342,17 @@ def evaluate_regime_point(profile: dict, probability: float) -> dict:
         profile["return_polynomial_by_survival_power"], probability
     )
     reference_return = float(profile["reference_mean_discounted_return"])
+    no_overwrite_coefficients = profile.get(
+        "no_overwrite_polynomial_by_survival_power",
+        profile["success_polynomial_by_survival_power"],
+    )
+    no_overwrite = evaluate_polynomial(no_overwrite_coefficients, probability)
     return {
         "overwrite_probability": probability,
         "existing_success_rate": success,
         "existing_expected_discounted_return": expected_return,
-        "existing_loss_episode_probability": 1.0 - success,
+        "existing_failure_probability": 1.0 - success,
+        "existing_loss_episode_probability": 1.0 - no_overwrite,
         "reference_success_rate": 1.0,
         "reference_expected_discounted_return": reference_return,
         "existing_minus_reference_return": expected_return - reference_return,
