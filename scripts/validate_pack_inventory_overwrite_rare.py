@@ -21,7 +21,9 @@ from hackrl.pack_inventory_overwrite_rare import (
     combine_risk_profiles,
     evaluate_regime_point,
     find_return_crossover,
-    validate_stochastic_overwrite_kernel,
+)
+from hackrl.pack_inventory_overwrite_rare_kernel import (
+    validate_stochastic_overwrite_kernel_vectorized,
 )
 from hackrl.pack_restore import PackRestoreVariant
 from hackrl.pack_restore_gc import (
@@ -41,6 +43,7 @@ SOURCE_FILES = (
     Path("scripts/validate_pack_inventory_overwrite_rare.py"),
     Path("src/hackrl/pack_inventory_overwrite_gate.py"),
     Path("src/hackrl/pack_inventory_overwrite_rare.py"),
+    Path("src/hackrl/pack_inventory_overwrite_rare_kernel.py"),
     Path("src/hackrl/pack_restore.py"),
     Path("src/hackrl/pack_restore_gc.py"),
 )
@@ -305,7 +308,7 @@ def main() -> None:
 
     prerequisite = _verify_prerequisites()
     _write_json(RUN_ROOT / "prerequisites.json", prerequisite)
-    kernel = validate_stochastic_overwrite_kernel()
+    kernel = validate_stochastic_overwrite_kernel_vectorized()
     _write_json(RUN_ROOT / "kernel_validation.json", kernel)
 
     reference = validate_reference_paths()
