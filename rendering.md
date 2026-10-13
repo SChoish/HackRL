@@ -1,5 +1,66 @@
 # 환경 영상과 결과 그림
 
+## SPATIAL-WALL-PASS 픽셀 렌더링
+
+PACK/TICK의 타일·캐릭터 스타일을 재사용한다. 1920×1080 화면에서 최대 세
+episode를 나란히 보여주며, 벽 통과·차단·소포 수집·납품 시 더 오래 정지한다.
+지도는 실제 `walkable`과 `wall_mask`를 사용하고, 캐릭터는 기록된 이산 상태에만
+표시한다. 점선은 실제 벽 통과 이동의 연결선이며 중간 상태가 아니다.
+정상 대시와 벽 통과를 구별하고, 종료한 episode는 마지막 상태와 tick을 유지한다.
+
+설명용 참조 경로 미리보기 (학습 결과가 아님):
+
+```bash
+PYTHONPATH=src:scripts JAX_PLATFORMS=cpu python -m report_figures.record_spatial_trace \
+  --demo --output runs/spatial_pixel_demo/trace.json
+PYTHONPATH=scripts python -m report_figures.render_spatial_pixel \
+  --trace runs/spatial_pixel_demo/trace.json --output runs/spatial_pixel_demo
+```
+
+실제 학습 결과는 기존 evaluation JSON의 `episode_records[].path`를 지정한다.
+`--spec` 파일 예시 (경로는 spec 파일 기준):
+
+```json
+{
+  "split": "validation",
+  "layout": 0,
+  "selection": "Preselected seed and layout; no best-case selection",
+  "scenes": [
+    {
+      "file": "evaluation.json",
+      "pointer": "/mutant/mode/episode_records/0",
+      "kernel": "mutant",
+      "title": "BUG PRESENT",
+      "subtitle": "Adapted policy | seed 132",
+      "description": "Use the actual evaluation JSON pointer and matching layout."
+    }
+  ]
+}
+```
+
+```bash
+PYTHONPATH=src:scripts JAX_PLATFORMS=cpu python -m report_figures.record_spatial_trace \
+  --spec /path/to/spec.json --output /path/to/spatial_trace.json
+PYTHONPATH=scripts python -m report_figures.render_spatial_pixel \
+  --trace /path/to/spatial_trace.json --output /path/to/spatial_render
+```
+
+지원 대상은 원래 fixture의 `fixed`/`mutant` 커널과 자연 시작이다. 재생기는
+기록된 action을 실제 커널로 재실행해 모든 before/after 위치, 기록된 차단·통과,
+최종 성공과 길이를 대조한다. 불일치하거나 `path`가 없으면 중단한다. 경로 요약만으로
+없는 행동열을 만들지 않는다. 새 지도와 one-shot-block 개입은 이 입력 경로의
+지원 대상이 아니다. 원본 평가 JSON과 커널 소스의 해시 및 사례 선택 규칙을 남긴다.
+재생 검증은 원본 정책/체크포인트의 정체성까지 검증하지 않는다.
+
+출력: `spatial_wall_pass.mp4`, 주요 사건 PNG, 최종 경로 PNG, `timeline.json`.
+FFmpeg가 PATH에 있어야 MP4를 내보낼 수 있다. `--images-only`는 Pillow만으로
+이미지를 내보내며, 기존 PACK 모듈의 import 의존성인 imageio/numpy도 필요하다.
+`--step-seconds 1 --event-seconds 2.5`로 재생 속도를 조절할 수 있다.
+
+```bash
+PYTHONPATH=src:scripts JAX_PLATFORMS=cpu python -m pytest tests/test_spatial_pixel_render.py -q
+```
+
 TICK-CLAIM, PACK-RESTORE, CRAFT-REMAIN은 실제 게임에서 보고된 증상을 참고해
 작성한 합성 작업장이다. Minecraft/Factorio의 원본 코드나 패치를 실행하는
 재현이 아니다. 초기 Craftax 변형 트랙과 구분한다.
