@@ -25,7 +25,10 @@
     "p1_adapt": "The same-seed policy after a prior 32-update PPO adaptation at overwrite probability 1, frozen before this experiment; it is evaluation-only and never initializes these branches.",
     "normal_kernel_mode": "The final learned branch policy reevaluated by deterministic argmax in the normal kernel.",
     "target_sample": "The final learned branch policy evaluated with sampled actions in its matching stochastic overwrite kernel.",
-    "valid_ppo_samples": "Collector transitions while the delivery command is active; slots after goal completion and before the world reset remain physical transitions but are masked from PPO."
+    "frozen_baseline_metrics": "The success and return values under frozen_baselines are exact deterministic-mode values in the named target overwrite probability, not normal-kernel metrics.",
+    "valid_ppo_samples": "Collector transitions while the delivery command is active; slots after goal completion and before the world reset remain physical transitions but are masked from PPO.",
+    "execution_head": "The commit whose training runner and environment sources were pinned for the 10 learning jobs.",
+    "aggregation_head": "The commit whose summarizer produced the canonical raw result."
   },
   "design": {
     "seeds": [30, 31, 32, 33, 34],
@@ -45,6 +48,7 @@
     "scope": "Exact only for the finite panel and the declared independent Bernoulli overwrite kernel, not for an unrestricted start-state distribution.",
     "panel": "Five learner seeds by the same 32 validation natural starts, equally weighted within each condition and baseline.",
     "policy_action": "Deterministic actor argmax.",
+    "decision_role": "Deterministic argmax is the preregistered primary evaluation; sampled-action evaluation is secondary and is not presented as the deployment rule.",
     "formula": "For fixed-kernel path i with success s_i, length T_i, and risky-harvest count k_i, success is mean[s_i(1-p)^k_i], return is mean[s_i*0.995^(T_i-1)*(1-p)^k_i], and overwrite-loss probability is mean[1-(1-p)^k_i].",
     "assumptions": "Each risky harvest has an independent constant-probability overwrite event; the fixed-kernel no-fire path supplies T_i and k_i; any first loss makes success impossible.",
     "loss_probability_definition": "Probability of at least one overwrite on the fixed path, averaged over all panel starts; it is separate from all-cause failure probability.",
@@ -65,8 +69,10 @@
   "final_aggregates": {
     "p05_adapt": {
       "exact_mode_success_rate": 0.95625,
+      "exact_mode_failure_probability": 0.043750000000000025,
       "exact_mode_expected_discounted_return": 0.8657421485479571,
       "exact_mode_loss_episode_probability": 0.018750000000000024,
+      "exact_mode_no_loss_failure_probability": 0.025,
       "return_minus_normal_continue": -0.013597437135750168,
       "return_minus_original": -0.010188101154815655,
       "return_minus_p1_adapt": -0.03229848880183108,
@@ -99,8 +105,10 @@
     },
     "p30_adapt": {
       "exact_mode_success_rate": 0.8875,
+      "exact_mode_failure_probability": 0.11250000000000002,
       "exact_mode_expected_discounted_return": 0.8064508949076175,
       "exact_mode_loss_episode_probability": 0.11250000000000002,
+      "exact_mode_no_loss_failure_probability": 0.0,
       "return_minus_normal_continue": 0.07477838662649479,
       "return_minus_original": 0.09523440251210172,
       "return_minus_p1_adapt": -0.04620274446762076,
@@ -161,6 +169,13 @@
         "expected_discounted_return": 0.8526536393752382
       }
     }
+  },
+  "frozen_policy_panel": {
+    "panel_starts": 160,
+    "source": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1/result.json",
+    "original": {"risk_count_distribution": {"0": 44, "1": 116}, "normal_kernel_success_rate": 1.0, "normal_kernel_return": 0.9088730011642241},
+    "normal_continue": {"risk_count_distribution": {"0": 56, "1": 104}, "normal_kernel_success_rate": 1.0, "normal_kernel_return": 0.9088730011642242},
+    "p1_adapt": {"risk_count_distribution": {"0": 128, "1": 32}, "normal_kernel_success_rate": 1.0, "normal_kernel_return": 0.9071180369446982}
   },
   "learning_curves": {
     "p05_adapt": [
@@ -255,14 +270,18 @@
     "storage_reserve_preserved": true
   },
   "decision": {
-    "p05": "No aggregate return improvement over normal_continue; seed results are mixed (3 positive, 2 negative).",
-    "p30": "Aggregate return improved over normal_continue by 0.07477838662649479; four seeds are positive and one ties within 1e-12.",
-    "acquisition_gap": "The frozen p=1 policy is better than normal_continue at p=0.05, while new p=0.05 learning does not improve in aggregate. A higher-return frozen policy exists, but this fixed rare-experience run did not reliably reacquire it."
+    "p05": "Risky fixed-mode starts fell from 116/160 in the shared original policy to 60/160, but 4/160 no-fire paths failed, normal-kernel mode success fell to 97.5%, and normal-kernel return fell from the normal_continue baseline's 0.9088730011642242 to 0.8826957586550217. Risk exposure decreased without an aggregate target-return improvement over normal_continue; seed target-return differences were mixed (3 positive, 2 negative).",
+    "p30": "Risky fixed-mode starts fell from 116/160 to 60/160 with no no-fire path failures, 100% normal-kernel mode success, and normal-kernel return 0.9086459962101603 versus 0.9088730011642242 for normal_continue. Aggregate target return improved over normal_continue by 0.07477838662649479; four seeds were positive and one tied within 1e-12.",
+    "comparator_note": "The 116/160 source-to-final comparison describes behavior acquired from the shared original initialization. The primary performance contrast is instead against frozen normal_continue, which has 104/160 risky starts.",
+    "equal_risk_count_note": "The matching 60/160 aggregate risk counts do not imply identical policies or that the same starts were made safe.",
+    "acquisition_gap": "At p=0.05, the frozen p=1 policy target return is 0.8980406373497882 versus 0.8793395856837073 for normal_continue and 0.8657421485479571 for p05_adapt. A higher-return frozen policy exists, but this fixed rare-experience run did not reliably reacquire it.",
+    "p1_transfer_note": "The frozen p=1 policy is also higher at p=0.30: 0.8526536393752382 versus 0.8064508949076175 for p30_adapt. It is a transfer baseline, not an optimality claim or a learning initialization."
   },
   "non_claims": [
     "Neither 5%, 30%, nor any earlier crossover is an optimal-avoidance boundary.",
     "The zero-loss reference and p=1 policy are not claimed optimal.",
     "The difference between p=0.05 and p=0.30 is not attributed to experience frequency alone.",
+    "Reduced risky-harvest exposure is not by itself adaptation success when normal task performance declines.",
     "Five learner seeds do not establish statistical significance or broad generalization.",
     "Sample evaluation does not replace exact deterministic-mode evaluation."
   ],

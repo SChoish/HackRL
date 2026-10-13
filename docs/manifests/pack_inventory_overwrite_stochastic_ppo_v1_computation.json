@@ -54,6 +54,7 @@
     "seed": "30--34"
   },
   "run": {
+    "scope": "This records the CPU aggregation command only; it is not the training runtime.",
     "started_at": "2026-10-13T06:06:53.064000Z",
     "runtime_seconds": 1.122044937,
     "exit_status": 0
@@ -61,7 +62,7 @@
   "outputs": [
     {
       "path": "docs/manifests/pack_inventory_overwrite_stochastic_ppo_v1_results.json",
-      "sha256": "f303e6991515ac22fc43ca228442c73d6b1fa4e230f89a5b110237f4a15681e4"
+      "sha256": "5eceabb11aba5eacd5e3a1087edff7a5e9771cb43f3ac74cca9937b0dc1979fa"
     }
   ],
   "checks": [
@@ -72,14 +73,16 @@
     "Execution sources and all three pinned prerequisite artifacts retained their launch hashes. End storage retained 7,902,925,979,648 free RAID bytes, above the declared peak-plus-reserve requirement.",
     "The focused stochastic, checkpoint, exact-polynomial, and manifest suite passed 14 tests. The full repository run passed 504 tests and had nine provenance-sensitive failures: eight from authorized-source hash mismatches in Mine files outside this branch's experiment changes, and one from five stale historical spatial GPU source hashes, four outside this branch and one changed PACK source.",
     "At p=0.05, paired return differences versus normal continuation had signs +,+,+,-,- and mean -0.013597437135750168. At p=0.30, they had signs +,+,+,+,0 and mean 0.07477838662649479.",
+    "Both adapted conditions reduced risky no-fire paths from 116/160 in the shared original policy to 60/160. At p=0.05, 4/160 no-fire paths failed, giving 0.025 no-loss failure probability and 0.975 normal-kernel mode success; at p=0.30, no no-fire path failed and normal-kernel mode success was 1.0.",
+    "The 116/160 comparison describes change from the shared original initialization; the primary frozen normal_continue comparator has 104/160 risky starts. Its normal-kernel return is 0.9088730011642242, versus 0.8826957586550217 for p05_adapt and 0.9086459962101603 for p30_adapt.",
     "The compact repository result was mechanically compared with the canonical raw result for both condition aggregates, all 10 seed rows, and all eight preregistered curve points."
   ],
-  "result": "Implementation and finite assertion verified in the stated range. At p=0.05 the final exact mode success rate was 0.95625 and expected return 0.8657421485479571, which was 0.013597437135750168 below normal continuation on average, with three positive and two negative seeds. At p=0.30 success was 0.8875 and return 0.8064508949076175, which was 0.07477838662649479 above normal continuation, with four positive seeds and one tie. The frozen p=1 policy remained better than normal continuation at p=0.05, so a higher-return frozen policy existed but was not reliably reacquired by the rare-experience branch under this budget.",
+  "result": "Implementation and finite assertion verified in the stated range. Both conditions reduced risky no-fire paths from 116/160 in the shared original policy to 60/160; the separate primary normal_continue comparator has 104/160. At p=0.05, however, 4/160 no-fire paths failed, normal-kernel mode success fell to 0.975, and normal-kernel return fell from normal_continue's 0.9088730011642242 to 0.8826957586550217. Exact target return was 0.8657421485479571, or 0.013597437135750168 below normal continuation, with three positive and two negative seeds. At p=0.30 there were no no-fire path failures, normal-kernel mode success was 1.0, normal-kernel return was 0.9086459962101603, and target return was 0.8064508949076175, or 0.07477838662649479 above normal continuation, with four positive seeds and one tie. Thus reduced risk exposure did not guarantee target-return improvement when normal task performance degraded. The equal 60/160 counts do not imply identical policies or protected starts. The frozen p=1 policy had higher target return at both p=0.05 and p=0.30, but it is a transfer baseline rather than an optimality claim or learning initialization.",
   "residual_risks": [
     "The environment, exact-path evaluator, training runner, and aggregation code are internally authored. Pairing, checkpoint hashes, endpoint logic, and focused tests reduce but do not eliminate common-implementation error.",
     "The exact mode computation assumes independent Bernoulli fires and uses the no-fire deterministic path; its correctness relies on the verified physical invariant that any first grain loss makes the three-grain target unreachable.",
     "Binary64 finite sums were not independently recomputed at higher precision, although the reported contrasts are much larger than rounding error except the explicitly classified p=0.30 seed-34 tie.",
     "PPO learning is randomized and only five learner seeds were run. Per-episode counts are not treated as independent learned-policy replications.",
-    "The full repository was not globally green because nine unrelated or stale-provenance checks failed; all directly scoped stochastic tests and result-integrity gates passed."
+    "The full repository was not globally green because nine provenance-sensitive checks failed. Eight concerned Mine files outside this branch's experiment changes; the ninth included the changed PACK source among five stale historical hashes. These failures are not evidence that the scoped result is invalid, but they do not establish equivalence with the historical validations either."
   ]
 }
