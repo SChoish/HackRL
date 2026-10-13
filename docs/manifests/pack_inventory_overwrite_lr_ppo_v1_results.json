@@ -1,0 +1,301 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_lr_ppo_compact_result_v1",
+  "status": "complete_fixed_budget_no_automatic_extension",
+  "status_definition": "Complete means that the preregistered budget and integrity gates finished; it is not a scientific acceptance verdict.",
+  "execution_head": "25806dd1f85a0a65b9ec82d75ec8b598217865b8",
+  "aggregation_head": "25806dd1f85a0a65b9ec82d75ec8b598217865b8",
+  "design_manifest": {
+    "path": "docs/manifests/pack_inventory_overwrite_lr_ppo_v1.json",
+    "sha256": "fbc906d79019b47d5269fbe1e1d3eb31daa57f8650eb358a5b13fbdcf295dfad"
+  },
+  "raw_result": {
+    "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/result.json",
+    "sha256": "99a0fa5eadcb669cbae41a956fe39eaef7b32c69206aa25ae8ed28061d6d0007"
+  },
+  "run_manifest": {
+    "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/run_manifest.json",
+    "sha256": "e03199525a1320c9985f5e113be88b7e36c7bd01c73ab0b06060d7f3db3c80eb"
+  },
+  "definitions": {
+    "standard_rate": "The inherited source learning rate, 0.0002.",
+    "quarter_rate": "The single preregistered intervention, learning rate 0.00005; it is not claimed optimal.",
+    "exact_mode": "Finite-panel expectation for deterministic actor argmax under the declared independent Bernoulli overwrite kernel.",
+    "normal_kernel_mode": "The learned branch reevaluated by deterministic actor argmax with overwrite disabled.",
+    "risky_start": "A natural start whose deterministic normal-kernel path contains at least one valid harvest with positive pre-harvest inventory.",
+    "exact_overwrite_incident_probability": "Mean 1-(1-p)^k over all fixed paths. This is physical overwrite incidence on the no-fire path, including paths that already fail normally; overwrite-attributable success decrement is reported separately.",
+    "behavior_kl": "Mean categorical D_KL(source actor || current actor), equally weighted over every active state on the source actor's 32 deterministic normal-kernel validation paths.",
+    "valid_ppo_samples": "Collector transitions while the delivery command is active; physical slots after command completion remain physical transitions but are masked from PPO."
+  },
+  "design": {
+    "seeds": [35, 36, 37, 38, 39],
+    "probabilities": [0.05, 0.30],
+    "learning_rate_multipliers": [1.0, 0.25],
+    "updates_per_job": 32,
+    "collector_slots_per_job": 1048576,
+    "total_jobs": 20,
+    "total_collector_slots": 20971520,
+    "evaluation_updates": [0, 2, 8, 32],
+    "natural_mode_starts_per_seed": 32,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "automatic_extension": false
+  },
+  "exact_mode_method": {
+    "formula": "For fixed-kernel path i with success s_i, length T_i, and risky-harvest count k_i, success is mean[s_i(1-p)^k_i], return is mean[s_i*0.995^(T_i-1)*(1-p)^k_i], and overwrite-incident probability is mean[1-(1-p)^k_i].",
+    "scope": "Exact only for these deterministic paths, 160 seed-start pairs per condition, and the declared independent overwrite model.",
+    "fixed_failure_separated_from_overwrite_loss": true,
+    "sample_policy_evaluation_reported_separately": true,
+    "arithmetic": "IEEE-754 binary64 finite sums; a separate Decimal recomputation from all 20 final episode panels agreed within 2.02e-16 for aggregate return."
+  },
+  "source_baselines": {
+    "p05": {
+      "exact_success_rate": 0.9706249999999998,
+      "exact_expected_discounted_return": 0.8822878529394489,
+      "normal_kernel_success_rate": 1.0,
+      "normal_kernel_return": 0.9089857947834835,
+      "risky_starts": 94
+    },
+    "p30": {
+      "exact_success_rate": 0.8237499999999999,
+      "exact_expected_discounted_return": 0.7487981437192766,
+      "normal_kernel_success_rate": 1.0,
+      "normal_kernel_return": 0.9089857947834835,
+      "risky_starts": 94
+    }
+  },
+  "final_aggregates": {
+    "p05_lr1": {
+      "exact_success_rate": 0.94128125,
+      "exact_expected_discounted_return": 0.8511540941722838,
+      "exact_overwrite_incident_probability": 0.022468750000000037,
+      "overwrite_attributable_success_decrement": 0.021218750000000064,
+      "return_minus_source": -0.031133758767164975,
+      "normal_kernel_success_rate": 0.9625,
+      "normal_kernel_return": 0.8702558420578654,
+      "target_sample_success_rate": 0.9484375,
+      "target_sample_return": 0.8545748199382501,
+      "risky_starts": 70,
+      "risk_count_distribution": {"0": 90, "1": 68, "2": 2},
+      "mean_actor_kl": 0.29880174100399015,
+      "mean_argmax_action_change_rate": 0.1435188263654709,
+      "collection": {
+        "collector_slots": 5242880,
+        "valid_ppo_samples": 982736,
+        "optimizer_applications": 5120,
+        "cumulative_lost_grain": 1279,
+        "loss_episodes": 1176,
+        "risky_harvests": 23584,
+        "overwrite_fires": 1189
+      }
+    },
+    "p05_lr025": {
+      "exact_success_rate": 0.9731249999999999,
+      "exact_expected_discounted_return": 0.8845607435934053,
+      "exact_overwrite_incident_probability": 0.026875000000000048,
+      "overwrite_attributable_success_decrement": 0.026875000000000093,
+      "return_minus_source": 0.0022728906539563496,
+      "normal_kernel_success_rate": 1.0,
+      "normal_kernel_return": 0.9089857947834835,
+      "target_sample_success_rate": 0.9609375,
+      "target_sample_return": 0.8733655494719412,
+      "risky_starts": 86,
+      "risk_count_distribution": {"0": 74, "1": 86},
+      "mean_actor_kl": 0.028795567527413368,
+      "mean_argmax_action_change_rate": 0.026838066801428796,
+      "collection": {
+        "collector_slots": 5242880,
+        "valid_ppo_samples": 950700,
+        "optimizer_applications": 5120,
+        "cumulative_lost_grain": 1297,
+        "loss_episodes": 1199,
+        "risky_harvests": 24542,
+        "overwrite_fires": 1221
+      }
+    },
+    "p30_lr1": {
+      "exact_success_rate": 0.905,
+      "exact_expected_discounted_return": 0.8225138687316473,
+      "exact_overwrite_incident_probability": 0.08249999999999999,
+      "overwrite_attributable_success_decrement": 0.08250000000000002,
+      "return_minus_source": 0.07371572501237074,
+      "normal_kernel_success_rate": 0.9875,
+      "normal_kernel_return": 0.8974511588259869,
+      "target_sample_success_rate": 0.8890625,
+      "target_sample_return": 0.8054958025979457,
+      "risky_starts": 44,
+      "risk_count_distribution": {"0": 116, "1": 44},
+      "mean_actor_kl": 0.22156872898340224,
+      "mean_argmax_action_change_rate": 0.1072783499956131,
+      "collection": {
+        "collector_slots": 5242880,
+        "valid_ppo_samples": 1468365,
+        "optimizer_applications": 5120,
+        "cumulative_lost_grain": 6789,
+        "loss_episodes": 5936,
+        "risky_harvests": 20819,
+        "overwrite_fires": 6297
+      }
+    },
+    "p30_lr025": {
+      "exact_success_rate": 0.865,
+      "exact_expected_discounted_return": 0.7863008395095559,
+      "exact_overwrite_incident_probability": 0.13500000000000004,
+      "overwrite_attributable_success_decrement": 0.135,
+      "return_minus_source": 0.03750269579027936,
+      "normal_kernel_success_rate": 1.0,
+      "normal_kernel_return": 0.9089857947834835,
+      "target_sample_success_rate": 0.8546875,
+      "target_sample_return": 0.7768105603822828,
+      "risky_starts": 72,
+      "risk_count_distribution": {"0": 88, "1": 72},
+      "mean_actor_kl": 0.05784135237336159,
+      "mean_argmax_action_change_rate": 0.03741256520152092,
+      "collection": {
+        "collector_slots": 5242880,
+        "valid_ppo_samples": 1546072,
+        "optimizer_applications": 5120,
+        "cumulative_lost_grain": 7567,
+        "loss_episodes": 6716,
+        "risky_harvests": 23525,
+        "overwrite_fires": 7098
+      }
+    }
+  },
+  "paired_learning_rate_contrasts": {
+    "p05_lower_minus_standard": {
+      "mean_exact_return": 0.03340664942112133,
+      "mean_exact_success": 0.03184374999999997,
+      "mean_normal_return": 0.038729952725618036,
+      "mean_normal_success": 0.0375,
+      "mean_risky_starts": 3.2,
+      "mean_actor_kl": -0.2700061734765768,
+      "mean_argmax_action_change_rate": -0.11668075956404209,
+      "signs": {"positive": 2, "equal_within_tolerance": 0, "negative": 3},
+      "per_seed_exact_return": [
+        {"seed": 35, "difference": -0.0028808036704901507},
+        {"seed": 36, "difference": -0.00007940201443923378},
+        {"seed": 37, "difference": 0.06700734960033272},
+        {"seed": 38, "difference": 0.10582721650764859},
+        {"seed": 39, "difference": -0.0028411133174452985}
+      ]
+    },
+    "p30_lower_minus_standard": {
+      "mean_exact_return": -0.036213029222091374,
+      "mean_exact_success": -0.040000000000000036,
+      "mean_normal_return": 0.01153463595749662,
+      "mean_normal_success": 0.0125,
+      "mean_risky_starts": 5.6,
+      "mean_actor_kl": -0.16372737661004066,
+      "mean_argmax_action_change_rate": -0.06986578479409218,
+      "signs": {"positive": 0, "equal_within_tolerance": 1, "negative": 4},
+      "per_seed_exact_return": [
+        {"seed": 35, "difference": -0.02861001110667527},
+        {"seed": 36, "difference": -0.034093359809344914},
+        {"seed": 37, "difference": -0.10131509528976423},
+        {"seed": 38, "difference": -0.017046679904672457},
+        {"seed": 39, "difference": 0.0}
+      ]
+    }
+  },
+  "comparator_map": {
+    "primary": "Within each fixed overwrite probability and seed, quarter learning rate minus standard learning rate at update 32.",
+    "source": "The shared update-zero policy is a before-training baseline, not the primary trained comparator.",
+    "normal_kernel": "Normal-kernel evaluation diagnoses retention of the original task; it is not a separate training arm.",
+    "probability_regimes": "p=0.05 and p=0.30 are separate treatment regimes and are not controls for one another."
+  },
+  "per_seed_final": {
+    "p05_lr1": [
+      {"seed": 35, "exact_return": 0.8947204795831905, "normal_success": 1.0, "normal_return": 0.9060423871810434, "risky_starts": 8},
+      {"seed": 36, "exact_return": 0.8859669455270915, "normal_success": 1.0, "normal_return": 0.9057554418387647, "risky_starts": 14},
+      {"seed": 37, "exact_return": 0.8194200054426342, "normal_success": 0.9375, "normal_return": 0.8356614702303156, "risky_starts": 14},
+      {"seed": 38, "exact_return": 0.7692356852655367, "normal_success": 0.875, "normal_return": 0.7946636494566732, "risky_starts": 18},
+      {"seed": 39, "exact_return": 0.8864273550429669, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 16}
+    ],
+    "p05_lr025": [
+      {"seed": 35, "exact_return": 0.8918396759127003, "normal_success": 1.0, "normal_return": 0.9088721502507856, "risky_starts": 12},
+      {"seed": 36, "exact_return": 0.8858875435126523, "normal_success": 1.0, "normal_return": 0.908588038919041, "risky_starts": 16},
+      {"seed": 37, "exact_return": 0.8864273550429669, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 16},
+      {"seed": 38, "exact_return": 0.8750629017731852, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 24},
+      {"seed": 39, "exact_return": 0.8835862417255216, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 18}
+    ],
+    "p30_lr1": [
+      {"seed": 35, "exact_return": 0.852333995233622, "normal_success": 0.9375, "normal_return": 0.852333995233622, "risky_starts": 0},
+      {"seed": 36, "exact_return": 0.840571786099398, "normal_success": 1.0, "normal_return": 0.908588038919041, "risky_starts": 8},
+      {"seed": 37, "exact_return": 0.8911445975395874, "normal_success": 1.0, "normal_return": 0.9080212368122107, "risky_starts": 2},
+      {"seed": 38, "exact_return": 0.7557361424404783, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 18},
+      {"seed": 39, "exact_return": 0.7727828223451506, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 16}
+    ],
+    "p30_lr025": [
+      {"seed": 35, "exact_return": 0.8237239841269467, "normal_success": 1.0, "normal_return": 0.9088721502507856, "risky_starts": 10},
+      {"seed": 36, "exact_return": 0.8064784262900531, "normal_success": 1.0, "normal_return": 0.908588038919041, "risky_starts": 12},
+      {"seed": 37, "exact_return": 0.7898295022498232, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 14},
+      {"seed": 38, "exact_return": 0.7386894625358058, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 20},
+      {"seed": 39, "exact_return": 0.7727828223451506, "normal_success": 1.0, "normal_return": 0.9091562615825302, "risky_starts": 16}
+    ]
+  },
+  "learning_curves": {
+    "p05_lr1": [
+      {"update": 0, "return": 0.8822878529394489, "normal_success": 1.0, "risky_starts": 94, "actor_kl": 1.6273193281790555e-08},
+      {"update": 2, "return": 0.8828560756029381, "normal_success": 1.0, "risky_starts": 92, "actor_kl": 0.00662136310711503},
+      {"update": 8, "return": 0.8714916223331564, "normal_success": 0.9875, "risky_starts": 92, "actor_kl": 0.025089269503951073},
+      {"update": 32, "return": 0.8511540941722838, "normal_success": 0.9625, "risky_starts": 70, "actor_kl": 0.29880174100399015}
+    ],
+    "p05_lr025": [
+      {"update": 0, "return": 0.8822878529394489, "normal_success": 1.0, "risky_starts": 94, "actor_kl": 1.6273193281790555e-08},
+      {"update": 2, "return": 0.8822878529394489, "normal_success": 1.0, "risky_starts": 94, "actor_kl": 0.0012210516491904856},
+      {"update": 8, "return": 0.8828560756029381, "normal_success": 1.0, "risky_starts": 92, "actor_kl": 0.0031825171317905188},
+      {"update": 32, "return": 0.8845607435934053, "normal_success": 1.0, "risky_starts": 86, "actor_kl": 0.028795567527413368}
+    ],
+    "p30_lr1": [
+      {"update": 0, "return": 0.7487981437192766, "normal_success": 1.0, "risky_starts": 94, "actor_kl": 1.6273193281790555e-08},
+      {"update": 2, "return": 0.7522074797002111, "normal_success": 1.0, "risky_starts": 92, "actor_kl": 0.004053608560934663},
+      {"update": 8, "return": 0.7522074797002111, "normal_success": 1.0, "risky_starts": 92, "actor_kl": 0.023310527577996253},
+      {"update": 32, "return": 0.8225138687316473, "normal_success": 0.9875, "risky_starts": 44, "actor_kl": 0.22156872898340224}
+    ],
+    "p30_lr025": [
+      {"update": 0, "return": 0.7487981437192766, "normal_success": 1.0, "risky_starts": 94, "actor_kl": 1.6273193281790555e-08},
+      {"update": 2, "return": 0.7522074797002111, "normal_success": 1.0, "risky_starts": 92, "actor_kl": 0.0008300623157992959},
+      {"update": 8, "return": 0.7522074797002111, "normal_success": 1.0, "risky_starts": 92, "actor_kl": 0.0044539942871779205},
+      {"update": 32, "return": 0.7863008395095559, "normal_success": 1.0, "risky_starts": 72, "actor_kl": 0.05784135237336159}
+    ]
+  },
+  "gates": {
+    "all_20_jobs_complete": true,
+    "total_collector_slots_exact": true,
+    "scheduled_optimizer_accounting_exact": true,
+    "paired_restored_state_and_worker_initial_hashes_identical": true,
+    "source_checkpoint_file_set_and_hashes_match_manifest": true,
+    "update_zero_behavior_matches_source_on_frozen_anchor": true,
+    "all_retained_state_file_receipts_valid": true,
+    "execution_sources_and_prerequisites_unchanged": true,
+    "non_intervention_checkpoint_config_matches_source": true,
+    "no_teacher_or_bc_updates": true,
+    "no_automatic_extension": true,
+    "storage_reserve_preserved": true
+  },
+  "decision": {
+    "p05": "The quarter-rate branch preserved all 160 paths on the finite deterministic normal-kernel panel and the source mean normal return while reducing risky starts from 94/160 to 86/160. The standard-rate branch reduced risk further to 70/160 but failed 6/160 normal paths. Quarter-rate exact target return was 0.8845607435934053, 0.0022728906539563496 above its source and 0.03340664942112133 above standard rate. The paired advantage was not seed-consistent: two seeds were positive and three were negative, with the positive mean driven by the standard-rate normal-panel failures in seeds 37 and 38.",
+    "p30": "The quarter-rate branch also preserved normal behavior but adapted less: it left 72/160 risky starts versus 44/160 at the standard rate and its exact target return was lower by 0.036213029222091374. Four paired seeds were negative and one tied.",
+    "intervention_check": "The quarter-rate branches had substantially smaller source-panel actor KL and argmax change rates at both probabilities. This establishes that the intervention reduced measured behavioral movement on source visitation, not that KL alone guarantees task preservation.",
+    "tradeoff": "Under this fixed 32-update budget, smaller updates prevented average normal-panel damage at 5% but learned less risk avoidance; at 30%, the same slowing preserved the finite normal panel yet sacrificed useful adaptation. The 5% aggregate benefit is heterogeneous rather than a stable five-seed improvement."
+  },
+  "non_claims": [
+    "The standard learning rate is not identified as the sole cause of the earlier rare-defect result.",
+    "The quarter learning rate is not claimed optimal.",
+    "A lower actor KL or fewer action changes is not by itself task preservation.",
+    "Source-visitation KL does not measure policy changes outside the frozen source trajectories.",
+    "The difference between p=0.05 and p=0.30 is not attributed to experience frequency alone.",
+    "Five learner seeds do not establish statistical significance or broad generalization."
+  ],
+  "verification": {
+    "focused_tests": "28 passed, 1 warning",
+    "full_repository_tests": "510 passed, 9 failed, 1 warning",
+    "full_failure_scope": "Eight pre-existing Mine tests rejected historical execution or manifest hash contracts; one historical spatial GPU validation rejected a stale source hash. None exercised the new learning-rate experiment result.",
+    "independent_decimal_recomputation": "All 20 final episode panels were recomputed directly. Maximum per-panel success error was 1e-16, maximum return error was 1.421875e-16, and maximum aggregate return error was 2.0175625e-16."
+  },
+  "storage": {
+    "run_bytes_before_result": 2574389193,
+    "raid_free_bytes_at_end": 7860743675904,
+    "reserve_preserved": true
+  }
+}

@@ -1,0 +1,96 @@
+{
+  "schema_version": 1,
+  "claim_id": "pack_inventory_overwrite_lr_ppo_v1_fixed_budget_exact_mode",
+  "repository": {
+    "execution_and_aggregation_commit": "25806dd1f85a0a65b9ec82d75ec8b598217865b8",
+    "dirty_during_training_and_aggregation": false
+  },
+  "commands": {
+    "training": "env HACKRL_DEVICE=cuda JAX_PLATFORMS=cuda XLA_PYTHON_CLIENT_PREALLOCATE=false PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python -u scripts/run_pack_inventory_overwrite_lr_ppo.py --all",
+    "aggregation": "env PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_lr_ppo.py",
+    "focused_tests": "env PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python -m pytest -q tests/test_pack_inventory_overwrite.py tests/test_pack_inventory_overwrite_rare.py tests/test_pack_restore_gc_stochastic_overwrite.py tests/test_pack_inventory_overwrite_lr_ppo.py tests/test_pack_inventory_overwrite_ppo.py tests/test_pack_inventory_overwrite_policy_panel.py",
+    "full_tests": "env PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python -m pytest -q"
+  },
+  "environment": {
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2",
+      "NumPy 2.5.0",
+      "Linux 6.8.0-55-generic x86_64"
+    ],
+    "hardware": "Training and frozen evaluation used NVIDIA H200 143771 MiB, driver 580.173.02. JAX GPU preallocation was disabled because an unrelated process was active. Aggregation and tests used CPU."
+  },
+  "mathematics": {
+    "assertion_tested": "Starting from each seed-35--39 source actor-critic and Adam state, compare 32-update PPO branches at the inherited and quarter learning rates under overwrite probabilities 0.05 and 0.30. At each probability, subtract the standard-rate final exact deterministic-mode return from the quarter-rate return within seed, then report all paired differences, their mean, normal-task retention, risk exposure, actor movement, sampled-policy performance, and adaptation loss.",
+    "coefficient_domain": "Integer episode, transition, trigger, event, and loss counts; path returns and probability weights use IEEE-754 binary64 with discount 0.995. An independent Decimal recomputation used precision 50.",
+    "conventions": "Each condition is an equal-weight mean over five learner seeds. Each seed exact-mode value is an equal-weight mean over 32 natural validation starts. For fixed-kernel path i with success s_i, length T_i, and risky-harvest count k_i, success is s_i(1-p)^k_i and discounted return is s_i*0.995^(T_i-1)*(1-p)^k_i. Existing fixed-kernel failure is distinct from overwrite loss. Paired signs use tolerance 1e-12.",
+    "inputs": [
+      "docs/manifests/pack_inventory_overwrite_lr_ppo_v1.json at sha256 fbc906d79019b47d5269fbe1e1d3eb31daa57f8650eb358a5b13fbdcf295dfad",
+      "scripts/run_pack_inventory_overwrite_lr_ppo.py at sha256 1773549e04f92992e02f760f841b269efe8b18af63d1fc659585cc21a815fe7d",
+      "scripts/summarize_pack_inventory_overwrite_lr_ppo.py at sha256 fd0723d9e01cff7f4f754d8bdde94d9ef7ddbe22de35d6fd63377b964abea545",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/run_manifest.json at sha256 e03199525a1320c9985f5e113be88b7e36c7bd01c73ab0b06060d7f3db3c80eb",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/training_complete.json at sha256 bc41adc697d986cae70706f3ac7f73b9782ece742d0ea0584bb473a29ac73100",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/result.json at sha256 99a0fa5eadcb669cbae41a956fe39eaef7b32c69206aa25ae8ed28061d6d0007",
+      "Twenty completed cell summaries, 640 ordered update records, 80 retained checkpoint receipts and state files, and 80 preregistered evaluations under the canonical RAID run root."
+    ],
+    "bounds": {
+      "learner_seeds": [35, 39],
+      "learner_seed_count": 5,
+      "probabilities": [0.05, 0.30],
+      "learning_rate_multipliers": [1.0, 0.25],
+      "learning_jobs": 20,
+      "updates_per_job": 32,
+      "collector_slots_per_job": 1048576,
+      "total_collector_slots": 20971520,
+      "natural_mode_starts_per_seed_checkpoint": 32,
+      "sample_episodes_per_seed_checkpoint_kernel": 128,
+      "evaluation_updates": [0, 2, 8, 32],
+      "paired_sign_zero_tolerance": 1e-12
+    },
+    "non_claims": [
+      "The quarter learning rate is not claimed optimal.",
+      "Learning rate is not identified as the sole cause of the prior rare-defect degradation.",
+      "A lower source-panel KL is not a guarantee of task preservation or a measurement of off-anchor behavior.",
+      "The p=0.05 versus p=0.30 difference is not attributed to experience frequency alone.",
+      "Five learner seeds do not establish statistical significance or generalization beyond these policies, starts, budgets, and defect model."
+    ]
+  },
+  "randomness": {
+    "used": true,
+    "generator": "JAX PRNG with learner seeds 35--39. Within seed, all four branches shared initial actor-critic, Adam state, worker state, action/environment/sampler RNG states, and a slot-indexed fold_in-derived defect-uniform stream. Overwrite probability was only the threshold and was not observed.",
+    "seed": "35--39"
+  },
+  "run": {
+    "training_started_at": "2026-10-13T13:22:24.787428Z",
+    "training_completed_at": "2026-10-13T13:40:03.146128Z",
+    "training_wall_seconds_from_capacity_start_to_completion": 1058.358699798584,
+    "training_exit_status": 0,
+    "aggregation_exit_status": 0
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_lr_ppo_v1_results.json",
+      "sha256": "6fb4a73d5920e1daac33b3d5ea39389507618c4dd59127a39824758e892d3344"
+    }
+  ],
+  "checks": [
+    "All 20 preregistered jobs completed exactly 32 updates and 1,048,576 collector slots; the aggregate is 20,971,520 slots with 20,480 optimizer applications, zero empty minibatches, zero teacher updates, and zero BC updates.",
+    "All 640 update records were present and ordered. Retained checkpoints were exactly updates 0, 2, 8, and 32 for each job; all 80 state files matched their receipts and all rolling resume directories were empty.",
+    "The run-manifest job matrix, execution-source set, source-checkpoint file set, source hashes, prescribed source paths, source global updates, update-zero train-state hashes, and non-intervention checkpoint configuration all matched the frozen manifest.",
+    "Within seed, all four origins had identical restored train-state and fresh-worker hashes. Every update-zero actor had zero argmax changes on its frozen source anchor, same-p exact results matched, and all four fixed-mode risk profiles matched.",
+    "All execution sources and three pinned prerequisites retained their launch hashes. No failed-job marker remained. RAID ended with 7,860,743,675,904 free bytes, above the declared peak-plus-reserve requirement.",
+    "The focused overwrite suite passed 28 tests with one warning. The full repository passed 510 tests and had nine pre-existing provenance-sensitive failures: eight Mine execution or manifest hash checks and one historical spatial GPU source hash check.",
+    "An independent precision-50 Decimal recomputation read all 20 final episode panels directly. Maximum success error was 1e-16, maximum per-panel return error was 1.421875e-16, and maximum aggregate return error was 2.0175625e-16.",
+    "The compact result names mean 1-(1-p)^k as overwrite-incident probability, including normally failing paths, and separately reports normal success minus exact success as overwrite-attributable success decrement.",
+    "At p=0.05, quarter-minus-standard exact-return differences were negative, negative, positive, positive, negative for seeds 35--39; their mean was 0.03340664942112133. At p=0.30 the signs were negative, negative, negative, negative, tie; their mean was -0.036213029222091374.",
+    "The compact result was mechanically compared with the canonical raw result for all four final aggregates, all 20 seed rows, all 16 curve points, and all ten paired return differences."
+  ],
+  "result": "At p=0.05, the quarter-rate branch preserved all 160 paths on the finite deterministic normal-kernel panel and its source mean normal return, reduced risky starts from 94/160 to 86/160, and reached exact target return 0.8845607435934053. This was 0.0022728906539563496 above source and 0.03340664942112133 above the standard-rate branch on average. However, the paired advantage occurred in only two of five seeds; the mean was driven by preventing standard-rate normal-panel failures in seeds 37 and 38. At p=0.30, the quarter rate preserved the finite normal panel but left 72/160 risky starts versus 44/160 at the standard rate and reduced target return by 0.036213029222091374, with four negative seeds and one tie. The intervention substantially reduced source-panel KL and argmax changes at both probabilities. Under this fixed 32-update budget, the result supports a preservation-versus-adaptation tradeoff, not a generally superior learning rate or an asymptotic speed claim.",
+  "residual_risks": [
+    "The training runner, environment, exact-path evaluator, and aggregation code are internally authored. Hashes, paired initialization checks, checkpoint receipts, independent Decimal arithmetic, and focused tests reduce but do not eliminate common-implementation error.",
+    "The exact computation assumes independent Bernoulli fires and the verified physical invariant that any first grain loss makes the three-grain target unreachable. It is exact only for deterministic argmax on the finite validation panel.",
+    "The source-visitation KL anchor does not cover states visited only after the policy changes.",
+    "The positive p=0.05 mean is heterogeneous: two large positive seed differences outweigh three small negative differences.",
+    "The full repository was not globally green because nine historical provenance-sensitive tests failed. Their failure does not invalidate the scoped gates, but it also does not revalidate those historical experiments against current sources."
+  ]
+}
