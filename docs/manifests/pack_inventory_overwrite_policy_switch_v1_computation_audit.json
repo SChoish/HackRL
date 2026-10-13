@@ -69,7 +69,7 @@
   "outputs": [
     {
       "path": "docs/manifests/pack_inventory_overwrite_policy_switch_v1_results.json",
-      "sha256": "1e9223861403b80d368c0d12e160e5048546ae0a492fa9650b2e5a0fad21326a"
+      "sha256": "2e01accce12fcdf009899f6e86c61ecad1d18152fe9b6c9ffa707f6438a495ee"
     }
   ],
   "randomness": {
@@ -78,7 +78,7 @@
     "used": false
   },
   "repository": {
-    "commit": "272e3d04067c8fd58091656486fcda1e621f0b40",
+    "commit": "986de58ff4e3422b56e9ee16c00b6c20530b16eb",
     "dirty": false
   },
   "residual_risks": [

@@ -12,7 +12,7 @@
     ],
     "tolerance": "1E-14"
   },
-  "decision": "Persistent switching preserved fixed-kernel success and slightly improved mean p=0.05 return over the source policy, but retained 82 of the source policy's 94 risky starts. At the first switch, the adapted policy still selected a risky harvest in 82 of 94 switched episodes. The frozen p=1 policy's avoidance therefore did not transfer as a reliable local replacement at the source policy's risky states; persistent switching mainly prevented repeated one-step loops in six seed-39 starts.",
+  "decision": "Persistent switching preserved fixed-kernel success and slightly improved mean p=0.05 return over the source policy, but retained 82 of the source policy's 94 risky starts. At the first switch, the adapted policy still selected a risky harvest in 82 of 94 switched episodes. The frozen p=1 policy's avoidance therefore did not transfer as a reliable local replacement at the source policy's risky states; persistent switching's entire observed mean advantage over one-step came from six seed-39 starts where repeated paths became shorter.",
   "design": {
     "direct_kernels": [
       "fixed",
@@ -46,7 +46,7 @@
   "interpretation": {
     "limitation": "The mean p=0.05 advantage over source is small (+0.00206), positive in two seeds and exactly zero in three. This is not evidence of a population-level effect.",
     "mechanism": "Only 12 of 94 first switch actions were safe. The adapted-only policy reached just six risky starts by changing earlier trajectory decisions; late oracle switching cannot reproduce most of that avoidance.",
-    "persistent_specific": "Persistent and one-step switching have the same 82 risky starts. Persistent improves over one-step by eliminating repeated fixed-kernel loops, with shorter paths in six seed-39 starts.",
+    "persistent_specific": "Persistent and one-step switching have the same 82 risky starts. The entire observed p=0.05 return difference between them comes from six seed-39 fixed paths that are shorter under persistent switching and contain no repeated compact state/action pairs.",
     "primary": "Persistent switching has the highest mean p=0.05 return among the four frozen execution modes in this five-seed panel, while retaining 100% fixed-kernel success."
   },
   "modes": {
@@ -527,6 +527,7 @@
   ],
   "one_step_vs_persistent_paths": {
     "different_fixed_action_paths": 14,
+    "persistent_minus_one_step_p05_return": 0.0016305277003991786,
     "persistent_shorter_path_keys": [
       {
         "seed": 39,
@@ -553,7 +554,9 @@
         "state_index": 30
       }
     ],
-    "persistent_shorter_paths": 6
+    "persistent_shorter_paths": 6,
+    "shorter_paths_account_for_entire_p05_difference": true,
+    "shorter_paths_p05_return_contribution": 0.0016305277003991786
   },
   "paired_p05_return_contrasts": {
     "adapted_minus_source": {
@@ -690,10 +693,10 @@
     }
   },
   "provenance": {
-    "aggregation_head": "272e3d04067c8fd58091656486fcda1e621f0b40",
+    "aggregation_head": "986de58ff4e3422b56e9ee16c00b6c20530b16eb",
     "aggregation_script": {
       "path": "scripts/summarize_pack_inventory_overwrite_policy_switch.py",
-      "sha256": "d00333d69e95db0f38ed58c4c055264031152e4e50b9d77bcc1b23f47ae43086"
+      "sha256": "3c74cae160b50974834dfc32c61b9cc401394635eab1ef907b31b66009fc0de5"
     },
     "complete_marker": {
       "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/complete.json",
