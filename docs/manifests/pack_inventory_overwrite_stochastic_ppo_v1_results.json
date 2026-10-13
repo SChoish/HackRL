@@ -1,0 +1,279 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_stochastic_ppo_compact_result_v1",
+  "status": "complete_fixed_budget_no_automatic_extension",
+  "status_definition": "Complete means that the preregistered budget and integrity gates finished; it is not a scientific acceptance verdict.",
+  "execution_head": "77c3ccee1395ee11a8ad86205ac386b3a0fc4e2f",
+  "aggregation_head": "8d5ce40d58c7a08243b0d6d1a34d6053287c8a7a",
+  "design_manifest": {
+    "path": "docs/manifests/pack_inventory_overwrite_stochastic_ppo_v1.json",
+    "sha256": "e2c28a2df42cd86296e2eb0ddcac66d9e77f745616ce8bb2e602734ce2161abb"
+  },
+  "raw_result": {
+    "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_stochastic_ppo_v1/result.json",
+    "sha256": "6f4e8740934a548c4794ee792088bca593bb68f3889f3ead97de537ea57bed1b"
+  },
+  "run_manifest": {
+    "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_stochastic_ppo_v1/run_manifest.json",
+    "sha256": "4160dab42f7ff239ba3c7fefc361bdcee9a69b895b62cda074b26c0c9651bba2"
+  },
+  "definitions": {
+    "task_success": "Deliver all three initially available grain units within the unchanged 128-tick horizon; the only task reward is one on goal completion.",
+    "inventory_overwrite": "On a valid harvest with c>0 carried grain, an independent Bernoulli(p) event sets carried grain to 1 rather than c+1 while decrementing source grain normally. Any first loss makes the three-grain goal unreachable in that episode.",
+    "risky_harvest": "A valid harvest with positive pre-harvest carried grain.",
+    "original": "The frozen source Dual fixed-continuation actor-critic before this experiment.",
+    "normal_continue": "The same-seed policy after 32 PPO updates in the normal kernel, frozen before this experiment; this is the primary comparator.",
+    "p1_adapt": "The same-seed policy after a prior 32-update PPO adaptation at overwrite probability 1, frozen before this experiment; it is evaluation-only and never initializes these branches.",
+    "normal_kernel_mode": "The final learned branch policy reevaluated by deterministic argmax in the normal kernel.",
+    "target_sample": "The final learned branch policy evaluated with sampled actions in its matching stochastic overwrite kernel.",
+    "valid_ppo_samples": "Collector transitions while the delivery command is active; slots after goal completion and before the world reset remain physical transitions but are masked from PPO."
+  },
+  "design": {
+    "seeds": [30, 31, 32, 33, 34],
+    "conditions": {
+      "p05_adapt": 0.05,
+      "p30_adapt": 0.30
+    },
+    "updates_per_job": 32,
+    "collector_slots_per_job": 1048576,
+    "total_jobs": 10,
+    "total_collector_slots": 10485760,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "automatic_extension": false
+  },
+  "exact_mode_method": {
+    "scope": "Exact only for the finite panel and the declared independent Bernoulli overwrite kernel, not for an unrestricted start-state distribution.",
+    "panel": "Five learner seeds by the same 32 validation natural starts, equally weighted within each condition and baseline.",
+    "policy_action": "Deterministic actor argmax.",
+    "formula": "For fixed-kernel path i with success s_i, length T_i, and risky-harvest count k_i, success is mean[s_i(1-p)^k_i], return is mean[s_i*0.995^(T_i-1)*(1-p)^k_i], and overwrite-loss probability is mean[1-(1-p)^k_i].",
+    "assumptions": "Each risky harvest has an independent constant-probability overwrite event; the fixed-kernel no-fire path supplies T_i and k_i; any first loss makes success impossible.",
+    "loss_probability_definition": "Probability of at least one overwrite on the fixed path, averaged over all panel starts; it is separate from all-cause failure probability.",
+    "arithmetic": "IEEE-754 binary64 finite sums.",
+    "fixed_failure_separated_from_overwrite_loss": true,
+    "sample_policy_evaluation_reported_separately": true
+  },
+  "evaluation_protocol": {
+    "split": "validation",
+    "natural_starts_per_seed": 32,
+    "horizon_ticks": 128,
+    "sample_repeats_per_start": 4,
+    "sample_episodes_per_seed_checkpoint_kernel": 128,
+    "evaluated_checkpoint_updates": [0, 2, 8, 32],
+    "optimizer_applications_per_job": 1024,
+    "frozen_baseline_source": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1/result.json"
+  },
+  "final_aggregates": {
+    "p05_adapt": {
+      "exact_mode_success_rate": 0.95625,
+      "exact_mode_expected_discounted_return": 0.8657421485479571,
+      "exact_mode_loss_episode_probability": 0.018750000000000024,
+      "return_minus_normal_continue": -0.013597437135750168,
+      "return_minus_original": -0.010188101154815655,
+      "return_minus_p1_adapt": -0.03229848880183108,
+      "paired_return_signs_vs_normal_continue": {
+        "positive": 3,
+        "equal_within_1e-12": 0,
+        "negative": 2
+      },
+      "normal_kernel_mode_success_rate": 0.975,
+      "normal_kernel_mode_return": 0.8826957586550217,
+      "target_sample_success_rate": 0.984375,
+      "target_sample_return": 0.8877548824250585,
+      "risk_count_distribution": {
+        "0": 100,
+        "1": 60
+      },
+      "collection": {
+        "collector_slots": 5242880,
+        "physical_transitions": 5242880,
+        "valid_ppo_samples": 987253,
+        "optimizer_applications": 5120,
+        "completed_world_episodes": 40960,
+        "loss_episodes": 1310,
+        "cumulative_lost_grain": 1396,
+        "risky_harvests": 25972,
+        "overwrite_fires": 1329,
+        "empirical_fire_per_risky_harvest": 0.05117049129832127,
+        "goal_successes": 39596
+      }
+    },
+    "p30_adapt": {
+      "exact_mode_success_rate": 0.8875,
+      "exact_mode_expected_discounted_return": 0.8064508949076175,
+      "exact_mode_loss_episode_probability": 0.11250000000000002,
+      "return_minus_normal_continue": 0.07477838662649479,
+      "return_minus_original": 0.09523440251210172,
+      "return_minus_p1_adapt": -0.04620274446762076,
+      "paired_return_signs_vs_normal_continue": {
+        "positive": 4,
+        "equal_within_1e-12": 1,
+        "negative": 0
+      },
+      "normal_kernel_mode_success_rate": 1.0,
+      "normal_kernel_mode_return": 0.9086459962101603,
+      "target_sample_success_rate": 0.884375,
+      "target_sample_return": 0.8027694260252819,
+      "risk_count_distribution": {
+        "0": 100,
+        "1": 60
+      },
+      "collection": {
+        "collector_slots": 5242880,
+        "physical_transitions": 5242880,
+        "valid_ppo_samples": 1580103,
+        "optimizer_applications": 5120,
+        "completed_world_episodes": 40960,
+        "loss_episodes": 6922,
+        "cumulative_lost_grain": 7389,
+        "risky_harvests": 23832,
+        "overwrite_fires": 7122,
+        "empirical_fire_per_risky_harvest": 0.2988418932527694,
+        "goal_successes": 33983
+      }
+    }
+  },
+  "frozen_baselines": {
+    "p05": {
+      "original": {
+        "success_rate": 0.9637499999999999,
+        "expected_discounted_return": 0.8759302497027728
+      },
+      "normal_continue": {
+        "success_rate": 0.9674999999999999,
+        "expected_discounted_return": 0.8793395856837073
+      },
+      "p1_adapt": {
+        "success_rate": 0.99,
+        "expected_discounted_return": 0.8980406373497882
+      }
+    },
+    "p30": {
+      "original": {
+        "success_rate": 0.7825,
+        "expected_discounted_return": 0.7112164923955158
+      },
+      "normal_continue": {
+        "success_rate": 0.805,
+        "expected_discounted_return": 0.7316725082811226
+      },
+      "p1_adapt": {
+        "success_rate": 0.9400000000000001,
+        "expected_discounted_return": 0.8526536393752382
+      }
+    }
+  },
+  "learning_curves": {
+    "p05_adapt": [
+      {
+        "update": 0,
+        "slots_per_seed": 0,
+        "success_rate": 0.9637499999999999,
+        "return": 0.8759302497027728,
+        "return_minus_normal_continue": -0.0034093359809345136
+      },
+      {
+        "update": 2,
+        "slots_per_seed": 65536,
+        "success_rate": 0.9643749999999999,
+        "return": 0.8764984723662618,
+        "return_minus_normal_continue": -0.0028411133174454316
+      },
+      {
+        "update": 8,
+        "slots_per_seed": 262144,
+        "success_rate": 0.953125,
+        "return": 0.8643411990676271,
+        "return_minus_normal_continue": -0.014998386616080151
+      },
+      {
+        "update": 32,
+        "slots_per_seed": 1048576,
+        "success_rate": 0.95625,
+        "return": 0.8657421485479571,
+        "return_minus_normal_continue": -0.013597437135750168
+      }
+    ],
+    "p30_adapt": [
+      {
+        "update": 0,
+        "slots_per_seed": 0,
+        "success_rate": 0.7825,
+        "return": 0.7112164923955158,
+        "return_minus_normal_continue": -0.020456015885606926
+      },
+      {
+        "update": 2,
+        "slots_per_seed": 65536,
+        "success_rate": 0.78625,
+        "return": 0.7146258283764502,
+        "return_minus_normal_continue": -0.017046679904672457
+      },
+      {
+        "update": 8,
+        "slots_per_seed": 262144,
+        "success_rate": 0.8049999999999999,
+        "return": 0.7316725082811226,
+        "return_minus_normal_continue": -6.661338147750939e-17
+      },
+      {
+        "update": 32,
+        "slots_per_seed": 1048576,
+        "success_rate": 0.8875,
+        "return": 0.8064508949076175,
+        "return_minus_normal_continue": 0.07477838662649479
+      }
+    ]
+  },
+  "per_seed_final": {
+    "p05_adapt": [
+      {"seed": 30, "success_rate": 0.9875, "return": 0.8839804629555383, "return_minus_normal_continue": 0.0003942212300167558, "normal_success_rate": 1.0, "lost_grain": 201},
+      {"seed": 31, "success_rate": 0.9781249999999999, "return": 0.8873575287954545, "return_minus_normal_continue": 0.02162364243124415, "normal_success_rate": 1.0, "lost_grain": 339},
+      {"seed": 32, "success_rate": 0.965625, "return": 0.8768243920300014, "return_minus_normal_continue": 0.010284830209152496, "normal_success_rate": 1.0, "lost_grain": 352},
+      {"seed": 33, "success_rate": 0.928125, "return": 0.8424199303123963, "return_minus_normal_continue": -0.04630872651770157, "normal_success_rate": 0.9375, "lost_grain": 338},
+      {"seed": 34, "success_rate": 0.921875, "return": 0.838128428646395, "return_minus_normal_continue": -0.05398115303146267, "normal_success_rate": 0.9375, "lost_grain": 166}
+    ],
+    "p30_adapt": [
+      {"seed": 30, "success_rate": 0.925, "return": 0.8409695419638403, "return_minus_normal_continue": 0.08523339952336206, "normal_success_rate": 1.0, "lost_grain": 971},
+      {"seed": 31, "success_rate": 0.85, "return": 0.7721891667455221, "return_minus_normal_continue": 0.11932675933270698, "normal_success_rate": 1.0, "lost_grain": 1823},
+      {"seed": 32, "success_rate": 0.8875, "return": 0.8061090815587852, "return_minus_normal_continue": 0.15265301854634172, "normal_success_rate": 1.0, "lost_grain": 1720},
+      {"seed": 33, "success_rate": 0.8875, "return": 0.806110502115444, "return_minus_normal_continue": 0.016678755730063166, "normal_success_rate": 1.0, "lost_grain": 1950},
+      {"seed": 34, "success_rate": 0.8875, "return": 0.8068761821544955, "return_minus_normal_continue": 0.0, "normal_success_rate": 1.0, "lost_grain": 925}
+    ]
+  },
+  "gates": {
+    "all_10_jobs_complete": true,
+    "total_collector_slots_exact": true,
+    "total_optimizer_applications_exact": true,
+    "paired_initialization_identity": true,
+    "paired_update_zero_fixed_profiles": true,
+    "all_retained_checkpoint_hashes_valid": true,
+    "execution_sources_unchanged": true,
+    "prerequisites_unchanged": true,
+    "no_teacher_updates": true,
+    "no_bc_updates": true,
+    "no_automatic_extension": true,
+    "storage_reserve_preserved": true
+  },
+  "decision": {
+    "p05": "No aggregate return improvement over normal_continue; seed results are mixed (3 positive, 2 negative).",
+    "p30": "Aggregate return improved over normal_continue by 0.07477838662649479; four seeds are positive and one ties within 1e-12.",
+    "acquisition_gap": "The frozen p=1 policy is better than normal_continue at p=0.05, while new p=0.05 learning does not improve in aggregate. A higher-return frozen policy exists, but this fixed rare-experience run did not reliably reacquire it."
+  },
+  "non_claims": [
+    "Neither 5%, 30%, nor any earlier crossover is an optimal-avoidance boundary.",
+    "The zero-loss reference and p=1 policy are not claimed optimal.",
+    "The difference between p=0.05 and p=0.30 is not attributed to experience frequency alone.",
+    "Five learner seeds do not establish statistical significance or broad generalization.",
+    "Sample evaluation does not replace exact deterministic-mode evaluation."
+  ],
+  "verification": {
+    "focused_tests": "14 passed, 1 warning",
+    "full_repository_tests": "504 passed, 9 failed, 1 warning",
+    "full_failure_scope": "Eight Mine Expedition tests rejected authorized-source hash mismatches in files outside this branch's experiment changes; one historical spatial GPU validation rejected five stale source hashes, four outside this branch and one changed PACK source."
+  },
+  "storage": {
+    "run_bytes_before_result": 1287219156,
+    "raid_free_bytes_at_end": 7902925979648,
+    "reserve_preserved": true
+  }
+}

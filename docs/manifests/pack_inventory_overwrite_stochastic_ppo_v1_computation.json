@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "claim_id": "pack_inventory_overwrite_stochastic_ppo_v1_fixed_budget_exact_mode",
+  "repository": {
+    "commit": "8d5ce40d58c7a08243b0d6d1a34d6053287c8a7a",
+    "dirty": false
+  },
+  "command": "env JAX_PLATFORMS=cpu PYTHONPATH=src /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_stochastic_ppo.py",
+  "environment": {
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2",
+      "NumPy 2.5.0",
+      "Linux 6.8.0-55-generic x86_64"
+    ],
+    "hardware": "Training and frozen evaluation used NVIDIA H200 143771 MiB, driver 580.173.02; aggregation used CPU. Training disabled JAX GPU preallocation to coexist with an unrelated process."
+  },
+  "mathematics": {
+    "assertion_tested": "For PPO policies trained independently from the same original seed-30--34 checkpoints for 32 updates at overwrite probabilities 0.05 or 0.30, compute the finite-panel deterministic-mode expected discounted return at the matching probability and subtract the same-seed frozen normal-continuation policy return. Decide whether the five-seed mean improves and report every paired sign, normal-kernel retention, sampled-policy performance, risky-harvest exposure, and adaptation loss.",
+    "coefficient_domain": "Integer episode, transition, trigger, event, and loss counts; path returns and grouped probability polynomials use IEEE-754 binary64 with discount 0.995.",
+    "conventions": "Each learned-policy condition is an equal-weight mean over five learner seeds, and each seed's exact mode value is an equal-weight mean over all 32 natural validation starts. For a fixed-kernel path with success s_i, length T_i, and risky-harvest count k_i, success is s_i(1-p)^k_i, discounted return is s_i*0.995^(T_i-1)*(1-p)^k_i, and overwrite-loss probability is 1-(1-p)^k_i. Existing fixed-kernel failure is counted separately from overwrite loss. A risky harvest is a valid harvest with positive pre-harvest inventory. Sampled policy evaluation is separate from the exact deterministic-mode computation.",
+    "inputs": [
+      "docs/manifests/pack_inventory_overwrite_stochastic_ppo_v1.json at sha256 e2c28a2df42cd86296e2eb0ddcac66d9e77f745616ce8bb2e602734ce2161abb",
+      "scripts/summarize_pack_inventory_overwrite_stochastic_ppo.py at sha256 7136558ebf5fe0dc4557c9530918fc2c106090e46bdceb0377f7d47b32415e3c",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_stochastic_ppo_v1/run_manifest.json at sha256 4160dab42f7ff239ba3c7fefc361bdcee9a69b895b62cda074b26c0c9651bba2",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_stochastic_ppo_v1/training_complete.json at sha256 15bd4a79352eeb9c6ddee21a4aa9688be0c292bc5ee58757aaa373460ba1a90c",
+      "Ten completed cell summaries, 320 update records, 40 retained checkpoint receipts and state files, and 40 preregistered evaluations under the canonical run root; their identities and budgets are checked by the committed summarizer.",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1/result.json at sha256 ab3f4d08171febd6dc2118a30d8b459a1408825383e5ede31fd5f62530a584f3"
+    ],
+    "bounds": {
+      "learner_seeds": [30, 34],
+      "learner_seed_count": 5,
+      "probabilities": [0.05, 0.30],
+      "learning_jobs": 10,
+      "updates_per_job": 32,
+      "collector_slots_per_job": 1048576,
+      "total_collector_slots": 10485760,
+      "natural_mode_starts_per_seed_checkpoint": 32,
+      "sample_episodes_per_seed_checkpoint_kernel": 128,
+      "evaluation_updates": [0, 2, 8, 32],
+      "paired_sign_zero_tolerance": 1e-12
+    },
+    "non_claims": [
+      "Neither 5%, 30%, nor an earlier policy-reference equality is an optimal-avoidance boundary.",
+      "The scripted zero-loss reference and frozen p=1 policy are not claimed optimal.",
+      "The p=0.30 versus p=0.05 outcome difference is not attributed to experience frequency alone.",
+      "Five learner seeds do not establish statistical significance or generalization beyond these policies, starts, budgets, and independent defect model.",
+      "The bounded calculation is not a universal theorem about rare-defect adaptation."
+    ]
+  },
+  "randomness": {
+    "used": true,
+    "generator": "JAX PRNG with learner seeds 30--34; action, environment, sampler, and a separate fold_in-derived defect stream are checkpointed or reproducibly derived. The p=0.05 and p=0.30 branches within a seed use the same initial actor-critic, Adam state, worker state, RNG state, and slot-indexed defect uniforms.",
+    "seed": "30--34"
+  },
+  "run": {
+    "started_at": "2026-10-13T06:06:53.064000Z",
+    "runtime_seconds": 1.122044937,
+    "exit_status": 0
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_stochastic_ppo_v1_results.json",
+      "sha256": "f303e6991515ac22fc43ca228442c73d6b1fa4e230f89a5b110237f4a15681e4"
+    }
+  ],
+  "checks": [
+    "All 10 preregistered jobs completed exactly 32 updates and 1,048,576 collector slots; the aggregate is 10,485,760 slots with 10,240 optimizer applications, zero teacher updates, and zero BC updates.",
+    "All update records were present and numerically ordered; retained checkpoints were exactly updates 0, 2, 8, and 32, and every serialized state matched its receipt hash.",
+    "Every evaluation train-state hash matched its checkpoint receipt, all rolling resume checkpoints were pruned, and no failed-job marker remained.",
+    "Within every seed, p=0.05 and p=0.30 origins had identical source and branch train-state hashes, worker-state hashes, optimizer steps, and source checkpoints; update-zero fixed-mode risk profiles were identical.",
+    "Execution sources and all three pinned prerequisite artifacts retained their launch hashes. End storage retained 7,902,925,979,648 free RAID bytes, above the declared peak-plus-reserve requirement.",
+    "The focused stochastic, checkpoint, exact-polynomial, and manifest suite passed 14 tests. The full repository run passed 504 tests and had nine provenance-sensitive failures: eight from authorized-source hash mismatches in Mine files outside this branch's experiment changes, and one from five stale historical spatial GPU source hashes, four outside this branch and one changed PACK source.",
+    "At p=0.05, paired return differences versus normal continuation had signs +,+,+,-,- and mean -0.013597437135750168. At p=0.30, they had signs +,+,+,+,0 and mean 0.07477838662649479.",
+    "The compact repository result was mechanically compared with the canonical raw result for both condition aggregates, all 10 seed rows, and all eight preregistered curve points."
+  ],
+  "result": "Implementation and finite assertion verified in the stated range. At p=0.05 the final exact mode success rate was 0.95625 and expected return 0.8657421485479571, which was 0.013597437135750168 below normal continuation on average, with three positive and two negative seeds. At p=0.30 success was 0.8875 and return 0.8064508949076175, which was 0.07477838662649479 above normal continuation, with four positive seeds and one tie. The frozen p=1 policy remained better than normal continuation at p=0.05, so a higher-return frozen policy existed but was not reliably reacquired by the rare-experience branch under this budget.",
+  "residual_risks": [
+    "The environment, exact-path evaluator, training runner, and aggregation code are internally authored. Pairing, checkpoint hashes, endpoint logic, and focused tests reduce but do not eliminate common-implementation error.",
+    "The exact mode computation assumes independent Bernoulli fires and uses the no-fire deterministic path; its correctness relies on the verified physical invariant that any first grain loss makes the three-grain target unreachable.",
+    "Binary64 finite sums were not independently recomputed at higher precision, although the reported contrasts are much larger than rounding error except the explicitly classified p=0.30 seed-34 tie.",
+    "PPO learning is randomized and only five learner seeds were run. Per-episode counts are not treated as independent learned-policy replications.",
+    "The full repository was not globally green because nine unrelated or stale-provenance checks failed; all directly scoped stochastic tests and result-integrity gates passed."
+  ]
+}
