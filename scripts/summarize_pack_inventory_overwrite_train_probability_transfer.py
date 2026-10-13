@@ -37,6 +37,9 @@ EVALUATION_PROBABILITIES = {
     for name, value in SPEC["evaluation_probabilities"].items()
 }
 PRIOR_ROOT = Path(SPEC["prerequisites"]["prior_raw_result"]).parent
+AGGREGATION_SOURCE_RELATIVE = (
+    "scripts/summarize_pack_inventory_overwrite_train_probability_transfer.py"
+)
 
 
 def sha256(path: Path) -> str:
@@ -120,9 +123,17 @@ def validate_inputs() -> tuple[dict, dict, dict, dict]:
     ):
         raise AssertionError("execution-source set changed")
     for relative, expected in run_manifest["execution_source_sha256"].items():
+        if relative == AGGREGATION_SOURCE_RELATIVE:
+            execution_blob = subprocess.check_output(
+                ["git", "show", f"{run_manifest['execution_head']}:{relative}"],
+                cwd=REPOSITORY,
+            )
+            if hashlib.sha256(execution_blob).hexdigest() != expected:
+                raise AssertionError("execution-time aggregation source hash changed")
+            continue
         if sha256(REPOSITORY / relative) != expected:
             raise AssertionError(
-                f"execution source changed after launch: {relative}"
+                f"training execution source changed after launch: {relative}"
             )
     expected_source_files = {
         str(
@@ -337,7 +348,10 @@ def validate_cell(condition: str, seed: int) -> dict:
             )
         ):
             raise AssertionError("checkpoint configuration changed")
-        if set(config) != set(source_config):
+        expected_config_keys = set(source_config) | {
+            "inventory_overwrite_probability"
+        }
+        if set(config) != expected_config_keys:
             raise AssertionError("checkpoint configuration key set changed")
         if (
             config["num_updates"] != SPEC["optimization"]["updates"]
@@ -932,6 +946,20 @@ def main() -> None:
         "execution_head": run_manifest["execution_head"],
         "aggregation_head": git("rev-parse", "HEAD"),
         "manifest_sha256": sha256(SPEC_PATH),
+        "aggregation_source": {
+            "path": AGGREGATION_SOURCE_RELATIVE,
+            "execution_time_sha256": run_manifest["execution_source_sha256"][
+                AGGREGATION_SOURCE_RELATIVE
+            ],
+            "aggregation_time_sha256": sha256(
+                REPOSITORY / AGGREGATION_SOURCE_RELATIVE
+            ),
+            "post_training_fix": (
+                "Allow the preregistered inventory_overwrite_probability config "
+                "key, which is absent from the fixed source config, while retaining "
+                "exact equality checks for every non-intervention source field."
+            ),
+        },
         "training_completion": completion,
         "gates": {
             "all_10_new_jobs_complete": True,
@@ -946,6 +974,8 @@ def main() -> None:
             "all_retained_state_file_receipts_valid": True,
             "source_checkpoint_file_set_and_hashes_match_manifest": True,
             "execution_source_set_matches_manifest": True,
+            "all_training_execution_sources_unchanged": True,
+            "aggregation_source_execution_blob_matches_recorded_hash": True,
             "job_matrix_and_run_contract_match_manifest": True,
             "non_intervention_checkpoint_config_matches_source": True,
             "reused_final_evaluations_match_pinned_hashes": True,
