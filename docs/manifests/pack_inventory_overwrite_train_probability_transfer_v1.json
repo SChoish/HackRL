@@ -1,0 +1,218 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_train_probability_transfer_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_train_probability_transfer_v1",
+  "status": "frozen_before_launch",
+  "understood_as": "Reuse every previously completed seed-35--39 final policy from the p=0.05 and p=0.30 learning-rate experiment without retraining or selection. Starting independently from the same seed-specific normal-policy actor-critic and inherited Adam state, train only the missing standard-learning-rate branches at overwrite probabilities 0 and 1 for exactly 32 PPO updates. Evaluate the deterministic final policies trained at p in {0, 0.05, 0.30, 1} at every p in {0, 0.05, 0.30, 1} with the preregistered finite-panel exact formula; include the two existing quarter-rate policies as auxiliary comparisons. Use p=0.05 expected discounted return as primary, report normal-task cost and collection harm, attribute any difference to the complete training-probability intervention rather than event count alone, and do not extend or sweep.",
+  "research_question": "Does PPO training with frequent inventory-overwrite defects produce a policy that transfers better to a rare p=0.05 defect than direct rare-defect training, and what normal-task and collection-harm costs accompany that transfer?",
+  "prior_observation": "Before this launch, the pinned p=0.30 standard-rate final risk profiles had already been evaluated algebraically at p=0.05, giving an aggregate return near 0.88496 versus 0.85115 for direct p=0.05 standard-rate training and near 0.88456 for direct p=0.05 quarter-rate training.",
+  "prospective_scope": "The newly prospective evidence is the fixed-budget p=0 and p=1 training branches and their comparisons with every pinned policy. All p=0.05 and p=0.30 policy entries are retrospective reused evidence, and the choice to add the endpoint branches was informed by the prior observation.",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1",
+  "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+  "source_checkpoint": "adapt_4096",
+  "source_global_update": 4608,
+  "execution_sources": [
+    "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1.json",
+    "scripts/run_pack_inventory_overwrite_train_probability_transfer.py",
+    "scripts/summarize_pack_inventory_overwrite_train_probability_transfer.py",
+    "docs/manifests/pack_inventory_overwrite_lr_ppo_v1.json",
+    "scripts/run_pack_inventory_overwrite_lr_ppo.py",
+    "scripts/summarize_pack_inventory_overwrite_lr_ppo.py",
+    "scripts/run_pack_inventory_overwrite_ppo.py",
+    "src/hackrl/pack_restore.py",
+    "src/hackrl/pack_restore_gc.py",
+    "src/hackrl/pack_inventory_overwrite_rare.py",
+    "src/hackrl/dual_leo.py"
+  ],
+  "prerequisites": {
+    "prior_result": "docs/manifests/pack_inventory_overwrite_lr_ppo_v1_results.json",
+    "prior_result_sha256": "6fb4a73d5920e1daac33b3d5ea39389507618c4dd59127a39824758e892d3344",
+    "prior_raw_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/result.json",
+    "prior_raw_result_sha256": "99a0fa5eadcb669cbae41a956fe39eaef7b32c69206aa25ae8ed28061d6d0007",
+    "prior_run_manifest": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/run_manifest.json",
+    "prior_run_manifest_sha256": "e03199525a1320c9985f5e113be88b7e36c7bd01c73ab0b06060d7f3db3c80eb",
+    "reference_paths": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1/reference_paths.json",
+    "reference_paths_sha256": "a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a",
+    "exact_formula_basis": "docs/manifests/pack_inventory_overwrite_rare_v1_results.json",
+    "exact_formula_basis_sha256": "3462a38e05bdef89c5658a165542a48028fe7c8134bcd7dc42a7f1fd7b545d19",
+    "reused_source_origin_sha256": {
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed35/origin.json": "d31625a80861effd62f72abd3d7439e71147078347b6bd6ec8eb5270095449ac",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed36/origin.json": "dd95b4c1bd25f81a626194d014c9d774eb71c41fd54dc5d623884933be685d7e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed37/origin.json": "a9fd3d2d0ce34f720d5cf424e746b86447a7c0602eb32fb578726706c26b5444",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed38/origin.json": "14d1d96d9f38a754b5ee6182a23f6a58f3219e5cd20006ecba87f8711ed24fbd",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed39/origin.json": "162e74379b6fd5a1ee56f1391a6b1542557380b8984ba490e1b3056ff4c906d2"
+    },
+    "reused_final_evaluation_sha256": {
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed35/evaluations/adapt_32.json": "e63ed0668295af59c211e6bcf38b77f596fac6f7c8959c711b9741e72eb0bffc",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed36/evaluations/adapt_32.json": "08ef6fc517ccb418502b2e207d4f85f6cdff31d04b4a4c0faf08e4fcca529902",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed37/evaluations/adapt_32.json": "a05e698c025ad24634c49cf7f1e3a620fa7dadc4ca02689ea410bbc5edfc0718",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed38/evaluations/adapt_32.json": "4a44ff65162309dcc49a698fbe59a5bb605ee9cea7ba3aa1343ac9a19d00d805",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr1/seed39/evaluations/adapt_32.json": "d701f4c72b537bb1cd9029c3a84bc01d94c257046bdc3618ff38ce8a2a9dc5d6",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed35/evaluations/adapt_32.json": "fc3615baffa21132a80f74343d209a2c39564609b809c1740a3f6be7b8a53aa7",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed36/evaluations/adapt_32.json": "3a23005fabfc1b6e9168b63b5851ac84ec2fb7544bdec2565c30f7238723d04e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed37/evaluations/adapt_32.json": "870937fb02eb123441e9f3d75e125c7cec9e48e7b82a74552d5e4f3e87fa41d8",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed38/evaluations/adapt_32.json": "af6bb725637be399b90fb2ac950f51fc12bffdf89e77e1bf9f4fe721250d9247",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p05_lr025/seed39/evaluations/adapt_32.json": "899048053eed8ddfc97afbf9283a64c2e259832a197da14b2a43bf09d24caf7d",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed35/evaluations/adapt_32.json": "749b444d0b7f2296c4830f267b93b9ff088d8a672025f53b5e4faf55b884128f",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed36/evaluations/adapt_32.json": "0755cd4a5a079ff443e450c8b65636a3a220e6f47b56e48bd597783a088a705e",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed37/evaluations/adapt_32.json": "6325a0279176b74b54f89d25db4dec476d667bca6d1b154509d3e0dfe6320ff8",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed38/evaluations/adapt_32.json": "939ee965b17766651a83704929573ae6b207f9a9ecb4152f94f09667c272b3e1",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr1/seed39/evaluations/adapt_32.json": "c26400bddebff5cca5ba1c46160b54afcfec5252afab0fb038ad03b9e0515826",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed35/evaluations/adapt_32.json": "a642f8b69d68a16acddb0ae95ec634153edc885d99d54d7d34d8246c91d79153",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed36/evaluations/adapt_32.json": "4d0128abb3c74d57f8d14c32c5fe32f246bab6c1cbf02cf18202ada18b55fbce",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed37/evaluations/adapt_32.json": "776b3f94720bfea9b512403909ff3fc49ca723806349da6e72bf9b9e8628b9f1",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed38/evaluations/adapt_32.json": "6244309074813dc9f880f57fa5fee1ae19f99d2d869624ea1aed6a6a34e541be",
+      "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_lr_ppo_v1/p30_lr025/seed39/evaluations/adapt_32.json": "926861ef63cb27c00221d631225d6fd4f857fef6a51aef7dcdc03b5d35cf7713"
+    }
+  },
+  "source": {
+    "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+    "checkpoint": "adapt_4096",
+    "global_update": 4608,
+    "policy_history": "Dual fixed-continuation; this experiment studies later PPO training-probability transfer and is not a Dual-versus-PPO comparison."
+  },
+  "seeds": [35, 36, 37, 38, 39],
+  "conditions": {
+    "p00_lr1": {
+      "kernel": "inventory_overwrite",
+      "overwrite_probability": 0.0,
+      "learning_rate_multiplier": 1.0,
+      "ppo_updates": 32,
+      "role": "New normal-continuation control with the overwrite mechanism present but never firing."
+    },
+    "p100_lr1": {
+      "kernel": "inventory_overwrite",
+      "overwrite_probability": 1.0,
+      "learning_rate_multiplier": 1.0,
+      "ppo_updates": 32,
+      "role": "New maximum-frequency defect-training branch."
+    }
+  },
+  "reused_conditions": {
+    "p05_lr1": {"training_probability": 0.05, "learning_rate_multiplier": 1.0, "role": "Standard-rate direct rare-defect training."},
+    "p30_lr1": {"training_probability": 0.30, "learning_rate_multiplier": 1.0, "role": "Standard-rate frequent-defect training."},
+    "p05_lr025": {"training_probability": 0.05, "learning_rate_multiplier": 0.25, "role": "Auxiliary lower-rate direct rare-defect training."},
+    "p30_lr025": {"training_probability": 0.30, "learning_rate_multiplier": 0.25, "role": "Auxiliary lower-rate frequent-defect training."}
+  },
+  "evaluation_probabilities": {
+    "p00": 0.0,
+    "p05": 0.05,
+    "p30": 0.30,
+    "p100": 1.0
+  },
+  "branch_initialization": {
+    "restored": ["actor parameters", "critic parameters", "PPO Adam moments and optimizer step"],
+    "not_restored": ["teacher parameters or teacher Adam state", "source environment state", "source action RNG", "source worker RNG"],
+    "fresh_state": "Within each seed, both new branches begin from initialize_pack_restore_gc on the same balanced 512-worker natural-start panel.",
+    "paired_rng": "Both new branches use the same deterministic seed construction, zero environment-step and rollout cursors, and byte-identical recorded worker, actor-critic, and Adam state within seed. Individual RNG arrays and defect uniforms are not separately hashed; their identity is conditional on the pinned shared execution sources.",
+    "defect_stream": "A separate deterministic key is derived from learner seed and absolute physical collector-slot index; probability is only the threshold and is not observed by the policy."
+  },
+  "optimization": {
+    "num_envs": 512,
+    "num_steps": 64,
+    "updates": 32,
+    "collector_slots_per_block": 32768,
+    "collector_slots_per_update": 32768,
+    "collector_slots_per_job": 1048576,
+    "collector_slots_per_condition_seed": 1048576,
+    "update_epochs": 1,
+    "minibatch_size": 1024,
+    "scheduled_optimizer_applications_per_job": 1024,
+    "source_learning_rate": 0.0002,
+    "branch_learning_rates": [0.0002],
+    "adam_restored": true,
+    "ppo_clipping_unchanged": true,
+    "entropy_unchanged": true,
+    "batching_unchanged": true,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "probability_in_observation": false,
+    "reward_changes": false,
+    "horizon_changes": false,
+    "discount_changes": false,
+    "observation_changes": false,
+    "action_space_changes": false,
+    "loss_penalty_added": false,
+    "early_termination_added": false
+  },
+  "budget": {
+    "jobs": 10,
+    "total_jobs": 10,
+    "collector_slots": 10485760,
+    "total_collector_slots": 10485760,
+    "evaluation_cost_is_separate": true,
+    "automatic_extension": false,
+    "probability_sweep": false,
+    "learning_rate_sweep": false,
+    "hyperparameter_sweep": false,
+    "teacher_fallback": false
+  },
+  "evaluation": {
+    "adaptation_updates": [0, 2, 8, 32],
+    "collector_slots": [0, 65536, 262144, 1048576],
+    "seed_base": 71000,
+    "split": "validation",
+    "start": "natural_reset",
+    "states": 32,
+    "horizon_ticks": 128,
+    "fixed_mode_repeats_per_state": 1,
+    "normal_sample_repeats_per_state": 4,
+    "stochastic_sample_repeats_per_state": 4,
+    "sample_episodes_per_seed_checkpoint_kernel": 128,
+    "sample_reported_separately": true,
+    "cross_probability_mode": "For every final policy, reuse its deterministic normal-kernel episode profile and evaluate it at each registered probability with the exact finite-panel formula. The p=0 and p=1 jobs are fixed before their launch; the p=0.05 and p=0.30 entries are explicitly retrospective pinned comparisons.",
+    "exactness_basis": "The pinned no-learning basis establishes that the world begins with exactly the three physical grain required by the goal, no resource-generation defect is enabled, each overwrite destroys positive physical grain, and any first overwrite therefore makes success and terminal reward impossible. Before the first fire the stochastic path equals the fixed path. Exactness additionally assumes independent Bernoulli fires with constant p at every counted risky harvest.",
+    "exact_mode_formula": "For each deterministic fixed-kernel path i, record fixed success s_i, length T_i, and the unrestricted count k_i of valid harvests with positive pre-harvest inventory. Success is mean[s_i(1-p)^k_i], return is mean[s_i gamma^(T_i-1)(1-p)^k_i], and overwrite-incident probability is mean[1-(1-p)^k_i]. Existing fixed-kernel failure is distinct from overwrite incidents.",
+    "behavior_drift_anchor": "For each seed, freeze every active observation-goal state visited by the update-zero source policy deterministic fixed-kernel trajectories from all 32 natural validation starts, up to success or the 128-tick horizon. Weight each active state equally. At every checkpoint compute mean D_KL(source actor || current actor) and argmax action-change rate on exactly this frozen panel.",
+    "primary_contrast": "At evaluation p=0.05 and update 32, compare the paired-by-seed exact expected discounted returns of standard-rate policies trained at p=0, 0.05, 0.30, and 1. Include p=0.05 and p=0.30 quarter-rate policies as auxiliary preregistered comparators.",
+    "secondary_contrasts": [
+      "the same training-policy matrix at evaluation p=0, 0.30, and 1",
+      "normal-kernel deterministic success and discounted return",
+      "risky-start count and exact overwrite-incident probability",
+      "cumulative lost grain, loss episodes, and overwrite fires during training",
+      "source-panel actor KL and argmax action-change rate",
+      "matching-probability sampled-action results reported separately"
+    ]
+  },
+  "metrics": {
+    "primary": "exact finite-panel expected discounted return at evaluation p=0.05",
+    "transfer": ["cross-probability exact success", "cross-probability exact discounted return", "normal-kernel success and return", "risky-start count"],
+    "adaptation_harm": ["cumulative lost grain", "physical loss events", "loss episode rate"],
+    "opportunity": ["overwrite trigger events", "overwrite fire events", "fixed-mode risky-harvest count distribution"],
+    "behavior_change": ["mean source-to-current categorical KL on frozen source states", "argmax action-change count and rate on frozen source states"],
+    "success_rule": "Lower risk exposure alone is not success. Interpret p=0.05 return together with normal-task preservation, training harm, and the complete transfer matrix."
+  },
+  "statistics": {
+    "independent_unit": "learner seed",
+    "paired_by": "seed and source checkpoint; the two new branches also share worker state and RNG streams",
+    "report": "All five seed values and condition means; no significance claim from five seeds.",
+    "sign_tolerance": 1e-12,
+    "episode_count_is_not_an_independent_replication_unit": true
+  },
+  "checkpoint_storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "capacity_measured_utc": "2026-10-13",
+    "home_free_bytes_at_preflight": 160935854080,
+    "raid_free_bytes_at_preflight": 7860208476160,
+    "prior_10_job_run_bytes": 1289027584,
+    "retained_checkpoints_per_job": [0, 2, 8, 32],
+    "retained_checkpoint_count": 40,
+    "projected_additional_bytes": 4294967296,
+    "projected_peak_writes_bytes": 5368709120,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 13958643712,
+    "retention": "Retain updates 0, 2, 8, and 32 plus evaluations. Keep at most one additional rolling resume checkpoint per active job and remove its predecessor only after the successor receipt is complete.",
+    "concurrency": 1
+  },
+  "interpretation": {
+    "claim_if_supported": "Frequent-defect training can or cannot transfer to the rare p=0.05 evaluation within the fixed budget and finite start panel.",
+    "non_claims": [
+      "The intervention does not isolate event count from the training reward landscape or state visitation.",
+      "The exact finite-panel mode result is not a new stochastic-policy rollout.",
+      "Five learner seeds do not establish broad generalization or statistical significance.",
+      "A result at 32 updates does not establish asymptotic learning speed or eventual convergence.",
+      "The simulator.s controllable defect probability need not be available in a deployed system.",
+      "Concurrency one is an operational launch choice, not a cross-process lock enforced by the wrapper."
+    ]
+  },
+  "stop_rule": "Finish the fixed 32-update budget for p=0 and p=1, preserve positive or negative results, and do not add probabilities, learning rates, updates, curricula, teachers, BC, entropy changes, or architecture changes."
+}
