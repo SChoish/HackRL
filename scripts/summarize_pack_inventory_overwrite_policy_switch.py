@@ -204,6 +204,7 @@ def path_comparison(raw: dict) -> dict:
     }
     differing = []
     shorter = []
+    p05_differences = {}
     for key in sorted(one):
         one_actions = [step["chosen_action"] for step in one[key]["steps"]]
         persistent_actions = [step["chosen_action"] for step in persistent[key]["steps"]]
@@ -211,9 +212,20 @@ def path_comparison(raw: dict) -> dict:
             differing.append(key)
         if persistent[key]["length"] < one[key]["length"]:
             shorter.append(key)
+        p05_differences[key] = (
+            persistent[key]["discounted_return"] * 0.95 ** persistent[key]["executed_risk_count"]
+            - one[key]["discounted_return"] * 0.95 ** one[key]["executed_risk_count"]
+        )
+    overall_difference = math.fsum(p05_differences.values()) / len(one)
+    shorter_path_contribution = math.fsum(p05_differences[key] for key in shorter) / len(one)
+    if not math.isclose(overall_difference, shorter_path_contribution, abs_tol=1e-15):
+        raise AssertionError("shorter paths do not account for the persistent p05 advantage")
     return {
         "different_fixed_action_paths": len(differing),
         "persistent_shorter_paths": len(shorter),
+        "persistent_minus_one_step_p05_return": overall_difference,
+        "shorter_paths_p05_return_contribution": shorter_path_contribution,
+        "shorter_paths_account_for_entire_p05_difference": True,
         "persistent_shorter_path_keys": [
             {"seed": seed, "state_index": state_index} for seed, state_index in shorter
         ],
@@ -232,7 +244,7 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
     return {
         "schema_version": "hackrl_pack_inventory_overwrite_policy_switch_compact_result_v1",
         "status": raw["status"],
-        "decision": "Persistent switching preserved fixed-kernel success and slightly improved mean p=0.05 return over the source policy, but retained 82 of the source policy's 94 risky starts. At the first switch, the adapted policy still selected a risky harvest in 82 of 94 switched episodes. The frozen p=1 policy's avoidance therefore did not transfer as a reliable local replacement at the source policy's risky states; persistent switching mainly prevented repeated one-step loops in six seed-39 starts.",
+        "decision": "Persistent switching preserved fixed-kernel success and slightly improved mean p=0.05 return over the source policy, but retained 82 of the source policy's 94 risky starts. At the first switch, the adapted policy still selected a risky harvest in 82 of 94 switched episodes. The frozen p=1 policy's avoidance therefore did not transfer as a reliable local replacement at the source policy's risky states; persistent switching's entire observed mean advantage over one-step came from six seed-39 starts where repeated paths became shorter.",
         "provenance": {
             "execution_head": run_manifest["execution_head"],
             "aggregation_head": git("rev-parse", "HEAD"),
@@ -267,7 +279,7 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
             "primary": "Persistent switching has the highest mean p=0.05 return among the four frozen execution modes in this five-seed panel, while retaining 100% fixed-kernel success.",
             "limitation": "The mean p=0.05 advantage over source is small (+0.00206), positive in two seeds and exactly zero in three. This is not evidence of a population-level effect.",
             "mechanism": "Only 12 of 94 first switch actions were safe. The adapted-only policy reached just six risky starts by changing earlier trajectory decisions; late oracle switching cannot reproduce most of that avoidance.",
-            "persistent_specific": "Persistent and one-step switching have the same 82 risky starts. Persistent improves over one-step by eliminating repeated fixed-kernel loops, with shorter paths in six seed-39 starts.",
+            "persistent_specific": "Persistent and one-step switching have the same 82 risky starts. The entire observed p=0.05 return difference between them comes from six seed-39 fixed paths that are shorter under persistent switching and contain no repeated compact state/action pairs.",
         },
         "non_claims": [
             "The oracle switch is not autonomous defect detection.",

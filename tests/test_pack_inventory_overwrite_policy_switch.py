@@ -127,4 +127,8 @@ def test_switch_summary_preserves_the_load_bearing_counts():
     assert persistent["switch_diagnostic"]["first_switch_risky_action_count"] == 82
     paths = SUMMARY.path_comparison(raw)
     assert paths["persistent_shorter_paths"] == 6
+    assert paths["shorter_paths_account_for_entire_p05_difference"] is True
+    assert paths["shorter_paths_p05_return_contribution"] == pytest.approx(
+        paths["persistent_minus_one_step_p05_return"], abs=1e-15
+    )
     assert {row["seed"] for row in paths["persistent_shorter_path_keys"]} == {39}
