@@ -1,0 +1,116 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_policy_switch_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_policy_switch_v1",
+  "status": "frozen_before_execution",
+  "research_question": "Can a frozen p=1-adapted policy handle risky harvest situations while the paired frozen source policy preserves the rest of normal task execution?",
+  "diagnostic_scope": "This is an oracle-assisted execution composability diagnostic, not a learned switching method and not additional PPO, teacher, BC, or test-time training.",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1",
+  "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+  "adapted_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1",
+  "source_checkpoint": "adapt_4096",
+  "adapted_checkpoint": "adapt_32",
+  "seeds": [35, 36, 37, 38, 39],
+  "execution_modes": {
+    "source": "Always execute the deterministic argmax action of the frozen source actor.",
+    "adapted": "Always execute the deterministic argmax action of the frozen p=1 adapted actor.",
+    "one_step": "Use the source actor except when its proposed action satisfies the overwrite trigger in the current state; execute the adapted actor's action for that one step, then return to the source actor.",
+    "persistent": "Use the source actor until its proposed action satisfies the overwrite trigger; then use the adapted actor until a delivery or storage transition empties carried grain, and return to the source actor. The adapted action is never replaced or forced safe."
+  },
+  "oracle": {
+    "predicate": "inventory_overwrite_trigger(state, source_argmax_action)",
+    "meaning": "A valid harvest is proposed while carried_grain > 0.",
+    "non_claim": "The simulator predicate is supplied to the executor. The policy does not discover the defect or the switching rule."
+  },
+  "evaluation": {
+    "split": "validation",
+    "start": "natural_reset",
+    "states_per_seed": 32,
+    "horizon_ticks": 128,
+    "action_selection": "deterministic_argmax",
+    "direct_kernels": ["fixed", "inventory_overwrite_p1"],
+    "exact_overwrite_probabilities": [0.0, 0.05, 0.30, 1.0],
+    "primary": "At overwrite probability 0.05, paired by seed: expected discounted return of each switch mode, interpreted with fixed-kernel task retention.",
+    "secondary": [
+      "success rate and expected discounted return",
+      "fixed-kernel success rate, return, and length",
+      "risky-harvest trigger count",
+      "switch count and adapted-policy duration",
+      "repeated compact-state/action count",
+      "all failed deterministic paths"
+    ],
+    "exact_formula": "For each fixed-kernel deterministic path i with success s_i, length T_i, and risky source-proposal count k_i, J(p)=mean[s_i*0.995^(T_i-1)*(1-p)^k_i]. Any fired overwrite destroys physical grain and makes delivery of three impossible.",
+    "endpoint_checks": [
+      "The exact formula at p=0 equals the direct fixed-kernel evaluation.",
+      "The exact formula at p=1 equals the direct deterministic always-fire evaluation.",
+      "Before the first p=1 overwrite, compact pre-state signatures and chosen actions equal the fixed-kernel path.",
+      "Every direct p=1 success has zero risky trigger count on its matched fixed path."
+    ]
+  },
+  "budget": {
+    "learning_updates": 0,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "policies": 10,
+    "execution_modes": 4,
+    "direct_kernels": 2,
+    "episodes": 1280,
+    "maximum_environment_steps": 163840,
+    "automatic_extension": false
+  },
+  "analysis": {
+    "independent_unit": "learner seed",
+    "paired_by": "seed, source checkpoint, adapted checkpoint, and natural start",
+    "report": "All five seed values, aggregate means, and every failed mode path. No significance claim from five seeds.",
+    "success_rule": "A switch mode must improve or retain p=0.05 return while restoring fixed-kernel execution; reduced risk or fewer switches alone is not success.",
+    "non_claims": [
+      "The oracle switch is not an autonomous defect-detection method.",
+      "Success does not show that the source and adapted policies can be combined without access to simulator semantics.",
+      "Failure does not prove that the preservation-adaptation tradeoff is unavoidable.",
+      "The exact finite-panel expectation is not a stochastic-policy rollout.",
+      "Five Dual-history learner seeds do not establish general population frequency."
+    ]
+  },
+  "prerequisites": {
+    "transfer_compact_result": "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_results.json",
+    "transfer_compact_result_sha256": "62365377984a24a9748f840b5eee61169713a557f4842acf047620f6e49a894e",
+    "transfer_raw_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/result.json",
+    "transfer_raw_result_sha256": "5e7444899a162d27e8425b42522fd13086d8c7d17e33f2e820096ba1de47f1c7",
+    "reference_paths": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_panel_v1/reference_paths.json",
+    "reference_paths_sha256": "a902dc69db5938d26aa6314669d95cb54d6629dd8f5a0f6b546d8a6404218a8a"
+  },
+  "checkpoint_sha256": {
+    "source": {
+      "35": {"arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a", "config.json": "dbf3cd1f934eea4c7623697f9c89d067304b580b8bcdaad7f407a09c8b31ce7f", "metadata.json": "0132b3eac566acd41f4361273eff2f10fea0b5eb765a67c48cefc2af1672710c", "state.msgpack": "77c48c03360b63bb9354e8346cb82a54d470cf541becb0b670e0037adc659d8f"},
+      "36": {"arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a", "config.json": "14eebc6b23126d923268c1f1eccf86b69e46dbd8f81ef2f6ddb7d3b4b1a36cac", "metadata.json": "1da47f53ee42ab8fdb952d677cc6a8d29f94714bcea8cd6a136cd9c03d856d1a", "state.msgpack": "208daa547bf3767db1c5bf257324b7f0b79d73e479dc375fa32715d5b76968d2"},
+      "37": {"arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a", "config.json": "3542cfeda4b16c9f9af60aea3f9d547aa4481931de6f76d115dbb6d283f86bac", "metadata.json": "ae6f4eeba957927ff10d5686a320ee3921916121cb4a2af1e1af6b9b21ef1e57", "state.msgpack": "2a43adce89d2c076f9a682cf351d669909d66e55d3919bc16d4fdb51a1e14c24"},
+      "38": {"arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a", "config.json": "7675f3f867f2628161dd0161098191415256079010e3e81e1e54068d86b94553", "metadata.json": "28d548fb0a2d0639580beb6263e08941ee672b0771b08ba4aa945defcf09db17", "state.msgpack": "a2509a17dbd94ad8af38cd66065271fe1640b153a54028e825c09177a8d6403b"},
+      "39": {"arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a", "config.json": "92bf4d3e6aec115956a0f40e1332791bd5c65b7a14caf3125014d44cf805ed6a", "metadata.json": "60c8c18adf9cdb945d762e83bb4cc5ab920b85ba915b70d33f12694a91292818", "state.msgpack": "f70d3889f623f9c5c28063b099f550a90150340681f6d466dbac522fec64658f"}
+    },
+    "adapted": {
+      "35": {"config.json": "3dfb06557e8842a7a22ea79bb5d09d6eb7024eddcfa33dccfec83a8528cf8307", "metadata.json": "a84db92f1054771f6f8a0b750438e2df705788a995a1e39687796315226c472e", "receipt.json": "78b2c3088f5e083dc5a66bffd08141b5eba0868734a23588bccd51d155f9e691", "state.msgpack": "64fa1b746073a0f96b84d1c26416930fc738cec829022c0cba3ff0d8a22e7395"},
+      "36": {"config.json": "109d8d06c824ee59a344643c9799be9a0fbcd79c9f1f7d005e05484543e45c11", "metadata.json": "a84db92f1054771f6f8a0b750438e2df705788a995a1e39687796315226c472e", "receipt.json": "b3dedf673d1a79cebb1305af8457b90aaf672e308e9f5425dec851ea581299b1", "state.msgpack": "01f8856bd1cc8ce831279b3f4cab746c7d94b47a6ff874993a4a92c6a2885cc0"},
+      "37": {"config.json": "f9e9cef6b97c3f45fdfac228e990cb2191a86bf1abe75cbef498b8414af0f471", "metadata.json": "a84db92f1054771f6f8a0b750438e2df705788a995a1e39687796315226c472e", "receipt.json": "a22266a20c7870fc50367771b9f4e35aa94de64c725dffed79627c3dbad870bd", "state.msgpack": "faa3e38f66732d00f356efa1be8f4d88b899f428f27e1b63dc8dfa6ee1885011"},
+      "38": {"config.json": "178044b076c40fa5ea4a021f43a91281b19d2faad57c5519c47ec0756a32698a", "metadata.json": "a84db92f1054771f6f8a0b750438e2df705788a995a1e39687796315226c472e", "receipt.json": "df4c6db7f54972e34b49f25f4029d02d2bb16d053dbb14041f639f35f8dd1dcc", "state.msgpack": "8a03625d3b4f038ebbabf74098ce9c5f8a3170ff9e7eb153dac661692a1f69e3"},
+      "39": {"config.json": "398a119111248a36594fd35c1689d3f9ce712ba72a7be12e3f9b0cfeb24df5c7", "metadata.json": "a84db92f1054771f6f8a0b750438e2df705788a995a1e39687796315226c472e", "receipt.json": "3c7ce5ea7d03643dc09db9e7f6f6ded524d4bc586635e0de7271cd775c971825", "state.msgpack": "7d07d07f8591c515ba82dc50eab32a7955f4872c75ada3f0e6b669304e52389b"}
+    }
+  },
+  "execution_sources": [
+    "docs/manifests/pack_inventory_overwrite_policy_switch_v1.json",
+    "scripts/evaluate_pack_inventory_overwrite_policy_switch.py",
+    "src/hackrl/pack_restore.py",
+    "src/hackrl/pack_restore_gc.py",
+    "src/hackrl/pack_inventory_overwrite_rare.py",
+    "src/hackrl/dual_leo.py"
+  ],
+  "storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "capacity_measured_utc": "2026-10-13",
+    "home_free_bytes_at_preflight": 159987662848,
+    "raid_free_bytes_at_preflight": 7809505992704,
+    "projected_peak_writes_bytes": 268435456,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 8858370048,
+    "checkpoints_written": 0
+  },
+  "stop_rule": "Complete all four frozen execution modes for all five seeds and both direct endpoint kernels, write the exact p=0.05 and p=0.30 summaries, and do not add learning, policies, seeds, thresholds, or switch variants."
+}

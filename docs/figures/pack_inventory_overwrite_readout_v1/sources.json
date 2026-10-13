@@ -1,0 +1,47 @@
+{
+  "assets": [
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/01_exploitation_and_recovery_paths.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/01_exploitation_and_recovery_paths.svg"
+    },
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/02_ppo_avoids_harmful_bug.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/02_ppo_avoids_harmful_bug.svg"
+    },
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/03_smaller_updates_tradeoff.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/03_smaller_updates_tradeoff.svg"
+    },
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/04_training_frequency_transfer.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/04_training_frequency_transfer.svg"
+    },
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/05_seed_specific_failure.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/05_seed_specific_failure.svg"
+    },
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/06_risk_and_task_decomposition.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/06_risk_and_task_decomposition.svg"
+    },
+    {
+      "png": "docs/figures/pack_inventory_overwrite_readout_v1/07_frozen_policy_switch_diagnostic.png",
+      "svg": "docs/figures/pack_inventory_overwrite_readout_v1/07_frozen_policy_switch_diagnostic.svg"
+    }
+  ],
+  "contact_sheet": "docs/figures/pack_inventory_overwrite_readout_v1/contact_sheet.png",
+  "notes": [
+    "All quantitative panels use recorded values; no illustrative numeric data were introduced.",
+    "Asset 01 is one selected deterministic path example, not a population average.",
+    "Asset 07 is a proposed oracle-assisted execution diagnostic, not a completed result."
+  ],
+  "render_script": "scripts/render_pack_inventory_overwrite_readout_assets.py",
+  "schema_version": "hackrl_pack_inventory_overwrite_readout_assets_v1",
+  "source_sha256": {
+    "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/result.json": "5e7444899a162d27e8425b42522fd13086d8c7d17e33f2e820096ba1de47f1c7",
+    "/raid/ext_csv/HackRL/runs/spatial_wall_pass_reliability_mix_v1/fixed_01pct_seed_132/checkpoints/adapt_4096/evaluation.json": "092d487154b6652e5298c4dba1048af5849fc6969be04d9d77fdb2d3c72c7029",
+    "docs/manifests/pack_inventory_overwrite_lr_ppo_v1_results.json": "6fb4a73d5920e1daac33b3d5ea39389507618c4dd59127a39824758e892d3344",
+    "docs/manifests/pack_inventory_overwrite_ppo_v1_results.json": "3cc5791c40540692c2a282a8f71d3fc81d109f1f8ea5e2cd29550bbe6302cac0",
+    "docs/manifests/pack_inventory_overwrite_train_probability_transfer_v1_results.json": "62365377984a24a9748f840b5eee61169713a557f4842acf047620f6e49a894e"
+  }
+}
