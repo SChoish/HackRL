@@ -113,14 +113,47 @@ def build_compact(raw: dict, design: dict, run_manifest: dict, complete: dict) -
     actual_targets = [(row["seed"], row["state_index"]) for row in targets]
     if actual_targets != expected_targets:
         raise AssertionError("diagnostic target identities changed")
+    d_episodes = {
+        (row["seed"], episode["state_index"]): episode
+        for row in raw["rows"]
+        for episode in row["fixed"]["episodes"]
+    }
+    target_details = []
+    for target in targets:
+        episode = d_episodes[(target["seed"], target["state_index"])]
+        branch_index = int(target["branch_step"]) - 1
+        branch = episode["steps"][branch_index]
+        later_disagreements = [
+            step
+            for step in episode["steps"][branch_index + 1 :]
+            if step["carried_grain"] == 0
+            and step["source_action"] != step["adapted_action"]
+        ]
+        target_details.append(
+            {
+                **target,
+                "branch_delivered_total": int(branch["delivered_total"]),
+                "later_empty_action_disagreement_count": len(later_disagreements),
+                "first_later_empty_action_disagreement": (
+                    None
+                    if not later_disagreements
+                    else {
+                        "step": int(later_disagreements[0]["step"]),
+                        "delivered_total": int(later_disagreements[0]["delivered_total"]),
+                        "source_action": int(later_disagreements[0]["source_action"]),
+                        "adapted_action": int(later_disagreements[0]["adapted_action"]),
+                    }
+                ),
+            }
+        )
     recovered = [
         [row["seed"], row["state_index"]]
-        for row in targets
+        for row in target_details
         if row["D_success"]
     ]
     failed = [
         [row["seed"], row["state_index"]]
-        for row in targets
+        for row in target_details
         if not row["D_success"]
     ]
     comparison = raw["comparison"]
@@ -131,8 +164,9 @@ def build_compact(raw: dict, design: dict, run_manifest: dict, complete: dict) -
         "status": raw["status"],
         "decision": (
             "One source-actor action recovered two of the four predeclared B-failure/C-success paths. "
-            "The step-15 cases recovered, while the step-3 cases still failed; therefore this finite panel mixes failures for which "
-            "one action was sufficient with failures requiring a different or longer intervention. No path that B had solved became a D failure."
+            "The step-15 cases recovered, while the step-3 cases still failed after the same empty-inventory disagreement recurred at step 12; "
+            "therefore this finite panel mixes failures for which one action was sufficient with failures requiring a different or longer intervention. "
+            "No path that B had solved became a D failure."
         ),
         "provenance": {
             "execution_head": run_manifest["execution_head"],
@@ -178,7 +212,7 @@ def build_compact(raw: dict, design: dict, run_manifest: dict, complete: dict) -
             "recovered_count": len(recovered),
             "recovered_seed_state_indices": recovered,
             "failed_seed_state_indices": failed,
-            "targets": targets,
+            "targets": target_details,
             "new_D_failures_among_B_successes": raw["diagnostic"]["new_D_failures_among_B_successes"],
         },
         "conditions": {
@@ -217,8 +251,9 @@ def build_compact(raw: dict, design: dict, run_manifest: dict, complete: dict) -
         },
         "interpretation": {
             "mixed_recovery": (
-                "D recovered state indices 16 and 24, whose first disagreement occurred at step 15, but did not recover "
-                "state indices 4 and 12, whose first disagreement occurred at step 3."
+                "D recovered state indices 16 and 24 after swapping at step 15 with delivered_total=2 and encountered no later eligible disagreement. "
+                "It did not recover state indices 4 and 12 after swapping at step 3 with delivered_total=1; on both paths the empty-inventory "
+                "UP-versus-DELIVER disagreement recurred at step 12 after delivered_total reached 2."
             ),
             "whole_panel": (
                 "D fixed-kernel success was 98.75% and p=0.05 return was 0.883804, between B (97.5%, 0.871333) "

@@ -106,4 +106,11 @@ def test_compact_builder_preserves_provenance_and_result_limits():
     assert compact["D_execution"]["no_swap_path_count"] == 88
     assert compact["decimal_audit"]["passed"]
     assert compact["provenance"]["raw_result"]["sha256"] == complete["result_sha256"]
+    details = {row["state_index"]: row for row in compact["diagnostic"]["targets"]}
+    assert details[4]["branch_delivered_total"] == 1
+    assert details[4]["first_later_empty_action_disagreement"] == {
+        "step": 12, "delivered_total": 2, "source_action": 3, "adapted_action": 23
+    }
+    assert details[16]["branch_delivered_total"] == 2
+    assert details[16]["first_later_empty_action_disagreement"] is None
     assert any("not a fresh generalization panel" in item for item in compact["non_claims"])
