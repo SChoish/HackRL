@@ -1,0 +1,418 @@
+{
+  "carry_gate_diagnostic": {
+    "adapted_policy_steps": 1174,
+    "episodes": 160,
+    "episodes_with_handoff": 160,
+    "failed_path_count": 0,
+    "first_handoff_risky_action_count": 6,
+    "first_handoff_safe_action_count": 154,
+    "handoff_count": 414,
+    "risky_start_count": 40
+  },
+  "decimal_audit": {
+    "domain": "Decimal, 50 digits",
+    "formula": "mean(success * 0.995^(length-1) * (1-p)^executed_risk_count)",
+    "maximum_absolute_difference": "8.38526422826452574738310393071965E-17",
+    "passed": true,
+    "points": {
+      "p00": {
+        "expected_discounted_return": "0.906841277057552221059928979280088365535149532417",
+        "overwrite_loss_episode_probability": "0",
+        "success_rate": "1"
+      },
+      "p05": {
+        "expected_discounted_return": "0.89550784973745769819204786317428321691779782821331",
+        "overwrite_loss_episode_probability": "0.0125",
+        "success_rate": "0.9875"
+      },
+      "p100": {
+        "expected_discounted_return": "0.68017273065566176370230665716398539318811544834906",
+        "overwrite_loss_episode_probability": "0.25",
+        "success_rate": "0.75"
+      },
+      "p30": {
+        "expected_discounted_return": "0.8388407131369850838526422826452574738310393071965",
+        "overwrite_loss_episode_probability": "0.075",
+        "success_rate": "0.925"
+      }
+    },
+    "tolerance": "1E-14"
+  },
+  "decision": "The carry-gated schedule met the preregistered success rule in this frozen five-seed panel. Carry-gated execution had the highest p=0.05 expected return, retained 100% fixed-kernel success, and reduced risky starts from 94 for source-only and 82 for late persistent switching to 40. Its paired p=0.05 return difference was positive in all five seeds against both source-only and late switching.",
+  "design": {
+    "direct_kernels": [
+      "fixed",
+      "inventory_overwrite_p1"
+    ],
+    "learning_updates": 0,
+    "maximum_environment_steps": 40960,
+    "natural_starts_per_seed": 32,
+    "new_episodes": 320,
+    "new_execution_mode": "carry_gated",
+    "seeds": [
+      35,
+      36,
+      37,
+      38,
+      39
+    ]
+  },
+  "exact_carry_gate": {
+    "p00": {
+      "expected_discounted_return": 0.9068412770575522,
+      "overwrite_loss_episode_probability": 0.0,
+      "overwrite_probability": 0.0,
+      "success_rate": 1.0
+    },
+    "p05": {
+      "expected_discounted_return": 0.8955078497374577,
+      "overwrite_loss_episode_probability": 0.012499999999999956,
+      "overwrite_probability": 0.05,
+      "success_rate": 0.9875
+    },
+    "p100": {
+      "expected_discounted_return": 0.6801727306556618,
+      "overwrite_loss_episode_probability": 0.25,
+      "overwrite_probability": 1.0,
+      "success_rate": 0.75
+    },
+    "p30": {
+      "expected_discounted_return": 0.838840713136985,
+      "overwrite_loss_episode_probability": 0.07499999999999996,
+      "overwrite_probability": 0.3,
+      "success_rate": 0.925
+    }
+  },
+  "gates": {
+    "all_320_direct_episodes_recorded": true,
+    "all_endpoint_checks_pass": true,
+    "no_learning_updates": true,
+    "prior_result_still_pinned": true
+  },
+  "interpretation": {
+    "composition": "Carry-gated execution outperformed full source execution in all five seeds, showing that the two frozen policies were composable under this supplied phase gate. Its mean also exceeded adapted-from-start, but that contrast was positive only in seed 35 and does not establish stable superiority over adapted-from-start.",
+    "cost": "The fixed-kernel success rate stayed at 100%, while mean fixed return decreased slightly and path length increased, so the safer route was not free.",
+    "limit": "Carry-gated and late-risk execution differ in the gate predicate, handoff timing, and states controlled by the adapted actor. The comparison therefore does not identify timing alone, explain the adapted actor internally, or show that a learned gate would recover the same benefit.",
+    "primary": "The tested carry-gated composite reduced risky starts and improved p=0.05 return, whereas the tested late-risk composite retained most source-policy risky paths."
+  },
+  "non_claims": [
+    "The evaluator supplied the carry gate; the policy did not learn when to switch.",
+    "The result does not isolate state-distribution shift as the cause of the late-switch failure.",
+    "The exact p=0.05 and p=0.30 values are finite-panel expectations from deterministic fixed paths, not fresh stochastic rollouts.",
+    "Five Dual-history learner seeds do not establish population frequency or significance."
+  ],
+  "normal_kernel_cost_vs_source": {
+    "mean_length_difference": 0.47499999999999787,
+    "return_difference": -0.002144517725931494,
+    "success_rate_difference": 0.0
+  },
+  "paired_p05_return_contrasts": {
+    "carry_gated_minus_adapted": {
+      "left": "carry_gated",
+      "mean_difference": 0.014772787428346224,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": 0.10824503938368313,
+          "seed": 35
+        },
+        {
+          "difference": -0.013624034673539342,
+          "seed": 36
+        },
+        {
+          "difference": -0.0025810522228389976,
+          "seed": 37
+        },
+        {
+          "difference": -0.016182981456169143,
+          "seed": 38
+        },
+        {
+          "difference": -0.0019930338894045274,
+          "seed": 39
+        }
+      ],
+      "right": "adapted",
+      "signs": {
+        "equal_within_tolerance": 0,
+        "negative": 4,
+        "positive": 1
+      }
+    },
+    "carry_gated_minus_persistent": {
+      "left": "carry_gated",
+      "mean_difference": 0.011164201252248263,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": 0.007955131458899922,
+          "seed": 35
+        },
+        {
+          "difference": 0.006655497792690368,
+          "seed": 36
+        },
+        {
+          "difference": 0.011364453269781638,
+          "seed": 37
+        },
+        {
+          "difference": 0.01677677413951506,
+          "seed": 38
+        },
+        {
+          "difference": 0.013069149600354324,
+          "seed": 39
+        }
+      ],
+      "right": "persistent",
+      "signs": {
+        "equal_within_tolerance": 0,
+        "negative": 0,
+        "positive": 5
+      }
+    },
+    "carry_gated_minus_source": {
+      "left": "carry_gated",
+      "mean_difference": 0.013219996798008648,
+      "metric": "p05_expected_discounted_return",
+      "per_seed": [
+        {
+          "difference": 0.009668294413700096,
+          "seed": 35
+        },
+        {
+          "difference": 0.006655497792690368,
+          "seed": 36
+        },
+        {
+          "difference": 0.011364453269781638,
+          "seed": 37
+        },
+        {
+          "difference": 0.01677677413951506,
+          "seed": 38
+        },
+        {
+          "difference": 0.02163496437435608,
+          "seed": 39
+        }
+      ],
+      "right": "source",
+      "signs": {
+        "equal_within_tolerance": 0,
+        "negative": 0,
+        "positive": 5
+      }
+    }
+  },
+  "per_seed": {
+    "adapted": [
+      {
+        "fixed_risky_start_count": 0,
+        "fixed_success_rate": 0.875,
+        "p05_expected_discounted_return": 0.790421817625272,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.9033259626614366,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 4,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.9003728605355875,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 0,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.9080226573688694,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 0,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.9015320133543911,
+        "seed": 39
+      }
+    ],
+    "carry_gated": [
+      {
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8986668570089551,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8897019279878973,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 8,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8977918083127485,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8918396759127003,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "seed": 39
+      }
+    ],
+    "persistent": [
+      {
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8907117255500552,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 18,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8830464301952069,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 16,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8864273550429669,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 24,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8750629017731852,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8864698298646323,
+        "seed": 39
+      }
+    ],
+    "source": [
+      {
+        "fixed_risky_start_count": 14,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.888998562595255,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 18,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8830464301952069,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 16,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8864273550429669,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 24,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8750629017731852,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 22,
+        "fixed_success_rate": 1.0,
+        "p05_expected_discounted_return": 0.8779040150906305,
+        "seed": 39
+      }
+    ]
+  },
+  "primary_p05": {
+    "adapted": {
+      "expected_discounted_return": 0.8807350623091112,
+      "fixed_mean_discounted_return": 0.8824201383496734,
+      "fixed_mean_length": 23.5875,
+      "fixed_risky_start_count": 6,
+      "fixed_success_rate": 0.975,
+      "success_rate": 0.973125
+    },
+    "carry_gated": {
+      "expected_discounted_return": 0.8955078497374577,
+      "fixed_mean_discounted_return": 0.906841277057552,
+      "fixed_mean_length": 20.5125,
+      "fixed_risky_start_count": 40,
+      "fixed_success_rate": 1.0,
+      "success_rate": 0.9875
+    },
+    "persistent": {
+      "expected_discounted_return": 0.8843436484852094,
+      "fixed_mean_discounted_return": 0.9076322543483093,
+      "fixed_mean_length": 20.3375,
+      "fixed_risky_start_count": 82,
+      "fixed_success_rate": 1.0,
+      "success_rate": 0.974375
+    },
+    "source": {
+      "expected_discounted_return": 0.8822878529394489,
+      "fixed_mean_discounted_return": 0.9089857947834835,
+      "fixed_mean_length": 20.0375,
+      "fixed_risky_start_count": 94,
+      "fixed_success_rate": 1.0,
+      "success_rate": 0.970625
+    }
+  },
+  "protocol": {
+    "adapted": "Execute the frozen p=1-adapted actor for the full episode.",
+    "carry_gated": "Execute the source actor whenever carried_grain is zero and the adapted actor whenever carried_grain is positive; the reversible gate can therefore hand off multiple times in one episode.",
+    "defect": "On a valid harvest with carried_grain > 0, the harmful kernel overwrites inventory to one. Any physical grain loss makes delivery of three impossible in this fixture.",
+    "episode_accounting": "Five seeds times 32 natural starts give 160 paths per kernel; fixed and always-fire endpoint kernels give 320 direct episodes.",
+    "gate_source": "The evaluator supplies both switching rules; neither policy learned the gate.",
+    "persistent": "Execute the source actor until it proposes a risky harvest, then execute the adapted actor until delivery or storage empties inventory; repeat if another source-risk proposal occurs.",
+    "risky_start": "A fixed-kernel deterministic path that executes at least one valid harvest while carrying grain.",
+    "source": "Execute the frozen source actor for the full episode.",
+    "success_rule": "Improve or retain p=0.05 expected return and fixed-kernel task performance; lower risk alone is not success."
+  },
+  "provenance": {
+    "aggregation_head": "bd8b6f808458b077b5392fe8abe91fdc8cb78728",
+    "aggregation_script": {
+      "path": "scripts/summarize_pack_inventory_overwrite_early_handoff.py",
+      "sha256": "a7052a7149ba17e2f306eeadead14c5bdeb29ccde97ec8d54be635d4aa2fec7e"
+    },
+    "complete_marker": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/complete.json",
+      "recorded_result_sha256": "b25b85e3a10ee23a6845d09ae5cd117e784c72feba2cfb5b7015be5f1a597a2b",
+      "sha256": "e42ca7dea4f187838f8e33ee074d5c6a0a87efa1f26cac2265470b5519849689"
+    },
+    "design_manifest": {
+      "path": "docs/manifests/pack_inventory_overwrite_early_handoff_v1.json",
+      "sha256": "f6992353032bf7724d8e76787f1f4483b2e44504ccebe36c7670beab666b9afa"
+    },
+    "execution_head": "96a4b17aa5aab32e47b3b3c361b4139ebc6bed66",
+    "raw_result": {
+      "bytes": 7313752,
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/result.json",
+      "sha256": "b25b85e3a10ee23a6845d09ae5cd117e784c72feba2cfb5b7015be5f1a597a2b"
+    },
+    "run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/run_manifest.json",
+      "sha256": "de003c14496d87880d27739cad57ff88583d42f8238b7fc7e3b7ffe1084c341a"
+    }
+  },
+  "risk_reduction": {
+    "carry_to_adapted": 34,
+    "late_to_carry": 42,
+    "source_to_late": 12
+  },
+  "schema_version": "hackrl_pack_inventory_overwrite_early_handoff_compact_result_v1",
+  "status": "complete_no_learning"
+}

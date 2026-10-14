@@ -1,0 +1,96 @@
+{
+  "checks": [
+    "All 320 direct episodes were recorded.",
+    "Exact p=0 and p=1 success and return matched direct endpoint kernels for every seed.",
+    "Pre-overwrite deterministic histories matched between fixed and always-fire kernels.",
+    "The prior source, late-switch, and adapted results remained hash-pinned.",
+    "Independent Decimal recomputation differed by at most 8.38526422826452574738310393071965E-17.",
+    "All five seeds and every failed fixed-kernel path were retained."
+  ],
+  "claim_id": "pack_inventory_overwrite_early_handoff_v1_finite_panel",
+  "command": [
+    "PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/evaluate_pack_inventory_overwrite_early_handoff.py --run",
+    "/home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_early_handoff.py --write"
+  ],
+  "environment": {
+    "hardware": "CPU backend; Intel(R) Xeon(R) Platinum 8480C; Linux-6.8.0-55-generic-x86_64-with-glibc2.39",
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2 / jaxlib 0.10.2",
+      "NumPy 2.5.0"
+    ]
+  },
+  "mathematics": {
+    "assertion_tested": "For the carry-gated frozen execution mode on 5 learner seeds x 32 natural starts, recompute exact expected success and discounted return at overwrite probabilities 0, 0.05, 0.30, and 1 from recorded fixed-kernel paths.",
+    "bounds": {
+      "direct_episodes": 320,
+      "direct_kernels": 2,
+      "evaluated_probabilities": [
+        0.0,
+        0.05,
+        0.3,
+        1.0
+      ],
+      "horizon_ticks": 128,
+      "learner_seeds": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "maximum_environment_steps": 40960,
+      "natural_starts_per_seed": 32,
+      "new_execution_modes": 1
+    },
+    "coefficient_domain": "Decimal arithmetic at 50 digits for the independent aggregate; binary64/JAX values in the recorded run.",
+    "conventions": "Discount 0.995; terminal success reward represented by 0.995^(T-1); independent overwrite survival (1-p)^k; one physical grain loss makes the three-grain goal impossible.",
+    "inputs": [
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/result.json",
+        "sha256": "b25b85e3a10ee23a6845d09ae5cd117e784c72feba2cfb5b7015be5f1a597a2b"
+      },
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/run_manifest.json",
+        "sha256": "de003c14496d87880d27739cad57ff88583d42f8238b7fc7e3b7ffe1084c341a"
+      },
+      {
+        "path": "docs/manifests/pack_inventory_overwrite_early_handoff_v1.json",
+        "sha256": "f6992353032bf7724d8e76787f1f4483b2e44504ccebe36c7670beab666b9afa"
+      }
+    ],
+    "non_claims": [
+      "The evaluator supplied the carry gate; the policy did not learn when to switch.",
+      "The result does not isolate state-distribution shift as the cause of the late-switch failure.",
+      "The exact p=0.05 and p=0.30 values are finite-panel expectations from deterministic fixed paths, not fresh stochastic rollouts.",
+      "Five Dual-history learner seeds do not establish population frequency or significance."
+    ]
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_early_handoff_v1_results.json",
+      "sha256": "cb9e485ef98327d0b331c8a579fd95dab0088a43d7c0924cf044b9fc818a1cbb"
+    }
+  ],
+  "randomness": {
+    "generator": "",
+    "seed": null,
+    "used": false
+  },
+  "repository": {
+    "commit": "bd8b6f808458b077b5392fe8abe91fdc8cb78728",
+    "dirty": false
+  },
+  "residual_risks": [
+    "The policy network and simulator implementation were not independently reimplemented.",
+    "The intermediate-probability result relies on the environment property that any overwrite loss makes the delivery goal impossible.",
+    "The supplied phase gate is not an autonomous switching method."
+  ],
+  "result": "Implementation and finite assertion verified in the stated five-seed, 32-start panel.",
+  "run": {
+    "exit_status": 0,
+    "runtime_seconds": 32.541035652160645,
+    "started_at": "2026-10-14T00:38:24.411050+00:00"
+  },
+  "schema_version": 1
+}
