@@ -68,7 +68,7 @@
   "outputs": [
     {
       "path": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1_results.json",
-      "sha256": "723ac10098f369337941f63abc19b4bbb68ae07f326f31f50b7240544945857c"
+      "sha256": "5948c2ca8df4e92d80b0fe063deea240e08b3be13fe98d1d965c1b2484d504b9"
     }
   ],
   "randomness": {
@@ -77,7 +77,7 @@
     "used": false
   },
   "repository": {
-    "commit": "2d1aa1fc5f87fcc2e25755c6ae3e19030e64beb4",
+    "commit": "07470984cedf3c8fdec42c05013d4d8de94d8ecc",
     "dirty": false
   },
   "residual_risks": [
@@ -88,7 +88,7 @@
     "Intermediate-probability values rely on the environment property that any overwrite loss makes the three-delivery goal impossible.",
     "Schema version 1 does not machine-pin every execution input or resource limit."
   ],
-  "result": "Finite TEST-panel assertion verified: carry-gated minus source p=0.05 return was +0.002876 on average, positive for four of five seeds, while fixed-kernel success decreased from 100% to 98.75%.",
+  "result": "Finite TEST-panel assertion verified: the supplied gate reduced risk and raised mean p=0.05 return over source, but lowered fixed-kernel success and was not seed-consistently better than adapted-only execution; it does not support a normal-performance-preservation claim.",
   "run": {
     "exit_status": 0,
     "runtime_seconds": 44.9209680557251,

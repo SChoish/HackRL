@@ -65,6 +65,16 @@
       "positive": 4
     }
   },
+  "claim_revision": {
+    "cross_panel_read": "Seed 35's validation failures were repaired by the supplied gate, but two normal TEST paths failed under the same gate. Explaining and repairing the validation cases did not establish general gate reliability.",
+    "manual_gate_phase": "Closed after this held-out evaluation; no further hand-written gate variants are authorized by this result.",
+    "not_supported": [
+      "Carry-gated execution preserves normal-task performance beyond the original validation panel.",
+      "Carry-gated execution is seed-consistently better than adapted-only execution.",
+      "The supplied gate generalizes to newly learned policy pairs."
+    ],
+    "supported": "Relative to the source actor, carry-gated execution reduced risky-path exposure and had higher mean p=0.05 return on TEST, with positive paired differences in four of five seeds."
+  },
   "conditions": {
     "adapted": {
       "fixed_mean_length": 23.5375,
@@ -170,7 +180,7 @@
     "scope": "All three conditions, 160 fixed-kernel paths per condition, at p=0, p=0.05, and p=1.",
     "tolerance": "1E-14"
   },
-  "decision": "On the predefined PACK TEST panel, carry-gated execution improved mean p=0.05 expected discounted return over the source actor by 0.002876 and was positive for seeds 36-39, while seed 35 decreased by 0.044043. The gate reduced risky paths from 94 to 36 but lowered fixed-kernel success from 100% to 98.75%; therefore the validation-panel benefit transferred across multiple policy pairs but was neither uniform nor failure-free.",
+  "decision": "Carry-gated execution reduced risky-path exposure and improved mean p=0.05 expected discounted return over the source actor by 0.002876 on the predefined PACK TEST panel, with positive differences in four of five seeds. It simultaneously lowered fixed-kernel success from 100% to 98.75%, and its p=0.05 advantage over adapted-only execution was positive in only one of five seeds. The manual gate is therefore a risk-reducing but sometimes task-damaging policy composition, not a rule that preserves normal performance.",
   "gates": {
     "all_960_direct_episodes_recorded": true,
     "all_endpoint_checks_pass": true,
@@ -376,10 +386,10 @@
     "primary": "carry_gated minus source at p=0.05"
   },
   "provenance": {
-    "aggregation_head": "2d1aa1fc5f87fcc2e25755c6ae3e19030e64beb4",
+    "aggregation_head": "07470984cedf3c8fdec42c05013d4d8de94d8ecc",
     "aggregation_script": {
       "path": "scripts/summarize_pack_inventory_overwrite_gate_heldout.py",
-      "sha256": "b7e29aba084563366b31de9f829272e574e4104b231b8d4dceda4f50bfb4f67d"
+      "sha256": "80b50ea4ee113ec95b55f165ab59155ea00fc6b0c80792dcfbf3f52caad8cbd3"
     },
     "complete_marker": {
       "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_gate_heldout_v1/complete.json",
