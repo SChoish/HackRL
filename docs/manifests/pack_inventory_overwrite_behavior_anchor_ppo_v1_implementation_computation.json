@@ -1,0 +1,68 @@
+{
+  "checks": [
+    "Pinned prerequisite and checkpoint hashes matched.",
+    "All source actor-critic, Adam, and teacher hashes were unchanged.",
+    "Full action logits and all 32 TRAIN starts were retained for every seed.",
+    "Manual KL, gradient direction, beta-zero parity, empty-minibatch, and PACK regression tests passed.",
+    "RAID free space exceeded projected peak writes plus the 8 GiB reserve; no checkpoints were written."
+  ],
+  "claim_id": "pack_inventory_overwrite_behavior_anchor_ppo_v1_implementation",
+  "command": "JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/validate_pack_inventory_overwrite_behavior_anchor_ppo.py --write-validation",
+  "environment": {
+    "hardware": "cpu:0",
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2",
+      "NumPy 2.5.0"
+    ]
+  },
+  "mathematics": {
+    "assertion_tested": "For seeds 30--34, the deterministic full-logit TRAIN anchors are constructed without mutating source state; KL(source || current) has a stopped source gradient, is stationary at equal outputs within 1e-6, and decreases under the tested changed-logit descent step.",
+    "bounds": {
+      "horizon_ticks": 128,
+      "learner_seeds": 5,
+      "starts_per_seed": 32
+    },
+    "coefficient_domain": "IEEE-754 float32 logits and probabilities",
+    "conventions": "Categorical KL sums over all PACK actions per state and then averages source-trajectory states equally.",
+    "inputs": [
+      "Pinned PACK Dual fixed-kernel adapt_4096 checkpoints for seeds 30--34",
+      "All 32 natural TRAIN starts per seed",
+      "128-tick trajectory cap"
+    ],
+    "non_claims": [
+      "This is a structural and finite implementation check, not evidence that anchored PPO improves task performance.",
+      "The validator and implementation share an author and KL implementation; manual-formula and legacy-path unit tests reduce but do not eliminate verifier-designer dependence.",
+      "Low KL on the TRAIN anchor does not establish normal-task preservation outside those source-visited states.",
+      "VALIDATION and TEST are development panels, not untouched confirmation data."
+    ]
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_behavior_anchor_ppo_v1_implementation_validation.json",
+      "sha256": "23b7a5652ac550eaaf120eee6a3d4ea87bdaab5fc12eea0379590f7eb3748dae"
+    }
+  ],
+  "randomness": {
+    "generator": "",
+    "seed": null,
+    "used": false
+  },
+  "repository": {
+    "commit": "6766131d618ab1e89327080dee4358ce687ed654",
+    "dirty": false
+  },
+  "residual_risks": [
+    "This is a structural and finite implementation check, not evidence that anchored PPO improves task performance.",
+    "The validator and implementation share an author and KL implementation; manual-formula and legacy-path unit tests reduce but do not eliminate verifier-designer dependence.",
+    "Low KL on the TRAIN anchor does not establish normal-task preservation outside those source-visited states.",
+    "VALIDATION and TEST are development panels, not untouched confirmation data."
+  ],
+  "result": "Implementation and finite contract assertions verified for the five pinned source checkpoints; training was not started.",
+  "run": {
+    "exit_status": 0,
+    "runtime_seconds": 175.7470803214237,
+    "started_at": "2026-10-14T11:13:34.289187+00:00"
+  },
+  "schema_version": 1
+}
