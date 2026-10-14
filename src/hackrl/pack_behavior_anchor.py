@@ -76,13 +76,15 @@ def build_pack_behavior_anchor(
     *,
     source_growth_period: int,
     horizon_ticks: int = 128,
+    split: PackRestoreSplit | str = PackRestoreSplit.TRAIN,
 ) -> tuple[PackBehaviorAnchor, PackBehaviorAnchorMetadata]:
-    """Replay all 32 natural TRAIN starts with frozen greedy source actions."""
+    """Replay all 32 natural split starts with frozen greedy source actions."""
 
     if horizon_ticks <= 0:
         raise ValueError("horizon_ticks must be positive")
+    split = PackRestoreSplit(split)
     starts, _, _, _ = _evaluation_states(
-        PackRestoreSplit.TRAIN,
+        split,
         1,
         source_growth_period,
         natural_only=True,
@@ -144,7 +146,7 @@ def build_pack_behavior_anchor(
         else ()
     )
     metadata = PackBehaviorAnchorMetadata(
-        split=PackRestoreSplit.TRAIN.value,
+        split=split.value,
         kernel=PackRestoreVariant.FIXED.value,
         start_count=start_count,
         state_count=anchor.state_count,

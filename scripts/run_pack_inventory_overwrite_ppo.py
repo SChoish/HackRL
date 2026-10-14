@@ -60,6 +60,13 @@ EXECUTION_SOURCES = (
 )
 
 
+def _spec_int(mapping: dict, *names: str) -> int:
+    for name in names:
+        if name in mapping:
+            return int(mapping[name])
+    raise KeyError(f"none of the required manifest keys are present: {names}")
+
+
 def _write_json(path: Path, value) -> None:
     path = Path(path)
     path.parent.mkdir(parents=True, exist_ok=True)
@@ -190,6 +197,7 @@ def _source_config(seed: int):
         or config.goal_mode != "deliver_3"
         or config.num_envs != int(expected["num_envs"])
         or config.num_steps != int(expected["num_steps"])
+        or config.update_epochs != int(expected["update_epochs"])
         or config.minibatch_size != int(expected["minibatch_size"])
         or metadata.get("global_update") != int(SPEC["source_global_update"])
         or arm != {"imitate_teacher": True, "learn_teacher": True}
@@ -467,13 +475,25 @@ def _checkpoint_for_update(cell: Path, update: int) -> Path:
 
 def _latest_checkpoint(cell: Path) -> tuple[int, Path] | None:
     found = []
+    maximum_update = int(SPEC["optimization"]["updates"])
     for root in (cell / "checkpoints", cell / "resume"):
         if not root.is_dir():
             continue
         for path in root.glob("adapt_*"):
             suffix = path.name.removeprefix("adapt_")
             if suffix.isdigit() and _checkpoint_complete(path):
-                found.append((int(suffix), path))
+                update = int(suffix)
+                if not 0 <= update <= maximum_update:
+                    continue
+                receipt = json.loads(
+                    (path / "receipt.json").read_text(encoding="utf-8")
+                )
+                if (
+                    int(receipt["adaptation_update"]) != update
+                    or _sha256(path / "state.msgpack") != receipt["state_sha256"]
+                ):
+                    raise RuntimeError(f"invalid resume checkpoint: {path}")
+                found.append((update, path))
     return max(found, default=None, key=lambda item: item[0])
 
 
@@ -514,7 +534,12 @@ def _write_evaluation(cell: Path, update: int, network, runner, seed: int) -> No
             "schema_version": "hackrl_pack_inventory_overwrite_eval_v1",
             "seed": seed,
             "adaptation_update": update,
-            "collector_slots": update * int(SPEC["optimization"]["collector_slots_per_block"]),
+            "collector_slots": update
+            * _spec_int(
+                SPEC["optimization"],
+                "collector_slots_per_block",
+                "collector_slots_per_update",
+            ),
             "train_state_sha256": _train_state_sha256(runner.train_state),
             "kernels": _evaluate(network, runner.train_state.params, seed),
         },
@@ -543,8 +568,10 @@ def _summarize_cell(
         json.loads(_update_record_path(cell, update).read_text(encoding="utf-8"))
         for update in range(1, updates + 1)
     ]
-    if tracker["collector_slots"] != int(
-        SPEC["optimization"]["collector_slots_per_condition_seed"]
+    if tracker["collector_slots"] != _spec_int(
+        SPEC["optimization"],
+        "collector_slots_per_condition_seed",
+        "collector_slots_per_job",
     ):
         raise AssertionError("collector budget did not finish")
     pending_loss_workers = int(np.sum(np.asarray(tracker["episode_loss_seen"])))
@@ -614,6 +641,13 @@ def _summarize_cell(
     }
 
 
+def _make_learning_update(network, config, runner, condition: str, seed: int):
+    """Build the learning update; experiment wrappers may add fixed losses."""
+
+    del runner, condition, seed
+    return make_pack_restore_gc_update(network, config)
+
+
 def run_learning(condition: str, seed: int) -> None:
     cell = _cell(condition, seed)
     summary_path = cell / "summary.json"
@@ -641,7 +675,9 @@ def run_learning(condition: str, seed: int) -> None:
             raise RuntimeError("resume checkpoint update mismatch")
         if completed in SCIENCE_UPDATES:
             _write_evaluation(cell, completed, network, runner, seed)
-    update_fn = jax.jit(make_pack_restore_gc_update(network, config))
+    update_fn = jax.jit(
+        _make_learning_update(network, config, runner, condition, seed)
+    )
     while completed < int(SPEC["optimization"]["updates"]):
         started = time.perf_counter()
         optimizer_before = int(runner.train_state.step)
@@ -676,6 +712,7 @@ def run_learning(condition: str, seed: int) -> None:
         if completed in SCIENCE_UPDATES:
             _write_evaluation(cell, completed, network, runner, seed)
             _prune_resume(cell)
+            _capacity_checkpoint()
         else:
             _prune_resume(cell, keep=destination)
         print(
@@ -772,16 +809,22 @@ def _run_manifest() -> dict:
         },
         "source_checkpoint_sha256": _source_checkpoint_hashes(),
         "jobs": build_jobs(),
-        "planned_collector_slots": int(SPEC["budget"]["total_collector_slots"]),
+        "planned_collector_slots": _spec_int(
+            SPEC["budget"], "total_collector_slots", "collector_slots"
+        ),
         "automatic_extension": False,
     }
 
 
 def validate_contract(*, require_committed: bool = False) -> dict:
     _validate_prerequisite()
-    if len(build_jobs()) != int(SPEC["budget"]["total_jobs"]):
+    if len(build_jobs()) != _spec_int(SPEC["budget"], "total_jobs", "jobs"):
         raise AssertionError("job count mismatch")
-    block = int(SPEC["optimization"]["collector_slots_per_block"])
+    block = _spec_int(
+        SPEC["optimization"],
+        "collector_slots_per_block",
+        "collector_slots_per_update",
+    )
     updates = int(SPEC["optimization"]["updates"])
     if block != int(SPEC["optimization"]["num_envs"]) * int(
         SPEC["optimization"]["num_steps"]
@@ -789,7 +832,7 @@ def validate_contract(*, require_committed: bool = False) -> dict:
         raise AssertionError("collector block arithmetic changed")
     if (
         len(build_jobs()) * block * updates
-        != int(SPEC["budget"]["total_collector_slots"])
+        != _spec_int(SPEC["budget"], "total_collector_slots", "collector_slots")
     ):
         raise AssertionError("total collector budget arithmetic changed")
     for seed in SEEDS:
@@ -798,7 +841,9 @@ def validate_contract(*, require_committed: bool = False) -> dict:
     result = {
         "status": "contract_valid",
         "jobs": len(build_jobs()),
-        "collector_slots": int(SPEC["budget"]["total_collector_slots"]),
+        "collector_slots": _spec_int(
+            SPEC["budget"], "total_collector_slots", "collector_slots"
+        ),
         "capacity": capacity,
     }
     if require_committed:

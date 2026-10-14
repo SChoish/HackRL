@@ -1,8 +1,19 @@
 {
   "schema_version": "hackrl_pack_inventory_overwrite_behavior_anchor_ppo_manifest_v1",
   "manifest_id": "pack_inventory_overwrite_behavior_anchor_ppo_v1",
-  "status": "implementation_ready_training_not_authorized",
-  "understood_as": "Close the hand-written policy-gate line and compare ordinary p=0.05 PPO adaptation with one behavior-anchored PPO intervention. Both branches start from the same frozen normal actor-critic and inherited Adam state, use paired initial states and RNG streams, and receive the same 32-update collector-slot budget; their visited states and rewards may diverge as soon as their actions differ. The constrained branch alone adds a fixed source-policy KL loss on a preregistered normal-behavior anchor. Do not train, tune the coefficient, add gate variants, or launch a sweep in this phase.",
+  "status": "authorized_fixed_budget_execution",
+  "understood_as": "Close the hand-written policy-gate line and compare ordinary p=0.05 PPO adaptation with one behavior-anchored PPO intervention. Both branches start from the same frozen normal actor-critic and inherited Adam state, use paired initial states and RNG streams, and receive the same 32-update collector-slot budget; their visited states and rewards may diverge as soon as their actions differ. The constrained branch alone adds a fixed source-policy KL loss on a preregistered normal-behavior anchor. Execute only the authorized fixed matrix; do not tune the coefficient, add gate variants, or launch a sweep.",
+  "execution_sources": [
+    "docs/manifests/pack_inventory_overwrite_behavior_anchor_ppo_v1.json",
+    "docs/manifests/pack_inventory_overwrite_behavior_anchor_ppo_v1_implementation_validation.json",
+    "scripts/run_pack_inventory_overwrite_behavior_anchor_ppo.py",
+    "scripts/summarize_pack_inventory_overwrite_behavior_anchor_ppo.py",
+    "scripts/run_pack_inventory_overwrite_ppo.py",
+    "src/hackrl/pack_behavior_anchor.py",
+    "src/hackrl/pack_restore.py",
+    "src/hackrl/pack_restore_gc.py",
+    "src/hackrl/dual_leo.py"
+  ],
   "research_question": "Can source-policy behavior anchoring reduce damage to normal task performance while retaining useful adaptation to a rare harmful inventory-overwrite defect?",
   "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_behavior_anchor_ppo_v1",
   "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
@@ -12,12 +23,14 @@
   "seed_scope": "All five available seed-30--34 source checkpoints are included. They were not used to design the manual carry gate, but they have appeared in earlier PACK studies and are not a globally untouched holdout.",
   "conditions": {
     "p05_ppo": {
+      "kernel": "inventory_overwrite",
       "overwrite_probability": 0.05,
       "ppo_updates": 32,
       "behavior_anchor_coefficient": 0.0,
       "role": "Ordinary PPO adaptation control implemented through the same updater as the constrained branch."
     },
     "p05_anchor_kl_beta01": {
+      "kernel": "inventory_overwrite",
       "overwrite_probability": 0.05,
       "ppo_updates": 32,
       "behavior_anchor_coefficient": 0.1,
@@ -151,7 +164,8 @@
     "independent_unit": "learner seed",
     "paired_by": "seed, source checkpoint, initial actor-critic, Adam state, worker state, RNG streams, collector slots, and overwrite-event uniforms",
     "report": "All five paired differences and their mean; no significance claim from five seeds.",
-    "episode_count_is_not_an_independent_replication_unit": true
+    "episode_count_is_not_an_independent_replication_unit": true,
+    "sign_tolerance": 1e-12
   },
   "implementation_contract": {
     "updater": "src/hackrl/pack_restore_gc.py plus src/hackrl/pack_behavior_anchor.py",
@@ -166,9 +180,11 @@
       "behavior_anchor_forward_state_evaluations",
       "per-update wall-clock seconds"
     ],
-    "training_entrypoint_added": false
+    "training_entrypoint_added": true
   },
   "prerequisites": {
+    "implementation_validation": "docs/manifests/pack_inventory_overwrite_behavior_anchor_ppo_v1_implementation_validation.json",
+    "implementation_validation_sha256": "23b7a5652ac550eaaf120eee6a3d4ea87bdaab5fc12eea0379590f7eb3748dae",
     "manual_gate_closeout": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1_results.json",
     "manual_gate_closeout_sha256": "5948c2ca8df4e92d80b0fe063deea240e08b3be13fe98d1d965c1b2484d504b9",
     "learning_rate_result": "docs/manifests/pack_inventory_overwrite_lr_ppo_v1_results.json",
@@ -210,6 +226,11 @@
   },
   "checkpoint_storage": {
     "chosen_filesystem": "/raid/ext_csv",
+    "capacity_rechecked_utc": "2026-10-14",
+    "home_free_bytes_before_launch": 158699159552,
+    "home_utilization_percent_before_launch": 92,
+    "raid_free_bytes_before_launch": 7595697205248,
+    "existing_run_bytes_before_launch": 0,
     "capacity_measured_utc": "2026-10-14",
     "home_free_bytes_at_design": 158726832128,
     "home_utilization_percent_at_design": 92,
@@ -231,6 +252,6 @@
     "VALIDATION and TEST are development panels for this intervention; neither is a fresh held-out confirmation after this design.",
     "Five source policies from one training family do not establish population-level generalization."
   ],
-  "next_authorized_unit": "Run implementation and contract validation only. Training remains unauthorized until the implementation and validation records are committed, storage is rechecked, and the user explicitly authorizes execution.",
-  "stop_rule": "Run only the two preregistered p=0.05 conditions for seeds 30--34 and 32 updates if later authorized. Do not add beta values, probabilities, learning rates, updates, teachers, gates, replay variants, or curricula in response to the result."
+  "next_authorized_unit": "Execute and aggregate exactly the ten preregistered jobs. Use only the final update-32 checkpoints for the primary comparison; do not extend or select by intermediate results.",
+  "stop_rule": "Run only the two preregistered p=0.05 conditions for seeds 30--34 and 32 updates. Do not add beta values, probabilities, learning rates, updates, teachers, gates, replay variants, or curricula in response to the result."
 }

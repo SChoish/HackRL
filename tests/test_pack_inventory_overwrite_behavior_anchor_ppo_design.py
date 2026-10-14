@@ -19,10 +19,10 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def test_implementation_keeps_training_locked_and_closes_manual_gate_fallback():
-    assert MANIFEST["status"] == "implementation_ready_training_not_authorized"
-    assert MANIFEST["implementation_contract"]["training_entrypoint_added"] is False
-    assert "Training remains unauthorized" in MANIFEST["next_authorized_unit"]
+def test_execution_is_authorized_but_remains_fixed_and_closes_manual_gate_fallback():
+    assert MANIFEST["status"] == "authorized_fixed_budget_execution"
+    assert MANIFEST["implementation_contract"]["training_entrypoint_added"] is True
+    assert "exactly the ten preregistered jobs" in MANIFEST["next_authorized_unit"]
     assert MANIFEST["budget"]["manual_gate_fallback"] is False
     closeout = json.loads(
         (
@@ -57,6 +57,18 @@ def test_budget_arithmetic_and_optimizer_schedule_are_fixed():
     ] == 10485760
     assert optimization["scheduled_optimizer_applications_per_job"] == 1024
     assert budget["automatic_extension"] is False
+
+
+def test_execution_sources_pin_runner_aggregator_and_shared_updater():
+    sources = set(MANIFEST["execution_sources"])
+    assert {
+        "scripts/run_pack_inventory_overwrite_behavior_anchor_ppo.py",
+        "scripts/summarize_pack_inventory_overwrite_behavior_anchor_ppo.py",
+        "scripts/run_pack_inventory_overwrite_ppo.py",
+        "src/hackrl/pack_behavior_anchor.py",
+        "src/hackrl/pack_restore_gc.py",
+    } <= sources
+    assert all((REPOSITORY / path).is_file() for path in sources)
 
 
 def test_anchor_is_train_only_and_both_evaluation_panels_are_declared_development_data():
@@ -95,3 +107,7 @@ def test_storage_forecast_keeps_peak_writes_plus_reserve_on_raid():
     ] + storage["safety_reserve_bytes"]
     assert storage["raid_free_bytes_at_design"] > storage["minimum_required_free_bytes"]
     assert storage["checkpoints_written_in_this_design_phase"] == 0
+    assert storage["existing_run_bytes_before_launch"] == 0
+    assert storage["raid_free_bytes_before_launch"] > storage[
+        "minimum_required_free_bytes"
+    ]
