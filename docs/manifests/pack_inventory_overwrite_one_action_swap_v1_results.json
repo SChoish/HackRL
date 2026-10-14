@@ -1,0 +1,417 @@
+{
+  "C_minus_D": {
+    "left": "C_carry_gated",
+    "mean_difference": 0.011703403763676734,
+    "metric": "p05_expected_discounted_return",
+    "per_seed": [
+      {
+        "difference": 0.057389068455738546,
+        "seed": 35
+      },
+      {
+        "difference": 0.0,
+        "seed": 36
+      },
+      {
+        "difference": 0.0011279503626451248,
+        "seed": 37
+      },
+      {
+        "difference": 0.0,
+        "seed": 38
+      },
+      {
+        "difference": 0.0,
+        "seed": 39
+      }
+    ],
+    "right": "D_one_action_swap",
+    "signs": {
+      "equal_within_tolerance": 3,
+      "negative": 0,
+      "positive": 2
+    }
+  },
+  "D_execution": {
+    "failed_path_count": 2,
+    "fixed_total_executed_risky_harvests": 40,
+    "no_swap_path_count": 88,
+    "swap_path_count": 72
+  },
+  "D_minus_B": {
+    "left": "D_one_action_swap",
+    "mean_difference": 0.012471088576130374,
+    "metric": "p05_expected_discounted_return",
+    "per_seed": [
+      {
+        "difference": 0.059893694269012254,
+        "seed": 35
+      },
+      {
+        "difference": 0.0007896823964901323,
+        "seed": 36
+      },
+      {
+        "difference": 0.0005384620014887709,
+        "seed": 37
+      },
+      {
+        "difference": 0.0011336042136607105,
+        "seed": 38
+      },
+      {
+        "difference": 0.0,
+        "seed": 39
+      }
+    ],
+    "right": "B_carry_persistent",
+    "signs": {
+      "equal_within_tolerance": 1,
+      "negative": 0,
+      "positive": 4
+    }
+  },
+  "conditions": {
+    "B_carry_persistent": {
+      "adapted_policy_steps": 3164,
+      "adapted_step_fraction": 0.8401486988847584,
+      "fixed_mean_length": 23.5375,
+      "fixed_risky_path_count": 40,
+      "fixed_success_rate": 0.975,
+      "p00_expected_discounted_return": 0.8826471362293296,
+      "p05_expected_discounted_return": 0.8713333573976504,
+      "p05_success_rate": 0.9624999999999999,
+      "total_active_steps": 3766
+    },
+    "C_carry_gated": {
+      "adapted_policy_steps": 1174,
+      "adapted_step_fraction": 0.35770871419865935,
+      "fixed_mean_length": 20.5125,
+      "fixed_risky_path_count": 40,
+      "fixed_success_rate": 1.0,
+      "p00_expected_discounted_return": 0.9068412770575522,
+      "p05_expected_discounted_return": 0.8955078497374577,
+      "p05_success_rate": 0.9875,
+      "total_active_steps": 3282
+    },
+    "D_one_action_swap": {
+      "adapted_policy_steps": 2836,
+      "adapted_step_fraction": 0.807977207977208,
+      "fixed_mean_length": 21.9375,
+      "fixed_risky_path_count": 40,
+      "fixed_success_rate": 0.9875,
+      "p00_expected_discounted_return": 0.8951378732938753,
+      "p05_expected_discounted_return": 0.8838044459737808,
+      "p05_success_rate": 0.9750000000000001,
+      "total_active_steps": 3510
+    }
+  },
+  "decimal_audit": {
+    "domain": "Decimal, 50 digits",
+    "formula": "mean(success * 0.995^(length-1) * (1-p)^executed_risk_count)",
+    "maximum_absolute_difference": "2.0386450600239897934161657218250469E-16",
+    "passed": true,
+    "points": {
+      "p00": {
+        "expected_discounted_return": "0.89513787329387550386450600239897934161657218250469",
+        "overwrite_loss_episode_probability": "0",
+        "success_rate": "0.9875"
+      },
+      "p05": {
+        "expected_discounted_return": "0.883804445973780980996624886293174192999220478301",
+        "overwrite_loss_episode_probability": "0.0125",
+        "success_rate": "0.975"
+      }
+    },
+    "scope": "All 160 newly executed D fixed-kernel paths at p=0 and p=0.05.",
+    "tolerance": "1E-14"
+  },
+  "decision": "One source-actor action recovered two of the four predeclared B-failure/C-success paths. The step-15 cases recovered, while the step-3 cases still failed; therefore this finite panel mixes failures for which one action was sufficient with failures requiring a different or longer intervention. No path that B had solved became a D failure.",
+  "diagnostic": {
+    "failed_seed_state_indices": [
+      [
+        35,
+        4
+      ],
+      [
+        35,
+        12
+      ]
+    ],
+    "new_D_failures_among_B_successes": [],
+    "recovered_count": 2,
+    "recovered_seed_state_indices": [
+      [
+        35,
+        16
+      ],
+      [
+        35,
+        24
+      ]
+    ],
+    "target_count": 4,
+    "targets": [
+      {
+        "B_length": 128,
+        "B_success": false,
+        "C_length": 20,
+        "C_success": true,
+        "D_executed_risk_count": 0,
+        "D_length": 128,
+        "D_success": false,
+        "adapted_action": 23,
+        "branch_step": 3,
+        "seed": 35,
+        "source_action": 3,
+        "state_index": 4
+      },
+      {
+        "B_length": 128,
+        "B_success": false,
+        "C_length": 20,
+        "C_success": true,
+        "D_executed_risk_count": 0,
+        "D_length": 128,
+        "D_success": false,
+        "adapted_action": 23,
+        "branch_step": 3,
+        "seed": 35,
+        "source_action": 3,
+        "state_index": 12
+      },
+      {
+        "B_length": 128,
+        "B_success": false,
+        "C_length": 23,
+        "C_success": true,
+        "D_executed_risk_count": 0,
+        "D_length": 23,
+        "D_success": true,
+        "adapted_action": 23,
+        "branch_step": 15,
+        "seed": 35,
+        "source_action": 3,
+        "state_index": 16
+      },
+      {
+        "B_length": 128,
+        "B_success": false,
+        "C_length": 23,
+        "C_success": true,
+        "D_executed_risk_count": 0,
+        "D_length": 23,
+        "D_success": true,
+        "adapted_action": 23,
+        "branch_step": 15,
+        "seed": 35,
+        "source_action": 3,
+        "state_index": 24
+      }
+    ]
+  },
+  "gates": {
+    "after_swap_D_uses_adapted_actor_until_termination": true,
+    "all_160_D_fixed_episodes_recorded": true,
+    "all_D_prefix_and_branch_checks_pass": true,
+    "diagnostic_panel_matches_four_predeclared_cases": true,
+    "each_D_path_uses_at_most_one_source_action_swap": true,
+    "each_swap_is_at_first_pinned_B_C_empty_action_disagreement": true,
+    "no_learning_updates": true,
+    "pinned_B_C_inputs_unchanged": true
+  },
+  "interpretation": {
+    "control_scope": "D used a one-action swap on 72 paths but still used the adapted actor for 80.8% of active steps, versus 84.0% for B and 35.8% for C.",
+    "mixed_recovery": "D recovered state indices 16 and 24, whose first disagreement occurred at step 15, but did not recover state indices 4 and 12, whose first disagreement occurred at step 3.",
+    "risk": "B, C, and D each had 40 fixed-kernel paths with an executed risky harvest. D therefore changed normal-task completion without changing this measured exposure count.",
+    "whole_panel": "D fixed-kernel success was 98.75% and p=0.05 return was 0.883804, between B (97.5%, 0.871333) and C (100%, 0.895508). D introduced no failure on a path that B had solved."
+  },
+  "non_claims": [
+    "D is an evaluator-supplied rule, not a learned selector.",
+    "The four diagnostic cases were defined from pinned B/C outcomes before D execution; they are not a fresh generalization panel.",
+    "A successful one-action intervention does not identify a semantic bug fix or establish that the same action works in unseen states.",
+    "B/C agreement before the branch follows from identical initial states, deterministic transitions, and identical chosen-action prefixes; stored summaries do not independently encode every latent state field.",
+    "Exact p=0.05 values are finite-panel expectations derived from deterministic fixed paths, not stochastic-policy rollouts.",
+    "Five Dual-history learner seeds do not establish population frequency or significance."
+  ],
+  "per_seed": {
+    "B_carry_persistent": [
+      {
+        "adapted_policy_steps": 984,
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 0.875,
+        "p00_expected_discounted_return": 0.7898648885646118,
+        "p05_expected_discounted_return": 0.7813840942842043,
+        "seed": 35,
+        "total_active_steps": 1112
+      },
+      {
+        "adapted_policy_steps": 536,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9057906446494242,
+        "p05_expected_discounted_return": 0.8889122455914071,
+        "seed": 36,
+        "total_active_steps": 664
+      },
+      {
+        "adapted_policy_steps": 528,
+        "fixed_risky_start_count": 8,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9074615091130547,
+        "p05_expected_discounted_return": 0.8961253959486146,
+        "seed": 37,
+        "total_active_steps": 652
+      },
+      {
+        "adapted_policy_steps": 532,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9077385460371249,
+        "p05_expected_discounted_return": 0.8907060716990396,
+        "seed": 38,
+        "total_active_steps": 650
+      },
+      {
+        "adapted_policy_steps": 584,
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9023800927824319,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "seed": 39,
+        "total_active_steps": 688
+      }
+    ],
+    "C_carry_gated": [
+      {
+        "adapted_policy_steps": 222,
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9071759913947042,
+        "p05_expected_discounted_return": 0.8986668570089551,
+        "seed": 35,
+        "total_active_steps": 654
+      },
+      {
+        "adapted_policy_steps": 250,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9066218892773087,
+        "p05_expected_discounted_return": 0.8897019279878973,
+        "seed": 36,
+        "total_active_steps": 658
+      },
+      {
+        "adapted_policy_steps": 202,
+        "fixed_risky_start_count": 8,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8977918083127485,
+        "seed": 37,
+        "total_active_steps": 640
+      },
+      {
+        "adapted_policy_steps": 244,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9088721502507856,
+        "p05_expected_discounted_return": 0.8918396759127003,
+        "seed": 38,
+        "total_active_steps": 642
+      },
+      {
+        "adapted_policy_steps": 256,
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9023800927824319,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "seed": 39,
+        "total_active_steps": 688
+      }
+    ],
+    "D_one_action_swap": [
+      {
+        "adapted_policy_steps": 726,
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 0.9375,
+        "p00_expected_discounted_return": 0.8497869229389656,
+        "p05_expected_discounted_return": 0.8412777885532166,
+        "seed": 35,
+        "total_active_steps": 874
+      },
+      {
+        "adapted_policy_steps": 516,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9066218892773087,
+        "p05_expected_discounted_return": 0.8897019279878973,
+        "seed": 36,
+        "total_active_steps": 658
+      },
+      {
+        "adapted_policy_steps": 508,
+        "fixed_risky_start_count": 8,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.908028311219885,
+        "p05_expected_discounted_return": 0.8966638579501034,
+        "seed": 37,
+        "total_active_steps": 648
+      },
+      {
+        "adapted_policy_steps": 506,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9088721502507856,
+        "p05_expected_discounted_return": 0.8918396759127003,
+        "seed": 38,
+        "total_active_steps": 642
+      },
+      {
+        "adapted_policy_steps": 580,
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9023800927824319,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "seed": 39,
+        "total_active_steps": 688
+      }
+    ]
+  },
+  "protocol": {
+    "B_carry_persistent": "After first positive inventory, use the adapted actor through episode termination.",
+    "C_carry_gated": "Use the adapted actor at positive inventory and the source actor at empty inventory.",
+    "D_one_action_swap": "Follow B, but at the first post-handoff empty-inventory state where the frozen argmax actions disagree, execute the source action once and then use the adapted actor through termination.",
+    "branch_selection": "The branch uses only current inventory, handoff history, and frozen argmax disagreement; it does not use outcomes.",
+    "episode_accounting": "Five seeds times 32 natural starts give 160 newly executed D paths; B and C paths are pinned prior results.",
+    "primary": "D recovery among four predeclared fixed-kernel B-failure/C-success paths.",
+    "secondary": "Whole-panel fixed-kernel success, p=0.05 expected discounted return, risky-path count, and new failures."
+  },
+  "provenance": {
+    "aggregation_head": "4d26e7e426e909b167f6a5032cbc328a1b9cc4e7",
+    "aggregation_script": {
+      "path": "scripts/summarize_pack_inventory_overwrite_one_action_swap.py",
+      "sha256": "1ce198e715592b64b930a9d356f491a948fc54b374a2ef11e246ec71186e390a"
+    },
+    "complete_marker": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1/complete.json",
+      "recorded_result_sha256": "bb5b80cee0739efc7b5c46a8e760724e99fea8adcfe13ebc63aefde4ba8d1223",
+      "sha256": "80b0a9c96eca2a54f813d72aafa610a088bea7fb45ef345fddace8a8080a112e"
+    },
+    "design_manifest": {
+      "path": "docs/manifests/pack_inventory_overwrite_one_action_swap_v1.json",
+      "sha256": "402e800e66fbf14f6beae72ec73b02c99f68e0bc6c670d668b0d4bcea0427069"
+    },
+    "execution_head": "46a440a4e44afb950ef94d015a2062b3da019e26",
+    "raw_result": {
+      "bytes": 2602749,
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1/result.json",
+      "sha256": "bb5b80cee0739efc7b5c46a8e760724e99fea8adcfe13ebc63aefde4ba8d1223"
+    },
+    "run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1/run_manifest.json",
+      "sha256": "afa5ac2c0df658ae2bbf86f94c9ef1778c715c53518affb7f627b83c3898eab4"
+    }
+  },
+  "schema_version": "hackrl_pack_inventory_overwrite_one_action_swap_compact_result_v1",
+  "status": "complete_no_learning"
+}

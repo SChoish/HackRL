@@ -1,0 +1,96 @@
+{
+  "checks": [
+    "All 160 D paths were recorded and all execution gates passed.",
+    "The four diagnostic identities were reconstructed from pinned B/C outcomes and matched the predeclared manifest.",
+    "Each D prefix and swap step matched the first pinned B/C empty-inventory action disagreement.",
+    "No D path used more than one source action, and every post-swap action used the adapted actor.",
+    "Independent Decimal recomputation differed by at most 2.0386450600239897934161657218250469E-16."
+  ],
+  "claim_id": "pack_inventory_overwrite_one_action_swap_v1_finite_panel",
+  "command": [
+    "PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/evaluate_pack_inventory_overwrite_one_action_swap.py --run",
+    "/home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_one_action_swap.py --write"
+  ],
+  "environment": {
+    "hardware": "CPU backend; Intel(R) Xeon(R) Platinum 8480C; Linux-6.8.0-55-generic-x86_64-with-glibc2.39",
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2 / jaxlib 0.10.2",
+      "NumPy 2.5.0"
+    ]
+  },
+  "mathematics": {
+    "assertion_tested": "Evaluate D on five frozen policy pairs and 32 natural starts per pair, and determine whether it recovers the four predeclared B-failure/C-success fixed-kernel paths.",
+    "bounds": {
+      "evaluated_probabilities": [
+        0.0,
+        0.05
+      ],
+      "horizon_ticks": 128,
+      "learner_seeds": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "maximum_environment_steps": 20480,
+      "natural_starts_per_seed": 32,
+      "new_D_paths": 160,
+      "predeclared_diagnostic_paths": 4
+    },
+    "coefficient_domain": "Integer path/event counts; IEEE-754 rollout summaries; independent Decimal arithmetic at 50-digit precision for p=0 and p=0.05 expectations.",
+    "conventions": "One-indexed recorded steps; gamma=0.995; deterministic argmax actions; D swaps once at the first eligible post-handoff empty-inventory argmax disagreement and then uses the adapted actor.",
+    "inputs": [
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1/result.json",
+        "sha256": "bb5b80cee0739efc7b5c46a8e760724e99fea8adcfe13ebc63aefde4ba8d1223"
+      },
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1/run_manifest.json",
+        "sha256": "afa5ac2c0df658ae2bbf86f94c9ef1778c715c53518affb7f627b83c3898eab4"
+      },
+      {
+        "path": "docs/manifests/pack_inventory_overwrite_one_action_swap_v1.json",
+        "sha256": "402e800e66fbf14f6beae72ec73b02c99f68e0bc6c670d668b0d4bcea0427069"
+      }
+    ],
+    "non_claims": [
+      "D is an evaluator-supplied rule, not a learned selector.",
+      "The four diagnostic cases were defined from pinned B/C outcomes before D execution; they are not a fresh generalization panel.",
+      "A successful one-action intervention does not identify a semantic bug fix or establish that the same action works in unseen states.",
+      "B/C agreement before the branch follows from identical initial states, deterministic transitions, and identical chosen-action prefixes; stored summaries do not independently encode every latent state field.",
+      "Exact p=0.05 values are finite-panel expectations derived from deterministic fixed paths, not stochastic-policy rollouts.",
+      "Five Dual-history learner seeds do not establish population frequency or significance."
+    ]
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_one_action_swap_v1_results.json",
+      "sha256": "990fa34a81c27da8eee1d3e2c72d2186e4c71e98e54b75ab016341b4867e5f74"
+    }
+  ],
+  "randomness": {
+    "generator": "",
+    "seed": null,
+    "used": false
+  },
+  "repository": {
+    "commit": "4d26e7e426e909b167f6a5032cbc328a1b9cc4e7",
+    "dirty": false
+  },
+  "residual_risks": [
+    "The policy network and simulator were not independently reimplemented.",
+    "The same project codebase generated the paths and goal-success labels; path invariants and pinned comparisons reduce but do not remove verifier-designer coupling.",
+    "The four diagnostic paths were selected from prior B/C outcomes and are not an independent generalization panel.",
+    "Intermediate-probability values rely on the pinned environment property that any overwrite loss makes the goal impossible.",
+    "Schema version 1 does not machine-pin every execution input or resource limit."
+  ],
+  "result": "Implementation and finite assertion verified: D recovered two of four predeclared diagnostic paths, with no new failure among paths B had solved.",
+  "run": {
+    "exit_status": 0,
+    "runtime_seconds": 28.528382778167725,
+    "started_at": "2026-10-14T07:50:49.906397+00:00"
+  },
+  "schema_version": 1
+}
