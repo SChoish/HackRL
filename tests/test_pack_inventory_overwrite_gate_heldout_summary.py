@@ -96,3 +96,6 @@ def test_compact_builder_preserves_panel_provenance_and_scope_limits():
     assert compact["protocol"]["panel"]["exact_overlap_with_train_natural_states"] == 0
     assert compact["protocol"]["panel"]["exact_overlap_with_validation_natural_states"] == 0
     assert any("does not test generalization" in item for item in compact["non_claims"])
+    assert "not a rule that preserves normal performance" in compact["decision"]
+    assert len(compact["claim_revision"]["not_supported"]) == 3
+    assert compact["claim_revision"]["manual_gate_phase"].startswith("Closed")

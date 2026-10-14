@@ -149,10 +149,11 @@ def build_compact(raw: dict, design: dict, run_manifest: dict, complete: dict) -
         "schema_version": "hackrl_pack_inventory_overwrite_gate_heldout_compact_result_v1",
         "status": raw["status"],
         "decision": (
-            "On the predefined PACK TEST panel, carry-gated execution improved mean p=0.05 expected discounted return "
-            "over the source actor by 0.002876 and was positive for seeds 36-39, while seed 35 decreased by 0.044043. "
-            "The gate reduced risky paths from 94 to 36 but lowered fixed-kernel success from 100% to 98.75%; therefore "
-            "the validation-panel benefit transferred across multiple policy pairs but was neither uniform nor failure-free."
+            "Carry-gated execution reduced risky-path exposure and improved mean p=0.05 expected discounted return over "
+            "the source actor by 0.002876 on the predefined PACK TEST panel, with positive differences in four of five seeds. "
+            "It simultaneously lowered fixed-kernel success from 100% to 98.75%, and its p=0.05 advantage over adapted-only "
+            "execution was positive in only one of five seeds. The manual gate is therefore a risk-reducing but sometimes "
+            "task-damaging policy composition, not a rule that preserves normal performance."
         ),
         "provenance": {
             "execution_head": run_manifest["execution_head"],
@@ -193,6 +194,24 @@ def build_compact(raw: dict, design: dict, run_manifest: dict, complete: dict) -
         },
         "carry_gated_minus_source": gated_minus_source,
         "carry_gated_minus_adapted": gated_minus_adapted,
+        "claim_revision": {
+            "supported": (
+                "Relative to the source actor, carry-gated execution reduced risky-path exposure and had higher mean p=0.05 "
+                "return on TEST, with positive paired differences in four of five seeds."
+            ),
+            "not_supported": [
+                "Carry-gated execution preserves normal-task performance beyond the original validation panel.",
+                "Carry-gated execution is seed-consistently better than adapted-only execution.",
+                "The supplied gate generalizes to newly learned policy pairs.",
+            ],
+            "cross_panel_read": (
+                "Seed 35's validation failures were repaired by the supplied gate, but two normal TEST paths failed under the "
+                "same gate. Explaining and repairing the validation cases did not establish general gate reliability."
+            ),
+            "manual_gate_phase": (
+                "Closed after this held-out evaluation; no further hand-written gate variants are authorized by this result."
+            ),
+        },
         "per_seed": {
             mode: raw["comparison"][mode]["per_seed"] for mode in design["conditions"]
         },
@@ -303,7 +322,9 @@ def build_audit(compact: dict, run_manifest: dict, raw: dict, started_clean: boo
             f"Independent Decimal recomputation differed by at most {compact['decimal_audit']['maximum_absolute_difference']}.",
         ],
         "result": (
-            "Finite TEST-panel assertion verified: carry-gated minus source p=0.05 return was +0.002876 on average, positive for four of five seeds, while fixed-kernel success decreased from 100% to 98.75%."
+            "Finite TEST-panel assertion verified: the supplied gate reduced risk and raised mean p=0.05 return over source, "
+            "but lowered fixed-kernel success and was not seed-consistently better than adapted-only execution; it does not "
+            "support a normal-performance-preservation claim."
         ),
         "residual_risks": [
             "The policy network and simulator were not independently reimplemented.",
