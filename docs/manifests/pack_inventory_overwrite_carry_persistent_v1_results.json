@@ -1,0 +1,361 @@
+{
+  "conditions": {
+    "A_late_risk_persistent": {
+      "adapted_policy_steps": 292,
+      "adapted_step_fraction": 0.08973570989551322,
+      "fixed_mean_length": 20.3375,
+      "fixed_risky_start_count": 82,
+      "fixed_success_rate": 1.0,
+      "p00_expected_discounted_return": 0.9076322543483093,
+      "p05_expected_discounted_return": 0.8843436484852094,
+      "p05_success_rate": 0.974375,
+      "total_active_steps": 3254
+    },
+    "B_carry_persistent": {
+      "adapted_policy_steps": 3164,
+      "adapted_step_fraction": 0.8401486988847584,
+      "fixed_mean_length": 23.5375,
+      "fixed_risky_start_count": 40,
+      "fixed_success_rate": 0.975,
+      "p00_expected_discounted_return": 0.8826471362293296,
+      "p05_expected_discounted_return": 0.8713333573976504,
+      "p05_success_rate": 0.9624999999999999,
+      "total_active_steps": 3766
+    },
+    "C_carry_gated": {
+      "adapted_policy_steps": 1174,
+      "adapted_step_fraction": 0.35770871419865935,
+      "fixed_mean_length": 20.5125,
+      "fixed_risky_start_count": 40,
+      "fixed_success_rate": 1.0,
+      "p00_expected_discounted_return": 0.9068412770575522,
+      "p05_expected_discounted_return": 0.8955078497374577,
+      "p05_success_rate": 0.9875,
+      "total_active_steps": 3282
+    }
+  },
+  "decimal_audit": {
+    "domain": "Decimal, 50 digits",
+    "formula": "mean(success * 0.995^(length-1) * (1-p)^executed_risk_count)",
+    "maximum_absolute_difference": "1.3600887946383988647425239559835856E-16",
+    "passed": true,
+    "points": {
+      "p00": {
+        "expected_discounted_return": "0.88264713622932960695806625543474824115969912028769",
+        "overwrite_loss_episode_probability": "0",
+        "success_rate": "0.975"
+      },
+      "p05": {
+        "expected_discounted_return": "0.87133335739765053600887946383988647425239559835856",
+        "overwrite_loss_episode_probability": "0.0125",
+        "success_rate": "0.9625"
+      }
+    },
+    "scope": "The 160 newly executed B carry-persistent paths at p=0 and p=0.05.",
+    "tolerance": "1E-14"
+  },
+  "decision": "In this five-seed paired panel, inventory-gated return to the source actor raised mean p=0.05 discounted return by 0.02417 over persistent adapted control, but 97.0% of that mean difference came from seed 35; excluding seed 35, the mean difference was 0.000897. Both rules produced 40 fixed-kernel paths with at least one executed risky harvest, so no reduction was observed in that exposure count.",
+  "gates": {
+    "B_never_relinquishes_policy_control_after_handoff": true,
+    "all_160_new_B_fixed_episodes_recorded": true,
+    "every_new_B_episode_has_exactly_one_positive_inventory_handoff": true,
+    "no_learning_updates": true,
+    "prior_A_and_C_endpoint_validation_remains_pinned": true
+  },
+  "interpretation": {
+    "exposure": "The return rule reduced adapted-policy exposure from 84.0% to 35.8% of active steps, preserving source-policy control in empty-inventory phases.",
+    "limit": "C minus B isolates the supplied return rule after their common first handoff only until their trajectories diverge; it does not show that a learned selector would reproduce the result.",
+    "retention": "C exceeded B in four seeds and tied in one, but 97.0% of the mean C-minus-B difference came from seed 35, where B fixed-kernel success was 87.5%. Excluding seed 35, the mean difference was 0.000897.",
+    "risk": "B and C each had 40 fixed-kernel paths with at least one executed risky harvest. Returning control at empty inventory therefore did not reduce this measured exposure count; equal counts do not establish equal actions, paths, or broader risk.",
+    "secondary": "B minus A was negative in the full mean because of seed 35, but positive for each of seeds 36-39. Changing the first-handoff predicate and its downstream state distribution was therefore policy-pair dependent when no return was allowed."
+  },
+  "non_claims": [
+    "The evaluator supplied the gates; the policies did not learn when to switch.",
+    "Equal risky-start counts do not imply identical trajectories or actions.",
+    "The seed-35-excluded value is a declared sensitivity analysis, not the primary result.",
+    "Five Dual-history learner seeds do not establish population frequency or significance.",
+    "Task retention is not a latent construct here; the reported preservation measure is fixed-kernel goal success."
+  ],
+  "per_seed": {
+    "A_late_risk_persistent": [
+      {
+        "adapted_policy_steps": 40,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9077441998881405,
+        "p05_expected_discounted_return": 0.8907117255500552,
+        "seed": 35,
+        "total_active_steps": 650
+      },
+      {
+        "adapted_policy_steps": 56,
+        "fixed_risky_start_count": 18,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.908588038919041,
+        "p05_expected_discounted_return": 0.8830464301952069,
+        "seed": 36,
+        "total_active_steps": 644
+      },
+      {
+        "adapted_policy_steps": 48,
+        "fixed_risky_start_count": 16,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8864273550429669,
+        "seed": 37,
+        "total_active_steps": 640
+      },
+      {
+        "adapted_policy_steps": 80,
+        "fixed_risky_start_count": 24,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8750629017731852,
+        "seed": 38,
+        "total_active_steps": 640
+      },
+      {
+        "adapted_policy_steps": 68,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9035165097693048,
+        "p05_expected_discounted_return": 0.8864698298646323,
+        "seed": 39,
+        "total_active_steps": 680
+      }
+    ],
+    "B_carry_persistent": [
+      {
+        "adapted_policy_steps": 984,
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 0.875,
+        "p00_expected_discounted_return": 0.7898648885646118,
+        "p05_expected_discounted_return": 0.7813840942842043,
+        "seed": 35,
+        "total_active_steps": 1112
+      },
+      {
+        "adapted_policy_steps": 536,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9057906446494242,
+        "p05_expected_discounted_return": 0.8889122455914071,
+        "seed": 36,
+        "total_active_steps": 664
+      },
+      {
+        "adapted_policy_steps": 528,
+        "fixed_risky_start_count": 8,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9074615091130547,
+        "p05_expected_discounted_return": 0.8961253959486146,
+        "seed": 37,
+        "total_active_steps": 652
+      },
+      {
+        "adapted_policy_steps": 532,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9077385460371249,
+        "p05_expected_discounted_return": 0.8907060716990396,
+        "seed": 38,
+        "total_active_steps": 650
+      },
+      {
+        "adapted_policy_steps": 584,
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9023800927824319,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "seed": 39,
+        "total_active_steps": 688
+      }
+    ],
+    "C_carry_gated": [
+      {
+        "adapted_policy_steps": 222,
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9071759913947042,
+        "p05_expected_discounted_return": 0.8986668570089551,
+        "seed": 35,
+        "total_active_steps": 654
+      },
+      {
+        "adapted_policy_steps": 250,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9066218892773087,
+        "p05_expected_discounted_return": 0.8897019279878973,
+        "seed": 36,
+        "total_active_steps": 658
+      },
+      {
+        "adapted_policy_steps": 202,
+        "fixed_risky_start_count": 8,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8977918083127485,
+        "seed": 37,
+        "total_active_steps": 640
+      },
+      {
+        "adapted_policy_steps": 244,
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9088721502507856,
+        "p05_expected_discounted_return": 0.8918396759127003,
+        "seed": 38,
+        "total_active_steps": 642
+      },
+      {
+        "adapted_policy_steps": 256,
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9023800927824319,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "seed": 39,
+        "total_active_steps": 688
+      }
+    ]
+  },
+  "primary_C_minus_B": {
+    "left": "C_carry_gated",
+    "mean_difference": 0.02417449233980711,
+    "metric": "p05_expected_discounted_return",
+    "per_seed": [
+      {
+        "difference": 0.1172827627247508,
+        "seed": 35
+      },
+      {
+        "difference": 0.0007896823964901323,
+        "seed": 36
+      },
+      {
+        "difference": 0.0016664123641338957,
+        "seed": 37
+      },
+      {
+        "difference": 0.0011336042136607105,
+        "seed": 38
+      },
+      {
+        "difference": 0.0,
+        "seed": 39
+      }
+    ],
+    "right": "B_carry_persistent",
+    "seed35_excluded_sensitivity": {
+      "mean_difference": 0.0008974247435711846,
+      "seeds": [
+        36,
+        37,
+        38,
+        39
+      ],
+      "signs": {
+        "equal_within_tolerance": 1,
+        "negative": 0,
+        "positive": 3
+      }
+    },
+    "signs": {
+      "equal_within_tolerance": 1,
+      "negative": 0,
+      "positive": 4
+    }
+  },
+  "protocol": {
+    "A_late_risk_persistent": "Switch at the first source-policy risky-harvest proposal and never return.",
+    "B_carry_persistent": "Switch at the first state with carried_grain > 0 and never return.",
+    "C_carry_gated": "Use the adapted actor whenever carried_grain > 0 and the source actor whenever carried_grain == 0.",
+    "episode_accounting": "Five seeds times 32 natural starts give 160 newly executed B paths. A and C each reuse 160 pinned paths from prior evaluations, for 480 condition-path records in the comparison.",
+    "gate_source": "The evaluator supplies all switching rules; no gate is learned.",
+    "primary": "C minus B p=0.05 expected discounted return.",
+    "terms": {
+      "adapted_actor": "The frozen p=1 overwrite-adapted policy checkpoint paired with that source actor.",
+      "fixed_kernel": "The normal PACK transition kernel with no overwrite firing; it exposes the deterministic path used for exact p evaluation.",
+      "fixed_risky_start_count": "Number of the 160 fixed-kernel paths with executed_risk_count > 0.",
+      "fixed_success_rate": "Goal-success fraction over the deterministic fixed-kernel paths.",
+      "natural_start": "One of the 32 unmodified validation reset states used for every policy pair and condition.",
+      "risky_harvest": "An executed valid harvest while carried_grain > 0, i.e. an action at which overwrite could fire.",
+      "source_actor": "The frozen normal-training policy checkpoint in each seed-specific policy pair."
+    }
+  },
+  "provenance": {
+    "aggregation_head": "7c6500c74140fc97b98463e6d61f0adb618e8142",
+    "aggregation_script": {
+      "path": "scripts/summarize_pack_inventory_overwrite_carry_persistent.py",
+      "sha256": "9c12d847818657f82af43177a603c9e185d55722caf7c49e071ebfbf865283a4"
+    },
+    "complete_marker": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/complete.json",
+      "recorded_result_sha256": "193c08bb8c2fc30e26c6460c4565b9aa22f05fb33b0313afeca7bfb2742a7ad9",
+      "sha256": "233b72d7526068a5026ebe96f67a94d9ff1c21a5e261bf70a6be002841dcfaca"
+    },
+    "design_manifest": {
+      "path": "docs/manifests/pack_inventory_overwrite_carry_persistent_v1.json",
+      "sha256": "75be5ed085a36b88da3694fa4b9ce820f33577a3d7890d4724082411f452be43"
+    },
+    "execution_head": "be8c11ae1f3dce43623093ba9e3d734b2f46b7a9",
+    "raw_result": {
+      "bytes": 2568930,
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/result.json",
+      "sha256": "193c08bb8c2fc30e26c6460c4565b9aa22f05fb33b0313afeca7bfb2742a7ad9"
+    },
+    "run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/run_manifest.json",
+      "sha256": "9860d7c76f2e889daa6df2562cd92b9db14ddc772919e779568755970f580c43"
+    }
+  },
+  "schema_version": "hackrl_pack_inventory_overwrite_carry_persistent_compact_result_v1",
+  "secondary_B_minus_A": {
+    "left": "B_carry_persistent",
+    "mean_difference": -0.013010291087558846,
+    "metric": "p05_expected_discounted_return",
+    "per_seed": [
+      {
+        "difference": -0.10932763126585088,
+        "seed": 35
+      },
+      {
+        "difference": 0.005865815396200236,
+        "seed": 36
+      },
+      {
+        "difference": 0.009698040905647742,
+        "seed": 37
+      },
+      {
+        "difference": 0.01564316992585435,
+        "seed": 38
+      },
+      {
+        "difference": 0.013069149600354324,
+        "seed": 39
+      }
+    ],
+    "right": "A_late_risk_persistent",
+    "seed35_excluded_sensitivity": {
+      "mean_difference": 0.011069043957014163,
+      "seeds": [
+        36,
+        37,
+        38,
+        39
+      ],
+      "signs": {
+        "equal_within_tolerance": 0,
+        "negative": 0,
+        "positive": 4
+      }
+    },
+    "signs": {
+      "equal_within_tolerance": 0,
+      "negative": 1,
+      "positive": 4
+    }
+  },
+  "status": "complete_no_learning"
+}

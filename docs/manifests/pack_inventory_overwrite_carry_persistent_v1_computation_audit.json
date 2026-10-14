@@ -1,0 +1,90 @@
+{
+  "checks": [
+    "All 160 newly executed B fixed-kernel paths were recorded.",
+    "Every new B path handed policy control to the adapted actor exactly once at positive inventory and never relinquished it.",
+    "Pinned A and C results retained their endpoint-validation gates.",
+    "Independent Decimal recomputation differed by at most 1.3600887946383988647425239559835856E-16.",
+    "All five seed contrasts and the declared seed-35-excluded sensitivity were retained."
+  ],
+  "claim_id": "pack_inventory_overwrite_carry_persistent_v1_finite_panel",
+  "command": [
+    "PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/evaluate_pack_inventory_overwrite_carry_persistent.py --run",
+    "/home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_carry_persistent.py --write"
+  ],
+  "environment": {
+    "hardware": "CPU backend; Intel(R) Xeon(R) Platinum 8480C; Linux-6.8.0-55-generic-x86_64-with-glibc2.39",
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2 / jaxlib 0.10.2",
+      "NumPy 2.5.0"
+    ]
+  },
+  "mathematics": {
+    "assertion_tested": "Recompute p=0 and p=0.05 success and discounted return for 5 seeds x 32 carry-persistent fixed paths.",
+    "bounds": {
+      "evaluated_probabilities": [
+        0.0,
+        0.05
+      ],
+      "horizon_ticks": 128,
+      "learner_seeds": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "maximum_environment_steps": 20480,
+      "natural_starts_per_seed": 32,
+      "new_fixed_paths": 160
+    },
+    "inputs": [
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/result.json",
+        "sha256": "193c08bb8c2fc30e26c6460c4565b9aa22f05fb33b0313afeca7bfb2742a7ad9"
+      },
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/run_manifest.json",
+        "sha256": "9860d7c76f2e889daa6df2562cd92b9db14ddc772919e779568755970f580c43"
+      },
+      {
+        "path": "docs/manifests/pack_inventory_overwrite_carry_persistent_v1.json",
+        "sha256": "75be5ed085a36b88da3694fa4b9ce820f33577a3d7890d4724082411f452be43"
+      }
+    ],
+    "non_claims": [
+      "The evaluator supplied the gates; the policies did not learn when to switch.",
+      "Equal risky-start counts do not imply identical trajectories or actions.",
+      "The seed-35-excluded value is a declared sensitivity analysis, not the primary result.",
+      "Five Dual-history learner seeds do not establish population frequency or significance.",
+      "Task retention is not a latent construct here; the reported preservation measure is fixed-kernel goal success."
+    ]
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_carry_persistent_v1_results.json",
+      "sha256": "49ca302e8b9cc7ab67183f3bb6eabc5115ff1b4a0cdfaaa8779f9406de370289"
+    }
+  ],
+  "randomness": {
+    "generator": "",
+    "seed": null,
+    "used": false
+  },
+  "repository": {
+    "commit": "7c6500c74140fc97b98463e6d61f0adb618e8142",
+    "dirty": false
+  },
+  "residual_risks": [
+    "The policy network and simulator were not independently reimplemented.",
+    "Intermediate-probability values rely on the pinned environment property that any overwrite loss makes the goal impossible.",
+    "The supplied phase gates are not autonomous switching methods."
+  ],
+  "result": "Implementation and finite assertion verified in the stated five-seed, 32-start panel.",
+  "run": {
+    "exit_status": 0,
+    "runtime_seconds": 30.757930994033813,
+    "started_at": "2026-10-14T01:32:29.269459+00:00"
+  },
+  "schema_version": 1
+}
