@@ -236,8 +236,9 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
                 "whereas waiting for the exact risky harvest state was too late for most source-policy paths."
             ),
             "composition": (
-                "Carry-gated execution outperformed both full source execution and adapted-from-start execution at p=0.05, "
-                "showing that the two frozen policies were composable under this supplied phase gate."
+                "Carry-gated execution outperformed full source execution in all five seeds, showing that the two frozen policies "
+                "were composable under this supplied phase gate. Its mean also exceeded adapted-from-start, but that contrast was "
+                "positive only in seed 35 and does not establish stable superiority over adapted-from-start."
             ),
             "cost": (
                 "The fixed-kernel success rate stayed at 100%, while mean fixed return decreased slightly and path length increased, "
