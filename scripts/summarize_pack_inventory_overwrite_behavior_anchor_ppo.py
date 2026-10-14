@@ -40,6 +40,10 @@ ANCHORED = next(
     for name, row in SPEC["conditions"].items()
     if float(row["behavior_anchor_coefficient"]) > 0.0
 )
+AGGREGATOR_RELATIVE_PATH = "scripts/summarize_pack_inventory_overwrite_behavior_anchor_ppo.py"
+PRE_CORRECTION_AGGREGATE_SHA256 = (
+    "03c96588799889c974d3ae28f1e577bf0a02bc2138556d43cece40f52bb42939"
+)
 
 
 def read(path: Path):
@@ -69,13 +73,14 @@ def mean(values) -> float:
 
 
 def sign_counts(values) -> dict:
+    values = [float(value) for value in values]
     tolerance = float(SPEC["statistics"]["sign_tolerance"])
     return {
-        "positive": sum(float(value) > tolerance for value in values),
+        "positive": sum(value > tolerance for value in values),
         "equal_within_tolerance": sum(
-            abs(float(value)) <= tolerance for value in values
+            abs(value) <= tolerance for value in values
         ),
-        "negative": sum(float(value) < -tolerance for value in values),
+        "negative": sum(value < -tolerance for value in values),
     }
 
 
@@ -116,6 +121,8 @@ def validate_run() -> dict:
     if manifest.get("automatic_extension") is not False:
         raise AssertionError("automatic extension occurred")
     for relative, expected in manifest["execution_source_sha256"].items():
+        if relative == AGGREGATOR_RELATIVE_PATH:
+            continue
         if sha256(REPOSITORY / relative) != expected:
             raise AssertionError(f"execution source changed: {relative}")
     for path, expected in manifest["source_checkpoint_sha256"].items():
@@ -502,12 +509,23 @@ def main() -> None:
         for condition in CONDITIONS
     }
     contrasts = {split: paired_contrast(rows, split) for split in PANELS}
+    aggregation_revision = {
+        "launch_aggregator_sha256": run_manifest["execution_source_sha256"][
+            AGGREGATOR_RELATIVE_PATH
+        ],
+        "current_aggregator_sha256": sha256(
+            REPOSITORY / AGGREGATOR_RELATIVE_PATH
+        ),
+        "pre_correction_aggregate_sha256": PRE_CORRECTION_AGGREGATE_SHA256,
+        "scope": "Materialize sign-count iterables before the positive, equal, and negative passes. Seed rows, means, checkpoints, evaluations, and training artifacts are unchanged.",
+    }
     result = {
         "schema_version": "hackrl_pack_inventory_overwrite_behavior_anchor_results_v1",
         "status": "complete_fixed_budget_no_automatic_extension",
         "manifest_id": SPEC["manifest_id"],
         "execution_head": run_manifest["execution_head"],
         "primary_panel": "validation",
+        "aggregation_revision": aggregation_revision,
         "conditions": {
             condition: aggregate_condition(rows[condition])
             for condition in CONDITIONS
@@ -553,6 +571,7 @@ def main() -> None:
         "manifest_sha256": sha256(SPEC_PATH),
         "aggregate_sha256": sha256(raw_path),
         "result_sha256": sha256(RESULT_PATH),
+        "aggregation_revision": aggregation_revision,
         "validated_cells": len(cells),
         "validated_update_records": sum(
             len(cell["update_files"]) for cell in cells.values()
