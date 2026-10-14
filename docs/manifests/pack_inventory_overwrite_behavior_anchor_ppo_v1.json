@@ -1,7 +1,7 @@
 {
   "schema_version": "hackrl_pack_inventory_overwrite_behavior_anchor_ppo_manifest_v1",
   "manifest_id": "pack_inventory_overwrite_behavior_anchor_ppo_v1",
-  "status": "design_only_no_execution",
+  "status": "implementation_ready_training_not_authorized",
   "understood_as": "Close the hand-written policy-gate line and compare ordinary p=0.05 PPO adaptation with one behavior-anchored PPO intervention. Both branches start from the same frozen normal actor-critic and inherited Adam state, use paired initial states and RNG streams, and receive the same 32-update collector-slot budget; their visited states and rewards may diverge as soon as their actions differ. The constrained branch alone adds a fixed source-policy KL loss on a preregistered normal-behavior anchor. Do not train, tune the coefficient, add gate variants, or launch a sweep in this phase.",
   "research_question": "Can source-policy behavior anchoring reduce damage to normal task performance while retaining useful adaptation to a rare harmful inventory-overwrite defect?",
   "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_behavior_anchor_ppo_v1",
@@ -104,6 +104,11 @@
   },
   "evaluation": {
     "adaptation_updates": [0, 2, 8, 32],
+    "frozen_source_baseline": {
+      "seeds": [30, 31, 32, 33, 34],
+      "role": "Update-zero actor-critic evaluated on the same panels and kernels; no additional learning job.",
+      "training_jobs": 0
+    },
     "collector_slots": [0, 65536, 262144, 1048576],
     "development_panels": {
       "validation": {
@@ -147,6 +152,21 @@
     "paired_by": "seed, source checkpoint, initial actor-critic, Adam state, worker state, RNG streams, collector slots, and overwrite-event uniforms",
     "report": "All five paired differences and their mean; no significance claim from five seeds.",
     "episode_count_is_not_an_independent_replication_unit": true
+  },
+  "implementation_contract": {
+    "updater": "src/hackrl/pack_restore_gc.py plus src/hackrl/pack_behavior_anchor.py",
+    "anchor_builder": "Replay every natural TRAIN start with the frozen source actor under the fixed kernel and retain full source logits for every active state.",
+    "source_freeze": "Only fixed observations and stop-gradient source logits enter the updater. Source actor parameters and teacher state are not updater arguments.",
+    "normalization": "The PPO actor has only the params variable collection and no mutable normalization statistics. The source actor-critic and its Adam state remain unchanged.",
+    "kl_reduction": "Sum D_KL(source || current) across the complete action dimension for each state, then average states with equal weight.",
+    "beta_zero": "Coefficient zero returns the existing make_pack_restore_gc_update code path directly.",
+    "optimizer_schedule": "The KL is included in the same loss and optimizer application as PPO. Empty PPO minibatches skip the whole update, including the anchor term.",
+    "compute_accounting": [
+      "behavior_anchor_state_count",
+      "behavior_anchor_forward_state_evaluations",
+      "per-update wall-clock seconds"
+    ],
+    "training_entrypoint_added": false
   },
   "prerequisites": {
     "manual_gate_closeout": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1_results.json",
@@ -211,6 +231,6 @@
     "VALIDATION and TEST are development panels for this intervention; neither is a fresh held-out confirmation after this design.",
     "Five source policies from one training family do not establish population-level generalization."
   ],
-  "next_authorized_unit": "Implement the shared updater, behavior-anchor construction, contract validation, and unit tests only. Do not launch training until the implementation is committed, storage is rechecked, and the user explicitly authorizes execution.",
+  "next_authorized_unit": "Run implementation and contract validation only. Training remains unauthorized until the implementation and validation records are committed, storage is rechecked, and the user explicitly authorizes execution.",
   "stop_rule": "Run only the two preregistered p=0.05 conditions for seeds 30--34 and 32 updates if later authorized. Do not add beta values, probabilities, learning rates, updates, teachers, gates, replay variants, or curricula in response to the result."
 }

@@ -19,10 +19,10 @@ def _sha256(path: Path) -> str:
     return digest.hexdigest()
 
 
-def test_design_has_no_execution_authority_and_closes_manual_gate_fallback():
-    assert MANIFEST["status"] == "design_only_no_execution"
-    assert MANIFEST["next_authorized_unit"].startswith("Implement")
-    assert "Do not launch training" in MANIFEST["next_authorized_unit"]
+def test_implementation_keeps_training_locked_and_closes_manual_gate_fallback():
+    assert MANIFEST["status"] == "implementation_ready_training_not_authorized"
+    assert MANIFEST["implementation_contract"]["training_entrypoint_added"] is False
+    assert "Training remains unauthorized" in MANIFEST["next_authorized_unit"]
     assert MANIFEST["budget"]["manual_gate_fallback"] is False
     closeout = json.loads(
         (
@@ -68,6 +68,8 @@ def test_anchor_is_train_only_and_both_evaluation_panels_are_declared_developmen
     assert anchor["coefficient"] == 0.1
     assert anchor["value_anchor"] is False
     assert set(MANIFEST["evaluation"]["development_panels"]) == {"validation", "test"}
+    assert MANIFEST["evaluation"]["frozen_source_baseline"]["seeds"] == MANIFEST["seeds"]
+    assert MANIFEST["evaluation"]["frozen_source_baseline"]["training_jobs"] == 0
     assert "not a fresh holdout" in MANIFEST["evaluation"]["development_panels"]["test"][
         "role"
     ]

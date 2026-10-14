@@ -598,7 +598,33 @@ def _weighted_mean(value, mask):
     return jnp.sum(value * mask) / jnp.maximum(jnp.sum(mask), 1.0)
 
 
-def make_pack_restore_gc_update(network, config):
+def categorical_source_kl(source_logits, current_logits):
+    """Per-state KL(source || current) over the complete action distribution."""
+
+    source_logits = jax.lax.stop_gradient(source_logits)
+    source_log_probabilities = jax.nn.log_softmax(source_logits, axis=-1)
+    current_log_probabilities = jax.nn.log_softmax(current_logits, axis=-1)
+    source_probabilities = jnp.exp(source_log_probabilities)
+    return jnp.sum(
+        source_probabilities
+        * (source_log_probabilities - current_log_probabilities),
+        axis=-1,
+    )
+
+
+def make_pack_restore_gc_update(
+    network,
+    config,
+    *,
+    behavior_anchor=None,
+    behavior_anchor_coefficient=0.0,
+):
+    behavior_anchor_coefficient = float(behavior_anchor_coefficient)
+    if behavior_anchor_coefficient < 0.0:
+        raise ValueError("behavior_anchor_coefficient must be non-negative")
+    if behavior_anchor_coefficient > 0.0 and behavior_anchor is None:
+        raise ValueError("a behavior anchor is required when its coefficient is positive")
+
     def rollout_step(runner, _):
         command_goal = runner.current_goal
         model_inputs = _batch_inputs(runner.env_state, command_goal)
@@ -662,7 +688,22 @@ def make_pack_restore_gc_update(network, config):
                 + config.value_coefficient * value_loss
                 - config.entropy_coefficient * entropy
             )
-            return total, (value_loss, actor_loss, entropy)
+            anchor_kl = jnp.asarray(0.0, dtype=jnp.float32)
+            if behavior_anchor_coefficient > 0.0:
+                anchor_policy, _ = network.apply(
+                    parameters,
+                    behavior_anchor.map_channels,
+                    behavior_anchor.numeric_features,
+                    behavior_anchor.goal_one_hot,
+                )
+                anchor_kl = jnp.mean(
+                    categorical_source_kl(
+                        behavior_anchor.source_logits,
+                        anchor_policy.logits,
+                    )
+                )
+                total = total + behavior_anchor_coefficient * anchor_kl
+            return total, (value_loss, actor_loss, entropy, anchor_kl)
 
         valid_count = jnp.sum(batch.transition.valid.astype(jnp.int32))
 
@@ -671,12 +712,16 @@ def make_pack_restore_gc_update(network, config):
                 state.params
             )
             state = state.apply_gradients(grads=gradients)
-            value_loss, policy_loss, entropy = auxiliary
+            value_loss, policy_loss, entropy, anchor_kl = auxiliary
             return state, {
                 "loss": loss.astype(jnp.float32),
                 "value_loss": value_loss.astype(jnp.float32),
                 "policy_loss": policy_loss.astype(jnp.float32),
                 "entropy": entropy.astype(jnp.float32),
+                "behavior_anchor_kl": anchor_kl.astype(jnp.float32),
+                "behavior_anchor_penalty": (
+                    behavior_anchor_coefficient * anchor_kl
+                ).astype(jnp.float32),
                 "empty_minibatch": jnp.asarray(0, dtype=jnp.int32),
             }
 
@@ -687,6 +732,8 @@ def make_pack_restore_gc_update(network, config):
                 "value_loss": zero,
                 "policy_loss": zero,
                 "entropy": zero,
+                "behavior_anchor_kl": zero,
+                "behavior_anchor_penalty": zero,
                 "empty_minibatch": jnp.asarray(1, dtype=jnp.int32),
             }
 
@@ -741,6 +788,11 @@ def make_pack_restore_gc_update(network, config):
         )
         occupied = 1.0 - losses["empty_minibatch"].astype(jnp.float32)
         empty_minibatches = jnp.sum(losses["empty_minibatch"])
+        anchor_state_count = (
+            int(behavior_anchor.source_logits.shape[0])
+            if behavior_anchor_coefficient > 0.0
+            else 0
+        )
 
         def _occupied_mean(value):
             return jnp.sum(value * occupied) / jnp.maximum(jnp.sum(occupied), 1.0)
@@ -752,6 +804,15 @@ def make_pack_restore_gc_update(network, config):
                 if key != "empty_minibatch"
             },
             "empty_minibatches": empty_minibatches,
+            "behavior_anchor_coefficient": jnp.asarray(
+                behavior_anchor_coefficient, dtype=jnp.float32
+            ),
+            "behavior_anchor_state_count": jnp.asarray(
+                anchor_state_count, dtype=jnp.int32
+            ),
+            "behavior_anchor_forward_state_evaluations": (
+                jnp.sum(occupied).astype(jnp.int32) * anchor_state_count
+            ),
             "transitions": runner.env_steps - start_steps,
             "valid_transitions": jnp.sum(trajectory.valid),
             "goal_successes": jnp.sum(trajectory.goal_done),
