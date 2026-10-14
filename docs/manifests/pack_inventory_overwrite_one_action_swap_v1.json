@@ -1,0 +1,105 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_one_action_swap_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_one_action_swap_v1",
+  "status": "frozen_before_execution",
+  "understood_as": "Evaluate one new frozen-policy condition D only: follow carry-persistent B, but after the first positive-inventory handoff, execute the source actor exactly once at the first empty-inventory state where source and adapted argmax actions differ, then use the adapted actor until termination.",
+  "research_question": "Were the four B-failure/C-success paths recovered by one specific source-actor action, or did they require continued inventory-gated policy selection?",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1",
+  "seeds": [35, 36, 37, 38, 39],
+  "new_mode": {
+    "D_one_action_swap": "Use the source actor before the first state with carried_grain > 0. From that first positive-inventory state onward use the adapted actor, except at the first later state where carried_grain == 0 and the source and adapted deterministic argmax actions differ: execute the source action exactly once. Use the adapted actor thereafter, including in later empty-inventory states.",
+    "no_disagreement": "If no eligible action disagreement occurs, D is identical to B and performs no swap.",
+    "selection_rule": "The branch depends only on handoff history, current carried_grain, and the two frozen argmax actions. Success and future outcomes are not consulted."
+  },
+  "evaluation": {
+    "split": "validation",
+    "start": "natural_reset",
+    "states_per_seed": 32,
+    "horizon_ticks": 128,
+    "action_selection": "deterministic_argmax",
+    "kernel": "fixed",
+    "exact_overwrite_probabilities": [0.0, 0.05],
+    "record": [
+      "success, discounted return, and length",
+      "executed risky-harvest count over the entire path, including before the swap",
+      "positive-inventory handoff and one-action-swap step",
+      "adapted-policy step count",
+      "all failed deterministic paths"
+    ],
+    "exact_formula": "For each successful fixed-kernel deterministic D path i with length T_i and full-path risky-harvest count k_i, J_D(p)=mean[0.995^(T_i-1)*(1-p)^k_i]. A fired overwrite destroys physical grain and makes delivery of three impossible in this fixture."
+  },
+  "diagnostic_panel": {
+    "definition": "All pinned cases where B carry-persistent fails on the fixed kernel and C carry-gated succeeds.",
+    "expected_count": 4,
+    "expected_seed_state_indices": [[35, 4], [35, 12], [35, 16], [35, 24]],
+    "primary_outcome": "Number and identities of these four paths that D recovers."
+  },
+  "budget": {
+    "learning_updates": 0,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "new_policies": 5,
+    "new_execution_modes": 1,
+    "episodes": 160,
+    "maximum_environment_steps": 20480,
+    "automatic_extension": false
+  },
+  "analysis": {
+    "independent_unit": "learner seed",
+    "paired_by": "seed, source checkpoint, adapted checkpoint, and natural start",
+    "primary_metric": "D recovery count among the four pinned B-failure/C-success paths",
+    "secondary_metrics": [
+      "whole-panel fixed-kernel success and p=0.05 expected discounted return",
+      "whole-panel risky-path count and full-path executed risky-harvest count",
+      "new D failures among paths where B succeeds",
+      "one-action-swap coverage and step"
+    ],
+    "decision_rule": {
+      "all_four": "A single source action was sufficient for these four observed failures; this does not establish sufficiency outside the fixed panel.",
+      "some": "The panel mixes failures recoverable by one action with failures requiring a different or longer intervention.",
+      "none_while_C_succeeds": "The first source action alone was insufficient on these paths; this does not prove that every later C selection was necessary.",
+      "success_with_worse_risk_or_return": "Normal-task recovery and rare-defect performance must be reported separately."
+    },
+    "non_claims": [
+      "D is an evaluator-supplied rule, not a learned selector.",
+      "The four diagnostic cases were defined from pinned B/C outcomes before D execution; they are not a fresh generalization panel.",
+      "A successful one-action intervention does not identify a semantic bug fix or establish that the same action works in unseen states.",
+      "B/C agreement before the branch follows from identical initial states, deterministic transitions, and identical chosen-action prefixes; stored summaries do not independently encode every latent state field.",
+      "Exact p=0.05 values are finite-panel expectations derived from deterministic fixed paths, not stochastic-policy rollouts.",
+      "Five Dual-history learner seeds do not establish population frequency or significance."
+    ]
+  },
+  "prerequisites": {
+    "B_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/result.json",
+    "B_result_sha256": "193c08bb8c2fc30e26c6460c4565b9aa22f05fb33b0313afeca7bfb2742a7ad9",
+    "B_complete": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_carry_persistent_v1/complete.json",
+    "B_complete_sha256": "233b72d7526068a5026ebe96f67a94d9ff1c21a5e261bf70a6be002841dcfaca",
+    "C_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/result.json",
+    "C_result_sha256": "b25b85e3a10ee23a6845d09ae5cd117e784c72feba2cfb5b7015be5f1a597a2b",
+    "C_complete": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1/complete.json",
+    "C_complete_sha256": "e42ca7dea4f187838f8e33ee074d5c6a0a87efa1f26cac2265470b5519849689"
+  },
+  "execution_sources": [
+    "docs/manifests/pack_inventory_overwrite_one_action_swap_v1.json",
+    "scripts/evaluate_pack_inventory_overwrite_one_action_swap.py",
+    "scripts/evaluate_pack_inventory_overwrite_carry_persistent.py",
+    "scripts/evaluate_pack_inventory_overwrite_policy_switch.py",
+    "src/hackrl/pack_restore.py",
+    "src/hackrl/pack_restore_gc.py",
+    "src/hackrl/pack_inventory_overwrite_rare.py",
+    "src/hackrl/dual_leo.py"
+  ],
+  "storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "capacity_measured_utc": "2026-10-14",
+    "home_free_bytes_at_preflight": 158660186112,
+    "home_utilization_percent_at_preflight": 92,
+    "raid_free_bytes_at_preflight": 7602751877120,
+    "existing_run_bytes": 0,
+    "projected_peak_writes_bytes": 33554432,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 8623489024,
+    "checkpoints_written": 0
+  },
+  "stop_rule": "Run D for all five seeds and 32 natural starts on the fixed kernel, compute p=0 and p=0.05, compare with pinned B and C, and do not add learning, seeds, kernels, repeated swaps, thresholds, or follow-up variants."
+}
