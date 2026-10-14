@@ -117,13 +117,27 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
     comparison = raw["comparison"]
     primary = contrast(comparison, "C_carry_gated", "B_carry_persistent")
     secondary = contrast(comparison, "B_carry_persistent", "A_late_risk_persistent")
+    compact_gates = {
+        "all_160_new_B_fixed_episodes_recorded": raw["gates"]["all_160_fixed_episodes_recorded"],
+        "every_new_B_episode_has_exactly_one_positive_inventory_handoff": raw["gates"][
+            "every_episode_has_one_positive_inventory_handoff"
+        ],
+        "B_never_relinquishes_policy_control_after_handoff": raw["gates"][
+            "no_episode_returns_to_source_after_handoff"
+        ],
+        "prior_A_and_C_endpoint_validation_remains_pinned": raw["gates"][
+            "prior_endpoint_validation_remains_pinned"
+        ],
+        "no_learning_updates": raw["gates"]["no_learning_updates"],
+    }
     return {
         "schema_version": "hackrl_pack_inventory_overwrite_carry_persistent_compact_result_v1",
         "status": raw["status"],
         "decision": (
-            "Returning to the source actor added task-retention value but not additional risk reduction in this panel. "
-            "Carry-persistent and carry-gated execution had the same 40 risky starts, while carry-persistent used the adapted actor "
-            "for 84.0% of active steps and reduced fixed-kernel success to 97.5%. Carry-gated used it for 35.8% of steps and retained 100% success."
+            "In this five-seed paired panel, inventory-gated return to the source actor raised mean p=0.05 discounted return by 0.02417 "
+            "over persistent adapted control, but 97.0% of that mean difference came from seed 35; excluding seed 35, the mean "
+            "difference was 0.000897. Both rules produced 40 fixed-kernel paths with at least one executed risky harvest, so no "
+            "reduction was observed in that exposure count."
         ),
         "provenance": {
             "execution_head": run_manifest["execution_head"],
@@ -141,12 +155,24 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
         "protocol": {
             "A_late_risk_persistent": "Switch at the first source-policy risky-harvest proposal and never return.",
             "B_carry_persistent": "Switch at the first state with carried_grain > 0 and never return.",
-            "C_carry_gated": "Use adapted whenever carried_grain > 0 and return to source whenever carried_grain == 0.",
+            "C_carry_gated": "Use the adapted actor whenever carried_grain > 0 and the source actor whenever carried_grain == 0.",
             "primary": "C minus B p=0.05 expected discounted return.",
-            "episode_accounting": "Five seeds times 32 natural starts give 160 newly executed fixed-kernel paths.",
+            "episode_accounting": (
+                "Five seeds times 32 natural starts give 160 newly executed B paths. A and C each reuse 160 pinned paths from "
+                "prior evaluations, for 480 condition-path records in the comparison."
+            ),
             "gate_source": "The evaluator supplies all switching rules; no gate is learned.",
+            "terms": {
+                "fixed_kernel": "The normal PACK transition kernel with no overwrite firing; it exposes the deterministic path used for exact p evaluation.",
+                "natural_start": "One of the 32 unmodified validation reset states used for every policy pair and condition.",
+                "risky_harvest": "An executed valid harvest while carried_grain > 0, i.e. an action at which overwrite could fire.",
+                "fixed_risky_start_count": "Number of the 160 fixed-kernel paths with executed_risk_count > 0.",
+                "fixed_success_rate": "Goal-success fraction over the deterministic fixed-kernel paths.",
+                "source_actor": "The frozen normal-training policy checkpoint in each seed-specific policy pair.",
+                "adapted_actor": "The frozen p=1 overwrite-adapted policy checkpoint paired with that source actor.",
+            },
         },
-        "gates": raw["gates"],
+        "gates": compact_gates,
         "conditions": {
             mode: {
                 "p00_expected_discounted_return": row["exact"]["p00"]["expected_discounted_return"],
@@ -166,6 +192,7 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
         "per_seed": {mode: row["per_seed"] for mode, row in comparison.items()},
         "decimal_audit": {
             "domain": "Decimal, 50 digits",
+            "scope": "The 160 newly executed B carry-persistent paths at p=0 and p=0.05.",
             "formula": "mean(success * 0.995^(length-1) * (1-p)^executed_risk_count)",
             "points": decimal_points,
             "tolerance": str(TOLERANCE),
@@ -174,19 +201,19 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
         },
         "interpretation": {
             "risk": (
-                "B and C had identical risky-start counts, so returning at empty inventory did not add measured avoidance. "
-                "Their shared first positive-inventory handoff is the main candidate for the risk reduction relative to A."
+                "B and C each had 40 fixed-kernel paths with at least one executed risky harvest. Returning control at empty inventory "
+                "therefore did not reduce this measured exposure count; equal counts do not establish equal actions, paths, or broader risk."
             ),
             "retention": (
-                "C exceeded B in four seeds and tied in one. The large mean difference was driven by seed 35, where B reduced fixed success to 87.5%; "
-                "excluding seed 35, C minus B remained slightly positive."
+                "C exceeded B in four seeds and tied in one, but 97.0% of the mean C-minus-B difference came from seed 35, where B fixed-kernel "
+                "success was 87.5%. Excluding seed 35, the mean difference was 0.000897."
             ),
             "exposure": (
                 "The return rule reduced adapted-policy exposure from 84.0% to 35.8% of active steps, preserving source-policy control in empty-inventory phases."
             ),
             "secondary": (
                 "B minus A was negative in the full mean because of seed 35, but positive for each of seeds 36-39. "
-                "The benefit of the earlier first handoff is therefore policy-pair dependent when no return is allowed."
+                "Changing the first-handoff predicate and its downstream state distribution was therefore policy-pair dependent when no return was allowed."
             ),
             "limit": (
                 "C minus B isolates the supplied return rule after their common first handoff only until their trajectories diverge; "
@@ -198,6 +225,7 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
             "Equal risky-start counts do not imply identical trajectories or actions.",
             "The seed-35-excluded value is a declared sensitivity analysis, not the primary result.",
             "Five Dual-history learner seeds do not establish population frequency or significance.",
+            "Task retention is not a latent construct here; the reported preservation measure is fixed-kernel goal success.",
         ],
     }
 
@@ -251,8 +279,8 @@ def build_audit(compact: dict, started_clean: bool) -> dict:
         },
         "outputs": [{"path": str(COMPACT_PATH.relative_to(REPOSITORY)), "sha256": sha256(COMPACT_PATH)}],
         "checks": [
-            "All 160 fixed-kernel paths were recorded.",
-            "Every path switched exactly once at positive inventory and never returned to source.",
+            "All 160 newly executed B fixed-kernel paths were recorded.",
+            "Every new B path handed policy control to the adapted actor exactly once at positive inventory and never relinquished it.",
             "Pinned A and C results retained their endpoint-validation gates.",
             f"Independent Decimal recomputation differed by at most {compact['decimal_audit']['maximum_absolute_difference']}.",
             "All five seed contrasts and the declared seed-35-excluded sensitivity were retained."
