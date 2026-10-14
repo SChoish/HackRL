@@ -1,0 +1,94 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_early_handoff_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_early_handoff_v1",
+  "status": "frozen_before_execution",
+  "research_question": "Does handing the frozen p=1-adapted policy control whenever inventory is nonempty transfer more avoidance than waiting until the source policy proposes the harmful harvest?",
+  "diagnostic_scope": "This is a zero-learning, oracle-assisted execution diagnostic. It compares an earlier inventory-phase gate with the completed late-risk switch, source-only, and adapted-from-start modes.",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_early_handoff_v1",
+  "seeds": [35, 36, 37, 38, 39],
+  "new_execution_mode": {
+    "carry_gated": "Use the deterministic source actor when carried_grain is zero and the deterministic p=1-adapted actor whenever carried_grain is positive. Return to the source actor after delivery or storage empties inventory. The adapted action is never replaced or forced safe."
+  },
+  "comparison_modes_from_prior_run": ["source", "persistent", "adapted"],
+  "policy_inputs": {
+    "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+    "source_checkpoint": "adapt_4096",
+    "adapted_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_train_probability_transfer_v1/p100_lr1",
+    "adapted_checkpoint": "adapt_32"
+  },
+  "evaluation": {
+    "split": "validation",
+    "start": "natural_reset",
+    "states_per_seed": 32,
+    "horizon_ticks": 128,
+    "action_selection": "deterministic_argmax",
+    "direct_kernels": ["fixed", "inventory_overwrite_p1"],
+    "exact_overwrite_probabilities": [0.0, 0.05, 0.30, 1.0],
+    "primary": "At overwrite probability 0.05, compare carry-gated expected discounted return with the paired prior source and late persistent-switch modes, while requiring fixed-kernel task retention.",
+    "secondary": [
+      "fixed-kernel success, return, and length",
+      "risky-harvest exposure and exact loss probability",
+      "switch count and adapted-policy duration",
+      "adapted action selected at the first handoff",
+      "all failed deterministic paths"
+    ]
+  },
+  "budget": {
+    "learning_updates": 0,
+    "teacher_updates": 0,
+    "bc_updates": 0,
+    "new_policies": 5,
+    "new_execution_modes": 1,
+    "direct_kernels": 2,
+    "episodes": 320,
+    "maximum_environment_steps": 40960,
+    "automatic_extension": false
+  },
+  "analysis": {
+    "independent_unit": "learner seed",
+    "paired_by": "seed, source checkpoint, adapted checkpoint, and natural start",
+    "success_rule": "Earlier handoff is useful only if it improves or retains p=0.05 return and fixed-kernel task performance; lower risk alone is not success.",
+    "interpretation": {
+      "carry_beats_late": "Avoidance depends on decisions made before the source policy reaches the risky harvest state.",
+      "carry_matches_late_but_trails_adapted": "Earlier control over the carrying phase is insufficient; policy-state compatibility or still-earlier route decisions remain plausible explanations.",
+      "carry_reduces_risk_but_lowers_return": "The gate induces more avoidance but harms task execution or path efficiency."
+    },
+    "non_claims": [
+      "The carry gate is supplied by the evaluator and is not learned defect detection.",
+      "A benefit cannot be attributed to experience frequency because no learning occurs.",
+      "Failure would not identify distribution shift as the sole cause.",
+      "Exact intermediate-probability values are finite-panel expectations from deterministic fixed-kernel paths.",
+      "Five Dual-history learner seeds do not establish population frequency or significance."
+    ]
+  },
+  "prerequisites": {
+    "prior_design": "docs/manifests/pack_inventory_overwrite_policy_switch_v1.json",
+    "prior_design_sha256": "135d9a0d9d76f496bb4a3e64947a2f5f48326e75f826d3f7e82732b9c9d5dfcd",
+    "prior_result": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/result.json",
+    "prior_result_sha256": "78a7eabf856046788e1319584bed0826aecbb9876922044a3a8b5ea67f381685",
+    "prior_complete": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_policy_switch_v1/complete.json",
+    "prior_complete_sha256": "eaa73ea05f9b4897f10a16e5e0ab87b9242de7129960ded2f8246bdff0378aa5"
+  },
+  "execution_sources": [
+    "docs/manifests/pack_inventory_overwrite_early_handoff_v1.json",
+    "scripts/evaluate_pack_inventory_overwrite_early_handoff.py",
+    "scripts/evaluate_pack_inventory_overwrite_policy_switch.py",
+    "src/hackrl/pack_restore.py",
+    "src/hackrl/pack_restore_gc.py",
+    "src/hackrl/pack_inventory_overwrite_rare.py",
+    "src/hackrl/dual_leo.py"
+  ],
+  "storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "capacity_measured_utc": "2026-10-14",
+    "home_free_bytes_at_preflight": 159631675392,
+    "home_utilization_percent_at_preflight": 92,
+    "raid_free_bytes_at_preflight": 7638729113600,
+    "prior_run_bytes": 37493690,
+    "projected_peak_writes_bytes": 67108864,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 8657043456,
+    "checkpoints_written": 0
+  },
+  "stop_rule": "Run the one carry-gated mode for all five seeds and both endpoint kernels, compute exact p=0.05 and p=0.30 expectations, compare with the pinned prior modes, and do not add learning, seeds, thresholds, or more gate variants."
+}
