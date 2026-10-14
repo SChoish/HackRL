@@ -1,0 +1,98 @@
+{
+  "checks": [
+    "All 960 direct episodes were recorded and every execution gate passed.",
+    "The 32 TEST states matched the frozen ordered hash, were unique, and had no exact full-state overlap with TRAIN or VALIDATION natural panels.",
+    "Every p=0 and p=1 exact value matched its direct endpoint-kernel rollout.",
+    "All first-overwrite prehistories matched between endpoint kernels, and every p=1 success had zero fixed-path risk.",
+    "Independent Decimal recomputation differed by at most 2.6151853571656986135058220021579712E-16."
+  ],
+  "claim_id": "pack_inventory_overwrite_gate_heldout_v1_finite_test_panel",
+  "command": [
+    "PYTHONPATH=src:scripts JAX_PLATFORMS=cpu /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/evaluate_pack_inventory_overwrite_gate_heldout.py --run",
+    "/home/ext_csv/miniconda3/envs/offrl/bin/python scripts/summarize_pack_inventory_overwrite_gate_heldout.py --write"
+  ],
+  "environment": {
+    "hardware": "CPU backend; Intel(R) Xeon(R) Platinum 8480C; Linux-6.8.0-55-generic-x86_64-with-glibc2.39",
+    "software": [
+      "Python 3.12.13",
+      "JAX 0.10.2 / jaxlib 0.10.2",
+      "NumPy 2.5.0"
+    ]
+  },
+  "mathematics": {
+    "assertion_tested": "Compare frozen source, p=1-adapted, and carried_grain>0 gated execution on the predefined PACK TEST natural-start panel, with carry-gated minus source p=0.05 expected return as primary.",
+    "bounds": {
+      "conditions": 3,
+      "direct_episodes": 960,
+      "endpoint_kernels": 2,
+      "evaluated_probabilities": [
+        0.0,
+        0.05,
+        1.0
+      ],
+      "horizon_ticks": 128,
+      "learner_seeds": [
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "maximum_environment_steps": 122880,
+      "test_natural_starts_per_seed": 32
+    },
+    "coefficient_domain": "Integer path/event counts; IEEE-754 rollout summaries; independent Decimal arithmetic at 50-digit precision for p=0, p=0.05, and p=1 expectations.",
+    "conventions": "Zero-indexed TEST state indices; one-indexed recorded steps; gamma=0.995; deterministic argmax actions; adapted actor exactly when carried_grain>0 in carry-gated mode.",
+    "inputs": [
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_gate_heldout_v1/result.json",
+        "sha256": "410e803abb8948202be01faf65c9da12f9f5570da5a01222122122e08989bbd0"
+      },
+      {
+        "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_gate_heldout_v1/run_manifest.json",
+        "sha256": "60741125d3863bcb32269a41a50dd98ea7cf87f5c089832400a199375a6b3f1b"
+      },
+      {
+        "path": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1.json",
+        "sha256": "6a37c57b0d43f204b1ad42ac1fda6134c611da14ad8c3eab62f3e3800628a076"
+      }
+    ],
+    "non_claims": [
+      "TEST changes map geometry as well as initial physical state; this is not an i.i.d. resample of the validation states.",
+      "The same five learner seeds and checkpoints are reused, so this does not test generalization to new learned policies.",
+      "The gate is evaluator supplied and was not learned.",
+      "The prior four seed-35 failures remain a validation-panel case analysis and are not part of this primary comparison.",
+      "Exact p=0.05 values are finite-panel expectations derived from deterministic fixed paths."
+    ]
+  },
+  "outputs": [
+    {
+      "path": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1_results.json",
+      "sha256": "723ac10098f369337941f63abc19b4bbb68ae07f326f31f50b7240544945857c"
+    }
+  ],
+  "randomness": {
+    "generator": "",
+    "seed": null,
+    "used": false
+  },
+  "repository": {
+    "commit": "2d1aa1fc5f87fcc2e25755c6ae3e19030e64beb4",
+    "dirty": false
+  },
+  "residual_risks": [
+    "The policy network and simulator were not independently reimplemented.",
+    "The same project codebase generated paths and goal-success labels; endpoint checks and Decimal recomputation reduce but do not remove verifier-designer coupling.",
+    "TEST changes geometry and state, so the result is not an i.i.d. resampling estimate.",
+    "The same five learned policy pairs were reused, so the result does not test generalization to new learner seeds.",
+    "Intermediate-probability values rely on the environment property that any overwrite loss makes the three-delivery goal impossible.",
+    "Schema version 1 does not machine-pin every execution input or resource limit."
+  ],
+  "result": "Finite TEST-panel assertion verified: carry-gated minus source p=0.05 return was +0.002876 on average, positive for four of five seeds, while fixed-kernel success decreased from 100% to 98.75%.",
+  "run": {
+    "exit_status": 0,
+    "runtime_seconds": 44.9209680557251,
+    "started_at": "2026-10-14T09:11:26.099016+00:00"
+  },
+  "schema_version": 1
+}

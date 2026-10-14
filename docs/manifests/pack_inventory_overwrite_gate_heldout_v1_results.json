@@ -1,0 +1,406 @@
+{
+  "carry_gated_minus_adapted": {
+    "left": "carry_gated",
+    "mean_difference": 0.004203554680437094,
+    "metric": "p05_expected_discounted_return",
+    "per_seed": [
+      {
+        "difference": -0.0022884742315303352,
+        "seed": 35
+      },
+      {
+        "difference": -0.013624034673539342,
+        "seed": 36
+      },
+      {
+        "difference": 0.05510629765282882,
+        "seed": 37
+      },
+      {
+        "difference": -0.016182981456169143,
+        "seed": 38
+      },
+      {
+        "difference": -0.0019930338894045274,
+        "seed": 39
+      }
+    ],
+    "right": "adapted",
+    "signs": {
+      "equal_within_tolerance": 0,
+      "negative": 4,
+      "positive": 1
+    }
+  },
+  "carry_gated_minus_source": {
+    "left": "carry_gated",
+    "mean_difference": 0.0028763541226285217,
+    "metric": "p05_expected_discounted_return",
+    "per_seed": [
+      {
+        "difference": -0.04404295285260529,
+        "seed": 35
+      },
+      {
+        "difference": 0.006655497792690368,
+        "seed": 36
+      },
+      {
+        "difference": 0.013357487159186388,
+        "seed": 37
+      },
+      {
+        "difference": 0.01677677413951506,
+        "seed": 38
+      },
+      {
+        "difference": 0.02163496437435608,
+        "seed": 39
+      }
+    ],
+    "right": "source",
+    "signs": {
+      "equal_within_tolerance": 0,
+      "negative": 1,
+      "positive": 4
+    }
+  },
+  "conditions": {
+    "adapted": {
+      "fixed_mean_length": 23.5375,
+      "fixed_risky_path_count": 6,
+      "fixed_success_rate": 0.975,
+      "p00_expected_discounted_return": 0.8826457284222022,
+      "p05_expected_discounted_return": 0.8809606523816402,
+      "p05_overwrite_loss_episode_probability": 0.00187499999999996,
+      "p05_success_rate": 0.973125,
+      "p100_expected_discounted_return": 0.8489442076109632,
+      "risk_count_distribution": {
+        "0": 154,
+        "1": 6
+      }
+    },
+    "carry_gated": {
+      "fixed_mean_length": 21.8875,
+      "fixed_risky_path_count": 36,
+      "fixed_success_rate": 0.9875,
+      "p00_expected_discounted_return": 0.8953640301685113,
+      "p05_expected_discounted_return": 0.8851642070620774,
+      "p05_overwrite_loss_episode_probability": 0.011249999999999982,
+      "p05_success_rate": 0.97625,
+      "p100_expected_discounted_return": 0.6913675680398351,
+      "risk_count_distribution": {
+        "0": 124,
+        "1": 36
+      }
+    },
+    "source": {
+      "fixed_mean_length": 20.0375,
+      "fixed_risky_path_count": 94,
+      "fixed_success_rate": 1.0,
+      "p00_expected_discounted_return": 0.9089857947834834,
+      "p05_expected_discounted_return": 0.8822878529394489,
+      "p05_overwrite_loss_episode_probability": 0.02937500000000004,
+      "p05_success_rate": 0.970625,
+      "p100_expected_discounted_return": 0.3750269579027937,
+      "risk_count_distribution": {
+        "0": 66,
+        "1": 94
+      }
+    }
+  },
+  "decimal_audit": {
+    "domain": "Decimal, 50 digits",
+    "formula": "mean(success * 0.995^(length-1) * (1-p)^executed_risk_count)",
+    "maximum_absolute_difference": "2.6151853571656986135058220021579712E-16",
+    "passed": true,
+    "points": {
+      "adapted": {
+        "p00": {
+          "expected_discounted_return": "0.88264572842220241020723290309982052909549021513319",
+          "overwrite_loss_episode_probability": "0",
+          "success_rate": "0.975"
+        },
+        "p05": {
+          "expected_discounted_return": "0.88096065238164046151853571656986135058220021579712",
+          "overwrite_loss_episode_probability": "0.001875",
+          "success_rate": "0.973125"
+        },
+        "p100": {
+          "expected_discounted_return": "0.84894420761096343643328917250063695882969022841119",
+          "overwrite_loss_episode_probability": "0.0375",
+          "success_rate": "0.9375"
+        }
+      },
+      "carry_gated": {
+        "p00": {
+          "expected_discounted_return": "0.89536403016851135114669829791679398510695445694062",
+          "overwrite_loss_episode_probability": "0",
+          "success_rate": "0.9875"
+        },
+        "p05": {
+          "expected_discounted_return": "0.88516420706207754572442460787238978881041213826319",
+          "overwrite_loss_episode_probability": "0.01125",
+          "success_rate": "0.97625"
+        },
+        "p100": {
+          "expected_discounted_return": "0.69136756803983524270122449702871005917610808339756",
+          "overwrite_loss_episode_probability": "0.225",
+          "success_rate": "0.7625"
+        }
+      },
+      "source": {
+        "p00": {
+          "expected_discounted_return": "0.90898579478348355776350850647774607899687921119231",
+          "overwrite_loss_episode_probability": "0",
+          "success_rate": "1"
+        },
+        "p05": {
+          "expected_discounted_return": "0.88228785293944906694553110622966400140628824429881",
+          "overwrite_loss_episode_probability": "0.029375",
+          "success_rate": "0.970625"
+        },
+        "p100": {
+          "expected_discounted_return": "0.37502695790279374140396050151610452718505987334245",
+          "overwrite_loss_episode_probability": "0.5875",
+          "success_rate": "0.4125"
+        }
+      }
+    },
+    "scope": "All three conditions, 160 fixed-kernel paths per condition, at p=0, p=0.05, and p=1.",
+    "tolerance": "1E-14"
+  },
+  "decision": "On the predefined PACK TEST panel, carry-gated execution improved mean p=0.05 expected discounted return over the source actor by 0.002876 and was positive for seeds 36-39, while seed 35 decreased by 0.044043. The gate reduced risky paths from 94 to 36 but lowered fixed-kernel success from 100% to 98.75%; therefore the validation-panel benefit transferred across multiple policy pairs but was neither uniform nor failure-free.",
+  "gates": {
+    "all_960_direct_episodes_recorded": true,
+    "all_endpoint_checks_pass": true,
+    "all_test_states_unique": true,
+    "no_learning_updates": true,
+    "test_has_no_exact_train_or_validation_state_overlap": true,
+    "test_panel_hash_matches_frozen_manifest": true
+  },
+  "interpretation": {
+    "adapted_comparison": "Carry-gated mean p=0.05 return exceeded adapted-only by +0.004204, but this contrast was positive for only one of five seeds and does not support a uniform advantage over adapted-only execution.",
+    "normal_performance": "Source fixed-kernel success was 100%. Carry-gated success was 98.75%; both failures were seed 35, whose carry-gated fixed success was 93.75%.",
+    "primary": "Carry-gated p=0.05 expected return was 0.885164, versus 0.882288 for source; the paired seed mean difference was +0.002876, positive for four of five seeds.",
+    "risk": "Carry-gated execution reduced fixed-path risk exposure from 94 to 36 paths and raised p=0.05 expected success from 0.970625 to 0.976250.",
+    "scope": "The result extends the comparison to a pre-existing TEST split with different geometry and states. It does not test new learner seeds, and it reveals that the fixed gate can introduce normal-task failures."
+  },
+  "non_claims": [
+    "TEST changes map geometry as well as initial physical state; this is not an i.i.d. resample of the validation states.",
+    "The same five learner seeds and checkpoints are reused, so this does not test generalization to new learned policies.",
+    "The gate is evaluator supplied and was not learned.",
+    "The prior four seed-35 failures remain a validation-panel case analysis and are not part of this primary comparison.",
+    "Exact p=0.05 values are finite-panel expectations derived from deterministic fixed paths."
+  ],
+  "per_seed": {
+    "adapted": [
+      {
+        "fixed_risky_start_count": 0,
+        "fixed_success_rate": 0.9375,
+        "p00_expected_discounted_return": 0.84724408397418,
+        "p05_expected_discounted_return": 0.84724408397418,
+        "p100_expected_discounted_return": 0.84724408397418,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9060691162293555,
+        "p05_expected_discounted_return": 0.9033259626614366,
+        "p100_expected_discounted_return": 0.851206044870977,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 4,
+        "fixed_success_rate": 0.9375,
+        "p00_expected_discounted_return": 0.8503607711842153,
+        "p05_expected_discounted_return": 0.8446785445493245,
+        "p100_expected_discounted_return": 0.736716238486399,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 0,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9080226573688694,
+        "p05_expected_discounted_return": 0.9080226573688694,
+        "p100_expected_discounted_return": 0.9080226573688694,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 0,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9015320133543911,
+        "p05_expected_discounted_return": 0.9015320133543911,
+        "p100_expected_discounted_return": 0.9015320133543911,
+        "seed": 39
+      }
+    ],
+    "carry_gated": [
+      {
+        "fixed_risky_start_count": 4,
+        "fixed_success_rate": 0.9375,
+        "p00_expected_discounted_return": 0.8506378363775405,
+        "p05_expected_discounted_return": 0.8449556097426497,
+        "p100_expected_discounted_return": 0.7369933036797243,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9066218892773087,
+        "p05_expected_discounted_return": 0.8897019279878973,
+        "p100_expected_discounted_return": 0.5682226634890813,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 6,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9083081821544894,
+        "p05_expected_discounted_return": 0.8997848422021533,
+        "p100_expected_discounted_return": 0.737841383107765,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 12,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9088721502507856,
+        "p05_expected_discounted_return": 0.8918396759127003,
+        "p100_expected_discounted_return": 0.5682226634890813,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 2,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9023800927824319,
+        "p05_expected_discounted_return": 0.8995389794649866,
+        "p100_expected_discounted_return": 0.8455578264335238,
+        "seed": 39
+      }
+    ],
+    "source": [
+      {
+        "fixed_risky_start_count": 14,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9088721502507857,
+        "p05_expected_discounted_return": 0.888998562595255,
+        "p100_expected_discounted_return": 0.5114003971401733,
+        "seed": 35
+      },
+      {
+        "fixed_risky_start_count": 18,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.908588038919041,
+        "p05_expected_discounted_return": 0.8830464301952069,
+        "p100_expected_discounted_return": 0.39775586444235694,
+        "seed": 36
+      },
+      {
+        "fixed_risky_start_count": 16,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8864273550429669,
+        "p100_expected_discounted_return": 0.4545781307912651,
+        "seed": 37
+      },
+      {
+        "fixed_risky_start_count": 24,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8750629017731852,
+        "p100_expected_discounted_return": 0.22728906539563254,
+        "seed": 38
+      },
+      {
+        "fixed_risky_start_count": 22,
+        "fixed_success_rate": 1.0,
+        "p00_expected_discounted_return": 0.9091562615825302,
+        "p05_expected_discounted_return": 0.8779040150906305,
+        "p100_expected_discounted_return": 0.2841113317445407,
+        "seed": 39
+      }
+    ]
+  },
+  "protocol": {
+    "conditions": {
+      "adapted": "Use the frozen p=1 overwrite-adapted actor at every step.",
+      "carry_gated": "Use the adapted actor when carried_grain > 0 and the source actor otherwise.",
+      "source": "Use the frozen normal-training actor at every step."
+    },
+    "episode_accounting": "Five policy-pair seeds times three conditions times two endpoint kernels times 32 TEST states give 960 direct episodes.",
+    "exact_probability_method": "For each successful fixed-kernel deterministic path, weight return and success by (1-p)^k, where k is its executed risky-harvest count.",
+    "independent_unit": "learner seed",
+    "panel": {
+      "all_repeat_indices_zero": true,
+      "exact_overlap_with_train_natural_states": 0,
+      "exact_overlap_with_validation_natural_states": 0,
+      "ordered_full_state_sha256": "12c107ee8d9ffa184e28eab1fedcbcbdfa27cc8685a3ce49fed22dc8165179c6",
+      "split": "test",
+      "state_count": 32,
+      "state_indices": [
+        0,
+        1,
+        2,
+        3,
+        4,
+        5,
+        6,
+        7,
+        8,
+        9,
+        10,
+        11,
+        12,
+        13,
+        14,
+        15,
+        16,
+        17,
+        18,
+        19,
+        20,
+        21,
+        22,
+        23,
+        24,
+        25,
+        26,
+        27,
+        28,
+        29,
+        30,
+        31
+      ],
+      "unique_state_count": 32
+    },
+    "primary": "carry_gated minus source at p=0.05"
+  },
+  "provenance": {
+    "aggregation_head": "2d1aa1fc5f87fcc2e25755c6ae3e19030e64beb4",
+    "aggregation_script": {
+      "path": "scripts/summarize_pack_inventory_overwrite_gate_heldout.py",
+      "sha256": "b7e29aba084563366b31de9f829272e574e4104b231b8d4dceda4f50bfb4f67d"
+    },
+    "complete_marker": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_gate_heldout_v1/complete.json",
+      "recorded_result_sha256": "410e803abb8948202be01faf65c9da12f9f5570da5a01222122122e08989bbd0",
+      "sha256": "3a81324127add6df488841e3f0bea5b390cb3094e5d43d59b1e29136f15d1c7c"
+    },
+    "design_manifest": {
+      "path": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1.json",
+      "sha256": "6a37c57b0d43f204b1ad42ac1fda6134c611da14ad8c3eab62f3e3800628a076"
+    },
+    "execution_head": "2032fbc96ff7f8742d1f75793ebe8bd9b451f2d7",
+    "raw_result": {
+      "bytes": 23912770,
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_gate_heldout_v1/result.json",
+      "sha256": "410e803abb8948202be01faf65c9da12f9f5570da5a01222122122e08989bbd0"
+    },
+    "run_manifest": {
+      "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_gate_heldout_v1/run_manifest.json",
+      "sha256": "60741125d3863bcb32269a41a50dd98ea7cf87f5c089832400a199375a6b3f1b"
+    }
+  },
+  "schema_version": "hackrl_pack_inventory_overwrite_gate_heldout_compact_result_v1",
+  "status": "complete_no_learning"
+}
