@@ -152,7 +152,7 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
         "schema_version": "hackrl_pack_inventory_overwrite_early_handoff_compact_result_v1",
         "status": raw["status"],
         "decision": (
-            "Earlier inventory-phase handoff succeeded in this frozen five-seed panel. "
+            "The carry-gated schedule met the preregistered success rule in this frozen five-seed panel. "
             "Carry-gated execution had the highest p=0.05 expected return, retained 100% fixed-kernel success, "
             "and reduced risky starts from 94 for source-only and 82 for late persistent switching to 40. "
             "Its paired p=0.05 return difference was positive in all five seeds against both source-only and late switching."
@@ -191,6 +191,30 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
             "new_episodes": 320,
             "maximum_environment_steps": 40960,
             "learning_updates": 0,
+        },
+        "protocol": {
+            "defect": (
+                "On a valid harvest with carried_grain > 0, the harmful kernel overwrites inventory to one. "
+                "Any physical grain loss makes delivery of three impossible in this fixture."
+            ),
+            "source": "Execute the frozen source actor for the full episode.",
+            "persistent": (
+                "Execute the source actor until it proposes a risky harvest, then execute the adapted actor until delivery or storage "
+                "empties inventory; repeat if another source-risk proposal occurs."
+            ),
+            "carry_gated": (
+                "Execute the source actor whenever carried_grain is zero and the adapted actor whenever carried_grain is positive; "
+                "the reversible gate can therefore hand off multiple times in one episode."
+            ),
+            "adapted": "Execute the frozen p=1-adapted actor for the full episode.",
+            "risky_start": "A fixed-kernel deterministic path that executes at least one valid harvest while carrying grain.",
+            "episode_accounting": (
+                "Five seeds times 32 natural starts give 160 paths per kernel; fixed and always-fire endpoint kernels give 320 direct episodes."
+            ),
+            "success_rule": (
+                "Improve or retain p=0.05 expected return and fixed-kernel task performance; lower risk alone is not success."
+            ),
+            "gate_source": "The evaluator supplies both switching rules; neither policy learned the gate.",
         },
         "gates": raw["gates"],
         "primary_p05": {
@@ -232,8 +256,8 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
         },
         "interpretation": {
             "primary": (
-                "The adapted policy transferred useful avoidance when it controlled the carrying phase, "
-                "whereas waiting for the exact risky harvest state was too late for most source-policy paths."
+                "The tested carry-gated composite reduced risky starts and improved p=0.05 return, whereas the tested late-risk "
+                "composite retained most source-policy risky paths."
             ),
             "composition": (
                 "Carry-gated execution outperformed full source execution in all five seeds, showing that the two frozen policies "
@@ -245,8 +269,9 @@ def build_compact(raw: dict, run_manifest: dict, complete: dict) -> dict:
                 "so the safer route was not free."
             ),
             "limit": (
-                "This causal contrast identifies gate timing in the tested deterministic panel, but does not establish why the adapted actor "
-                "chooses different actions internally or whether a learned gate would recover the same benefit."
+                "Carry-gated and late-risk execution differ in the gate predicate, handoff timing, and states controlled by the adapted actor. "
+                "The comparison therefore does not identify timing alone, explain the adapted actor internally, or show that a learned gate "
+                "would recover the same benefit."
             ),
         },
         "non_claims": [
