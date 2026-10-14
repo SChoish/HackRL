@@ -1,0 +1,216 @@
+{
+  "schema_version": "hackrl_pack_inventory_overwrite_behavior_anchor_ppo_manifest_v1",
+  "manifest_id": "pack_inventory_overwrite_behavior_anchor_ppo_v1",
+  "status": "design_only_no_execution",
+  "understood_as": "Close the hand-written policy-gate line and compare ordinary p=0.05 PPO adaptation with one behavior-anchored PPO intervention. Both branches start from the same frozen normal actor-critic and inherited Adam state, use paired initial states and RNG streams, and receive the same 32-update collector-slot budget; their visited states and rewards may diverge as soon as their actions differ. The constrained branch alone adds a fixed source-policy KL loss on a preregistered normal-behavior anchor. Do not train, tune the coefficient, add gate variants, or launch a sweep in this phase.",
+  "research_question": "Can source-policy behavior anchoring reduce damage to normal task performance while retaining useful adaptation to a rare harmful inventory-overwrite defect?",
+  "run_root": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_behavior_anchor_ppo_v1",
+  "source_root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/fixed",
+  "source_checkpoint": "adapt_4096",
+  "source_global_update": 4608,
+  "seeds": [30, 31, 32, 33, 34],
+  "seed_scope": "All five available seed-30--34 source checkpoints are included. They were not used to design the manual carry gate, but they have appeared in earlier PACK studies and are not a globally untouched holdout.",
+  "conditions": {
+    "p05_ppo": {
+      "overwrite_probability": 0.05,
+      "ppo_updates": 32,
+      "behavior_anchor_coefficient": 0.0,
+      "role": "Ordinary PPO adaptation control implemented through the same updater as the constrained branch."
+    },
+    "p05_anchor_kl_beta01": {
+      "overwrite_probability": 0.05,
+      "ppo_updates": 32,
+      "behavior_anchor_coefficient": 0.1,
+      "role": "Single preregistered normal-behavior preservation intervention; the coefficient is not claimed optimal."
+    }
+  },
+  "behavior_anchor": {
+    "source": "The update-zero source actor paired with each learner seed.",
+    "kernel": "fixed",
+    "split": "train",
+    "start": "natural_reset",
+    "starts_per_seed": 32,
+    "trajectory_policy": "deterministic_argmax",
+    "trajectory_end": "Goal success, world termination, or the unchanged 128-tick horizon. Include every active state, including states from an unsuccessful source trajectory; do not select states by later branch outcomes.",
+    "stored_values": [
+      "map_channels",
+      "numeric_features",
+      "deliver_3 goal one-hot",
+      "frozen source-policy logits"
+    ],
+    "state_weighting": "Equal weight per active source-trajectory state. Use the complete frozen anchor on every non-empty PPO minibatch update; no anchor sampling RNG is introduced.",
+    "loss_direction": "D_KL(stop_gradient(source policy) || current policy)",
+    "coefficient": 0.1,
+    "coefficient_origin": "Reuse the project's established 0.1 actor auxiliary-loss scale as one fixed diagnostic choice. This does not equate source-policy KL with teacher one-hot BC and does not claim calibration or optimality.",
+    "schedule": "Constant for all 32 adaptation updates.",
+    "value_anchor": false,
+    "empty_minibatch_rule": "If the PPO minibatch has no valid samples, skip the entire optimizer application in both branches; do not perform an anchor-only update.",
+    "shared_representation_note": "The actor and critic share a torso, so actor-logit anchoring can change shared features and indirectly affect value learning."
+  },
+  "objective": {
+    "ordinary": "L = L_PPO_actor + value_coefficient * L_value - entropy_coefficient * entropy",
+    "anchored": "L = L_PPO_actor + value_coefficient * L_value - entropy_coefficient * entropy + 0.1 * mean_anchor D_KL(source_policy || current_policy)",
+    "unchanged": [
+      "PPO clipping",
+      "value coefficient",
+      "entropy coefficient",
+      "gradient clipping",
+      "learning rate",
+      "minibatch construction and order",
+      "optimizer application schedule"
+    ]
+  },
+  "branch_initialization": {
+    "restored": [
+      "actor parameters",
+      "critic parameters",
+      "PPO Adam moments and optimizer step"
+    ],
+    "fresh": "Fresh paired 512-worker harmful-kernel environments are initialized identically within seed.",
+    "paired_rng": "Within seed, both conditions begin with byte-identical worker state, actor-critic, Adam state, policy RNG, environment RNG, sampler RNG, and slot-indexed overwrite-event uniforms.",
+    "teacher": "Loaded only if required to deserialize the source checkpoint; teacher actions, updates, and BC are disabled.",
+    "branch_difference": "The behavior-anchor coefficient is the only intended branch difference."
+  },
+  "optimization": {
+    "num_envs": 512,
+    "num_steps": 64,
+    "updates": 32,
+    "collector_slots_per_update": 32768,
+    "collector_slots_per_job": 1048576,
+    "update_epochs": 1,
+    "minibatch_size": 1024,
+    "scheduled_optimizer_applications_per_job": 1024,
+    "learning_rate": 0.0002,
+    "adam_restored": true,
+    "overwrite_probability": 0.05,
+    "probability_in_observation": false,
+    "reward_changes": false,
+    "observation_changes": false,
+    "action_space_changes": false,
+    "horizon_changes": false,
+    "early_termination_added": false,
+    "teacher_updates": 0,
+    "bc_updates": 0
+  },
+  "budget": {
+    "jobs": 10,
+    "collector_slots": 10485760,
+    "evaluation_cost_is_separate": true,
+    "automatic_extension": false,
+    "coefficient_sweep": false,
+    "probability_sweep": false,
+    "learning_rate_sweep": false,
+    "manual_gate_fallback": false
+  },
+  "evaluation": {
+    "adaptation_updates": [0, 2, 8, 32],
+    "collector_slots": [0, 65536, 262144, 1048576],
+    "development_panels": {
+      "validation": {
+        "states": 32,
+        "role": "Primary continuity panel matching prior PPO adaptation studies."
+      },
+      "test": {
+        "states": 32,
+        "role": "Secondary robustness panel. It has already informed the intervention and is development data, not a fresh holdout."
+      }
+    },
+    "horizon_ticks": 128,
+    "fixed_mode_repeats_per_state": 1,
+    "normal_sample_repeats_per_state": 4,
+    "target_sample_repeats_per_state": 4,
+    "exact_p05_formula": "For each successful deterministic fixed-kernel path i, weight success by (1-0.05)^k_i and discounted return by 0.995^(T_i-1)(1-0.05)^k_i, where k_i counts all executed valid harvests with positive pre-harvest inventory. Existing fixed-kernel failure is distinct from overwrite loss.",
+    "behavior_metrics": [
+      "mean source-to-current categorical KL on the frozen TRAIN anchor",
+      "argmax action-change count and rate on the frozen TRAIN anchor",
+      "the same drift diagnostics on complete source trajectories from each development panel"
+    ],
+    "primary_comparison": "At update 32, compare anchored minus ordinary PPO within seed on validation p=0.05 exact expected discounted return, while jointly reporting normal fixed-kernel success and return.",
+    "required_secondary_comparisons": [
+      "each final branch minus its own update-zero source on p=0.05 exact return",
+      "normal fixed-kernel mode success and return on both development panels",
+      "p=0.05 expected success, risky-path count, and overwrite-loss probability",
+      "sampled-action success and return separately from deterministic mode",
+      "cumulative lost grain and loss-episode rate during adaptation",
+      "anchor KL, argmax action changes, valid PPO samples, optimizer applications, and empty minibatches"
+    ]
+  },
+  "decision_rules": {
+    "preservation_with_adaptation": "The anchored branch retains every update-zero normal fixed-kernel success on both development panels, avoids any normal failure introduced by ordinary PPO, and has no lower mean p=0.05 exact return, with paired seed results shown.",
+    "preservation_only": "Normal performance is better preserved, but p=0.05 return or risk reduction is lower; report a preservation-adaptation tradeoff.",
+    "adaptation_only": "p=0.05 return improves without better normal performance; the behavior anchor is not supported as a preservation mechanism.",
+    "no_benefit": "Neither normal performance nor p=0.05 return improves; preserve the negative result and do not tune beta automatically.",
+    "heterogeneous": "If directions differ by seed or development panel, report all differences without a population-level claim."
+  },
+  "statistics": {
+    "independent_unit": "learner seed",
+    "paired_by": "seed, source checkpoint, initial actor-critic, Adam state, worker state, RNG streams, collector slots, and overwrite-event uniforms",
+    "report": "All five paired differences and their mean; no significance claim from five seeds.",
+    "episode_count_is_not_an_independent_replication_unit": true
+  },
+  "prerequisites": {
+    "manual_gate_closeout": "docs/manifests/pack_inventory_overwrite_gate_heldout_v1_results.json",
+    "manual_gate_closeout_sha256": "5948c2ca8df4e92d80b0fe063deea240e08b3be13fe98d1d965c1b2484d504b9",
+    "learning_rate_result": "docs/manifests/pack_inventory_overwrite_lr_ppo_v1_results.json",
+    "learning_rate_result_sha256": "6fb4a73d5920e1daac33b3d5ea39389507618c4dd59127a39824758e892d3344",
+    "learning_rate_audit": "docs/manifests/pack_inventory_overwrite_lr_ppo_v1_computation.json",
+    "learning_rate_audit_sha256": "44e6e3ce3e05c0a76d33f9a3577833bee5e6d00467396d3059fe3849f3e026c8"
+  },
+  "source_checkpoint_sha256": {
+    "30": {
+      "state.msgpack": "b0dde868532167401f1f1e31033204a1d2f639bcbf257a5a0b1a4d9d3997a880",
+      "config.json": "9cf042a26a561baa1c959756d6ea333c519c626b36eb61c24b68245f9555f65b",
+      "metadata.json": "6c9d1b03ae41127ca44299eb59e35bbb537b3d17511d6b67345909134f6351c6",
+      "arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a"
+    },
+    "31": {
+      "state.msgpack": "72ff426f345aebc47e0da7128434e26eecb50fdf7090c79066bc24008353fe6f",
+      "config.json": "64d9de6e498d82cee2280e6106f283397d0cdc9f73c4ebe034aa0ecb3efa3f74",
+      "metadata.json": "8c82f791ab15c61ea49c104f6a71111d396ff3262845a288286838f89826ff91",
+      "arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a"
+    },
+    "32": {
+      "state.msgpack": "55bbadc7d296661c2760e64ddfe835d28a73b26212154dd4180ee01f6c3b2690",
+      "config.json": "33ce95595a7c76b1260207495a917f44a88ce0d8cad599fc40571f8a6a661926",
+      "metadata.json": "d403cf7220f853f6498b09d3d3ce46f6b5faa9710286e7e6a87a1cde163d900c",
+      "arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a"
+    },
+    "33": {
+      "state.msgpack": "6b7002caad3e033b4951bec2e13481640fdc207527bd715110915eab85c18398",
+      "config.json": "82c37e6d12a83d9098344895b8374a28f23049fc55f25ac7d99700761d54d1c0",
+      "metadata.json": "4dd372c45e3e1799065ac98e579181d26463868dffd723ca083f257ba74e9007",
+      "arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a"
+    },
+    "34": {
+      "state.msgpack": "7c59f18ef81d111efda35f0af000c56428c66a95026a5150eb88db230b2bfb33",
+      "config.json": "e46579703b4d7eed73521868bf1ed0a24e1289ba948bdb36ac6c50edfd338fe8",
+      "metadata.json": "41eb7d90c2272d71078463cfe70aeb7c676ffb7da42b84dd433baf0d9d7a4b65",
+      "arm.json": "4cd018b35b3085f836b991c434a2ed4b4502480ee0a27b481975683507bf546a"
+    }
+  },
+  "checkpoint_storage": {
+    "chosen_filesystem": "/raid/ext_csv",
+    "capacity_measured_utc": "2026-10-14",
+    "home_free_bytes_at_design": 158726832128,
+    "home_utilization_percent_at_design": 92,
+    "raid_free_bytes_at_design": 7599548395520,
+    "reference_20_job_run_bytes": 2574474313,
+    "projected_additional_bytes": 2147483648,
+    "projected_peak_writes_bytes": 3221225472,
+    "safety_reserve_bytes": 8589934592,
+    "minimum_required_free_bytes": 11811160064,
+    "retained_checkpoint_updates": [0, 2, 8, 32],
+    "retention": "Retain the four science checkpoints and evaluations per job plus at most one verified rolling resume checkpoint. Recheck capacity immediately before launch and during the run.",
+    "checkpoints_written_in_this_design_phase": 0
+  },
+  "interpretation_limits": [
+    "A lower anchor KL or fewer argmax changes is not by itself task preservation.",
+    "The intervention uses a fixed source-visitation data set; it does not constrain behavior on every normal state.",
+    "The source and current policies share architecture and observations, and the source actor supplies the preservation target; this is behavior retention, not an external definition of optimal action.",
+    "The KL coefficient affects the shared actor-critic torso and does not isolate actor-only representation changes.",
+    "VALIDATION and TEST are development panels for this intervention; neither is a fresh held-out confirmation after this design.",
+    "Five source policies from one training family do not establish population-level generalization."
+  ],
+  "next_authorized_unit": "Implement the shared updater, behavior-anchor construction, contract validation, and unit tests only. Do not launch training until the implementation is committed, storage is rechecked, and the user explicitly authorizes execution.",
+  "stop_rule": "Run only the two preregistered p=0.05 conditions for seeds 30--34 and 32 updates if later authorized. Do not add beta values, probabilities, learning rates, updates, teachers, gates, replay variants, or curricula in response to the result."
+}
