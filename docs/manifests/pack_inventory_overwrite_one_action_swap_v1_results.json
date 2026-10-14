@@ -126,7 +126,7 @@
     "scope": "All 160 newly executed D fixed-kernel paths at p=0 and p=0.05.",
     "tolerance": "1E-14"
   },
-  "decision": "One source-actor action recovered two of the four predeclared B-failure/C-success paths. The step-15 cases recovered, while the step-3 cases still failed; therefore this finite panel mixes failures for which one action was sufficient with failures requiring a different or longer intervention. No path that B had solved became a D failure.",
+  "decision": "One source-actor action recovered two of the four predeclared B-failure/C-success paths. The step-15 cases recovered, while the step-3 cases still failed after the same empty-inventory disagreement recurred at step 12; therefore this finite panel mixes failures for which one action was sufficient with failures requiring a different or longer intervention. No path that B had solved became a D failure.",
   "diagnostic": {
     "failed_seed_state_indices": [
       [
@@ -161,7 +161,15 @@
         "D_length": 128,
         "D_success": false,
         "adapted_action": 23,
+        "branch_delivered_total": 1,
         "branch_step": 3,
+        "first_later_empty_action_disagreement": {
+          "adapted_action": 23,
+          "delivered_total": 2,
+          "source_action": 3,
+          "step": 12
+        },
+        "later_empty_action_disagreement_count": 117,
         "seed": 35,
         "source_action": 3,
         "state_index": 4
@@ -175,7 +183,15 @@
         "D_length": 128,
         "D_success": false,
         "adapted_action": 23,
+        "branch_delivered_total": 1,
         "branch_step": 3,
+        "first_later_empty_action_disagreement": {
+          "adapted_action": 23,
+          "delivered_total": 2,
+          "source_action": 3,
+          "step": 12
+        },
+        "later_empty_action_disagreement_count": 117,
         "seed": 35,
         "source_action": 3,
         "state_index": 12
@@ -189,7 +205,10 @@
         "D_length": 23,
         "D_success": true,
         "adapted_action": 23,
+        "branch_delivered_total": 2,
         "branch_step": 15,
+        "first_later_empty_action_disagreement": null,
+        "later_empty_action_disagreement_count": 0,
         "seed": 35,
         "source_action": 3,
         "state_index": 16
@@ -203,7 +222,10 @@
         "D_length": 23,
         "D_success": true,
         "adapted_action": 23,
+        "branch_delivered_total": 2,
         "branch_step": 15,
+        "first_later_empty_action_disagreement": null,
+        "later_empty_action_disagreement_count": 0,
         "seed": 35,
         "source_action": 3,
         "state_index": 24
@@ -222,7 +244,7 @@
   },
   "interpretation": {
     "control_scope": "D used a one-action swap on 72 paths but still used the adapted actor for 80.8% of active steps, versus 84.0% for B and 35.8% for C.",
-    "mixed_recovery": "D recovered state indices 16 and 24, whose first disagreement occurred at step 15, but did not recover state indices 4 and 12, whose first disagreement occurred at step 3.",
+    "mixed_recovery": "D recovered state indices 16 and 24 after swapping at step 15 with delivered_total=2 and encountered no later eligible disagreement. It did not recover state indices 4 and 12 after swapping at step 3 with delivered_total=1; on both paths the empty-inventory UP-versus-DELIVER disagreement recurred at step 12 after delivered_total reached 2.",
     "risk": "B, C, and D each had 40 fixed-kernel paths with an executed risky harvest. D therefore changed normal-task completion without changing this measured exposure count.",
     "whole_panel": "D fixed-kernel success was 98.75% and p=0.05 return was 0.883804, between B (97.5%, 0.871333) and C (100%, 0.895508). D introduced no failure on a path that B had solved."
   },
@@ -387,10 +409,10 @@
     "secondary": "Whole-panel fixed-kernel success, p=0.05 expected discounted return, risky-path count, and new failures."
   },
   "provenance": {
-    "aggregation_head": "4d26e7e426e909b167f6a5032cbc328a1b9cc4e7",
+    "aggregation_head": "c5a78360ab398548d7f0eb89c4ffadc3bb1b2744",
     "aggregation_script": {
       "path": "scripts/summarize_pack_inventory_overwrite_one_action_swap.py",
-      "sha256": "1ce198e715592b64b930a9d356f491a948fc54b374a2ef11e246ec71186e390a"
+      "sha256": "671025a7320472659828ec807c2b083a618d50ebf071f9722171cdb6897d1626"
     },
     "complete_marker": {
       "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_one_action_swap_v1/complete.json",
