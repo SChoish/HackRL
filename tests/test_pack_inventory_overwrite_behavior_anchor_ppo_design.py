@@ -79,6 +79,13 @@ def test_anchor_is_train_only_and_both_evaluation_panels_are_declared_developmen
     assert anchor["loss_direction"] == "D_KL(stop_gradient(source policy) || current policy)"
     assert anchor["coefficient"] == 0.1
     assert anchor["value_anchor"] is False
+    assert set(anchor["content_identity"]["per_seed"]) == {
+        str(seed) for seed in MANIFEST["seeds"]
+    }
+    for seed, identity in anchor["content_identity"]["per_seed"].items():
+        assert len(identity["argmax_action_sha256"]) == 64
+        assert identity["state_count"] == sum(identity["trajectory_lengths"])
+        assert identity["successful_trajectories"] == 32
     assert set(MANIFEST["evaluation"]["development_panels"]) == {"validation", "test"}
     assert MANIFEST["evaluation"]["frozen_source_baseline"]["seeds"] == MANIFEST["seeds"]
     assert MANIFEST["evaluation"]["frozen_source_baseline"]["training_jobs"] == 0
@@ -89,7 +96,12 @@ def test_anchor_is_train_only_and_both_evaluation_panels_are_declared_developmen
 
 def test_prerequisite_and_source_checkpoint_hashes_are_pinned():
     prerequisites = MANIFEST["prerequisites"]
-    for name in ("manual_gate_closeout", "learning_rate_result", "learning_rate_audit"):
+    for name in (
+        "implementation_validation",
+        "manual_gate_closeout",
+        "learning_rate_result",
+        "learning_rate_audit",
+    ):
         path = REPOSITORY / prerequisites[name]
         assert _sha256(path) == prerequisites[f"{name}_sha256"]
     root = Path(MANIFEST["source_root"])

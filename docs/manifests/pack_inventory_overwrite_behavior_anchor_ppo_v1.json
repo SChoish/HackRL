@@ -57,6 +57,16 @@
     "coefficient_origin": "Reuse the project's established 0.1 actor auxiliary-loss scale as one fixed diagnostic choice. This does not equate source-policy KL with teacher one-hot BC and does not claim calibration or optimality.",
     "schedule": "Constant for all 32 adaptation updates.",
     "value_anchor": false,
+    "content_identity": {
+      "rule": "Pin each source checkpoint byte-for-byte, then require the deterministic TRAIN replay to reproduce the preregistered active-state count, success count, trajectory lengths, and argmax action-sequence hash. Full floating-point source-logit bytes are recorded at runtime but are not compared across CPU and GPU backends.",
+      "per_seed": {
+        "30": {"argmax_action_sha256": "37431602fcb6e21bd111b073bca96f90d82f64a490fadcbbc54a22cdbce7a3c5", "state_count": 640, "successful_trajectories": 32, "trajectory_lengths": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]},
+        "31": {"argmax_action_sha256": "638de59bbc82f37d1ad723967be9ba1402ae92c89026609e4c8c12feba7a76a7", "state_count": 646, "successful_trajectories": 32, "trajectory_lengths": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 23, 20, 20, 20, 20, 20, 20, 20, 23]},
+        "32": {"argmax_action_sha256": "ca333e2cc147b86113ef7bd0debba6c58befed974f4d436f8e2cad2056dff3f8", "state_count": 640, "successful_trajectories": 32, "trajectory_lengths": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]},
+        "33": {"argmax_action_sha256": "4e721a6f61fa089733f54666a8f7734d9dddbb7795816eaa89c9225ed99e9753", "state_count": 644, "successful_trajectories": 32, "trajectory_lengths": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 21, 20, 21, 20, 20, 20, 20, 20, 21, 20, 21]},
+        "34": {"argmax_action_sha256": "5c6ac3c46d046336d7ea5f86fe7a32114a661a70bad2c239d9915fdddbd94ad8", "state_count": 640, "successful_trajectories": 32, "trajectory_lengths": [20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20, 20]}
+      }
+    },
     "empty_minibatch_rule": "If the PPO minibatch has no valid samples, skip the entire optimizer application in both branches; do not perform an anchor-only update.",
     "shared_representation_note": "The actor and critic share a torso, so actor-logit anchoring can change shared features and indirectly affect value learning."
   },
@@ -243,6 +253,16 @@
     "retained_checkpoint_updates": [0, 2, 8, 32],
     "retention": "Retain the four science checkpoints and evaluations per job plus at most one verified rolling resume checkpoint. Recheck capacity immediately before launch and during the run.",
     "checkpoints_written_in_this_design_phase": 0
+  },
+  "aborted_pretraining_attempt": {
+    "path": "/raid/ext_csv/HackRL/runs/pack_inventory_overwrite_behavior_anchor_ppo_v1_aborted_pretraining_9129526",
+    "execution_head": "912952647800b4af48f2f9f346ae0247165aef70",
+    "reason": "A CPU-recorded byte hash of floating source logits was incorrectly required to match GPU output. The backend-stable action paths matched; the gate was replaced before any optimizer update.",
+    "training_updates_completed": 0,
+    "bytes": 31948634,
+    "run_manifest_sha256": "42a1faf3008feace00fa4fb7c128008c0d44840991168c42136df1c671cc505d",
+    "update_zero_state_sha256": "3fb4c2a9024cbcb157231a63222ec3ddd37fa286a62a719da7265293dfe54123",
+    "failed_record_sha256": "555d55c3808cdc974f5290217f9fb9db6df3c590021f5e0d6beeaf9b770eacd4"
   },
   "interpretation_limits": [
     "A lower anchor KL or fewer argmax changes is not by itself task preservation.",

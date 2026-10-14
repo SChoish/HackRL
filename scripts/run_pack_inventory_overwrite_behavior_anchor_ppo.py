@@ -160,14 +160,24 @@ def _source_anchor(network, seed: int, split: str):
     ):
         raise RuntimeError(f"source actor variables changed for seed {seed}")
     metadata_document = asdict(metadata)
-    metadata_document["anchor_sha256"] = base._tree_sha256(anchor)
+    metadata_document["runtime_full_anchor_sha256"] = base._tree_sha256(anchor)
+    metadata_document["argmax_action_sha256"] = base._tree_sha256(
+        jnp.argmax(anchor.source_logits, axis=-1)
+    )
     if split == PackRestoreSplit.TRAIN.value:
-        expected = {
-            int(item["seed"]): item["anchor_sha256"]
-            for item in VALIDATION["anchor_contracts"]
-        }[seed]
-        if metadata_document["anchor_sha256"] != expected:
-            raise RuntimeError(f"TRAIN behavior-anchor content changed for seed {seed}")
+        expected = SPEC["behavior_anchor"]["content_identity"]["per_seed"][
+            str(seed)
+        ]
+        observed = {
+            "argmax_action_sha256": metadata_document["argmax_action_sha256"],
+            "state_count": metadata_document["state_count"],
+            "successful_trajectories": metadata_document[
+                "successful_trajectories"
+            ],
+            "trajectory_lengths": list(metadata_document["trajectory_lengths"]),
+        }
+        if observed != expected:
+            raise RuntimeError(f"TRAIN behavior-anchor path changed for seed {seed}")
     result = (anchor, metadata_document)
     _SOURCE_ANCHORS[key] = result
     return result
