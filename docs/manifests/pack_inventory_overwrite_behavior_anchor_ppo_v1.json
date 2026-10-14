@@ -237,9 +237,9 @@
   "checkpoint_storage": {
     "chosen_filesystem": "/raid/ext_csv",
     "capacity_rechecked_utc": "2026-10-14",
-    "home_free_bytes_before_launch": 158699159552,
-    "home_utilization_percent_before_launch": 92,
-    "raid_free_bytes_before_launch": 7595697205248,
+    "home_free_bytes_before_launch": 198487859200,
+    "home_utilization_percent_before_launch": 89,
+    "raid_free_bytes_before_launch": 7543718019072,
     "existing_run_bytes_before_launch": 0,
     "capacity_measured_utc": "2026-10-14",
     "home_free_bytes_at_design": 158726832128,
