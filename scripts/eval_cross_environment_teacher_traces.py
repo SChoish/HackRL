@@ -36,6 +36,7 @@ from hackrl.cross_environment_teacher_trace import (
     observe,
     public_record,
     start_states,
+    verify_trace_file,
     world_done,
 )
 from hackrl.dual_leo import load_dual_checkpoint
@@ -225,6 +226,10 @@ def evaluate(
                 }
                 handle.write(json.dumps(terminal, sort_keys=True) + "\n")
                 episode_rows.append(terminal)
+    replay = verify_trace_file(trace_path)
+    if not replay["passed"]:
+        raise RuntimeError(f"independent trace replay failed: {replay['errors']}")
+    _write_json(stem / "independent_replay.json", replay)
     trace_bytes = trace_path.stat().st_size
     summary = {
         "schema_version": "hackrl_cross_environment_teacher_trace_summary_v1",
@@ -243,6 +248,7 @@ def evaluate(
         "trace": str(trace_path),
         "trace_gzip_bytes": trace_bytes,
         "gzip_bytes_per_step": trace_bytes / max(total_steps, 1),
+        "independent_replay": replay,
     }
     _write_json(summary_path, summary)
     return summary
@@ -264,7 +270,14 @@ def main() -> None:
     parser.add_argument("--horizon", type=int, default=HORIZON)
     parser.add_argument("--non-scientific-smoke", action="store_true")
     parser.add_argument("--print-plan", action="store_true")
+    parser.add_argument("--verify-trace", type=Path)
     args = parser.parse_args()
+    if args.verify_trace is not None:
+        result = verify_trace_file(args.verify_trace)
+        print(json.dumps(result, indent=2, sort_keys=True))
+        if not result["passed"]:
+            raise SystemExit(1)
+        return
     if args.print_plan:
         print(json.dumps(_validate_panel(args.panel), indent=2, sort_keys=True))
         return

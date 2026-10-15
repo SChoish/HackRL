@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import gzip
 import json
 from pathlib import Path
 
@@ -19,6 +20,9 @@ from hackrl.cross_environment_teacher_trace import (
     initial_episode_oracle,
     legal_trigger_actions,
     legacy_opportunity_reached,
+    physical_total,
+    public_record,
+    verify_trace_file,
 )
 from hackrl.pack_restore import (
     PackRestoreAction,
@@ -128,3 +132,60 @@ def test_public_state_has_no_oracle_or_defect_identity_input() -> None:
     assert "variant" not in field_names
     assert "oracle" not in field_names
     assert "legal_trigger_action_ids_exhaustive" not in field_names
+
+
+def test_serialized_trace_replay_uses_only_conservation_fields(tmp_path: Path) -> None:
+    before = _pack_trigger_state(packed=True)
+    action = int(PackRestoreAction.REBUILD_EMPTY)
+    after, _ = actual_step("pack_restore", before, action, "mutant")
+    before_total = physical_total("pack_restore", before)
+    after_total = physical_total("pack_restore", after)
+    created = after_total - before_total
+    trace = tmp_path / "episodes.jsonl.gz"
+    rows = [
+        {
+            "record_type": "header",
+            "environment": "pack_restore",
+            "kernel": "mutant",
+        },
+        {
+            "record_type": "step",
+            "episode_id": "synthetic:0",
+            "timestep": 0,
+            "state_before": public_record(before),
+            "state_after": public_record(after),
+            "action": action,
+            "physical_resource_before": before_total,
+            "physical_resource_after": after_total,
+            "physical_resource_delta": created,
+            "defect_created_amount": created,
+            "delivered_delta": 0,
+            "defect_attributed_delivery": 0,
+            "actual_defect_trigger": True,
+            "retained_resource_recovered": False,
+            "excess_delivery_event": False,
+        },
+        {
+            "record_type": "episode_terminal",
+            "episode_id": "synthetic:0",
+            "actual_defect_triggered": True,
+            "actual_exploitation": False,
+            "defect_resource_delivered": 0,
+        },
+    ]
+    with gzip.open(trace, "wt", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row) + "\n")
+
+    replay = verify_trace_file(trace)
+    assert replay["passed"] is True
+    assert replay["transition_kernel_calls"] == 0
+    assert replay["policy_or_teacher_calls"] == 0
+
+    rows[1]["defect_created_amount"] = 0
+    with gzip.open(trace, "wt", encoding="utf-8") as handle:
+        for row in rows:
+            handle.write(json.dumps(row) + "\n")
+    corrupt = verify_trace_file(trace)
+    assert corrupt["passed"] is False
+    assert any("defect_created_amount mismatch" in error for error in corrupt["errors"])
