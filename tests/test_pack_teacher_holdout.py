@@ -133,6 +133,14 @@ def test_checkpoint_roundtrip_tamper(tmp_path,monkeypatch):
     with pytest.raises(AssertionError):runner.load_checked(tmp_path,None,None)
 
 
+def test_numeric_state_hash_ignores_mapping_order_not_values():
+    left={'b':np.arange(3,dtype=np.float32),'a':np.array(2,dtype=np.int32)}
+    right={'a':jnp.array(2,dtype=jnp.int32),'b':jnp.arange(3,dtype=jnp.float32)}
+    assert runner.tree_hash(left)==runner.tree_hash(right)
+    right['b']=right['b'].at[0].set(1)
+    assert runner.tree_hash(left)!=runner.tree_hash(right)
+
+
 def test_summary_budget_primary_and_source_kernel_contrasts(tmp_path,monkeypatch):
     monkeypatch.setattr(runner,'ROOT',tmp_path)
     for job in runner.jobs():

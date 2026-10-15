@@ -185,8 +185,17 @@ def verify():
 
 
 def tree_hash(value):
-    # Serialize numerical state only, including optimizers and BatchRenorm.
-    return hashlib.sha256(serialization.to_bytes(value)).hexdigest()
+    # Dictionary insertion order changes on restoration; hash named numerical
+    # leaves, including optimizer and BatchRenorm, not msgpack key ordering.
+    state=serialization.to_state_dict(value)
+    leaves,structure=jax.tree_util.tree_flatten_with_path(state)
+    h=hashlib.sha256(str(structure).encode())
+    for path,leaf in leaves:
+        array=np.asarray(jax.device_get(leaf))
+        h.update(jax.tree_util.keystr(path).encode()+b'\0')
+        h.update(array.dtype.str.encode()+b'\0')
+        h.update(json.dumps(array.shape).encode()+b'\0'+array.tobytes())
+    return h.hexdigest()
 
 
 def pair_identity(job,runner,leo):

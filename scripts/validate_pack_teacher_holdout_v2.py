@@ -35,6 +35,7 @@ def main():
         assert np.all(np.asarray(runner.current_goal)==11)
         update=base._dual_update(base.ENVS['pack'],network,teacher,cfg,batch,base._arm(job))
         t=time.monotonic();new,new_leo,metrics=update(runner,leo);jax.block_until_ready(new.train_state.step)
+        run.append(run.ROOT/'smoke_update_attempts.jsonl',{'condition':condition,'collector_slots':32768,'unix':time.time()})
         host={k:float(np.asarray(v)) for k,v in metrics.items()}
         assert all(np.isfinite(v) for v in host.values())
         assert int(new.global_update)==513 and int(new.train_state.step)>int(runner.train_state.step)
@@ -57,7 +58,9 @@ def main():
     run.write(run.ROOT/'validation.json',{'passed':True,'backend':jax.default_backend(),'devices':[str(d) for d in jax.devices()],
                 'source_unchanged':True,'paired_initial_state_sha256':initial[0],
                 'execution_source_sha256':run.verify()['source_sha256'],
-                'training_budget_charge':0,'separate_smoke_collector_slots':65536,'smoke_rows':rows})
+                'training_budget_charge':0,
+                'separate_smoke_collector_slots':sum(json.loads(x)['collector_slots'] for x in (run.ROOT/'smoke_update_attempts.jsonl').read_text().splitlines()),
+                'smoke_rows':rows})
 
 
 if __name__=='__main__':main()
