@@ -137,8 +137,15 @@ def validate(manifest: dict) -> dict:
     budget_passed = (
         matrix_jobs == budget["total_jobs"]
         and per_environment_jobs == budget["total_jobs"]
-        and budget["total_collector_slots"]
+        and budget["main_training_collection_slots"]
         == budget["total_jobs"] * budget["collector_slots_per_job"]
+        == 6_710_886_400
+        and budget["completed_smoke_collection_slots"] == 163_840
+        and budget["planned_total_including_smoke"] == 6_711_050_240
+        and budget["planned_total_including_smoke"]
+        == budget["main_training_collection_slots"]
+        + budget["completed_smoke_collection_slots"]
+        and budget["smoke_does_not_reduce_main_updates"] is True
     )
     if not budget_passed:
         errors.append("missing-learning budget arithmetic failed")
@@ -158,6 +165,8 @@ def validate(manifest: dict) -> dict:
         and cap.get("total_steps") == 11289600
         and manifest["common_trace_implementation"]["episode_cap"] == 88200
         and manifest["common_trace_implementation"]["step_cap"] == 11289600
+        and manifest["common_trace_implementation"]["automatic_re_evaluation"] is False
+        and _resolve(manifest["common_trace_implementation"]["orchestrator"]).is_file()
     )
     if not panel_passed:
         errors.append("common trace panel/cap contract failed")
@@ -180,7 +189,9 @@ def validate(manifest: dict) -> dict:
         and smoke_accounting.get("passed_attempts") == 5
         and smoke_accounting.get("failed_attempts") == 0
         and smoke_accounting.get("slots_charged") == 163840
-        and smoke_accounting.get("remaining_official_collection_slots") == 6710722560
+        and smoke_accounting.get("remaining_main_training_slots") == 6710886400
+        and smoke_accounting.get("planned_total_including_smoke") == 6711050240
+        and smoke_accounting.get("completed_smoke_collection_slots") == 163840
         and smoke.get("main_queue_launched") is False
         and len(smoke.get("checkpoint_receipts", [])) == 5
         and smoke.get("trace_evaluator_smoke", {}).get("episodes") == 4
@@ -195,6 +206,20 @@ def validate(manifest: dict) -> dict:
     if not smoke_passed:
         errors.append("integration smoke receipt failed")
 
+    comparison_status = manifest.get("comparison_evidence_status", {})
+    comparison_status_passed = (
+        bool(comparison_status.get("new_same_code_and_initialization"))
+        and bool(comparison_status.get("historical_equivalence_verified"))
+        and bool(comparison_status.get("exploratory_due_to_unresolved_code_difference"))
+        and "must not be called single-factor"
+        in comparison_status.get("single_factor_claim_rule", "")
+        and set(comparison_status.get(
+            "substitute_evidence_without_independent_source_manifest", {}
+        )) == {"tick_claim", "craft_remain"}
+    )
+    if not comparison_status_passed:
+        errors.append("comparison evidence status contract failed")
+
     authorization = manifest["authorization"]
     authorization_passed = (
         authorization["read_only_audit"]
@@ -204,10 +229,10 @@ def validate(manifest: dict) -> dict:
         and authorization["contract_smoke"]
         and authorization["smoke_checkpoint_writes"]
         and authorization["integration_smoke_complete"]
-        and not authorization["common_frozen_evaluation"]
-        and not authorization["main_training"]
-        and not authorization["main_training_checkpoint_writes"]
-        and not authorization["queue_or_watcher_launch"]
+        and authorization["common_frozen_evaluation"]
+        and authorization["main_training"]
+        and authorization["main_training_checkpoint_writes"]
+        and authorization["queue_or_watcher_launch"]
         and not authorization["dreamer_execution"]
     )
     if not authorization_passed:
@@ -223,17 +248,20 @@ def validate(manifest: dict) -> dict:
         "budget": {
             "matrix_jobs": matrix_jobs,
             "manifest_total_jobs": budget["total_jobs"],
-            "total_collector_slots": budget["total_collector_slots"],
+            "main_training_collection_slots": budget["main_training_collection_slots"],
+            "completed_smoke_collection_slots": budget["completed_smoke_collection_slots"],
+            "planned_total_including_smoke": budget["planned_total_including_smoke"],
             "passed": budget_passed,
         },
         "job_builder_passed": job_builder_passed,
         "trace_panel_passed": panel_passed,
         "evidence_freeze_passed": evidence_passed,
         "integration_smoke_passed": smoke_passed,
+        "comparison_evidence_status_passed": comparison_status_passed,
         "authorization_passed": authorization_passed,
         "errors": errors,
         "outcome": (
-            "implementation_ready_main_training_blocked" if not errors else "validation_failed"
+            "main_training_and_common_evaluation_authorized" if not errors else "validation_failed"
         ),
     }
 

@@ -113,16 +113,16 @@
     "workspace_git_sha": "11778eee0a991bbc754a4700ebe85705dc03c715"
   },
   "authorization": {
-    "common_frozen_evaluation": false,
+    "common_frozen_evaluation": true,
     "common_trace_evaluator_implementation": true,
     "contract_smoke": true,
     "dreamer_execution": false,
     "integration_smoke_complete": true,
-    "main_training": false,
-    "main_training_checkpoint_writes": false,
+    "main_training": true,
+    "main_training_checkpoint_writes": true,
     "matrix_and_validator_implementation": true,
     "missing_condition_runner_implementation": true,
-    "queue_or_watcher_launch": false,
+    "queue_or_watcher_launch": true,
     "read_only_audit": true,
     "smoke_checkpoint_writes": true
   },
@@ -170,8 +170,35 @@
     "Seed numbers are paired within an environment. PACK uses seeds 30-39 while TICK and CRAFT use 20-24, so cross-environment effects are not learner-seed-paired.",
     "Completed cells are retrospective evidence observed before this matrix; missing cells, evaluation rules, and the no-extension rule are fixed here before any new result is produced.",
     "Existing episode summaries do not satisfy the requested full action and full state trace contract; training completeness and common-evaluation completeness are separate.",
-    "Missing-condition runner and evaluator implementation are authorized; the 50-job main training queue and common scientific evaluation are not authorized in this phase."
+    "The exact 50-job main sequence and frozen common scientific evaluation are explicitly authorized; seed replacement, extension, and condition addition remain forbidden."
   ],
+  "comparison_evidence_status": {
+    "historical_equivalence_verified": [
+      {
+        "comparisons": "fixed versus mutant within every reused condition/run",
+        "basis": "The paired branches share that historical run, condition, source contract, and execution code; kernel is the intended branch change."
+      },
+      {
+        "comparisons": "PACK D-on versus D-off within pack_restore_scale_bc_v1",
+        "basis": "The two arms share the recorded run manifest, execution code, source checkpoints, seeds, and branch configuration apart from imitation."
+      }
+    ],
+    "new_same_code_and_initialization": [
+      "TICK D-task versus D-frozen, including each condition fixed versus mutant",
+      "CRAFT D-task versus D-frozen versus D-off, including each condition fixed versus mutant",
+      "Every new branch starts from the same environment/seed full-Dual source checkpoint under the frozen execution commit."
+    ],
+    "exploratory_due_to_unresolved_code_difference": [
+      "TICK new conditions versus historical D-on or historical D-off",
+      "CRAFT new conditions versus historical D-on",
+      "PACK comparisons crossing pack_restore_scale_bc_v1, pack_restore_delivery_only_teacher_v1, and pack_restore_pretrained_teacher_freeze_v1"
+    ],
+    "single_factor_claim_rule": "Only comparisons in the first two classes may be described as changing the named condition under matched code. Exploratory cross-code comparisons must display code provenance and must not be called single-factor interventions.",
+    "substitute_evidence_without_independent_source_manifest": {
+      "tick_claim": "Composite source/final checkpoint hashes, frozen config and curve hashes, and the recorded best post-run commit; the dirty exact D-on execution checkout remains unresolved.",
+      "craft_remain": "Composite source/final checkpoint hashes, frozen config and curve hashes, and hashes of the historical CRAFT runner/GC files; current dual_leo.py differs from the historical hash."
+    }
+  },
   "common_trace_implementation": {
     "checkpoint_origins": [
       "reused_result",
@@ -180,6 +207,8 @@
     "core": "src/hackrl/cross_environment_teacher_trace.py",
     "episode_cap": 88200,
     "evaluator": "scripts/eval_cross_environment_teacher_traces.py",
+    "orchestrator": "scripts/run_cross_environment_teacher_evaluation.py",
+    "automatic_re_evaluation": false,
     "format": "gzip JSONL separated by provenance/environment/checkpoint/kernel/view/family",
     "integration_smoke": {
       "environments": [
@@ -357,11 +386,13 @@
     "full_job_requires": "--run-job JOB_ID --authorize-main-training",
     "implementation_freeze_commit": "27bf886484ae74a3544682ac10ca591a608fc99e",
     "job_builder": "src/hackrl/cross_environment_teacher_matrix.py",
-    "output_root": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1",
+    "output_root": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1_main",
+    "smoke_output_root": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1",
     "queue_mode": false,
+    "external_fixed_sequence_authorized": true,
     "runner": "scripts/run_cross_environment_teacher_matrix.py",
     "smoke_contract": {
-      "accounting": "official first update; later main job resumes adapt_1, so smoke is inside rather than in addition to the cap",
+      "accounting": "independent implementation verification; retained in the smoke root and excluded from every main job, which starts fresh and receives all 4,096 updates",
       "jobs": [
         "tick-claim-d-task-s20-fixed",
         "tick-claim-d-frozen-s20-mutant",
@@ -397,17 +428,16 @@
   },
   "manifest_id": "cross_environment_teacher_matrix_v1",
   "missing_learning_budget": {
-    "actual_accounting_after_smoke": {
-      "failed_attempts": 0,
-      "new_collection_attempts": 5,
-      "official_slots_completed": 163840,
-      "passed_attempts": 5,
-      "remaining_official_collection_slots": 6710722560,
-      "resume_attempts": 0,
-      "slots_charged": 163840
-    },
     "automatic_extension": false,
     "collector_slots_per_job": 134217728,
+    "completed_smoke": {
+      "counts_against_main_training": false,
+      "jobs": 5,
+      "run_root": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1",
+      "scientific_performance_result": false,
+      "slots": 163840
+    },
+    "completed_smoke_collection_slots": 163840,
     "craft_remain": {
       "collector_slots": 4026531840,
       "conditions": [
@@ -418,17 +448,15 @@
       "jobs": 30
     },
     "evaluation_cost_excluded": true,
+    "failure_and_resume_accounting": "Every attempt is appended to the main collection ledger. Technical retries are reported separately and never replace a seed or change a condition.",
+    "main_training_collection_slots": 6710886400,
     "pack_restore": {
       "collector_slots": 0,
       "conditions": [],
       "jobs": 0
     },
-    "smoke_as_official_first_updates": {
-      "failed_and_retry_attempts": "separately appended to collection_ledger.jsonl",
-      "jobs": 5,
-      "remaining_after_successful_first_smoke": 6710722560,
-      "slots": 163840
-    },
+    "planned_total_including_smoke": 6711050240,
+    "smoke_does_not_reduce_main_updates": true,
     "tick_claim": {
       "collector_slots": 2684354560,
       "conditions": [
@@ -437,8 +465,8 @@
       ],
       "jobs": 20
     },
-    "total_collector_slots": 6710886400,
-    "total_jobs": 50
+    "total_jobs": 50,
+    "updates_per_main_job": 4096
   },
   "non_equivalent_existing_runs": {
     "gc_ppo": {
@@ -450,6 +478,8 @@
     }
   },
   "recorded_utc": "2026-10-15T10:43:12Z",
+  "execution_authorization_recorded_utc": "2026-10-15T13:25:00Z",
+  "understood_as_main_execution": "Run the exact frozen 50-job list for the full 4,096 updates per job in a fresh RAID main root, retain smoke as a separate 163,840-slot implementation audit, then run the frozen common evaluation without outcome-driven changes or automatic re-evaluation.",
   "research_question": "Do adaptation-time teacher updating, task-only teacher targets, and policy imitation have consistent effects across distinct transition defects?",
   "schema_version": "hackrl_cross_environment_teacher_matrix_v1",
   "shared_evaluation_contract": {
@@ -463,7 +493,7 @@
       "source-relative exploitation change",
       "seed-level condition contrasts"
     ],
-    "current_gap": "The complete trace evaluator and panel are implemented and frozen, but common scientific re-evaluation has not been authorized or executed. Historical metrics retain their original definitions.",
+    "current_gap": "The complete trace evaluator and panel are frozen and authorized. Scientific evaluation begins only after all 50 main jobs finish; historical metrics retain their original definitions.",
     "evaluation_kernels": [
       "fixed",
       "mutant"
@@ -569,7 +599,7 @@
       }
     }
   },
-  "status": "evidence_and_implementation_frozen_main_training_not_authorized",
+  "status": "main_training_and_common_evaluation_authorized_not_started",
   "storage_and_timing_forecast": {
     "capacity_record": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/capacity_before_smoke.json",
     "expected_common_trace_bytes_from_smoke_rate": 7920360000.0,
@@ -585,5 +615,5 @@
     "remaining_training_only_single_worker_hours": 5.157001014675051,
     "safety_reserve_bytes": 8589934592
   },
-  "understood_as": "Freeze only matrix-v1 evidence, implement the exact 50-job resumable runner and common trace evaluator, execute contract smoke only, and keep the 50-job main queue behind a later explicit authorization."
+  "understood_as": "Freeze matrix-v1 evidence and the exact 50-job resumable runner, retain contract smoke as a separate implementation audit, execute every main job for the full 4,096 updates under the explicit authorization recorded here, and then run the frozen common evaluation without outcome-driven changes or automatic re-evaluation."
 }

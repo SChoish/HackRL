@@ -1,9 +1,9 @@
 #!/usr/bin/env python3
 """Validated runner for the frozen cross-environment teacher matrix v1.
 
-There is deliberately no queue mode.  Full jobs require an explicit command-line
-acknowledgement, while ``--smoke`` advances five predeclared official jobs only
-to adapt_1 so every collected slot remains resumable and inside the fixed cap.
+There is deliberately no queue mode. Full jobs require an explicit command-line
+acknowledgement. Contract smoke and scientific main training use separate RAID
+roots so every main job receives the full frozen 4,096-update budget.
 """
 
 from __future__ import annotations
@@ -53,7 +53,8 @@ from hackrl.cross_environment_teacher_matrix import (
 from hackrl.dual_leo import load_dual_checkpoint
 
 
-DEFAULT_RUN_ROOT = Path("/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1")
+DEFAULT_SMOKE_RUN_ROOT = Path("/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1")
+DEFAULT_MAIN_RUN_ROOT = Path("/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1_main")
 SLOTS_PER_UPDATE = 512 * 64
 SMOKE_SELECTION = (
     ("tick_claim", "D-task", "fixed", 20),
@@ -64,6 +65,7 @@ SMOKE_SELECTION = (
 )
 SCIENTIFIC_CODE = (
     "docs/manifests/cross_environment_teacher_matrix_v1.json",
+    "docs/manifests/cross_environment_teacher_matrix_v1_evidence.json",
     "scripts/run_cross_environment_teacher_matrix.py",
     "scripts/run_dual_leo_compare.py",
     "src/hackrl/cross_environment_teacher_matrix.py",
@@ -130,15 +132,18 @@ def _assert_frozen_sources() -> dict:
     dirty = subprocess.run(
         ("git", "diff", "--quiet", "--", *SCIENTIFIC_CODE), cwd=ROOT
     ).returncode
+    staged = subprocess.run(
+        ("git", "diff", "--cached", "--quiet", "--", *SCIENTIFIC_CODE), cwd=ROOT
+    ).returncode
     untracked = [
         path for path in SCIENTIFIC_CODE
         if subprocess.run(("git", "ls-files", "--error-unmatch", path), cwd=ROOT,
                           stdout=subprocess.DEVNULL, stderr=subprocess.DEVNULL).returncode
     ]
-    if dirty or untracked:
+    if dirty or staged or untracked:
         raise RuntimeError(
             "scientific sources must be committed before checkpoint writes; "
-            f"dirty={bool(dirty)} untracked={untracked}"
+            f"dirty={bool(dirty)} staged={bool(staged)} untracked={untracked}"
         )
     return {
         "git_commit": head,
@@ -146,6 +151,28 @@ def _assert_frozen_sources() -> dict:
             path: sha256_file(ROOT / path) for path in SCIENTIFIC_CODE
         },
     }
+
+
+def _source_checkpoint_contract(matrix: dict, jobs: list[dict]) -> dict[str, str]:
+    evidence_path = Path(matrix["evidence_freeze"]["manifest"])
+    if not evidence_path.is_absolute():
+        evidence_path = ROOT / evidence_path
+    evidence = json.loads(evidence_path.read_text(encoding="utf-8"))
+    expected_by_path = {}
+    for row in evidence["checkpoint_index"].values():
+        checkpoint = Path(row["path"])
+        if not checkpoint.is_absolute():
+            checkpoint = ROOT / checkpoint
+        expected_by_path[str(checkpoint.resolve())] = row["fingerprint_sha256"]
+    contract = {}
+    for job in jobs:
+        source = str(Path(job["pretrain_checkpoint"]).resolve())
+        if source not in expected_by_path:
+            raise RuntimeError(f"source checkpoint absent from frozen evidence: {source}")
+        contract[source] = expected_by_path[source]
+    if len(contract) != 10:
+        raise RuntimeError(f"source checkpoint contract drift: {len(contract)} != 10")
+    return dict(sorted(contract.items()))
 
 
 def _capacity_snapshot(run_root: Path, jobs: list[dict]) -> dict:
@@ -227,6 +254,146 @@ def _last_metrics(cell: Path) -> dict:
     if not rows:
         raise RuntimeError(f"no adapt_1 metric row: {cell}")
     return rows[-1]
+
+
+def _observed_adaptation_update(cell: Path) -> int:
+    observed = [0]
+    saved = engine._latest_adapt(cell)
+    if saved is not None:
+        observed.append(int(saved))
+    updates = cell / "updates.jsonl"
+    if updates.is_file():
+        for line in updates.read_text().splitlines():
+            if line.strip():
+                observed.append(int(json.loads(line)["adaptation_update"]))
+    return max(observed)
+
+
+def _saved_adaptation_update(cell: Path) -> int:
+    saved = engine._latest_adapt(cell)
+    return 0 if saved is None else int(saved)
+
+
+def _update_row_count(cell: Path) -> int:
+    path = cell / "updates.jsonl"
+    return 0 if not path.is_file() else sum(bool(line.strip()) for line in path.read_text().splitlines())
+
+
+def _ensure_main_manifest(matrix: dict, run_root: Path, jobs: list[dict], provenance: dict) -> dict:
+    payload = {
+        "schema_version": "hackrl_cross_environment_teacher_matrix_main_run_v1",
+        "scientific_result": True,
+        "understood_as": (
+            "Run exactly the frozen 50-job list for 4,096 adaptation updates per job in "
+            "a fresh main root; retain the completed contract smoke as a separate 163,840-slot audit."
+        ),
+        "matrix": str(DEFAULT_MATRIX),
+        "matrix_sha256": sha256_file(DEFAULT_MATRIX),
+        "execution_commit": provenance["git_commit"],
+        "scientific_source_sha256": provenance["scientific_source_sha256"],
+        "source_checkpoint_sha256": _source_checkpoint_contract(matrix, jobs),
+        "job_ids": [job["id"] for job in jobs],
+        "job_ids_sha256": hashlib.sha256(
+            json.dumps([job["id"] for job in jobs], separators=(",", ":")).encode()
+        ).hexdigest(),
+        "main_jobs": len(jobs),
+        "updates_per_job": engine.ADAPT_UPDATES,
+        "slots_per_update": SLOTS_PER_UPDATE,
+        "planned_main_collection_slots": int(
+            matrix["missing_learning_budget"]["main_training_collection_slots"]
+        ),
+        "completed_smoke_collection_slots": int(
+            matrix["missing_learning_budget"]["completed_smoke_collection_slots"]
+        ),
+        "planned_total_including_smoke": int(
+            matrix["missing_learning_budget"]["planned_total_including_smoke"]
+        ),
+        "smoke_run_root": str(DEFAULT_SMOKE_RUN_ROOT),
+        "main_run_root": str(run_root),
+        "performance_based_changes_forbidden": True,
+    }
+    path = run_root / "run_manifest.json"
+    if path.is_file():
+        existing = json.loads(path.read_text())
+        if existing != payload:
+            raise RuntimeError(f"main run manifest drift: {path}")
+    else:
+        _write_json(path, payload)
+    return payload
+
+
+def run_main_job(matrix: dict, run_root: Path, job_id: str) -> dict:
+    _register_craft()
+    jobs = build_jobs(matrix)
+    provenance = _assert_frozen_sources()
+    job = job_by_id(job_id, matrix)
+    source_contract = _source_checkpoint_contract(matrix, jobs)
+    source_path = str(Path(job["pretrain_checkpoint"]).resolve())
+    observed_source = engine._checkpoint_fingerprint(Path(source_path))["sha256"]
+    if observed_source != source_contract[source_path]:
+        raise RuntimeError(
+            f"source checkpoint differs from frozen evidence: {source_path}; "
+            f"observed={observed_source} expected={source_contract[source_path]}"
+        )
+    capacity = _capacity_snapshot(run_root, jobs)
+    run_root.mkdir(parents=True, exist_ok=True)
+    _write_json(
+        run_root / "capacity_checks" / f"before_{job_id}_{time.time_ns()}.json",
+        capacity,
+    )
+    _ensure_main_manifest(matrix, run_root, jobs, provenance)
+    _reuse_update_zero_curve(job, run_root)
+    cell = engine._cell_dir(run_root, job)
+    start_update = _saved_adaptation_update(cell)
+    rows_before = _update_row_count(cell)
+    attempt = {
+        "recorded_utc": _utc(),
+        "job": job["id"],
+        "environment": job["environment"],
+        "condition": job["condition"],
+        "variant": job["variant"],
+        "start_adaptation_update": start_update,
+        "target_adaptation_update": engine.ADAPT_UPDATES,
+        "attempt_kind": (
+            "already_complete" if start_update == engine.ADAPT_UPDATES
+            else ("resume" if start_update else "fresh_main")
+        ),
+        "planned_slots_this_attempt": max(engine.ADAPT_UPDATES - start_update, 0) * SLOTS_PER_UPDATE,
+        "status": "started",
+        "execution_commit": provenance["git_commit"],
+        "matrix_sha256": sha256_file(DEFAULT_MATRIX),
+        "source_checkpoint_sha256": observed_source,
+    }
+    _append_jsonl(run_root / "collection_ledger.jsonl", attempt)
+    started = time.perf_counter()
+    try:
+        engine.run_adapt(run_root, job)
+        end_update = _observed_adaptation_update(cell)
+        if end_update != engine.ADAPT_UPDATES:
+            raise RuntimeError(f"incomplete main job {job_id}: observed adapt_{end_update}")
+        result = attempt | {
+            "recorded_utc": _utc(),
+            "status": "passed",
+            "end_adaptation_update": end_update,
+            "slots_charged": max(_update_row_count(cell) - rows_before, 0) * SLOTS_PER_UPDATE,
+            "elapsed_seconds": time.perf_counter() - started,
+            "checkpoint": str(cell / f"checkpoints/adapt_{engine.ADAPT_UPDATES}"),
+        }
+    except BaseException as error:
+        end_update = _observed_adaptation_update(cell)
+        result = attempt | {
+            "recorded_utc": _utc(),
+            "status": "failed",
+            "end_adaptation_update": end_update,
+            "slots_charged": max(_update_row_count(cell) - rows_before, 0) * SLOTS_PER_UPDATE,
+            "elapsed_seconds": time.perf_counter() - started,
+            "error": repr(error),
+        }
+        _append_jsonl(run_root / "collection_ledger.jsonl", result)
+        raise
+    _append_jsonl(run_root / "collection_ledger.jsonl", result)
+    _write_json(run_root / "job_receipts" / f"{job_id}.json", result)
+    return result
 
 
 def _check_update_contract(job: dict, cell: Path, metrics: dict) -> dict:
@@ -354,7 +521,7 @@ def run_smoke(matrix: dict, run_root: Path) -> dict:
             "matrix_sha256": sha256_file(DEFAULT_MATRIX),
             "total_main_jobs": len(jobs),
             "main_queue_launched": False,
-            "collection_cap_slots": int(matrix["missing_learning_budget"]["total_collector_slots"]),
+            "collection_cap_slots": int(matrix["missing_learning_budget"]["completed_smoke_collection_slots"]),
             **provenance,
         },
     )
@@ -403,7 +570,7 @@ def run_smoke(matrix: dict, run_root: Path) -> dict:
         _append_jsonl(run_root / "collection_ledger.jsonl", record)
         records.append(record)
     newly_charged = sum(row["slots_charged"] for row in records)
-    total_cap = int(matrix["missing_learning_budget"]["total_collector_slots"])
+    total_cap = int(matrix["missing_learning_budget"]["completed_smoke_collection_slots"])
     result = {
         "schema_version": "hackrl_cross_environment_teacher_matrix_smoke_v1",
         "scientific_performance_result": False,
@@ -414,7 +581,9 @@ def run_smoke(matrix: dict, run_root: Path) -> dict:
         "new_slots_charged_this_invocation": newly_charged,
         "official_job_slots_completed": 5 * SLOTS_PER_UPDATE,
         "collection_cap_slots": total_cap,
-        "remaining_official_collection_slots": total_cap - 5 * SLOTS_PER_UPDATE,
+        "remaining_main_training_slots": int(
+            matrix["missing_learning_budget"]["main_training_collection_slots"]
+        ),
         "main_queue_launched": False,
         "passed": all(row["status"] == "passed" for row in records),
     }
@@ -425,10 +594,11 @@ def run_smoke(matrix: dict, run_root: Path) -> dict:
 def main() -> None:
     parser = argparse.ArgumentParser()
     parser.add_argument("--matrix", type=Path, default=DEFAULT_MATRIX)
-    parser.add_argument("--run-root", type=Path, default=DEFAULT_RUN_ROOT)
+    parser.add_argument("--run-root", type=Path)
     group = parser.add_mutually_exclusive_group(required=True)
     group.add_argument("--validate", action="store_true")
     group.add_argument("--list-jobs", action="store_true")
+    group.add_argument("--list-job-ids", action="store_true")
     group.add_argument("--smoke", action="store_true")
     group.add_argument("--run-job")
     parser.add_argument("--authorize-main-training", action="store_true")
@@ -442,18 +612,17 @@ def main() -> None:
     if args.list_jobs:
         print(json.dumps(jobs, indent=2, sort_keys=True))
         return
+    if args.list_job_ids:
+        print("\n".join(job["id"] for job in jobs))
+        return
     if args.smoke:
-        print(json.dumps(run_smoke(matrix, args.run_root), indent=2, sort_keys=True))
+        smoke_root = args.run_root or DEFAULT_SMOKE_RUN_ROOT
+        print(json.dumps(run_smoke(matrix, smoke_root), indent=2, sort_keys=True))
         return
     if not args.authorize_main_training:
         raise SystemExit("--run-job requires --authorize-main-training; no queue mode exists")
-    _assert_frozen_sources()
-    capacity = _capacity_snapshot(args.run_root, jobs)
-    args.run_root.mkdir(parents=True, exist_ok=True)
-    _write_json(args.run_root / "capacity_before_main_job.json", capacity)
-    job = job_by_id(args.run_job, matrix)
-    _reuse_update_zero_curve(job, args.run_root)
-    engine.run_adapt(args.run_root, job)
+    main_root = args.run_root or DEFAULT_MAIN_RUN_ROOT
+    print(json.dumps(run_main_job(matrix, main_root, args.run_job), indent=2, sort_keys=True))
 
 
 if __name__ == "__main__":

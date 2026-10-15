@@ -12,9 +12,9 @@ def _load() -> dict:
     return json.loads(MANIFEST.read_text())
 
 
-def test_matrix_implementation_is_ready_but_main_execution_is_not_authorized() -> None:
+def test_matrix_authorizes_exact_main_execution_and_common_evaluation() -> None:
     manifest = _load()
-    assert manifest["status"] == "evidence_and_implementation_frozen_main_training_not_authorized"
+    assert manifest["status"] == "main_training_and_common_evaluation_authorized_not_started"
     authorization = manifest["authorization"]
     assert authorization["read_only_audit"] is True
     assert authorization["matrix_and_validator_implementation"] is True
@@ -31,9 +31,12 @@ def test_matrix_implementation_is_ready_but_main_execution_is_not_authorized() -
         "main_training",
         "main_training_checkpoint_writes",
         "queue_or_watcher_launch",
-        "dreamer_execution",
     ):
-        assert authorization[key] is False
+        assert authorization[key] is True
+    assert authorization["dreamer_execution"] is False
+    assert "full 4,096 updates" in manifest["understood_as"]
+    assert "explicit authorization" in manifest["understood_as"]
+    assert "later explicit authorization" not in manifest["understood_as"]
 
 
 def test_condition_set_and_task_goal_mapping_are_canonical() -> None:
@@ -68,9 +71,15 @@ def test_missing_jobs_and_slots_match_environment_matrix() -> None:
     budget = manifest["missing_learning_budget"]
     assert budget["total_jobs"] == 50
     assert budget["collector_slots_per_job"] == 134_217_728
-    assert budget["total_collector_slots"] == 6_710_886_400
-    assert budget["total_collector_slots"] == (
+    assert budget["main_training_collection_slots"] == 6_710_886_400
+    assert budget["completed_smoke_collection_slots"] == 163_840
+    assert budget["planned_total_including_smoke"] == 6_711_050_240
+    assert budget["main_training_collection_slots"] == (
         budget["total_jobs"] * budget["collector_slots_per_job"]
+    )
+    assert budget["planned_total_including_smoke"] == (
+        budget["main_training_collection_slots"]
+        + budget["completed_smoke_collection_slots"]
     )
 
 
@@ -90,6 +99,17 @@ def test_smoke_receipt_includes_independent_trace_replay() -> None:
     assert all(row["policy_or_teacher_calls"] == 0 for row in trace_smoke["traces"])
 
 
+def test_comparison_evidence_classes_prevent_single_factor_overclaim() -> None:
+    evidence = _load()["comparison_evidence_status"]
+    assert evidence["new_same_code_and_initialization"]
+    assert evidence["historical_equivalence_verified"]
+    assert evidence["exploratory_due_to_unresolved_code_difference"]
+    assert "must not be called single-factor" in evidence["single_factor_claim_rule"]
+    assert set(evidence["substitute_evidence_without_independent_source_manifest"]) == {
+        "tick_claim", "craft_remain"
+    }
+
+
 def test_old_teacher_split_is_explicitly_non_equivalent() -> None:
     manifest = _load()
     exclusion = manifest["non_equivalent_existing_runs"]["teacher_imitation_split_v1"]
@@ -100,7 +120,7 @@ def test_old_teacher_split_is_explicitly_non_equivalent() -> None:
 def test_completed_curves_do_not_claim_full_trace_completion() -> None:
     evaluation = _load()["shared_evaluation_contract"]
     assert "complete action sequence" in evaluation["required_episode_record"]
-    assert "not been authorized" in evaluation["current_gap"]
+    assert "authorized" in evaluation["current_gap"]
     assert "scientific performance" in evaluation["validator_scope"]
     assert any(
         "evaluation RNG seed schedule" in item

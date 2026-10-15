@@ -57,11 +57,12 @@
     }
   ],
   "collection_accounting" : {
-    "collection_cap_slots" : 6710886400,
+    "completed_smoke_collection_slots" : 163840,
     "failed_attempts" : 0,
     "new_collection_attempts" : 5,
     "passed_attempts" : 5,
-    "remaining_official_collection_slots" : 6710722560,
+    "remaining_main_training_slots" : 6710886400,
+    "planned_total_including_smoke" : 6711050240,
     "resume_validation_attempts" : 0,
     "slots_charged" : 163840,
     "started_attempts" : 5

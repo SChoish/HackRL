@@ -159,7 +159,7 @@ def validate_jobs(matrix: dict, jobs: list[dict]) -> None:
     if observed != EXPECTED_JOB_COUNTS:
         raise ValueError(f"job matrix drift: {observed}")
     slots = len(jobs) * int(budget["collector_slots_per_job"])
-    if slots != int(budget["total_collector_slots"]) or slots != 6_710_886_400:
+    if slots != int(budget["main_training_collection_slots"]) or slots != 6_710_886_400:
         raise ValueError(f"collection budget drift: {slots}")
 
 

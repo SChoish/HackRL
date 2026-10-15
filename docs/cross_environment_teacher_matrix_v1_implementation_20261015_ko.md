@@ -2,17 +2,20 @@
 
 ## 완료 상태
 
-구현 freeze commit은 `27bf886484ae74a3544682ac10ca591a608fc99e`다. 이 commit으로 근거 인덱스, 50-job builder, 단일-job runner, full-trace evaluator, 평가 패널과 contract tests를 고정했고 학습 contract smoke를 실행했다. 저장 trace의 독립 post-hoc replay 보강은 `838af485530f8c04d9f53336f8ade156a9dfd783`에 고정한 뒤 trace smoke를 다시 검증했다. **50-job 본학습 queue와 공통 과학 평가는 실행하지 않았다.**
+구현 freeze commit은 `27bf886484ae74a3544682ac10ca591a608fc99e`다. 이 commit으로 근거 인덱스, 50-job builder, 단일-job runner, full-trace evaluator, 평가 패널과 contract tests를 고정했고 학습 contract smoke를 실행했다. 저장 trace의 독립 post-hoc replay 보강은 `838af485530f8c04d9f53336f8ade156a9dfd783`에 고정한 뒤 trace smoke를 다시 검증했다. **50-job 본학습과 후속 공통 과학 평가는 명시적으로 승인됐으며, 새 실행 commit 고정 직후 시작한다.**
 
 Smoke receipt는 `docs/manifests/cross_environment_teacher_matrix_v1_smoke.json`, 원본은 `/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1`에 있다.
 
 ## 실행 명령
+
+모든 명령의 기준 디렉터리는 `/home/ext_csv/HackRL`이다. 첫 본학습 job이 시작될 때의 `HEAD`, scientific source SHA-256, matrix digest, 고정 job ID 목록과 열 개 source checkpoint fingerprint는 main root의 `run_manifest.json`에 기록된다. `--list-job-ids`가 내보내는 순서를 그대로 사용하며, 같은 job 명령을 다시 실행하면 마지막 저장 `adapt_N`에서 재개한다. `adapt_4096` 확인과 `job_receipts/JOB_ID.json`의 `passed` 기록이 job 완료 조건이다.
 
 검증과 작업 확인:
 
 ```bash
 JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/validate_cross_environment_teacher_matrix.py
 JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/run_cross_environment_teacher_matrix.py --validate
+JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/run_cross_environment_teacher_matrix.py --list-job-ids
 JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/run_cross_environment_teacher_matrix.py --list-jobs
 ```
 
@@ -24,7 +27,7 @@ PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python \
   scripts/run_cross_environment_teacher_matrix.py --smoke
 ```
 
-본학습은 승인 후에도 queue가 아니라 한 job을 명시한다.
+본학습은 matrix가 출력하는 고정 job ID 순서대로 한 job씩 명시한다.
 
 ```bash
 HACKRL_DEVICE=cuda PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python \
@@ -48,6 +51,14 @@ JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin
   scripts/eval_cross_environment_teacher_traces.py --verify-trace TRACE.jsonl.gz
 ```
 
+50 jobs 완료 후 공통 평가:
+
+```bash
+HACKRL_DEVICE=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python \
+  scripts/run_cross_environment_teacher_evaluation.py \
+  --run-all --authorize-common-evaluation
+```
+
 ## 재사용 및 신규 작업
 
 | 환경 | 재사용 | 신규 학습 |
@@ -62,7 +73,7 @@ JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin
 
 ## 통합 smoke 결과
 
-학습 smoke는 정식 다섯 job의 `adapt_1`로 저장돼 이후 그대로 재개된다.
+학습 smoke의 `adapt_1`은 기존 smoke root에 독립 구현 검증으로 보존한다. 본학습은 별도 main root에서 같은 source checkpoint로부터 각 job의 4,096 updates를 전부 실행한다.
 
 | 환경/조건/커널 | 검사 결과 | 시간 |
 | --- | --- | ---: |
@@ -80,13 +91,14 @@ Trace evaluator는 TICK·CRAFT × fixed·mutant를 각 1 episode, 최대 4 steps
 
 | 항목 | slots |
 | --- | ---: |
-| 총 상한 | 6,710,886,400 |
-| smoke 신규 수집 | 163,840 |
+| 본학습 50 jobs | 6,710,886,400 |
+| 완료된 독립 smoke | 163,840 |
+| **계획 총량** | **6,711,050,240** |
+| 현재 본학습 잔여량 | **6,710,886,400** |
 | 실패 실행 | 0 |
 | 재개 추가 수집 | 0 |
-| 남은 공식 수집량 | **6,710,722,560** |
 
-모든 start/pass 행은 RAID `collection_ledger.jsonl`에 따로 남겼다. smoke는 정식 job의 첫 update이므로 본학습 재개 시 다시 수집하지 않는다.
+Smoke ledger는 기존 RAID root에 보존한다. 본학습은 새 root의 별도 `collection_ledger.jsonl`에 fresh·resume·실패별 실제 update 행 수를 기록한다. Smoke 때문에 본학습 update를 줄이지 않는다.
 
 ## 저장공간과 예상 시간
 
@@ -99,9 +111,11 @@ Smoke 직전 `/home/ext_csv`는 90% 사용 중이어서 checkpoint 대상에서 
 - 예상 잔여 쓰기 합계: 39,293,755,468 bytes.
 - 별도 안전 reserve: 8,589,934,592 bytes.
 
-Smoke 직후 run tree는 493,327,473 bytes다. 이는 다섯 cell에 `adapt_0`과 `adapt_1`이 동시에 있어 생긴 일시적 overlap을 포함한다.
+Smoke tree는 493,327,473 bytes로 그대로 보존한다. 본학습 checkpoint는 새 `/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1_main`에 기록한다.
 
-기존 GPU 실행의 steady update는 TICK 0.09486초/update, CRAFT 0.08785초/update였다. smoke 이후 남은 순수 update 시간은 단일 worker 환산 약 5.16시간이다. 기존 science-curve 평가를 포함한 full-job 평균(TICK 535.02초, CRAFT 508.68초)으로는 50 jobs 순차 실행 약 7.21시간이다. 실제 wall-clock은 동시성, compilation, 현재 GPU 경합에 따라 달라진다.
+기존 GPU 실행의 steady update는 TICK 0.09486초/update, CRAFT 0.08785초/update였다. 본학습 전체 순수 update 시간은 단일 worker 환산 약 5.16시간이다. 기존 science-curve 평가를 포함한 full-job 평균(TICK 535.02초, CRAFT 508.68초)으로는 50 jobs 순차 실행 약 7.21시간이다. 실제 wall-clock은 동시성, compilation, 현재 GPU 경합에 따라 달라진다.
+
+공통 평가 runner는 완전한 task receipt와 artifact hash가 있는 결과만 재사용하며, 기록이 유실되거나 불완전하면 자동 재평가하지 않고 중단한다.
 
 Trace smoke의 gzip 평균은 701.06 bytes/step이었다. 단순 비례 추정은 전체 step 상한에서 약 7.91 GB이며, 상태 분포에 따른 압축률 변화가 있어 capacity plan에서는 24 GiB를 배정했다.
 

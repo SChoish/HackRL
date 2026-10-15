@@ -111,6 +111,8 @@ def evaluate(
     max_starts: int | None = None,
     horizon: int = HORIZON,
     scientific: bool = True,
+    actor_bundle=None,
+    checkpoint_fingerprint=None,
 ) -> dict:
     matrix = load_matrix(matrix_path)
     panel = _validate_panel(panel_path)
@@ -120,8 +122,13 @@ def evaluate(
     starts = start_states(environment, family)
     if max_starts is not None:
         starts = starts[: int(max_starts)]
-    spec, network, params = _load_actor(environment, checkpoint)
-    fingerprint = _checkpoint_fingerprint(checkpoint)
+    spec, network, params = (
+        _load_actor(environment, checkpoint) if actor_bundle is None else actor_bundle
+    )
+    fingerprint = (
+        _checkpoint_fingerprint(checkpoint)
+        if checkpoint_fingerprint is None else checkpoint_fingerprint
+    )
     stem = (
         output_root
         / checkpoint_origin
@@ -133,6 +140,12 @@ def evaluate(
     )
     trace_path = stem / "episodes.jsonl.gz"
     summary_path = stem / "summary.json"
+    replay_path = stem / "independent_replay.json"
+    if scientific and any(path.exists() for path in (trace_path, summary_path, replay_path)):
+        raise RuntimeError(
+            "scientific evaluation artifact already exists; verify the recorded receipt or "
+            "stop for manual recovery rather than automatically re-evaluating"
+        )
     trace_path.parent.mkdir(parents=True, exist_ok=True)
     episode_rows = []
     total_steps = 0
@@ -229,7 +242,7 @@ def evaluate(
     replay = verify_trace_file(trace_path)
     if not replay["passed"]:
         raise RuntimeError(f"independent trace replay failed: {replay['errors']}")
-    _write_json(stem / "independent_replay.json", replay)
+    _write_json(replay_path, replay)
     trace_bytes = trace_path.stat().st_size
     summary = {
         "schema_version": "hackrl_cross_environment_teacher_trace_summary_v1",
