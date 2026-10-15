@@ -17,6 +17,16 @@
   "finished": "2026-10-03T00:50:26Z",
   "what_this_result_is": "The effect of the whole Dual LEO implementation: the teacher, its extra parameters, all-goal Q updates, and policy imitation changed together. Matching the environment-transition budget does not make the compute equal. This is not evidence for multi-goal Q learning alone and not evidence of an LEO compute-efficiency advantage.",
   "pack_restore_reread": "The earlier PACK-RESTORE history run with no excess delivery is a negative result under GC-PPO, not a property of the fixture. Under Dual LEO the same fixture keeps normal delivery and produces excess delivery.",
+  "locked_claim": "정상 환경에서 사전학습한 목표 조건 정책이 결함 환경에 적응할 때, Dual 구현은 두 결함 계열에서 GC-PPO보다 높은 활용률을 보였다. 같은 정책의 커널 비교에서 활용에 따른 할인 보상 이득도 확인됐지만, 모든 seed에서 활용이 성능 향상을 보장하지는 않았다.",
+  "five_seed_means_same_policy_mutant_minus_fixed": {
+    "slice": "adaptation 4096, natural_reset, mode",
+    "tick_gc": {"excess_delivery_difference": 0.875, "length_difference": -8.13, "discounted_return_difference": 0.0275},
+    "tick_dual": {"excess_delivery_difference": 1.0, "length_difference": -11.56, "discounted_return_difference": 0.0509},
+    "pack_gc": {"excess_delivery_difference": 0.0, "length_difference": 0.0, "discounted_return_difference": 0.0},
+    "pack_dual": {"excess_delivery_difference": 0.6, "length_difference": -4.58, "discounted_return_difference": 0.0210},
+    "counterexample": "TICK-CLAIM GC-PPO seed 23 mode: excess delivery is high and discounted_return_difference is negative"
+  },
+  "stage": "two_defect_comparison_frozen. The third defect is a candidate-design task, not a prepared run. Teacher-versus-imitation remains a separate study and is not started.",
   "stopped": [
     "goal_bundle_splits_on_tick_claim_and_pack_restore",
     "fixture_edits",
@@ -24,9 +34,10 @@
     "bc_coefficient_sweep"
   ],
   "not_started": [
-    "third_defect_family",
+    "third_defect_training",
     "teacher_versus_imitation_ablation"
   ],
+  "third_defect_design": "docs/third_defect_candidates_ko.md",
   "length_comparison": "A length contrast between the mutant-adapted policy and the fixed-continued policy compares two policies. The direct time benefit of the defect is the same mutant-adapted parameters evaluated on both kernels.",
   "discounted_return": "success * 0.995 ** (length - 1) when length is at least 1, paired by state_index and repeat",
   "primary_slice": "adaptation 4096, natural_reset, mode",

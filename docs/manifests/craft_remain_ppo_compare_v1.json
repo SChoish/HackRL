@@ -1,6 +1,7 @@
 {
   "schema_version": "hackrl_craft_remain_ppo_compare_v1",
-  "status": "frozen_before_launch",
+  "status": "preserved_after_results",
+  "results": "docs/manifests/craft_remain_ppo_compare_v1_results.json",
   "parent_contract": "9155a0d922bbf4a2d335c8bca5cc33a5ce0ff948",
   "fixture_id": "craft_remain_workshop_v1",
   "growth_period": 16,

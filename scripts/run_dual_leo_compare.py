@@ -129,6 +129,7 @@ ENVS = {
         "parameters": tick_claim_gc_parameter_count,
         "locked": TICK_LOCKED,
         "outcome": _tick_outcome,
+        "families": ("natural_reset", "common_setup"),
     },
     "pack": {
         "config": PackRestoreGCConfig,
@@ -149,6 +150,7 @@ ENVS = {
         "parameters": pack_restore_gc_parameter_count,
         "locked": PACK_LOCKED,
         "outcome": _pack_outcome,
+        "families": ("natural_reset", "common_setup"),
     },
 }
 
@@ -351,7 +353,7 @@ def _evaluate(spec, network, params, *, variant, seed):
             record_episodes=True,
         )
         views[name] = {}
-        for family in FAMILIES:
+        for family in spec.get("families", FAMILIES):
             block = dict(result[family])
             block["mean_discounted_return"] = _family_return(result["episode_records"], family)
             views[name][family] = block
@@ -359,7 +361,7 @@ def _evaluate(spec, network, params, *, variant, seed):
     return views
 
 
-def _curve_complete(path, update):
+def _curve_complete(path, update, families=FAMILIES):
     path = Path(path)
     if not path.is_file():
         return False
@@ -372,7 +374,7 @@ def _curve_complete(path, update):
             return False
         for name in ("mode", "sample"):
             view = block.get(name, {})
-            for family in FAMILIES:
+            for family in families:
                 if "success_rate" not in view.get(family, {}):
                     return False
                 if "mean_discounted_return" not in view.get(family, {}):
@@ -382,7 +384,8 @@ def _curve_complete(path, update):
 
 def _write_curve(cell, job, runner, update, network):
     destination = _curve(cell, update)
-    if _curve_complete(destination, update):
+    families = ENVS[job["env"]].get("families", FAMILIES)
+    if _curve_complete(destination, update, families):
         return
     _write_json(
         destination,
@@ -501,7 +504,11 @@ def _record_adaptation_origin(log_dir, job, cell):
     if not job.get("record_checkpoint_fingerprint", False):
         return None
     source = _adapt_source(log_dir, job)
-    fingerprint = _ensure_checkpoint_fingerprint(source)
+    fingerprint = (
+        _ensure_checkpoint_fingerprint(source)
+        if job.get("persist_source_fingerprint", False)
+        else _checkpoint_fingerprint(source)
+    )
     document = {
         "schema_version": "hackrl_adaptation_origin_v1",
         "job": job["id"],
@@ -523,21 +530,28 @@ def _record_adaptation_origin(log_dir, job, cell):
     return document
 
 
-def _cell_finished(cell):
+def _cell_finished(cell, families=FAMILIES):
     final = _adapt_ckpt(cell, ADAPT_UPDATES)
     if _meta_update(final) != PRETRAIN_UPDATES + ADAPT_UPDATES:
         return False
     return (Path(cell) / "summary.json").is_file() and all(
-        _curve_complete(_curve(cell, update), update) for update in SCIENCE_UPDATES
+        _curve_complete(_curve(cell, update), update, families)
+        for update in SCIENCE_UPDATES
     )
 
 
 def _latest_adapt(cell):
     best = None
-    for update in SAVE_UPDATES:
-        found = _meta_update(_adapt_ckpt(cell, update))
-        if found == PRETRAIN_UPDATES + int(update):
-            best = int(update)
+    checkpoint_root = Path(cell) / "checkpoints"
+    paths = checkpoint_root.glob("adapt_*") if checkpoint_root.is_dir() else ()
+    for path in paths:
+        suffix = path.name.removeprefix("adapt_")
+        if not suffix.isdigit():
+            continue
+        update = int(suffix)
+        found = _meta_update(path)
+        if found == PRETRAIN_UPDATES + update and (best is None or update > best):
+            best = update
     return best
 
 
@@ -711,11 +725,22 @@ def run_pretrain(log_dir, job):
     _write_json(destination / "summary.json", summary)
 
 
-def run_adapt(log_dir, job):
+def run_adapt(
+    log_dir,
+    job,
+    *,
+    target_adapt_updates=ADAPT_UPDATES,
+    write_science_curves=True,
+):
+    target_adapt_updates = int(target_adapt_updates)
+    if not 1 <= target_adapt_updates <= ADAPT_UPDATES:
+        raise ValueError(f"target_adapt_updates must be in [1, {ADAPT_UPDATES}]")
     spec = ENVS[job["env"]]
     cell = _cell_dir(log_dir, job)
     origin = _record_adaptation_origin(log_dir, job, cell)
-    if _cell_finished(cell):
+    if target_adapt_updates == ADAPT_UPDATES and _cell_finished(
+        cell, spec.get("families", FAMILIES)
+    ):
         print(f"[skip] {cell}", flush=True)
         return
     branch = _job_config(
@@ -744,19 +769,37 @@ def run_adapt(log_dir, job):
         saved = 0
     else:
         runner, leo = _load_state(spec, job["method"], _adapt_ckpt(cell, saved), template, leo_template, branch, arm)
-    if saved in SCIENCE_UPDATES:
+    if saved is not None and saved > target_adapt_updates:
+        raise RuntimeError(
+            f"checkpoint adapt_{saved} is beyond requested target {target_adapt_updates}"
+        )
+    if write_science_curves and saved in SCIENCE_UPDATES:
         _write_curve(cell, job, runner, saved, network)
     ppo_count = spec["parameters"](runner.train_state.params)
     started = time.perf_counter()
     step_seconds = []
+    last_metrics = [None]
 
     def on_step(current, current_leo, metrics, seconds):
         finished = int(current.global_update) - PRETRAIN_UPDATES
         step_seconds.append(seconds)
-        _append(cell / "updates.jsonl", _host_metrics(metrics, finished) | {"seconds": seconds})
-        if finished in SAVE_UPDATES:
+        host = _host_metrics(metrics, finished)
+        last_metrics[0] = host
+        _append(
+            cell / "updates.jsonl",
+            host
+            | {
+                "seconds": seconds,
+                "run_phase": (
+                    "contract_smoke"
+                    if target_adapt_updates < ADAPT_UPDATES
+                    else "main_training"
+                ),
+            },
+        )
+        if finished in SAVE_UPDATES or finished == target_adapt_updates:
             _save_state(spec, job["method"], _adapt_ckpt(cell, finished), current, current_leo, branch, arm)
-        if finished in SCIENCE_UPDATES:
+        if write_science_curves and finished in SCIENCE_UPDATES:
             _write_curve(cell, job, current, finished, network)
         if finished in SAVE_UPDATES and job.get("rolling_checkpoints", False):
             _prune_rolling_checkpoints(
@@ -771,13 +814,25 @@ def run_adapt(log_dir, job):
                     f"teacher_steps={host.get('teacher_grad_steps')}"
                 )
             print(
-                f"[adapt] {job['id']} step {finished}/{ADAPT_UPDATES} seconds={seconds:.3f} "
+                f"[adapt] {job['id']} step {finished}/{target_adapt_updates} seconds={seconds:.3f} "
                 f"valid_transitions={host.get('valid_transitions')} "
                 f"goal_successes={host.get('goal_successes')}{extra}",
                 flush=True,
             )
 
-    runner, leo = _train_loop(update, runner, leo, job["method"], PRETRAIN_UPDATES + ADAPT_UPDATES, on_step)
+    runner, leo = _train_loop(
+        update, runner, leo, job["method"], PRETRAIN_UPDATES + target_adapt_updates, on_step
+    )
+    if target_adapt_updates < ADAPT_UPDATES:
+        return {
+            "cell": str(cell),
+            "adaptation_update": target_adapt_updates,
+            "runner": runner,
+            "leo": leo,
+            "metrics": last_metrics[0],
+            "seconds": time.perf_counter() - started,
+            "origin": origin,
+        }
     summary = {
         "env": job["env"],
         "method": job["method"],
@@ -816,6 +871,15 @@ def run_adapt(log_dir, job):
         summary["teacher_scheduled_grad_steps"] = int(runner.global_update) * teacher_per_update
     _write_json(cell / "summary.json", summary)
     print(f"[done] {cell}", flush=True)
+    return {
+        "cell": str(cell),
+        "adaptation_update": ADAPT_UPDATES,
+        "runner": runner,
+        "leo": leo,
+        "metrics": last_metrics[0],
+        "seconds": time.perf_counter() - started,
+        "origin": origin,
+    }
 
 
 def _pid_alive(pid):
@@ -847,7 +911,8 @@ def _pretrain_complete(log_dir, job):
 def _job_complete(log_dir, job):
     if job["kind"] == "pretrain":
         return _pretrain_complete(log_dir, job)
-    return _cell_finished(_cell_dir(log_dir, job))
+    spec = ENVS[job["env"]]
+    return _cell_finished(_cell_dir(log_dir, job), spec.get("families", FAMILIES))
 
 
 def _ready(log_dir, job, jobs=None):

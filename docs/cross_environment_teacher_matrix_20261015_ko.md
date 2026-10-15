@@ -1,0 +1,76 @@
+# 공통 Teacher Matrix v1 구현 정본
+
+## 상태
+
+TICK-CLAIM, PACK-RESTORE, CRAFT-REMAIN을 동일한 teacher 조건 비교로 고정했다. 기존 결과와 대형 checkpoint는 원래 위치에서 해시로 참조하며, TICK `D-task`·`D-frozen` 20 jobs와 CRAFT `D-task`·`D-frozen`·`D-off` 30 jobs만 신규 학습 대상이다. PACK 신규 학습은 0이다.
+
+근거 인덱스, 정확한 50-job builder, 재개 가능한 runner, 공통 full-trace evaluator와 시작 패널 구현은 완료했다. 본학습 50 jobs와 공통 과학 평가는 아직 승인되지 않았다. 통합 smoke는 다섯 정식 job의 첫 update로만 실행하며 과학 성능 결과로 사용하지 않는다.
+
+| 환경 | Source | D-on | D-task | D-frozen | D-off | 신규 학습 |
+| --- | ---: | ---: | ---: | ---: | ---: | ---: |
+| TICK-CLAIM, seed 20–24 | 재사용 | 재사용 | 10 | 10 | 재사용 | 20 jobs |
+| PACK-RESTORE, seed 30–39 | 재사용 | 재사용 | 재사용 (`D-delivery`) | 재사용 | 재사용 | 0 jobs |
+| CRAFT-REMAIN, seed 20–24 | 재사용 | 재사용 | 10 | 10 | 10 | 30 jobs |
+
+## 근거 고정
+
+[evidence manifest](manifests/cross_environment_teacher_matrix_v1_evidence.json)는 6개 결과군, 130개 source/final checkpoint, 123개 config·최종 curve·result artifact를 연결한다. checkpoint tree에는 새 파일을 쓰지 않고 `state.msgpack`, `config.json`, `metadata.json`, 선택적 `arm.json`의 합성 SHA-256만 기록했다.
+
+작업 시작 시 수정·미추적 목록을 evidence manifest에 보존했다. 선택 커밋에는 매트릭스가 참조하는 CRAFT 명세·결과와 Dual 결과, 새 구현·검증·문서만 포함한다. 다른 사용자 파일은 reset, stash, 삭제, stage하지 않는다.
+
+과거 코드의 동일성에는 다음 경계를 둔다.
+
+- PACK 결과는 각 RAID run manifest의 `execution_code_sha`와 당시 scientific source hashes를 정본으로 삼는다.
+- CRAFT의 runner와 CRAFT GC 코드는 `fd201788...`과 일치하지만, 현재 `dual_leo.py`는 당시 파일과 다르다.
+- TICK D-on은 dirty `fbaef1d...` 작업 트리에서 시작했다는 과거 기록이 있으므로 `9155a0d...`는 가장 가까운 사후 freeze일 뿐 정확한 실행 checkout을 증명하지 않는다.
+- 과거 curve는 원래 지표 정의를 유지한다. 새 exhaustive legal opportunity로 소급 변경하지 않는다.
+
+## 공통 runner
+
+작업 목록의 유일한 기준은 [matrix manifest](manifests/cross_environment_teacher_matrix_v1.json)의 `new_learning_jobs`다. `src/hackrl/cross_environment_teacher_matrix.py`가 이를 정확히 50 jobs로 변환하고, `scripts/run_cross_environment_teacher_matrix.py`가 한 job씩 명시적으로 실행한다. queue·watcher mode는 없다.
+
+- source는 환경과 learner seed가 같은 full-Dual `update_512` checkpoint다.
+- 목표는 각 환경 명세의 `goal_id`를 해당 환경 `GOAL_IDS`에서 독립적으로 조회하고 기록 index와 대조한다.
+- `D-task`는 한 task head만 teacher TD target에 포함하며 target term 수를 검사한다.
+- `D-frozen`은 teacher parameters, Adam state, BatchRenorm statistics, optimizer step의 전후 digest가 모두 같은지 검사한다.
+- `D-off`는 teacher update를 유지하면서 policy BC coefficient가 실제로 0인지 검사한다.
+- 기존 D-on의 update-0 평가는 새 rollout 없이 원본 SHA-256과 provenance sidecar를 붙여 재사용한다.
+- smoke의 `adapt_1`은 정식 cell에 저장되며 이후 같은 job이 이어서 재개한다.
+
+검증과 작업 목록 확인:
+
+```bash
+JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/validate_cross_environment_teacher_matrix.py
+JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/run_cross_environment_teacher_matrix.py --validate
+JAX_PLATFORMS=cpu PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/run_cross_environment_teacher_matrix.py --list-jobs
+```
+
+본학습은 나중에 승인되더라도 queue가 아니라 다음처럼 한 job을 명시해야 한다.
+
+```bash
+HACKRL_DEVICE=cuda PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bin/python scripts/run_cross_environment_teacher_matrix.py \
+  --run-job JOB_ID --authorize-main-training
+```
+
+## 공통 trace evaluator
+
+[panel manifest](manifests/cross_environment_teacher_trace_panel_v1.json)은 TICK·PACK의 validation 16 layouts × 2 phases와 CRAFT의 두 phases를 family별 순서·state hash와 함께 고정한다. fixed·mutant, mode·sample, 자연·기회 시작은 경로상 별도 파일로 저장한다.
+
+각 gzip JSONL은 완전 상태, public observation, action과 logits, timestep, 종료 이유, 전후 물리 자원, 독립 oracle의 실제 결함 발동·활용, exhaustive legal trigger action 목록, 기존 좁은 `opportunity_reached`를 분리 기록한다. oracle 계산은 actor action 선택 뒤에만 실행하며 actor·teacher 입력이나 학습 보상에 들어가지 않는다. 재사용 checkpoint와 신규 checkpoint도 `reused_result`·`new_matrix_result`로 분리한다.
+
+전체 공통 평가의 사전 상한은 88,200 episodes, 11,289,600 steps다. 이번 구현 단계에서는 이 과학 평가를 실행하지 않는다.
+
+## 예산 경계
+
+신규 collection 상한은 6,710,886,400 slots다. 최소 smoke 다섯 update는 163,840 slots이며 정식 job의 첫 update이므로 성공 시 남은 공식 수집량은 6,710,722,560 slots다. 실패·재개 시도는 RAID run root의 `collection_ledger.jsonl`에 별도 행과 보수적 charge로 기록한다.
+
+저장 위치는 `/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1`이다. checkpoint writer 직전에 `/home/ext_csv`와 `/raid/ext_csv`의 여유 공간, 기존 run 크기, final retention, predecessor-successor overlap, 평가 artifact, 로그, 안전 reserve를 다시 계산한다.
+
+## 정본
+
+- 매트릭스: `docs/manifests/cross_environment_teacher_matrix_v1.json`
+- 근거: `docs/manifests/cross_environment_teacher_matrix_v1_evidence.json`
+- 평가 패널: `docs/manifests/cross_environment_teacher_trace_panel_v1.json`
+- validator: `scripts/validate_cross_environment_teacher_matrix.py`
+- runner: `scripts/run_cross_environment_teacher_matrix.py`
+- trace evaluator: `scripts/eval_cross_environment_teacher_traces.py`

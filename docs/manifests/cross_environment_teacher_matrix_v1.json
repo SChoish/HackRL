@@ -1,0 +1,538 @@
+{
+  "aggregate_checks": [
+    {
+      "execution_complete": true,
+      "id": "pack_D_task_result",
+      "path": "/raid/ext_csv/HackRL/runs/pack_restore_delivery_only_teacher_v1/result.json",
+      "validated_curve_count": 320
+    },
+    {
+      "execution_complete": true,
+      "id": "pack_D_frozen_result",
+      "path": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/result.json",
+      "validated_curve_count": 480
+    }
+  ],
+  "artifact_checks": [
+    {
+      "expected": 5,
+      "glob": "seed*/checkpoints/update_512/state.msgpack",
+      "id": "tick_source",
+      "root": "runs/dual_leo_compare_v1/tick/dual/pretrain"
+    },
+    {
+      "expected": 10,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "tick_D_on_checkpoint",
+      "root": "runs/dual_leo_compare_v1/tick/dual"
+    },
+    {
+      "expected": 10,
+      "glob": "{fixed,mutant}/seed*/curve/adapt_4096.json",
+      "id": "tick_D_on_curve",
+      "root": "runs/dual_leo_compare_v1/tick/dual"
+    },
+    {
+      "expected": 10,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "tick_D_off_checkpoint",
+      "root": "runs/dual_adapt_bc_off_v1/tick/adapt_bc_off"
+    },
+    {
+      "expected": 10,
+      "glob": "{fixed,mutant}/seed*/curve/adapt_4096.json",
+      "id": "tick_D_off_curve",
+      "root": "runs/dual_adapt_bc_off_v1/tick/adapt_bc_off"
+    },
+    {
+      "expected": 10,
+      "glob": "seed*/checkpoints/update_512/state.msgpack",
+      "id": "pack_source",
+      "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/pretrain"
+    },
+    {
+      "expected": 20,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "pack_D_on_checkpoint",
+      "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual"
+    },
+    {
+      "expected": 20,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "pack_D_off_checkpoint",
+      "root": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual_bc_off"
+    },
+    {
+      "expected": 20,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "pack_D_task_checkpoint",
+      "root": "/raid/ext_csv/HackRL/runs/pack_restore_delivery_only_teacher_v1/size_s/pack/dual_teacher_delivery_only"
+    },
+    {
+      "expected": 20,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "pack_D_frozen_checkpoint",
+      "root": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/size_s/pack/dual_teacher_frozen"
+    },
+    {
+      "expected": 5,
+      "glob": "seed*/checkpoints/update_512/state.msgpack",
+      "id": "craft_source",
+      "root": "runs/craft_remain_compare_v1/dual/pretrain"
+    },
+    {
+      "expected": 10,
+      "glob": "{fixed,mutant}/seed*/checkpoints/adapt_4096/state.msgpack",
+      "id": "craft_D_on_checkpoint",
+      "root": "runs/craft_remain_compare_v1/dual"
+    },
+    {
+      "expected": 10,
+      "glob": "{fixed,mutant}/seed*/curve/adapt_4096.json",
+      "id": "craft_D_on_curve",
+      "root": "runs/craft_remain_compare_v1/dual"
+    }
+  ],
+  "audit_provenance": {
+    "commit_blocker": null,
+    "commit_ready": true,
+    "selective_commit_rule": "Only matrix-referenced evidence and new implementation/test/report files; preserve all unrelated dirty and untracked paths.",
+    "source_sha256": {
+      "/raid/ext_csv/HackRL/runs/pack_restore_delivery_only_teacher_v1/result.json": "b8c31b4eb76fe9ed54de6e0181c0dbdb97dc6830ab4925b5ec7c313de4eeb514",
+      "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/result.json": "2da51da872745ae7d59bb8690827610405ec59ba0ca3346daa401d9e404b68a6",
+      "docs/manifests/craft_remain_ppo_compare_v1.json": "7cbdbea9ec7bba51bc66cdeafdddc0ab64f9ac4904ca4f88db4d5332066c0565",
+      "docs/manifests/craft_remain_ppo_compare_v1_results.json": "bd6d9f4ca664e3c42bce55d4ff6c8b26a28a321bd52b8e5849bd73ed3d346337",
+      "docs/manifests/dual_adapt_bc_off_v1.json": "f90b066fd785ce0a5c5abcdc316c9f704389318ccd9688eaf1f80abb07210e8c",
+      "docs/manifests/dual_leo_ppo_compare_v1.json": "04602e3b4da06dbb6ee6cceee61da2171ab7dd630e2bf72fbdafce12303a6e2d",
+      "docs/manifests/dual_leo_ppo_compare_v1_results.json": "e46b9ab789c554161ce9d548cc48ad963dcca11514787011b73de8f183da10d4",
+      "docs/manifests/pack_restore_delivery_only_teacher_v1.json": "ffbe809b4a2283e0df8481d6adbce7bdf6575bc8d909c8ef4f39a3a41558143f",
+      "docs/manifests/pack_restore_pretrained_teacher_freeze_v1.json": "f20357644909ff2036123f1da89c2955570660c9a7eb5fdd08718edef005b079",
+      "docs/manifests/pack_restore_scale_bc_v1.json": "85ee37b55b4e7904391b817d924c381e613911cd91d13574b4fd4c07bf4dc534"
+    },
+    "workspace_dirty": true,
+    "workspace_git_sha": "11778eee0a991bbc754a4700ebe85705dc03c715"
+  },
+  "authorization": {
+    "common_frozen_evaluation": false,
+    "common_trace_evaluator_implementation": true,
+    "contract_smoke": true,
+    "dreamer_execution": false,
+    "integration_smoke_complete": false,
+    "main_training": false,
+    "main_training_checkpoint_writes": false,
+    "matrix_and_validator_implementation": true,
+    "missing_condition_runner_implementation": true,
+    "queue_or_watcher_launch": false,
+    "read_only_audit": true,
+    "smoke_checkpoint_writes": true
+  },
+  "canonical_conditions": {
+    "D-frozen": {
+      "frozen_teacher_state": [
+        "parameters",
+        "Adam state",
+        "BatchRenorm statistics",
+        "optimizer step"
+      ],
+      "meaning": "The learned teacher from the same full-Dual source checkpoint is frozen throughout adaptation while its recommendations are imitated.",
+      "policy_imitation_during_adaptation": true,
+      "teacher_learning_during_adaptation": false
+    },
+    "D-off": {
+      "meaning": "The teacher continues to learn but the policy BC coefficient is zero during adaptation.",
+      "policy_imitation_during_adaptation": false,
+      "teacher_learning_during_adaptation": true,
+      "teacher_target_heads": "all 12 workshop goals"
+    },
+    "D-on": {
+      "meaning": "The complete adaptation-time teacher and BC path.",
+      "policy_imitation_during_adaptation": true,
+      "teacher_learning_during_adaptation": true,
+      "teacher_target_heads": "all 12 workshop goals"
+    },
+    "D-task": {
+      "meaning": "Teacher TD targets during adaptation are restricted to the environment's final task goal. Shared teacher parameters may still change other Q outputs; this condition does not claim parameter-wise freezing of the other heads. PACK's prior D-delivery arm is the existing instance of D-task.",
+      "policy_imitation_during_adaptation": true,
+      "teacher_learning_during_adaptation": true,
+      "teacher_target_heads": [
+        11
+      ]
+    },
+    "source": {
+      "meaning": "The frozen full-Dual normal-pretraining checkpoint before any adaptation update; it is evaluated but not continued as a source condition.",
+      "policy_imitation_during_adaptation": false,
+      "teacher_learning_during_adaptation": false
+    }
+  },
+  "claim_boundary": [
+    "Environment replication is the primary unit of expansion; each environment keeps its own legal fixture and task-equivalent goal.",
+    "A completed checkpoint is reusable only when its pretraining history, adaptation toggle, fixed/mutant branch, learner seed, and evaluation contract match the canonical condition.",
+    "Seed numbers are paired within an environment. PACK uses seeds 30-39 while TICK and CRAFT use 20-24, so cross-environment effects are not learner-seed-paired.",
+    "Completed cells are retrospective evidence observed before this matrix; missing cells, evaluation rules, and the no-extension rule are fixed here before any new result is produced.",
+    "Existing episode summaries do not satisfy the requested full action and full state trace contract; training completeness and common-evaluation completeness are separate.",
+    "Missing-condition runner and evaluator implementation are authorized; the 50-job main training queue and common scientific evaluation are not authorized in this phase."
+  ],
+  "common_trace_implementation": {
+    "checkpoint_origins": [
+      "reused_result",
+      "new_matrix_result"
+    ],
+    "core": "src/hackrl/cross_environment_teacher_trace.py",
+    "episode_cap": 88200,
+    "evaluator": "scripts/eval_cross_environment_teacher_traces.py",
+    "format": "gzip JSONL separated by provenance/environment/checkpoint/kernel/view/family",
+    "output_root": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1",
+    "panel": "docs/manifests/cross_environment_teacher_trace_panel_v1.json",
+    "scientific_evaluation_executed": false,
+    "step_cap": 11289600
+  },
+  "dreamer_extension": {
+    "not_part_of_teacher_factorial": true,
+    "rule": "Qualify normal-task learning independently per environment, then branch each Dreamer checkpoint into fixed continuation and mutant adaptation. Do not label Dreamer as a teacher condition.",
+    "status": "separate_algorithm_system_axis"
+  },
+  "environment_matrix": {
+    "craft_remain": {
+      "conditions": {
+        "D-frozen": {
+          "existing_learning_jobs": 0,
+          "new_learning_jobs": 10,
+          "status": "missing_training"
+        },
+        "D-off": {
+          "existing_learning_jobs": 0,
+          "new_learning_jobs": 10,
+          "status": "missing_training"
+        },
+        "D-on": {
+          "evidence": "runs/craft_remain_compare_v1/dual/{fixed|mutant}/seed{20..24}",
+          "existing_learning_jobs": 10,
+          "new_learning_jobs": 0,
+          "status": "complete_result_and_artifacts"
+        },
+        "D-task": {
+          "existing_learning_jobs": 0,
+          "new_learning_jobs": 10,
+          "status": "missing_training"
+        },
+        "source": {
+          "evidence": "runs/craft_remain_compare_v1/dual/pretrain/seed{20..24}/checkpoints/update_512",
+          "existing_learning_jobs": 5,
+          "new_learning_jobs": 0,
+          "status": "complete_artifact_audited"
+        }
+      },
+      "fixture": "CRAFT-REMAIN crafting-input conservation defect",
+      "learner_seeds": [
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    },
+    "pack_restore": {
+      "conditions": {
+        "D-frozen": {
+          "evidence": "/raid/ext_csv/HackRL/runs/pack_restore_pretrained_teacher_freeze_v1/size_s/pack/dual_teacher_frozen/{fixed|mutant}/seed{30..39}",
+          "existing_learning_jobs": 20,
+          "new_learning_jobs": 0,
+          "status": "complete_aggregate_verified"
+        },
+        "D-off": {
+          "evidence": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual_bc_off/{fixed|mutant}/seed{30..39}",
+          "existing_learning_jobs": 20,
+          "new_learning_jobs": 0,
+          "status": "complete_artifact_audited"
+        },
+        "D-on": {
+          "evidence": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/{fixed|mutant}/seed{30..39}",
+          "existing_learning_jobs": 20,
+          "new_learning_jobs": 0,
+          "status": "complete_artifact_audited"
+        },
+        "D-task": {
+          "evidence": "/raid/ext_csv/HackRL/runs/pack_restore_delivery_only_teacher_v1/size_s/pack/dual_teacher_delivery_only/{fixed|mutant}/seed{30..39}",
+          "existing_alias": "D-delivery",
+          "existing_learning_jobs": 20,
+          "new_learning_jobs": 0,
+          "status": "complete_aggregate_verified"
+        },
+        "source": {
+          "evidence": "/raid/ext_csv/HackRL/runs/pack_restore_scale_bc_v1/size_s/pack/dual/pretrain/seed{30..39}/checkpoints/update_512",
+          "existing_learning_jobs": 10,
+          "new_learning_jobs": 0,
+          "status": "complete_artifact_audited"
+        }
+      },
+      "fixture": "PACK-RESTORE source-growth conservation defect",
+      "learner_seeds": [
+        30,
+        31,
+        32,
+        33,
+        34,
+        35,
+        36,
+        37,
+        38,
+        39
+      ],
+      "policy_size": "S, hidden size 512"
+    },
+    "tick_claim": {
+      "conditions": {
+        "D-frozen": {
+          "existing_learning_jobs": 0,
+          "new_learning_jobs": 10,
+          "status": "missing_training"
+        },
+        "D-off": {
+          "evidence": "runs/dual_adapt_bc_off_v1/tick/adapt_bc_off/{fixed|mutant}/seed{20..24}",
+          "existing_learning_jobs": 10,
+          "new_learning_jobs": 0,
+          "status": "complete_artifact_audited_needs_common_reaggregation"
+        },
+        "D-on": {
+          "evidence": "runs/dual_leo_compare_v1/tick/dual/{fixed|mutant}/seed{20..24}",
+          "existing_learning_jobs": 10,
+          "new_learning_jobs": 0,
+          "status": "complete_result_and_artifacts"
+        },
+        "D-task": {
+          "existing_learning_jobs": 0,
+          "new_learning_jobs": 10,
+          "status": "missing_training"
+        },
+        "source": {
+          "evidence": "runs/dual_leo_compare_v1/tick/dual/pretrain/seed{20..24}/checkpoints/update_512",
+          "existing_learning_jobs": 5,
+          "new_learning_jobs": 0,
+          "status": "complete_artifact_audited"
+        }
+      },
+      "fixture": "TICK-CLAIM reservation-settlement conservation defect",
+      "learner_seeds": [
+        20,
+        21,
+        22,
+        23,
+        24
+      ]
+    }
+  },
+  "evidence_freeze": {
+    "artifact_count": 123,
+    "checkpoint_count": 130,
+    "generator": "scripts/freeze_cross_environment_teacher_evidence.py",
+    "historical_code_identity_rule": "execution commit/source hashes are retained per result; current source equality is not inferred from a current freeze",
+    "large_checkpoint_policy": "reference existing path and composite SHA-256; never copy into Git",
+    "manifest": "docs/manifests/cross_environment_teacher_matrix_v1_evidence.json"
+  },
+  "execution_implementation": {
+    "engine": "scripts/run_dual_leo_compare.py",
+    "full_job_requires": "--run-job JOB_ID --authorize-main-training",
+    "job_builder": "src/hackrl/cross_environment_teacher_matrix.py",
+    "output_root": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1",
+    "queue_mode": false,
+    "runner": "scripts/run_cross_environment_teacher_matrix.py",
+    "smoke_contract": {
+      "accounting": "official first update; later main job resumes adapt_1, so smoke is inside rather than in addition to the cap",
+      "jobs": [
+        "tick-claim-d-task-s20-fixed",
+        "tick-claim-d-frozen-s20-mutant",
+        "craft-remain-d-task-s20-fixed",
+        "craft-remain-d-frozen-s20-mutant",
+        "craft-remain-d-off-s20-mutant"
+      ],
+      "official_jobs_advanced": 5,
+      "scientific_performance_result": false,
+      "slots_per_job": 32768,
+      "slots_total": 163840,
+      "target_adaptation_update": 1
+    },
+    "sole_job_source": "this matrix environment_matrix[*].conditions[*].new_learning_jobs",
+    "source_contract": "same environment and learner seed full-Dual update_512 source, including actor-critic, teacher, optimizer, BatchRenorm, and RNG state",
+    "task_goal_rule": "resolve the goal_id against each environment GOAL_IDS catalog and verify its recorded index"
+  },
+  "harmful_defect_extension": {
+    "fixture": "PACK INVENTORY-OVERWRITE",
+    "not_an_endpoint": "increased exploit rate",
+    "primary_outcomes": [
+      "normal-kernel success and return preservation",
+      "risky-harvest exposure",
+      "actual inventory loss",
+      "loss-episode rate",
+      "harmful-kernel success and return"
+    ],
+    "same_condition_names": true,
+    "status": "separate_future_manifest_not_counted_in_missing_budget"
+  },
+  "manifest_id": "cross_environment_teacher_matrix_v1",
+  "missing_learning_budget": {
+    "automatic_extension": false,
+    "collector_slots_per_job": 134217728,
+    "craft_remain": {
+      "collector_slots": 4026531840,
+      "conditions": [
+        "D-task",
+        "D-frozen",
+        "D-off"
+      ],
+      "jobs": 30
+    },
+    "evaluation_cost_excluded": true,
+    "pack_restore": {
+      "collector_slots": 0,
+      "conditions": [],
+      "jobs": 0
+    },
+    "smoke_as_official_first_updates": {
+      "failed_and_retry_attempts": "separately appended to collection_ledger.jsonl",
+      "jobs": 5,
+      "remaining_after_successful_first_smoke": 6710722560,
+      "slots": 163840
+    },
+    "tick_claim": {
+      "collector_slots": 2684354560,
+      "conditions": [
+        "D-task",
+        "D-frozen"
+      ],
+      "jobs": 20
+    },
+    "total_collector_slots": 6710886400,
+    "total_jobs": 50
+  },
+  "non_equivalent_existing_runs": {
+    "gc_ppo": {
+      "reason": "GC-PPO is a separate teacher-free method baseline and is not the requested D-off arm, which starts from the same full-Dual checkpoint and continues teacher learning."
+    },
+    "teacher_imitation_split_v1": {
+      "path": "docs/manifests/teacher_imitation_split_v1.json",
+      "reason": "Its teacher_only and frozen_imitation toggles apply from pretraining. Frozen imitation uses an initialized, unlearned teacher, so neither arm fills the adaptation-only D-frozen cell defined here."
+    }
+  },
+  "recorded_utc": "2026-10-15T10:43:12Z",
+  "research_question": "Do adaptation-time teacher updating, task-only teacher targets, and policy imitation have consistent effects across distinct transition defects?",
+  "schema_version": "hackrl_cross_environment_teacher_matrix_v1",
+  "shared_evaluation_contract": {
+    "aggregation_rule": "Report mode and sample separately, report natural and opportunity starts separately, retain every learner seed, and do not pool episodes as independent replications.",
+    "common_metrics": [
+      "success_rate",
+      "mean_episode_length",
+      "mean_discounted_return",
+      "real_defect_trigger_rate",
+      "real_defect_exploitation_rate",
+      "source-relative exploitation change",
+      "seed-level condition contrasts"
+    ],
+    "current_gap": "The complete trace evaluator and panel are implemented and frozen, but common scientific re-evaluation has not been authorized or executed. Historical metrics retain their original definitions.",
+    "evaluation_kernels": [
+      "fixed",
+      "mutant"
+    ],
+    "independence_controls_required": [
+      "Score outcomes from actual fixed or mutant kernel transitions, never from teacher labels or imagined trajectories.",
+      "Replay complete traces through a separately implemented transition and conservation oracle before accepting exploitation events.",
+      "Freeze the common start panels and evaluator hashes before producing any missing-cell result; do not revise them after inspecting condition outcomes.",
+      "Keep natural-start and opportunity-start estimates separate so the designed opportunity panel cannot substitute for natural reachability."
+    ],
+    "opportunity_start_rule": "The opportunity start must be reachable through legal fixed-kernel transitions and must not inject a defect event or desired action.",
+    "policy_views": [
+      "mode",
+      "sample"
+    ],
+    "pre_execution_freeze_required": [
+      "exact start-state count, ordered identifiers, generator version, and content hashes for every start family",
+      "evaluation RNG seed schedule and sample-repeat coupling",
+      "episode horizon and termination rules",
+      "metric formulas and defect-oracle version",
+      "trace schema, storage path, retention rule, and expected peak bytes"
+    ],
+    "required_episode_record": [
+      "complete action sequence",
+      "complete public observation sequence",
+      "complete physical state sequence sufficient to replay the kernel",
+      "defect trigger events",
+      "defect-attributed delivery or benefit events",
+      "success, return, and termination reason"
+    ],
+    "sample_repeats_per_start": 4,
+    "start_families": {
+      "craft_remain": [
+        "natural_reset",
+        "path_check"
+      ],
+      "pack_restore": [
+        "natural_reset",
+        "common_setup"
+      ],
+      "tick_claim": [
+        "natural_reset",
+        "common_setup"
+      ]
+    },
+    "training_branches_evaluated": [
+      "fixed",
+      "mutant"
+    ],
+    "validator_scope": "Validation checks artifacts, hashes, environment-specific goal catalogs, exact 50-job construction, collection accounting, frozen panels, and authorization boundaries. Smoke verifies real updates and oracles but is never a scientific performance result."
+  },
+  "shared_learning_contract": {
+    "adaptation": {
+      "automatic_extension": false,
+      "bc_schedule": "0.1 * max(0, 1 - global_update / 4608); never restarted",
+      "branches": [
+        "fixed",
+        "mutant"
+      ],
+      "collector_slots_per_job": 134217728,
+      "entropy_coefficient": 0.005,
+      "gae_lambda": 0.95,
+      "gamma": 0.995,
+      "job_definition": "one learner seed x one adaptation branch; each missing condition has five seeds x two branches = 10 jobs",
+      "num_envs": 512,
+      "num_steps": 64,
+      "policy_goal_mode": "deliver_3",
+      "ppo_epochs": 1,
+      "ppo_learning_rate": 0.0002,
+      "ppo_minibatch_size": 1024,
+      "science_updates": [
+        0,
+        32,
+        128,
+        256,
+        512,
+        1024,
+        2048,
+        4096
+      ],
+      "teacher_epochs": 2,
+      "teacher_minibatch_size": 512,
+      "updates": 4096
+    },
+    "pretraining": {
+      "goal_mode": "workshop12",
+      "kernel": "fixed",
+      "source_type": "full Dual actor-critic and learned teacher checkpoint",
+      "updates": 512
+    },
+    "task_goal_mapping": {
+      "craft_remain": {
+        "goal_id": "delivery/count_ge_3",
+        "goal_index": 11
+      },
+      "pack_restore": {
+        "goal_id": "delivery/count_ge_3",
+        "goal_index": 11
+      },
+      "tick_claim": {
+        "goal_id": "delivery/count_ge_3",
+        "goal_index": 11
+      }
+    }
+  },
+  "status": "evidence_and_implementation_frozen_main_training_not_authorized",
+  "understood_as": "Freeze only matrix-v1 evidence, implement the exact 50-job resumable runner and common trace evaluator, execute contract smoke only, and keep the 50-job main queue behind a later explicit authorization."
+}

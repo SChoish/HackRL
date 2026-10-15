@@ -1,0 +1,1005 @@
+{
+  "evaluation_upper_bound": {
+    "craft_remain": {
+      "episodes": 1800,
+      "policies": 45,
+      "steps": 230400
+    },
+    "pack_restore": {
+      "episodes": 57600,
+      "policies": 90,
+      "steps": 7372800
+    },
+    "tick_claim": {
+      "episodes": 28800,
+      "policies": 45,
+      "steps": 3686400
+    },
+    "total_episodes": 88200,
+    "total_steps": 11289600
+  },
+  "families": {
+    "craft_remain": {
+      "natural_reset": {
+        "count": 2,
+        "ordered_panel_sha256": "83d2432d7ac74b2a05e7682efebb94ba4a7f5343f71f6361ae576f3e78688086",
+        "ordered_starts": [
+          {
+            "id": "craft_remain:natural_reset:phase0",
+            "layout": null,
+            "phase": 0,
+            "state_index": 0,
+            "state_sha256": "d1d33efb639b244709a6c1cbe8d6ab5c96f494755a42015371ed678efeb9489e"
+          },
+          {
+            "id": "craft_remain:natural_reset:phase1",
+            "layout": null,
+            "phase": 1,
+            "state_index": 1,
+            "state_sha256": "234fd6c387181f8da725e58516d977c860530dfbde2187adfe494ef645b7ef74"
+          }
+        ]
+      },
+      "path_check": {
+        "count": 2,
+        "ordered_panel_sha256": "9bf7ee3c21c4f532a38fa82e8bad64df6152d1d87d38559aed178a94e6628d70",
+        "ordered_starts": [
+          {
+            "id": "craft_remain:path_check:phase0",
+            "layout": null,
+            "phase": 0,
+            "state_index": 2,
+            "state_sha256": "452627b01523d0303c32baf47b67eeb85d2f243f9d6c346fdca9d51050e86ac0"
+          },
+          {
+            "id": "craft_remain:path_check:phase1",
+            "layout": null,
+            "phase": 1,
+            "state_index": 3,
+            "state_sha256": "413b7242e249f0b2d91d991fbce5c312932f828a99f086ef3e1bd1fbda4f52f9"
+          }
+        ]
+      }
+    },
+    "pack_restore": {
+      "common_setup": {
+        "count": 32,
+        "ordered_panel_sha256": "6ca42a4c4a38e63d19d7fe3e198322fcfab2c5c62dec08be90dd2a388f9c244a",
+        "ordered_starts": [
+          {
+            "id": "pack_restore:common_setup:layout00:phase0",
+            "layout": 0,
+            "phase": 0,
+            "state_index": 0,
+            "state_sha256": "3102a2aa20c760d9d47fa980708944d246a64c7eb8d1a04cdccd350ef6572bd8"
+          },
+          {
+            "id": "pack_restore:common_setup:layout01:phase0",
+            "layout": 1,
+            "phase": 0,
+            "state_index": 1,
+            "state_sha256": "8577eff07804ee0165da4f1a4b1c2bb8675b62eedafd93ac00c8d328ddb42853"
+          },
+          {
+            "id": "pack_restore:common_setup:layout02:phase0",
+            "layout": 2,
+            "phase": 0,
+            "state_index": 2,
+            "state_sha256": "aee679a00c29dcf72ca129b9a31f4e28b140c9d288be7b854749fd76d9f3efde"
+          },
+          {
+            "id": "pack_restore:common_setup:layout03:phase0",
+            "layout": 3,
+            "phase": 0,
+            "state_index": 3,
+            "state_sha256": "58d0e9f9736fd1b34fa6da8559b989bc2410fa4d63af0f99480626b4fd6f4deb"
+          },
+          {
+            "id": "pack_restore:common_setup:layout04:phase0",
+            "layout": 4,
+            "phase": 0,
+            "state_index": 4,
+            "state_sha256": "bbfb655499c14ce5889898300ea52ea03a2a7e4376ebf09bb0360562fb80462b"
+          },
+          {
+            "id": "pack_restore:common_setup:layout05:phase0",
+            "layout": 5,
+            "phase": 0,
+            "state_index": 5,
+            "state_sha256": "27079923657a928b3119778c26526e6257d49067342ccd06fdfef1ab3017d8c2"
+          },
+          {
+            "id": "pack_restore:common_setup:layout06:phase0",
+            "layout": 6,
+            "phase": 0,
+            "state_index": 6,
+            "state_sha256": "74b5afed3c346c3fbeb832b8bf31a69cc8f2c1e800fb2b4bffe2c7537b4911bf"
+          },
+          {
+            "id": "pack_restore:common_setup:layout07:phase0",
+            "layout": 7,
+            "phase": 0,
+            "state_index": 7,
+            "state_sha256": "97b2a86b20c4dbb463ea27e4f053d506f9564c2d6d03d22fb6d630f006ae68b3"
+          },
+          {
+            "id": "pack_restore:common_setup:layout08:phase0",
+            "layout": 8,
+            "phase": 0,
+            "state_index": 8,
+            "state_sha256": "a1f2c66e9fc465eb505c2f70412fa620b4801a84876e9f482794e2d20fc9f092"
+          },
+          {
+            "id": "pack_restore:common_setup:layout09:phase0",
+            "layout": 9,
+            "phase": 0,
+            "state_index": 9,
+            "state_sha256": "21c91ec66aa47bf6cd7fb1e069697898d2cc5f8eba3ae7cf60c413898ca4593c"
+          },
+          {
+            "id": "pack_restore:common_setup:layout10:phase0",
+            "layout": 10,
+            "phase": 0,
+            "state_index": 10,
+            "state_sha256": "5beb795be7ca746212ffe76b037747c0b7e593c379d0f156aad43bf6874df0bf"
+          },
+          {
+            "id": "pack_restore:common_setup:layout11:phase0",
+            "layout": 11,
+            "phase": 0,
+            "state_index": 11,
+            "state_sha256": "9386de606327d781606918a9ff9432c76658221ac3f922764d965f4d36c49a26"
+          },
+          {
+            "id": "pack_restore:common_setup:layout12:phase0",
+            "layout": 12,
+            "phase": 0,
+            "state_index": 12,
+            "state_sha256": "75057c3a43ddd6bc03e335a4690e40d688688444cca179ba105a6796f778d420"
+          },
+          {
+            "id": "pack_restore:common_setup:layout13:phase0",
+            "layout": 13,
+            "phase": 0,
+            "state_index": 13,
+            "state_sha256": "097252db7956505b734a86058acb0f6c14602ee9050c1a78355b1fd41b07669d"
+          },
+          {
+            "id": "pack_restore:common_setup:layout14:phase0",
+            "layout": 14,
+            "phase": 0,
+            "state_index": 14,
+            "state_sha256": "3f1efc96b62949f67be143582f764083a6b9bd65c3b71a4ade1e8428e8de0e73"
+          },
+          {
+            "id": "pack_restore:common_setup:layout15:phase0",
+            "layout": 15,
+            "phase": 0,
+            "state_index": 15,
+            "state_sha256": "25f7e07e6240009d3afecb1744d1e29b162537726fc6b600c998b1f3398714a5"
+          },
+          {
+            "id": "pack_restore:common_setup:layout00:phase1",
+            "layout": 0,
+            "phase": 1,
+            "state_index": 16,
+            "state_sha256": "7be86f7c794b4561ea04a95c419d957e96678ba6781bbf6555568bf3bde7e16e"
+          },
+          {
+            "id": "pack_restore:common_setup:layout01:phase1",
+            "layout": 1,
+            "phase": 1,
+            "state_index": 17,
+            "state_sha256": "e7dcacba15ec4fc0271cb6c28a2be33b7e6d9fad06a6a5a66f3a1aa90e34b6f8"
+          },
+          {
+            "id": "pack_restore:common_setup:layout02:phase1",
+            "layout": 2,
+            "phase": 1,
+            "state_index": 18,
+            "state_sha256": "3872d80b7d8a689e7798af8d6e0c2f3f7001947c11150709953218a949e30d1c"
+          },
+          {
+            "id": "pack_restore:common_setup:layout03:phase1",
+            "layout": 3,
+            "phase": 1,
+            "state_index": 19,
+            "state_sha256": "2c9a38e0613a756e009aa0bc5a46f22ccc5d835bdb274a01b6374107a6e4bd14"
+          },
+          {
+            "id": "pack_restore:common_setup:layout04:phase1",
+            "layout": 4,
+            "phase": 1,
+            "state_index": 20,
+            "state_sha256": "15a9acd4ef58852bdf3f139c2b28b00e57827b3ba6277f5ddf2a61dfa06e35c1"
+          },
+          {
+            "id": "pack_restore:common_setup:layout05:phase1",
+            "layout": 5,
+            "phase": 1,
+            "state_index": 21,
+            "state_sha256": "c88579ce8bf593191b258e6b03c5445f69a616a881added6267b237600a460d7"
+          },
+          {
+            "id": "pack_restore:common_setup:layout06:phase1",
+            "layout": 6,
+            "phase": 1,
+            "state_index": 22,
+            "state_sha256": "c4ad756a3cd5bd540468df8cf94995bdc7ced99ecdf9956eb4732e5efad89c35"
+          },
+          {
+            "id": "pack_restore:common_setup:layout07:phase1",
+            "layout": 7,
+            "phase": 1,
+            "state_index": 23,
+            "state_sha256": "fed34702ee30bebc2e9815670eb346d57dc7a29c5effcedd142c3a5b6b596bbb"
+          },
+          {
+            "id": "pack_restore:common_setup:layout08:phase1",
+            "layout": 8,
+            "phase": 1,
+            "state_index": 24,
+            "state_sha256": "86a252884e9bb6fcbdfaf31d4c3c0d0988ff8675eb8857fd4d315d9891b74c24"
+          },
+          {
+            "id": "pack_restore:common_setup:layout09:phase1",
+            "layout": 9,
+            "phase": 1,
+            "state_index": 25,
+            "state_sha256": "8f3523c1beccc16eecb6dfada65b0d3a63232e88c9c5cef1acbe48309c26d8f4"
+          },
+          {
+            "id": "pack_restore:common_setup:layout10:phase1",
+            "layout": 10,
+            "phase": 1,
+            "state_index": 26,
+            "state_sha256": "cd4f2282b401212f8894ed6cb74ba991e43d4073540970dc4723f8453c6384ce"
+          },
+          {
+            "id": "pack_restore:common_setup:layout11:phase1",
+            "layout": 11,
+            "phase": 1,
+            "state_index": 27,
+            "state_sha256": "2d9c0ac1d570c6866bb3e92d959cc6f03471b0d0259a385a9275693b2a8f1b99"
+          },
+          {
+            "id": "pack_restore:common_setup:layout12:phase1",
+            "layout": 12,
+            "phase": 1,
+            "state_index": 28,
+            "state_sha256": "7e66d4a21daa694a95878fbd356f993e2f05285b48cdb8440aed0e3d5eb77f5a"
+          },
+          {
+            "id": "pack_restore:common_setup:layout13:phase1",
+            "layout": 13,
+            "phase": 1,
+            "state_index": 29,
+            "state_sha256": "4e8bc1dba2ed5c91341fe9d74d712ac9e7399bbe7ad5cab3ae6bd13e73d7d52c"
+          },
+          {
+            "id": "pack_restore:common_setup:layout14:phase1",
+            "layout": 14,
+            "phase": 1,
+            "state_index": 30,
+            "state_sha256": "0240d44006abe9d314efb2de4fbbb055293c4e96db185185ca1bf85fc357e45d"
+          },
+          {
+            "id": "pack_restore:common_setup:layout15:phase1",
+            "layout": 15,
+            "phase": 1,
+            "state_index": 31,
+            "state_sha256": "51f206d73b73bc7585e93dbcc4c11aa708903cf4ca89e6a3d6df547754256052"
+          }
+        ]
+      },
+      "natural_reset": {
+        "count": 32,
+        "ordered_panel_sha256": "561af6ee7b9a0cb8c9308bf5b962302b4a0992d60c7a881a8f1db3f18b244f04",
+        "ordered_starts": [
+          {
+            "id": "pack_restore:natural_reset:layout00:phase0",
+            "layout": 0,
+            "phase": 0,
+            "state_index": 0,
+            "state_sha256": "26cbad9e7ce0400faac36ba1a1612cee35f42ea27c6fdb9e6fe7363b01248a22"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout01:phase0",
+            "layout": 1,
+            "phase": 0,
+            "state_index": 1,
+            "state_sha256": "1f1ea8795405f5f761b5e6e9c75444dd21676a42a7917ba3efe5757b741d195b"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout02:phase0",
+            "layout": 2,
+            "phase": 0,
+            "state_index": 2,
+            "state_sha256": "8d383da17301b0f91b43002a4a1decd47d24705ff7f5e5906f035ceeee613977"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout03:phase0",
+            "layout": 3,
+            "phase": 0,
+            "state_index": 3,
+            "state_sha256": "f286f2e42cc7c10ec27a94179eeb702d99bc10ddd4b4b116ababa2bcde92f8f7"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout04:phase0",
+            "layout": 4,
+            "phase": 0,
+            "state_index": 4,
+            "state_sha256": "58d77a854bf5966ae5181b82034cedc26ab96491236eddb33218fb16df22bb80"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout05:phase0",
+            "layout": 5,
+            "phase": 0,
+            "state_index": 5,
+            "state_sha256": "e81e78d5d33eb59a35b4225f425a02a0c4dbb143aa8ceecea6609ee70f4a5bc4"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout06:phase0",
+            "layout": 6,
+            "phase": 0,
+            "state_index": 6,
+            "state_sha256": "8c18df9d4fc3858e588195691a69905dee80611bfcfc721ab43476dd35fa794e"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout07:phase0",
+            "layout": 7,
+            "phase": 0,
+            "state_index": 7,
+            "state_sha256": "e53b619761c1c5f736592532ca877aece401bb301586084ce66051bb6b161405"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout08:phase0",
+            "layout": 8,
+            "phase": 0,
+            "state_index": 8,
+            "state_sha256": "4910b23a0297e4d34f5cf0ee996b113ac1288f0deb08532fce94cb947e649303"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout09:phase0",
+            "layout": 9,
+            "phase": 0,
+            "state_index": 9,
+            "state_sha256": "e3fd0a1e0167895a987b10666a55db44d010d7aacf61d59c62d60613ab79afbe"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout10:phase0",
+            "layout": 10,
+            "phase": 0,
+            "state_index": 10,
+            "state_sha256": "c86fd130b0e18228f597199ec5a22a3263ad3e3dab919dd5aee050a4e39c55bd"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout11:phase0",
+            "layout": 11,
+            "phase": 0,
+            "state_index": 11,
+            "state_sha256": "d3c7fc6175edd4d5fe31868ee470fcf9aa9bc3f26f18231b4c87bc3825da7930"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout12:phase0",
+            "layout": 12,
+            "phase": 0,
+            "state_index": 12,
+            "state_sha256": "7584b6463ea2ff97912b6b3365481da0bce1ebb1c0472ffe8a4befaac0599e16"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout13:phase0",
+            "layout": 13,
+            "phase": 0,
+            "state_index": 13,
+            "state_sha256": "1ca0861e1433790973dd339e857b2aa4f2e591e613c5d4fce75b0e936fb8ffe1"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout14:phase0",
+            "layout": 14,
+            "phase": 0,
+            "state_index": 14,
+            "state_sha256": "e5703f807baa0cf2435bdc15c6d0653f25127fd86b9402c7e1dbb51880f64358"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout15:phase0",
+            "layout": 15,
+            "phase": 0,
+            "state_index": 15,
+            "state_sha256": "50439ea23a7532491d670cc8e761e2fad2680d6bf20f7470e9cdd5cbe041e33c"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout00:phase1",
+            "layout": 0,
+            "phase": 1,
+            "state_index": 16,
+            "state_sha256": "ae32396fd6fff2d00f1ebb7d1d9efe5401c4f4573582396456f09b28f36d41f5"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout01:phase1",
+            "layout": 1,
+            "phase": 1,
+            "state_index": 17,
+            "state_sha256": "020592e7c0d312d2434091c3c852ab401b98eebe67e6bfa867ab72ea883c63f7"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout02:phase1",
+            "layout": 2,
+            "phase": 1,
+            "state_index": 18,
+            "state_sha256": "1c8964474968e5481a6fa23e3c4964726649e964610591b13dee04587c973964"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout03:phase1",
+            "layout": 3,
+            "phase": 1,
+            "state_index": 19,
+            "state_sha256": "3bfbb11952cff12b079c81e72af7169d22cb6169a81a0c67324234b0c5b8cbc0"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout04:phase1",
+            "layout": 4,
+            "phase": 1,
+            "state_index": 20,
+            "state_sha256": "b163c952bf9f954de567c323c131fb7ed638eda571b8c9f5b16f0ad7f7adb423"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout05:phase1",
+            "layout": 5,
+            "phase": 1,
+            "state_index": 21,
+            "state_sha256": "84042c17a00a10c92a41ab605e098e475e56906e51fa3ad1de2107337b7599e9"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout06:phase1",
+            "layout": 6,
+            "phase": 1,
+            "state_index": 22,
+            "state_sha256": "441a73497d373cab59e4077c48637141774ef07a3df49bf6c81799acd7d860d8"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout07:phase1",
+            "layout": 7,
+            "phase": 1,
+            "state_index": 23,
+            "state_sha256": "7dbfa1bb1da1e019245d805247b96ff9b57f55e724469814057f0bcd169ba4e3"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout08:phase1",
+            "layout": 8,
+            "phase": 1,
+            "state_index": 24,
+            "state_sha256": "5c13c8956582234a621ecaac513f205a9cf3858a276d9f6e6a6d53976fcec85b"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout09:phase1",
+            "layout": 9,
+            "phase": 1,
+            "state_index": 25,
+            "state_sha256": "1aee9d2877dd0dc6b01637b09fd9bb1832b2da8ddb78c3469f723d862a29a1be"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout10:phase1",
+            "layout": 10,
+            "phase": 1,
+            "state_index": 26,
+            "state_sha256": "9a818a9f9cfdb834ba40af24bffd90704cfdc41a054979bcd641b0c1940f4dae"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout11:phase1",
+            "layout": 11,
+            "phase": 1,
+            "state_index": 27,
+            "state_sha256": "ba675d61e4b7e8eb6aa897292b2b8aa4f63d589c90c2518a8e95c3fecd8ea810"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout12:phase1",
+            "layout": 12,
+            "phase": 1,
+            "state_index": 28,
+            "state_sha256": "4e3214b077e214aadb5942cfa90c8c46e2e7dda8054bd218e905e51546b7a259"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout13:phase1",
+            "layout": 13,
+            "phase": 1,
+            "state_index": 29,
+            "state_sha256": "8394d43b5b10a2528546ce85611655242f0bc7dd9f966ba7c72bb77a424ce721"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout14:phase1",
+            "layout": 14,
+            "phase": 1,
+            "state_index": 30,
+            "state_sha256": "647894f624585f1402c44b5c7413ee8edee920783333fc463c833dc45c2c1654"
+          },
+          {
+            "id": "pack_restore:natural_reset:layout15:phase1",
+            "layout": 15,
+            "phase": 1,
+            "state_index": 31,
+            "state_sha256": "24c8487200935885a6d5c4315d09f59b37bdccdf0faa67f195765a7a1734b919"
+          }
+        ]
+      }
+    },
+    "tick_claim": {
+      "common_setup": {
+        "count": 32,
+        "ordered_panel_sha256": "1221671b0d1865bd1b6ab80f25feb52a99f49e843a624fbacf5ca7a8b88530b3",
+        "ordered_starts": [
+          {
+            "id": "tick_claim:common_setup:layout00:phase0",
+            "layout": 0,
+            "phase": 0,
+            "state_index": 0,
+            "state_sha256": "21247b94edb8817fd1d4ce7b3383d20c9a33b30f6f0d924279b6625fdf39ec57"
+          },
+          {
+            "id": "tick_claim:common_setup:layout01:phase0",
+            "layout": 1,
+            "phase": 0,
+            "state_index": 1,
+            "state_sha256": "a26e35a509d9aea7ecf54e629df717587c2a880f5cfb2c23e342ff3753a148e2"
+          },
+          {
+            "id": "tick_claim:common_setup:layout02:phase0",
+            "layout": 2,
+            "phase": 0,
+            "state_index": 2,
+            "state_sha256": "945c4fa79a4c653d983b58a7f75fdd96713c91394919c658ab158af26616985a"
+          },
+          {
+            "id": "tick_claim:common_setup:layout03:phase0",
+            "layout": 3,
+            "phase": 0,
+            "state_index": 3,
+            "state_sha256": "3f41951f75a18e1863b6d50ff718f2399dfe6a72907b67c6f75b2c59297a3395"
+          },
+          {
+            "id": "tick_claim:common_setup:layout04:phase0",
+            "layout": 4,
+            "phase": 0,
+            "state_index": 4,
+            "state_sha256": "2a5276a68c42e89d0da8c87dcf5a1b6deabe19170408c59eb59c8760477d67cf"
+          },
+          {
+            "id": "tick_claim:common_setup:layout05:phase0",
+            "layout": 5,
+            "phase": 0,
+            "state_index": 5,
+            "state_sha256": "b35c00f69aede25ae35f4751e93e4d8e48b7235d14502977eaec68061295c0f0"
+          },
+          {
+            "id": "tick_claim:common_setup:layout06:phase0",
+            "layout": 6,
+            "phase": 0,
+            "state_index": 6,
+            "state_sha256": "b2d5516ba63783196acc99627212e4619436ade1ffaee9cbbbf27811be3ef876"
+          },
+          {
+            "id": "tick_claim:common_setup:layout07:phase0",
+            "layout": 7,
+            "phase": 0,
+            "state_index": 7,
+            "state_sha256": "98ab81774010c96fb04ce169d5be58ec31289fbe7934f14eedd0fc3686ab60f2"
+          },
+          {
+            "id": "tick_claim:common_setup:layout08:phase0",
+            "layout": 8,
+            "phase": 0,
+            "state_index": 8,
+            "state_sha256": "2ac1e5261cf6d6504e8c255327a0086b427589e3db0a10c7625f197a4f8bc0ee"
+          },
+          {
+            "id": "tick_claim:common_setup:layout09:phase0",
+            "layout": 9,
+            "phase": 0,
+            "state_index": 9,
+            "state_sha256": "4464205bfd68dc18a8eeadf42445e01ee3bce2213f568a45b92b1246fb005b6c"
+          },
+          {
+            "id": "tick_claim:common_setup:layout10:phase0",
+            "layout": 10,
+            "phase": 0,
+            "state_index": 10,
+            "state_sha256": "d47822863175d1e4303cd75633da3fe97a6ba82d2460d69d3437c83d5c41a0ee"
+          },
+          {
+            "id": "tick_claim:common_setup:layout11:phase0",
+            "layout": 11,
+            "phase": 0,
+            "state_index": 11,
+            "state_sha256": "4798e74c97fa9ec6316c82fd9c2973a96ca954fede2b1e8dfc5cfc56a7deabe6"
+          },
+          {
+            "id": "tick_claim:common_setup:layout12:phase0",
+            "layout": 12,
+            "phase": 0,
+            "state_index": 12,
+            "state_sha256": "81b8862735e40030bd77fce65ab2cdac5ddd8dacca21e8f4725bcd92dbd9730b"
+          },
+          {
+            "id": "tick_claim:common_setup:layout13:phase0",
+            "layout": 13,
+            "phase": 0,
+            "state_index": 13,
+            "state_sha256": "299a1b2b9f7642a55dc6c900b4fc046390e4adab88887f73d1b59d7595a4d152"
+          },
+          {
+            "id": "tick_claim:common_setup:layout14:phase0",
+            "layout": 14,
+            "phase": 0,
+            "state_index": 14,
+            "state_sha256": "f4a664200aac15619b5f153686c826f268c42694252bdd05b96bacfd005efa5d"
+          },
+          {
+            "id": "tick_claim:common_setup:layout15:phase0",
+            "layout": 15,
+            "phase": 0,
+            "state_index": 15,
+            "state_sha256": "8b65c265473f8b0c85ff54da067cdabd4e73600d62c0ca048c46dd3ca1ca5136"
+          },
+          {
+            "id": "tick_claim:common_setup:layout00:phase1",
+            "layout": 0,
+            "phase": 1,
+            "state_index": 16,
+            "state_sha256": "3f1f997dfadca442334a6f26afc78679bd4e1adfb57c11f1ee963503922a3266"
+          },
+          {
+            "id": "tick_claim:common_setup:layout01:phase1",
+            "layout": 1,
+            "phase": 1,
+            "state_index": 17,
+            "state_sha256": "8b7c0d6feb8e8a3ebc1100c8297fc173d951f248398da94a9965f5252034028d"
+          },
+          {
+            "id": "tick_claim:common_setup:layout02:phase1",
+            "layout": 2,
+            "phase": 1,
+            "state_index": 18,
+            "state_sha256": "cb69a6ed5d4cf0f7f0ce326df51d6c5c7e790d698cb467a0ee8ca8a8f965e5e8"
+          },
+          {
+            "id": "tick_claim:common_setup:layout03:phase1",
+            "layout": 3,
+            "phase": 1,
+            "state_index": 19,
+            "state_sha256": "1b1c6fe411bc7678b4caeecf8c06ba9647e2c9cc417b0a1e2b777d88cb844b0c"
+          },
+          {
+            "id": "tick_claim:common_setup:layout04:phase1",
+            "layout": 4,
+            "phase": 1,
+            "state_index": 20,
+            "state_sha256": "837cecb4e9d24bdd7b5cbe5aa4364a022f43e5400ffc74c551c812e990ae6d54"
+          },
+          {
+            "id": "tick_claim:common_setup:layout05:phase1",
+            "layout": 5,
+            "phase": 1,
+            "state_index": 21,
+            "state_sha256": "f9d37f7fa2efb36b377a01f18802987cc34589b5fc7927035c735ea4e493857f"
+          },
+          {
+            "id": "tick_claim:common_setup:layout06:phase1",
+            "layout": 6,
+            "phase": 1,
+            "state_index": 22,
+            "state_sha256": "036339e6c5939181e1afc90218cd39dd44e11ffa0aaa74dae0d603031d0e00aa"
+          },
+          {
+            "id": "tick_claim:common_setup:layout07:phase1",
+            "layout": 7,
+            "phase": 1,
+            "state_index": 23,
+            "state_sha256": "e32f89f75f5bfec3ce6db291a65b483436260c2f8c0def950e59375a8fc30320"
+          },
+          {
+            "id": "tick_claim:common_setup:layout08:phase1",
+            "layout": 8,
+            "phase": 1,
+            "state_index": 24,
+            "state_sha256": "5162ccb005cd67daac99e6de7b138ce924bdc18817b2b42aefd0bd174f17c70a"
+          },
+          {
+            "id": "tick_claim:common_setup:layout09:phase1",
+            "layout": 9,
+            "phase": 1,
+            "state_index": 25,
+            "state_sha256": "0f799d27b97d97be20018e61eff14a4599dca80eeef082dc7d47d6ccf688b93c"
+          },
+          {
+            "id": "tick_claim:common_setup:layout10:phase1",
+            "layout": 10,
+            "phase": 1,
+            "state_index": 26,
+            "state_sha256": "dae45c83e236814530d0c0d334dd1e91f2b0d46cc3798f47c293d99c0e63b1a1"
+          },
+          {
+            "id": "tick_claim:common_setup:layout11:phase1",
+            "layout": 11,
+            "phase": 1,
+            "state_index": 27,
+            "state_sha256": "a49b3c6995b1c55adf51b615e03fc8c8d320cc39aeddf65d173337bfedeab1dc"
+          },
+          {
+            "id": "tick_claim:common_setup:layout12:phase1",
+            "layout": 12,
+            "phase": 1,
+            "state_index": 28,
+            "state_sha256": "7392294fb0e2de29355f15be916c53c312a098c2ac216cbc53e03224319ebe49"
+          },
+          {
+            "id": "tick_claim:common_setup:layout13:phase1",
+            "layout": 13,
+            "phase": 1,
+            "state_index": 29,
+            "state_sha256": "bf83b4172ac401942c9fd5f2f61eb10f8da7f4f0d329a578e904d195279c4d28"
+          },
+          {
+            "id": "tick_claim:common_setup:layout14:phase1",
+            "layout": 14,
+            "phase": 1,
+            "state_index": 30,
+            "state_sha256": "a64024a3d87ed12cb218aadf4f1f0cbb1e6f7cd9a0e6d0f734649ffbc5e4a81a"
+          },
+          {
+            "id": "tick_claim:common_setup:layout15:phase1",
+            "layout": 15,
+            "phase": 1,
+            "state_index": 31,
+            "state_sha256": "d381974647de984841f4fbad09a50f8f49a751e67c492603dd691e044a536888"
+          }
+        ]
+      },
+      "natural_reset": {
+        "count": 32,
+        "ordered_panel_sha256": "bd32cbeca15e28b892a51ccd9bc966680e3d5292072912878c4f75c22eeaa50b",
+        "ordered_starts": [
+          {
+            "id": "tick_claim:natural_reset:layout00:phase0",
+            "layout": 0,
+            "phase": 0,
+            "state_index": 0,
+            "state_sha256": "e60c080b1d521b3ace7003b2c99b46cc6746c906139c2ea7c9f6af515385f9d0"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout01:phase0",
+            "layout": 1,
+            "phase": 0,
+            "state_index": 1,
+            "state_sha256": "004dfc2bd256fde31b088108855dcea065baee7fff60acd87ba8160ac3228887"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout02:phase0",
+            "layout": 2,
+            "phase": 0,
+            "state_index": 2,
+            "state_sha256": "29347917fa9a2b55d82ebe7d079bc77fb0016f3a33af074d9f4d7eb9ba01320a"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout03:phase0",
+            "layout": 3,
+            "phase": 0,
+            "state_index": 3,
+            "state_sha256": "e54211a4dab577434e54ab3d9f6056017cef1027dff94ca4fa63249ee45ab63c"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout04:phase0",
+            "layout": 4,
+            "phase": 0,
+            "state_index": 4,
+            "state_sha256": "319527fcf3fed4cfc1deb950ef1baea33d109637222152ef23852bc1f21f04d9"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout05:phase0",
+            "layout": 5,
+            "phase": 0,
+            "state_index": 5,
+            "state_sha256": "7c1add86fb91ceab28b4e6d519c2d6624bd8ba2d1fd0a13a69b76dd3e7abed93"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout06:phase0",
+            "layout": 6,
+            "phase": 0,
+            "state_index": 6,
+            "state_sha256": "2a0b5df241f85804798650ee683b848be4a839f4f0c0612ca53abaaa4df00364"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout07:phase0",
+            "layout": 7,
+            "phase": 0,
+            "state_index": 7,
+            "state_sha256": "17316c589c181092203cf3d510157db3d704776cd41d438191706b4ec8d89b02"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout08:phase0",
+            "layout": 8,
+            "phase": 0,
+            "state_index": 8,
+            "state_sha256": "3c7539f90345c39a602f08ceb7cc44d6cd53be2549dda54ba383b06cb41a1c26"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout09:phase0",
+            "layout": 9,
+            "phase": 0,
+            "state_index": 9,
+            "state_sha256": "35a7f2b6fd7234031c6a968eaf8679b94f0d7462db6a68131ef2010c6edcf1a1"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout10:phase0",
+            "layout": 10,
+            "phase": 0,
+            "state_index": 10,
+            "state_sha256": "1719957515be581db6c3b9fe347220bc7bd6e790f94d28f0ec063ed83e816d7a"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout11:phase0",
+            "layout": 11,
+            "phase": 0,
+            "state_index": 11,
+            "state_sha256": "60d1d11973ad0c3358a0f9ff746443190b50636ea63d3ce7dce41bc8661d771f"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout12:phase0",
+            "layout": 12,
+            "phase": 0,
+            "state_index": 12,
+            "state_sha256": "1b3bb696c7df2328daf017512d98f6ea351ce0a57f977800cff42bbae598c138"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout13:phase0",
+            "layout": 13,
+            "phase": 0,
+            "state_index": 13,
+            "state_sha256": "b3ab8e6830724141a4a91e193cb0ab1f5c1eff847197ef50347cf36d87decd54"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout14:phase0",
+            "layout": 14,
+            "phase": 0,
+            "state_index": 14,
+            "state_sha256": "5c0ec9b5d87aca58d2fdf4c28a32d0fd5f877eb1753cacc420c2e80e5fc0b0b0"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout15:phase0",
+            "layout": 15,
+            "phase": 0,
+            "state_index": 15,
+            "state_sha256": "954bfeffc1a998da326bad49a0f62b2d129949c63dc85cfb08c470793561768b"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout00:phase1",
+            "layout": 0,
+            "phase": 1,
+            "state_index": 16,
+            "state_sha256": "f62e3e4b1f704f6a4f0a3950fb70328499e62f4ca117c2633223e408c42c6d2e"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout01:phase1",
+            "layout": 1,
+            "phase": 1,
+            "state_index": 17,
+            "state_sha256": "11d3c4975d77d1361ad4c8b68d56a0d18483b467db7956f496f3c350d5f0f487"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout02:phase1",
+            "layout": 2,
+            "phase": 1,
+            "state_index": 18,
+            "state_sha256": "58df022d27d1ba23bab4c901b43ee66f92b2de7017194f5b3716a1633f406157"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout03:phase1",
+            "layout": 3,
+            "phase": 1,
+            "state_index": 19,
+            "state_sha256": "b930373bc387a2ce1fe991226e3ecf67fafe743e50cfcd135bbe11f0e6485a0e"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout04:phase1",
+            "layout": 4,
+            "phase": 1,
+            "state_index": 20,
+            "state_sha256": "41be0ca9a530d40b2321b816641f43d428d9197bb01c6f195c1df1ca222ef9f7"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout05:phase1",
+            "layout": 5,
+            "phase": 1,
+            "state_index": 21,
+            "state_sha256": "0180de5cceb562f584b6a3e507df2138582be0ac045f7908fa7a4c8e09aa534f"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout06:phase1",
+            "layout": 6,
+            "phase": 1,
+            "state_index": 22,
+            "state_sha256": "5d081eaa8da96f0eff92a03b8c6ad2fe7f1e6ab5a81d7d4271467d72a0b1285c"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout07:phase1",
+            "layout": 7,
+            "phase": 1,
+            "state_index": 23,
+            "state_sha256": "04c83ac0ccfcd12aa295bf7091da8033f39412bcf44570ba781e4bba92d870fe"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout08:phase1",
+            "layout": 8,
+            "phase": 1,
+            "state_index": 24,
+            "state_sha256": "fd97559ae0c36961fa8197102d901db4e4f51b5644f74cd111824326a526e023"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout09:phase1",
+            "layout": 9,
+            "phase": 1,
+            "state_index": 25,
+            "state_sha256": "7373430ccec684251dc7dfb92361c655b83519fcc05a0535b41cc318089ae81f"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout10:phase1",
+            "layout": 10,
+            "phase": 1,
+            "state_index": 26,
+            "state_sha256": "bbd24bb0e337563bd515eebd0e737670d1aef7b8df931fd95e5b71963219694d"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout11:phase1",
+            "layout": 11,
+            "phase": 1,
+            "state_index": 27,
+            "state_sha256": "bc6ba20d6c0216f4c8a3b51f6c10f8adef58131f76eb0d792eaf3e12fc8a0ddf"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout12:phase1",
+            "layout": 12,
+            "phase": 1,
+            "state_index": 28,
+            "state_sha256": "494c994d82e6539d54be8f63b710dacb06d3c8081c096c32f968de8aeacdaaba"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout13:phase1",
+            "layout": 13,
+            "phase": 1,
+            "state_index": 29,
+            "state_sha256": "b5015cc356548cf9c964cecf0e621a328610849dde991afa00eab1e436fc4268"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout14:phase1",
+            "layout": 14,
+            "phase": 1,
+            "state_index": 30,
+            "state_sha256": "288b42183160d062a8a97e3979a503005ec3a88d4cc44c28102b0508e65717dc"
+          },
+          {
+            "id": "tick_claim:natural_reset:layout15:phase1",
+            "layout": 15,
+            "phase": 1,
+            "state_index": 31,
+            "state_sha256": "f569031df7b05c0d8fa5bac9bf758b22abd79f607ec3ae8d80cb58af0d2b353c"
+          }
+        ]
+      }
+    }
+  },
+  "horizon": 128,
+  "legacy_metric_rule": "Legacy opportunity_reached fields retain their historical narrow definitions and are never overwritten by exhaustive legal-opportunity fields.",
+  "oracle_isolation": "All legal-action and defect oracles execute after actor action selection and are excluded from actor inputs, teacher inputs, and reward.",
+  "policy_views": {
+    "mode": 1,
+    "sample": 4
+  },
+  "rng_formula": "PRNGKey(20000 + 1000 * learner_seed + 4 * state_index + repeat_index); split each step into carry key 0 and action key 1",
+  "schema_version": "hackrl_cross_environment_teacher_trace_panel_v1",
+  "split": {
+    "craft_remain": "fixed handcrafted panel",
+    "pack_restore": "validation",
+    "tick_claim": "validation"
+  },
+  "termination": "first delivery/count_ge_3 success or world horizon",
+  "trace_retention": "gzip JSONL, header plus complete per-step state/observation/action/oracle records and episode terminal records"
+}
