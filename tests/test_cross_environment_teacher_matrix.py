@@ -23,6 +23,7 @@ def test_matrix_implementation_is_ready_but_main_execution_is_not_authorized() -
         "common_trace_evaluator_implementation",
         "contract_smoke",
         "smoke_checkpoint_writes",
+        "integration_smoke_complete",
     ):
         assert authorization[key] is True
     for key in (
@@ -71,6 +72,22 @@ def test_missing_jobs_and_slots_match_environment_matrix() -> None:
     assert budget["total_collector_slots"] == (
         budget["total_jobs"] * budget["collector_slots_per_job"]
     )
+
+
+def test_smoke_receipt_includes_independent_trace_replay() -> None:
+    manifest = _load()
+    receipt = json.loads(
+        (ROOT / manifest["execution_implementation"]["smoke_receipt"]).read_text()
+    )
+    trace_smoke = receipt["trace_evaluator_smoke"]
+    assert receipt["trace_replay_code_commit"] == (
+        manifest["common_trace_implementation"]["posthoc_replay_commit"]
+    )
+    assert trace_smoke["independent_replay_passed"] == 4
+    assert len(trace_smoke["traces"]) == 4
+    assert all(row["independent_replay_passed"] for row in trace_smoke["traces"])
+    assert all(row["transition_kernel_calls"] == 0 for row in trace_smoke["traces"])
+    assert all(row["policy_or_teacher_calls"] == 0 for row in trace_smoke["traces"])
 
 
 def test_old_teacher_split_is_explicitly_non_equivalent() -> None:

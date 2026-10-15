@@ -1,0 +1,192 @@
+{
+  "checkpoint_receipts" : [
+    {
+      "files" : {
+        "arm.json" : "6962c139277a4be7221aa3c6814166c2306a3cd81280a1113e72ea316d036e01",
+        "config.json" : "46f813856658fe0c3760eb019414f77597753c430cbd11effb622511f2922cf2",
+        "metadata.json" : "529626bb87ed8d4cf719eec9f008c6fd6d94f8c2a89feee5af7696bd1e4feaf0",
+        "state.msgpack" : "55f120d703bb801fdab1faeaf76e21b1a15dbe176055c88b6c8f3a4540a40dda"
+      },
+      "fingerprint_sha256" : "97abbd84bdc9b814a40260accbee4e48103bdb6405d84e00fe6fd859b4c61669",
+      "job" : "tick-claim-d-task-s20-fixed",
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/tick/dual_teacher_task/fixed/seed20/checkpoints/adapt_1"
+    },
+    {
+      "files" : {
+        "arm.json" : "8f02fde72899642dd646e4d056d7bdf7dfe40ee5d192dcbe514d6ef45dc935ed",
+        "config.json" : "ced20193efa8eee54aa458d855d27efdb5e7a3edd76fd9af849f0f97077324ba",
+        "metadata.json" : "e8ab6a6f60d28a4a389c59bcd0272ed21fac8b4fb97ea4e6bb9e76a34492f01f",
+        "state.msgpack" : "acd1b4100073754a3ede9cc994ad2b7f13e7934b89fa64d352095a0dcbcc5f7f"
+      },
+      "fingerprint_sha256" : "d7940ade74dd9e165ce30286f4623df0563f9781f753f64a9ecf74c53bed9825",
+      "job" : "tick-claim-d-frozen-s20-mutant",
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/tick/dual_teacher_frozen/mutant/seed20/checkpoints/adapt_1"
+    },
+    {
+      "files" : {
+        "arm.json" : "6962c139277a4be7221aa3c6814166c2306a3cd81280a1113e72ea316d036e01",
+        "config.json" : "7586ea4dde175cbe7c9814cf3c342b21a1f18e0e035a226fc13a004d08a20913",
+        "metadata.json" : "698fc2ad4088b5a9b5b0da876af17319da0796544233d6a377facec298bae42d",
+        "state.msgpack" : "65e0e77168a91aa3170c8818dd7688e402cad43499380b38aabf87868754eaf0"
+      },
+      "fingerprint_sha256" : "6bf9d0d819cc8c72ddf155884fca7f0c693b695b7a599190cfb0b23c96243363",
+      "job" : "craft-remain-d-task-s20-fixed",
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/craft/dual_teacher_task/fixed/seed20/checkpoints/adapt_1"
+    },
+    {
+      "files" : {
+        "arm.json" : "8f02fde72899642dd646e4d056d7bdf7dfe40ee5d192dcbe514d6ef45dc935ed",
+        "config.json" : "95e2f239e0706fdfcd143bbd15f4058f38f695fa4902a3dd5d5bf20ad21c5be8",
+        "metadata.json" : "1b90cc876c287462a0d6fc72271f4050f371447ffde3f40603b33772c4c29634",
+        "state.msgpack" : "336b7b836a6cad2bbd8fa7b5537c5067cace8b91db5ab0fe7f682d5460856b4e"
+      },
+      "fingerprint_sha256" : "b6a81f23bab38eb307d313eeb6160970244f1217aec1b86ad66b2a1b77848da0",
+      "job" : "craft-remain-d-frozen-s20-mutant",
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/craft/dual_teacher_frozen/mutant/seed20/checkpoints/adapt_1"
+    },
+    {
+      "files" : {
+        "arm.json" : "dbbfbc15b7081db470acde7b89ce5338b001c0dd0c56ebbba0f37e5bb90b0ce1",
+        "config.json" : "95e2f239e0706fdfcd143bbd15f4058f38f695fa4902a3dd5d5bf20ad21c5be8",
+        "metadata.json" : "698fc2ad4088b5a9b5b0da876af17319da0796544233d6a377facec298bae42d",
+        "state.msgpack" : "a29e5dbe3440546e8a6fec7a3b33e3ff260dfc07ff41f695e4051b8b2d932579"
+      },
+      "fingerprint_sha256" : "186b030b99b896132a8dfaf922f4731b7ed612d58059440e15735111f155faae",
+      "job" : "craft-remain-d-off-s20-mutant",
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/craft/dual_bc_off/mutant/seed20/checkpoints/adapt_1"
+    }
+  ],
+  "collection_accounting" : {
+    "collection_cap_slots" : 6710886400,
+    "failed_attempts" : 0,
+    "new_collection_attempts" : 5,
+    "passed_attempts" : 5,
+    "remaining_official_collection_slots" : 6710722560,
+    "resume_validation_attempts" : 0,
+    "slots_charged" : 163840,
+    "started_attempts" : 5
+  },
+  "evaluation_cap" : {
+    "episodes" : 88200,
+    "steps" : 11289600
+  },
+  "execution_commit" : "27bf886484ae74a3544682ac10ca591a608fc99e",
+  "trace_replay_code_commit" : "838af485530f8c04d9f53336f8ade156a9dfd783",
+  "main_queue_launched" : false,
+  "raid_source_artifacts" : {
+    "capacity_before_smoke.json" : {
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/capacity_before_smoke.json",
+      "sha256" : "90f51f9593e451bb64712be94e80f98c66237da53084232842b7889c225f67f3"
+    },
+    "collection_ledger.jsonl" : {
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/collection_ledger.jsonl",
+      "sha256" : "f66adcdb8004fc31288e4194f410f219d7c7c02d82dccb884e6e92233852bf67"
+    },
+    "run_manifest.json" : {
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/run_manifest.json",
+      "sha256" : "7e2f20c5ddbf497311eca17df6491aa9074f12a82dbf01790f1479aaffd61611"
+    },
+    "smoke.json" : {
+      "path" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/smoke.json",
+      "sha256" : "1fa76816bf25f662ab06d6bd822b386a878d8566446c9a71e43729aea20a2d30"
+    }
+  },
+  "run_root" : "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1",
+  "schema_version" : "hackrl_cross_environment_teacher_matrix_smoke_receipt_v1",
+  "scientific_performance_result" : false,
+  "storage_after_smoke" : {
+    "run_bytes" : 493327473,
+    "trace_smoke_bytes" : 18110
+  },
+  "timing" : {
+    "contract_smoke_elapsed_seconds_sum" : 124.969502754509,
+    "historical_full_job_seconds_mean_including_science_curves" : {
+      "craft_remain" : 508.680017463863,
+      "tick_claim" : 535.023810940702
+    },
+    "historical_gpu_steady_seconds_per_update" : {
+      "craft_remain" : 0.0878476722306459,
+      "tick_claim" : 0.0948600458036708
+    },
+    "remaining_full_job_wall_seconds_single_worker_estimate" : 25960.8767427299,
+    "remaining_training_update_seconds_single_worker_estimate" : 18565.2036528302
+  },
+  "trace_evaluator_smoke" : {
+    "episodes" : 4,
+    "independent_replay_passed" : 4,
+    "mean_gzip_bytes_per_step" : 701.0625,
+    "projected_common_trace_bytes_at_step_cap" : 7914715200,
+    "root" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke",
+    "steps" : 16,
+    "traces" : [
+      {
+        "environment" : "craft_remain",
+        "episodes" : 1,
+        "gzip_bytes_per_step" : 684.5,
+        "independent_replay" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/craft_remain/bdca8337f422a8eb50bce1744e1798774de64ad28c718027548a176f13095aff/fixed/mode/natural_reset/independent_replay.json",
+        "independent_replay_passed" : true,
+        "independent_replay_sha256" : "c11574fd17333d74db0e0162f0268615f363eb56c14b943aedd213fc4462f8a8",
+        "kernel" : "fixed",
+        "policy_or_teacher_calls" : 0,
+        "scientific_performance_result" : false,
+        "steps" : 4,
+        "summary" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/craft_remain/bdca8337f422a8eb50bce1744e1798774de64ad28c718027548a176f13095aff/fixed/mode/natural_reset/summary.json",
+        "summary_sha256" : "05169bdf0ec1e4334697cc8b159784d4ba716839e62f8e331371bfc04d02e5f1",
+        "trace" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/craft_remain/bdca8337f422a8eb50bce1744e1798774de64ad28c718027548a176f13095aff/fixed/mode/natural_reset/episodes.jsonl.gz",
+        "trace_sha256" : "736129dce1d92c0085f2c519257cbdad83c2656364dc3ef7383619e35250514e",
+        "transition_kernel_calls" : 0
+      },
+      {
+        "environment" : "craft_remain",
+        "episodes" : 1,
+        "gzip_bytes_per_step" : 684.5,
+        "independent_replay" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/craft_remain/bdca8337f422a8eb50bce1744e1798774de64ad28c718027548a176f13095aff/mutant/mode/natural_reset/independent_replay.json",
+        "independent_replay_passed" : true,
+        "independent_replay_sha256" : "86ff417b388a9ffaaf36efe7fbf3c7c18f030def06def054d3d8eaacc5c397e8",
+        "kernel" : "mutant",
+        "policy_or_teacher_calls" : 0,
+        "scientific_performance_result" : false,
+        "steps" : 4,
+        "summary" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/craft_remain/bdca8337f422a8eb50bce1744e1798774de64ad28c718027548a176f13095aff/mutant/mode/natural_reset/summary.json",
+        "summary_sha256" : "94fc87faffd015ed608412e916020d664fff5d1c43097f534708beed5c98e1e1",
+        "trace" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/craft_remain/bdca8337f422a8eb50bce1744e1798774de64ad28c718027548a176f13095aff/mutant/mode/natural_reset/episodes.jsonl.gz",
+        "trace_sha256" : "e6e283ad2ffd26490f0bf5481ed7a69082f13844b8dfb8785e88ab8ec41bd9f1",
+        "transition_kernel_calls" : 0
+      },
+      {
+        "environment" : "tick_claim",
+        "episodes" : 1,
+        "gzip_bytes_per_step" : 717.5,
+        "independent_replay" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/tick_claim/47b44d92461f8b1c6b6b0bd8fc6985ed9e4451079157881d463ccc623028eb53/fixed/mode/natural_reset/independent_replay.json",
+        "independent_replay_passed" : true,
+        "independent_replay_sha256" : "24f74160210c0748aa35d66bf16e00a1d31d90c67cf7b6307e25781d6cecb2ad",
+        "kernel" : "fixed",
+        "policy_or_teacher_calls" : 0,
+        "scientific_performance_result" : false,
+        "steps" : 4,
+        "summary" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/tick_claim/47b44d92461f8b1c6b6b0bd8fc6985ed9e4451079157881d463ccc623028eb53/fixed/mode/natural_reset/summary.json",
+        "summary_sha256" : "374cf6fe01f92f7beddda34d99d3259ef02ae7c4e6f91d227938693bdd865b6c",
+        "trace" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/tick_claim/47b44d92461f8b1c6b6b0bd8fc6985ed9e4451079157881d463ccc623028eb53/fixed/mode/natural_reset/episodes.jsonl.gz",
+        "trace_sha256" : "09292fcf95bf7d116616803907ec29cea60451831e902bb2bbd1bcf8c421dd93",
+        "transition_kernel_calls" : 0
+      },
+      {
+        "environment" : "tick_claim",
+        "episodes" : 1,
+        "gzip_bytes_per_step" : 717.75,
+        "independent_replay" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/tick_claim/47b44d92461f8b1c6b6b0bd8fc6985ed9e4451079157881d463ccc623028eb53/mutant/mode/natural_reset/independent_replay.json",
+        "independent_replay_passed" : true,
+        "independent_replay_sha256" : "5a5743177183faeefdf53dab8b17629b3ca4d528a129293cf110b53ccc02454e",
+        "kernel" : "mutant",
+        "policy_or_teacher_calls" : 0,
+        "scientific_performance_result" : false,
+        "steps" : 4,
+        "summary" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/tick_claim/47b44d92461f8b1c6b6b0bd8fc6985ed9e4451079157881d463ccc623028eb53/mutant/mode/natural_reset/summary.json",
+        "summary_sha256" : "065e1656a382ac422dbf7a8daa6734a41f6f09b08cc3e6f38bd85dcb20437ebf",
+        "trace" : "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_smoke/reused_result/tick_claim/47b44d92461f8b1c6b6b0bd8fc6985ed9e4451079157881d463ccc623028eb53/mutant/mode/natural_reset/episodes.jsonl.gz",
+        "trace_sha256" : "1adb5006ccc71b643cfe1aa3355ad3326429d757e7c63986845d7e7c84f3d52c",
+        "transition_kernel_calls" : 0
+      }
+    ]
+  }
+}

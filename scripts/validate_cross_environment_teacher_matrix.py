@@ -172,6 +172,29 @@ def validate(manifest: dict) -> dict:
     if not evidence_passed:
         errors.append("evidence freeze contract failed")
 
+    smoke_path = _resolve(manifest["execution_implementation"]["smoke_receipt"])
+    smoke = json.loads(smoke_path.read_text()) if smoke_path.is_file() else {}
+    smoke_accounting = smoke.get("collection_accounting", {})
+    smoke_passed = (
+        smoke_accounting.get("started_attempts") == 5
+        and smoke_accounting.get("passed_attempts") == 5
+        and smoke_accounting.get("failed_attempts") == 0
+        and smoke_accounting.get("slots_charged") == 163840
+        and smoke_accounting.get("remaining_official_collection_slots") == 6710722560
+        and smoke.get("main_queue_launched") is False
+        and len(smoke.get("checkpoint_receipts", [])) == 5
+        and smoke.get("trace_evaluator_smoke", {}).get("episodes") == 4
+        and smoke.get("trace_evaluator_smoke", {}).get("independent_replay_passed") == 4
+        and all(
+            trace.get("independent_replay_passed")
+            and trace.get("transition_kernel_calls") == 0
+            and trace.get("policy_or_teacher_calls") == 0
+            for trace in smoke.get("trace_evaluator_smoke", {}).get("traces", [])
+        )
+    )
+    if not smoke_passed:
+        errors.append("integration smoke receipt failed")
+
     authorization = manifest["authorization"]
     authorization_passed = (
         authorization["read_only_audit"]
@@ -180,6 +203,7 @@ def validate(manifest: dict) -> dict:
         and authorization["common_trace_evaluator_implementation"]
         and authorization["contract_smoke"]
         and authorization["smoke_checkpoint_writes"]
+        and authorization["integration_smoke_complete"]
         and not authorization["common_frozen_evaluation"]
         and not authorization["main_training"]
         and not authorization["main_training_checkpoint_writes"]
@@ -205,6 +229,7 @@ def validate(manifest: dict) -> dict:
         "job_builder_passed": job_builder_passed,
         "trace_panel_passed": panel_passed,
         "evidence_freeze_passed": evidence_passed,
+        "integration_smoke_passed": smoke_passed,
         "authorization_passed": authorization_passed,
         "errors": errors,
         "outcome": (

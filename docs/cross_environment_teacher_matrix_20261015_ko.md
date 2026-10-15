@@ -56,7 +56,7 @@ HACKRL_DEVICE=cuda PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bi
 
 [panel manifest](manifests/cross_environment_teacher_trace_panel_v1.json)은 TICK·PACK의 validation 16 layouts × 2 phases와 CRAFT의 두 phases를 family별 순서·state hash와 함께 고정한다. fixed·mutant, mode·sample, 자연·기회 시작은 경로상 별도 파일로 저장한다.
 
-각 gzip JSONL은 완전 상태, public observation, action과 logits, timestep, 종료 이유, 전후 물리 자원, 독립 oracle의 실제 결함 발동·활용, exhaustive legal trigger action 목록, 기존 좁은 `opportunity_reached`를 분리 기록한다. oracle 계산은 actor action 선택 뒤에만 실행하며 actor·teacher 입력이나 학습 보상에 들어가지 않는다. 재사용 checkpoint와 신규 checkpoint도 `reused_result`·`new_matrix_result`로 분리한다.
+각 gzip JSONL은 완전 상태, public observation, action과 logits, timestep, 종료 이유, 전후 물리 자원, 독립 oracle의 실제 결함 발동·활용, exhaustive legal trigger action 목록, 기존 좁은 `opportunity_reached`를 분리 기록한다. oracle 계산은 actor action 선택 뒤에만 실행하며 actor·teacher 입력이나 학습 보상에 들어가지 않는다. 저장 trace는 transition kernel과 policy·teacher를 호출하지 않는 별도 post-hoc replay로 자원 보존량·결함 발동·최종 활용을 다시 검사한다. 재사용 checkpoint와 신규 checkpoint도 `reused_result`·`new_matrix_result`로 분리한다.
 
 전체 공통 평가의 사전 상한은 88,200 episodes, 11,289,600 steps다. 이번 구현 단계에서는 이 과학 평가를 실행하지 않는다.
 
@@ -74,3 +74,9 @@ HACKRL_DEVICE=cuda PYTHONPATH=src:scripts /home/ext_csv/miniconda3/envs/offrl/bi
 - validator: `scripts/validate_cross_environment_teacher_matrix.py`
 - runner: `scripts/run_cross_environment_teacher_matrix.py`
 - trace evaluator: `scripts/eval_cross_environment_teacher_traces.py`
+
+## 통합 smoke 완료
+
+구현 freeze `27bf886...`과 독립 replay 보강 `838af48...`로 정식 다섯 job의 첫 update만 실행해 5/5 통과했다. 총 163,840 slots가 공식 예산 안에서 사용됐고 남은 수집량은 6,710,722,560 slots다. TICK·CRAFT의 D-task scaling, D-frozen 전체 teacher 상태 동결, CRAFT D-off의 실제 BC 0을 확인했다. 비과학적 trace smoke도 두 환경의 fixed·mutant에서 통과했고, 저장 trace-only 독립 replay는 4/4 통과했다. 50-job 본학습 queue와 공통 과학 평가는 실행하지 않았다.
+
+상세 수치와 실행 명령은 [구현 완료 보고](cross_environment_teacher_matrix_v1_implementation_20261015_ko.md)에 있다.

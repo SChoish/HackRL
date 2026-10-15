@@ -117,7 +117,7 @@
     "common_trace_evaluator_implementation": true,
     "contract_smoke": true,
     "dreamer_execution": false,
-    "integration_smoke_complete": false,
+    "integration_smoke_complete": true,
     "main_training": false,
     "main_training_checkpoint_writes": false,
     "matrix_and_validator_implementation": true,
@@ -181,8 +181,31 @@
     "episode_cap": 88200,
     "evaluator": "scripts/eval_cross_environment_teacher_traces.py",
     "format": "gzip JSONL separated by provenance/environment/checkpoint/kernel/view/family",
+    "integration_smoke": {
+      "environments": [
+        "tick_claim",
+        "craft_remain"
+      ],
+      "episodes": 4,
+      "independent_posthoc_replay": {
+        "passed": 4,
+        "policy_or_teacher_calls": 0,
+        "rule": "Recompute resource conservation, actual triggers, attribution, and terminal exploitation from serialized pre/post states and actions only.",
+        "traces": 4,
+        "transition_kernel_calls": 0
+      },
+      "kernels": [
+        "fixed",
+        "mutant"
+      ],
+      "mean_gzip_bytes_per_step": 701.0625,
+      "projected_bytes_at_full_step_cap": 7914715200.0,
+      "scientific_performance_result": false,
+      "steps": 16
+    },
     "output_root": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1",
     "panel": "docs/manifests/cross_environment_teacher_trace_panel_v1.json",
+    "posthoc_replay_commit": "838af485530f8c04d9f53336f8ade156a9dfd783",
     "scientific_evaluation_executed": false,
     "step_cap": 11289600
   },
@@ -332,6 +355,7 @@
   "execution_implementation": {
     "engine": "scripts/run_dual_leo_compare.py",
     "full_job_requires": "--run-job JOB_ID --authorize-main-training",
+    "implementation_freeze_commit": "27bf886484ae74a3544682ac10ca591a608fc99e",
     "job_builder": "src/hackrl/cross_environment_teacher_matrix.py",
     "output_root": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1",
     "queue_mode": false,
@@ -345,12 +369,15 @@
         "craft-remain-d-frozen-s20-mutant",
         "craft-remain-d-off-s20-mutant"
       ],
+      "main_queue_launched": false,
       "official_jobs_advanced": 5,
+      "result": "passed_5_of_5",
       "scientific_performance_result": false,
       "slots_per_job": 32768,
       "slots_total": 163840,
       "target_adaptation_update": 1
     },
+    "smoke_receipt": "docs/manifests/cross_environment_teacher_matrix_v1_smoke.json",
     "sole_job_source": "this matrix environment_matrix[*].conditions[*].new_learning_jobs",
     "source_contract": "same environment and learner seed full-Dual update_512 source, including actor-critic, teacher, optimizer, BatchRenorm, and RNG state",
     "task_goal_rule": "resolve the goal_id against each environment GOAL_IDS catalog and verify its recorded index"
@@ -370,6 +397,15 @@
   },
   "manifest_id": "cross_environment_teacher_matrix_v1",
   "missing_learning_budget": {
+    "actual_accounting_after_smoke": {
+      "failed_attempts": 0,
+      "new_collection_attempts": 5,
+      "official_slots_completed": 163840,
+      "passed_attempts": 5,
+      "remaining_official_collection_slots": 6710722560,
+      "resume_attempts": 0,
+      "slots_charged": 163840
+    },
     "automatic_extension": false,
     "collector_slots_per_job": 134217728,
     "craft_remain": {
@@ -534,5 +570,20 @@
     }
   },
   "status": "evidence_and_implementation_frozen_main_training_not_authorized",
+  "storage_and_timing_forecast": {
+    "capacity_record": "/raid/ext_csv/HackRL/runs/cross_environment_teacher_matrix_v1/capacity_before_smoke.json",
+    "expected_common_trace_bytes_from_smoke_rate": 7920360000.0,
+    "expected_retained_final_checkpoint_bytes": 2467008550,
+    "historical_full_job_single_worker_hours_estimate": 7.211078424173096,
+    "historical_gpu_steady_seconds_per_update": {
+      "craft_remain": 0.0878476722306459,
+      "tick_claim": 0.0948600458036708
+    },
+    "note": "Full-job estimate includes historical science-curve overhead; concurrency and current GPU contention can change wall-clock.",
+    "projected_remaining_write_bytes_conservative": 39293755468,
+    "raid_free_bytes_before_smoke": 7488342851584,
+    "remaining_training_only_single_worker_hours": 5.157001014675051,
+    "safety_reserve_bytes": 8589934592
+  },
   "understood_as": "Freeze only matrix-v1 evidence, implement the exact 50-job resumable runner and common trace evaluator, execute contract smoke only, and keep the 50-job main queue behind a later explicit authorization."
 }
