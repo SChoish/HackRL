@@ -20,7 +20,7 @@
     "normal qualification thresholds and tie rules",
     "observation and action adapters",
     "exact mode and sample semantics",
-    "normal pretraining and adaptation environment-step budgets",
+    "normal pretraining and adaptation environment-step budgets plus the exact main source checkpoint index",
     "stable-repetition latency rule",
     "resolved code, config, dependency, panel, and storage hashes"
   ],
@@ -115,12 +115,14 @@
     "shared_registry_across_environments": true,
     "mutant_data_allowed_for_selection": false,
     "teacher_matrix_results_allowed_for_algorithm_hyperparameter_selection": false,
-    "normal_qualification": "Each algorithm must first learn the fixed-kernel task independently in every environment. Thresholds, checkpoints, and tie rules must be frozen in an implementation amendment before any development run.",
-    "failure_rule": "A system that does not qualify normal performance in an environment is reported as not qualified there; its defect exploitation is not interpreted as an adaptation comparison."
+    "normal_qualification": "Use development seeds 48 and 49 only to select the frozen algorithm configuration and establish fixed-kernel learnability in each environment. After implementation smoke and throughput measurement, freeze the exact source-pretraining transition budget and checkpoint index before any normal-only development run; development outcomes cannot revise either value.",
+    "development_failure_rule": "If an algorithm does not satisfy the predeclared normal qualification rule on both development seeds in an environment, do not open that algorithm x environment main cell.",
+    "main_failure_rule": "Normal performance from held-out main seeds is an outcome, not a selection gate. Preserve every predeclared main seed and its fixed-budget source checkpoint even when normal performance is low."
   },
   "main_protocol": {
-    "source_pretraining": "Train one fixed-kernel source independently for every algorithm x environment x held-out learner seed.",
-    "fork": "Clone the complete algorithm state at the qualified source checkpoint into fixed continuation and mutant adaptation branches.",
+    "source_pretraining": "Train one fixed-kernel source independently for every algorithm x environment x held-out learner seed for the exact predeclared transition budget, then use the checkpoint at the predeclared index.",
+    "main_source_checkpoint_rule": "For seeds 50 through 54, never choose a checkpoint from that seed's observed success, return, learning curve, or first successful time. A low-performing predeclared checkpoint is retained and reported.",
+    "fork": "Clone the complete algorithm state at the predeclared fixed-budget source checkpoint into fixed continuation and mutant adaptation branches, regardless of that main seed's observed normal performance.",
     "complete_state": [
       "parameters and target parameters",
       "all optimizer states",
@@ -228,7 +230,7 @@
   "gates_before_any_main_run": [
     "Pass unit and one-update smoke tests for every algorithm x environment cell.",
     "Demonstrate checkpoint-resume identity including replay and Dreamer state.",
-    "Measure throughput and freeze non-null environment-step budgets without mutant-result tuning.",
+    "Measure throughput and freeze non-null environment-step budgets plus the exact main source checkpoint index before normal-only development, without development-seed, main-seed, or mutant-result tuning.",
     "Freeze the stable-repetition latency rule and all checkpoint evaluation times before any mutant result is observed.",
     "Qualify normal learning on both development seeds in every opened cell.",
     "Commit an executable amendment with code hashes, configs, budgets, RAID paths, evaluation hashes, and explicit execution authority."

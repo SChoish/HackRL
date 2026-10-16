@@ -77,3 +77,21 @@ def test_estimand_and_claim_boundaries_are_explicit() -> None:
     assert "not external ground truth" in (
         manifest["evaluation_contract"]["oracle_independence_boundary"]
     )
+
+
+def test_main_source_checkpoint_is_not_selected_on_main_seed_outcomes() -> None:
+    manifest = _load()
+    selection = manifest["selection_contract"]
+    protocol = manifest["main_protocol"]
+    assert "development seeds 48 and 49 only" in selection["normal_qualification"]
+    assert "development outcomes cannot revise either value" in (
+        selection["normal_qualification"]
+    )
+    assert "held-out main seeds is an outcome" in selection["main_failure_rule"]
+    assert "predeclared index" in protocol["source_pretraining"]
+    assert "never choose a checkpoint" in protocol["main_source_checkpoint_rule"]
+    assert "regardless of that main seed's observed normal performance" in protocol["fork"]
+    assert "exact main source checkpoint index" in " ".join(
+        manifest["gates_before_any_main_run"]
+    )
+    assert "qualified source checkpoint" not in json.dumps(manifest)
