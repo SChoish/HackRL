@@ -1,0 +1,65 @@
+{
+  "environments": {
+    "craft_remain": {
+      "actions_equal": true,
+      "actual_defect_trigger_observed": true,
+      "cpu_independent_replay_passed": true,
+      "cpu_trace": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation/cpu_reference/new_matrix_result/craft_remain/250c37e0b2771f5544cee6dffb76aeb6473eddeb35d95af05bb5b2d49155a931/mutant/mode/natural_reset/episodes.jsonl.gz",
+      "cpu_trace_sha256": "3d0d68daed4f5794c7c2051c94b343597d513c00bdf523deeb340b4ebfe9c97b",
+      "gpu_independent_replay_passed": true,
+      "gpu_trace": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation/gpu/policies/_non_scientific_unscoped/new_matrix_result/craft_remain/250c37e0b2771f5544cee6dffb76aeb6473eddeb35d95af05bb5b2d49155a931/mutant/mode/natural_reset/episodes.jsonl.gz",
+      "gpu_trace_sha256": "78f2498f79f7863d65a87c1e561a46472bb7360cd9ebbfa0ed3b93ffbef4d5db",
+      "max_abs_policy_logit_error": 0.0019731521606445312,
+      "max_policy_total_variation": 0.00018733157138570953,
+      "max_policy_total_variation_threshold": 0.001,
+      "non_logit_records_exact": true,
+      "passed": true,
+      "records": 28,
+      "steps": 26
+    },
+    "pack_restore": {
+      "actions_equal": true,
+      "actual_defect_trigger_observed": true,
+      "cpu_independent_replay_passed": true,
+      "cpu_trace": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation/cpu_reference/reused_result/pack_restore/4e912b968dfa2ac438f9f1209346ffde66023bea485083e338070598afccae36/mutant/sample/common_setup/episodes.jsonl.gz",
+      "cpu_trace_sha256": "6deec60f0128335255e3ad38b91e26c46d4d8a1cd36eec94935f0548f33ac1d1",
+      "gpu_independent_replay_passed": true,
+      "gpu_trace": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation/gpu/policies/_non_scientific_unscoped/reused_result/pack_restore/4e912b968dfa2ac438f9f1209346ffde66023bea485083e338070598afccae36/mutant/sample/common_setup/episodes.jsonl.gz",
+      "gpu_trace_sha256": "8eb8ae4a198b9596002ca4aa2f4953c6487188308d603e8b29ee66f46bfe282e",
+      "max_abs_policy_logit_error": 0.0053195953369140625,
+      "max_policy_total_variation": 2.3065428292816733e-05,
+      "max_policy_total_variation_threshold": 0.001,
+      "non_logit_records_exact": true,
+      "passed": true,
+      "records": 45,
+      "steps": 40
+    },
+    "tick_claim": {
+      "actions_equal": true,
+      "actual_defect_trigger_observed": true,
+      "cpu_independent_replay_passed": true,
+      "cpu_trace": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation/cpu_reference/new_matrix_result/tick_claim/90d561d5a12f939d096b9eb30398c6922ee1c3e39cb9f69a4287e02233ab1b9d/mutant/mode/natural_reset/episodes.jsonl.gz",
+      "cpu_trace_sha256": "2ae0ff28002a00d43d7834d4c414f3ad95eced78c042ddd5ebbfe3fb2524fecd",
+      "gpu_independent_replay_passed": true,
+      "gpu_trace": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation/gpu/policies/_non_scientific_unscoped/new_matrix_result/tick_claim/90d561d5a12f939d096b9eb30398c6922ee1c3e39cb9f69a4287e02233ab1b9d/mutant/mode/natural_reset/episodes.jsonl.gz",
+      "gpu_trace_sha256": "a8e29197cff29a0f125c19682a47ed80efdbcb86cb35b1f8dc79a033bb6ea8a4",
+      "max_abs_policy_logit_error": 0.00423431396484375,
+      "max_policy_total_variation": 2.489700508660416e-05,
+      "max_policy_total_variation_threshold": 0.001,
+      "non_logit_records_exact": true,
+      "passed": true,
+      "records": 20,
+      "steps": 18
+    }
+  },
+  "independence_scope": "The CPU and GPU implementations share checkpoints and environment semantics. Their action/state trace paths differ, and each trace is checked by the same state-only replay verifier; this is not an externally authored oracle.",
+  "passed": true,
+  "purpose": "Implementation equivalence smoke only; not a policy performance result.",
+  "schema_version": "hackrl_cross_environment_teacher_gpu_evaluator_validation_v1",
+  "scientific_performance_result": false,
+  "validated_source_sha256": {
+    "scripts/eval_cross_environment_teacher_traces.py": "a66f2f22e8e764e2469958d9510e54ae5f48b88f560768a5ccdebc6ec3b84a51",
+    "scripts/eval_cross_environment_teacher_traces_gpu.py": "bb46fc11fcca6e244047748d686e268009877a1dd8e33f67db74b2c5aea4926b"
+  },
+  "validation_root": "/raid/ext_csv/HackRL/evaluations/cross_environment_teacher_matrix_v1_gpu_validation"
+}
