@@ -17,7 +17,29 @@
 - `Source`는 적응 전 정상 사전학습 checkpoint다. `D-on`은 전체 teacher head 갱신과 정책 모방을 유지하고, `D-task`는 해당 과제 head만 갱신하며 모방을 유지한다. `D-frozen`은 teacher 전체 상태를 동결한 채 모방하고, `D-off`는 teacher 갱신을 유지하되 정책 BC 계수를 0으로 둔다.
 - `mode`는 greedy 행동 1회, `sample`은 확률적 행동 4회 반복이다. 자연 시작은 `natural_reset`, 합법적 기회 시작은 TICK·PACK의 `common_setup`과 CRAFT의 `path_check` 고정 패널이다.
 - 성공률은 최종 과제 완료 비율이다. 활용률은 TICK·PACK에서는 결함으로 생긴 자원이 실제 납품된 episode, CRAFT에서는 결함 발동 뒤 보존 자원을 회수하고 초과 납품까지 한 episode의 비율이다.
-- `U`는 각 seed에서 mutant 학습 정책의 활용률에서 fixed 계속학습 정책의 활용률을 뺀 뒤 seed 동일 가중한 값이다. `양수 seed`는 반올림 전 `U>0`인 seed 수다.
+- `U_{s,c}`는 seed `s`와 조건 `c`에서 mutant 학습 정책의 활용률에서 fixed 계속학습 정책의 활용률을 뺀 값이다. 조건 대비는 `ΔU_s = U_{s,left} − U_{s,right}`이고 표에는 seed 동일가중 `mean(ΔU_s)`를 보고한다. `양수 seed`는 반올림 전 `ΔU_s>0`인 seed 수다.
+
+## 원고용 핵심 결과
+
+> TICK·CRAFT에서는 모방을 유지한 task teacher 갱신 대 동결의 `ΔU`가 양수였고, PACK에서는 전체 teacher 갱신 중 모방 유지 대 중단의 `ΔU`가 양수였다. 두 비교는 서로 다른 개입이며 learner seed별 결과가 달랐다. 활용 채택의 증가는 정상 수행 보존을 보장하지 않았다.
+
+아래 주 효과는 직접 활용률 차이가 아니라 seed별 `ΔU_s = U_{s,left} − U_{s,right}`의 평균 `mean(ΔU_s)`다. `U_{s,c}`는 같은 seed·조건에서 mutant 학습 정책과 fixed 계속학습 정책을 모두 mutant kernel에 평가한 활용률 차이다. `ΔΔJ`도 같은 차이-중-차이 구조의 할인 return이며 환경 사이의 절대 크기를 직접 비교하지 않는다. 정상 성능은 각 조건의 최종 mutant 학습 정책을 fixed kernel·mode·자연 시작에서 평가한 좌/우 값이다.
+
+| 환경 | 개입: 좌 − 우 | 자연 ΔU | 기회 ΔU | 양수 seed 자연/기회 | 자연 ΔΔJ | 기회 ΔΔJ | 정상 성공률 좌/우 | 정상 return 좌/우 |
+| --- | --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |
+| TICK-CLAIM | D-task − D-frozen | +11.56pp | +25.16pp | 2/5 · 2/5 | +0.00092 | +0.00431 | 100.00% / 100.00% | 0.85420 / 0.85730 |
+| CRAFT-REMAIN | D-task − D-frozen | +60.00pp | +60.00pp | 3/5 · 3/5 | +0.03314 | +0.03315 | 100.00% / 100.00% | 0.79858 / 0.79981 |
+| PACK-RESTORE | D-on − D-off | +59.30pp | +59.06pp | 7/10 · 7/10 | +0.01413 | +0.01152 | 98.75% / 99.38% | 0.89098 / 0.90082 |
+
+예를 들어 PACK 자연 시작의 `ΔU`는 `(64.61−0.31)−(5.00−0.00)=59.30pp`다. 최종 mutant 학습 정책끼리의 직접 활용률 차이 `64.61−5.00=59.61pp`와 다르다.
+
+PACK `D-on − D-off`는 같은 historical run manifest·실행 코드·source checkpoint·seed·branch config를 공유하고 적응 중 모방만 달랐다는 해시·config 감사에 근거한다. 다른 run을 가로지르는 PACK 비교의 과거 코드 차이는 여전히 미해결이다.
+
+원고 그림은 [PNG](figures/cross_environment_teacher_matrix_v1_seed_effects.png)와 [PDF](figures/cross_environment_teacher_matrix_v1_seed_effects.pdf)로 제공한다. [그림 데이터 CSV](figures/cross_environment_teacher_matrix_v1_seed_effects.csv)는 모든 learner-seed 점을 보존한다.
+
+**그림 캡션.** 환경별 사전 지정 비교의 learner-seed 분포. TICK·CRAFT는 `D-task − D-frozen`, PACK은 별개의 `D-on − D-off` 개입이다. (a) `ΔU`는 mutant kernel의 sample 평가에서 조건별 mutant-vs-fixed 학습 효과를 다시 뺀 값이며 자연 시작과 합법적 기회 시작을 분리한다. 직접 활용률은 이 패널에 표시하지 않는다. (b) 두 조건의 최종 mutant 학습 정책을 fixed kernel의 mode·자연 시작에서 평가한 성공률이다. (c) (a)와 같은 차이-중-차이의 할인 return이다. 옅은 선은 같은 learner seed를 잇고, seed별 수평 jitter는 값이 겹쳐도 각 점을 보이게 한다. 검은 마름모는 seed 동일가중 평균이다. 88,200개 평가 episode는 각 정책 추정의 정밀도를 높이지만 독립 learner 수를 늘리지 않는다.
+
+**Manuscript text.** In TICK and CRAFT, the prespecified `D-task − D-frozen` difference-in-differences in exploit adoption was positive on average: +11.56/+25.16 pp and +60.00/+60.00 pp for natural/opportunity starts, respectively. In PACK, the distinct prespecified `D-on − D-off` contrast was +59.30/+59.06 pp. These descriptive contrasts were concentrated in subsets of learner seeds, and no significance or equivalence test was performed. `D-on − D-task` comparisons were exploratory because of unresolved historical code differences and do not identify an effect of full-goal updating. Increased exploit adoption did not guarantee normal-task preservation.
 
 ## Source와 mutant 적응 정책의 공통 패널 결과
 

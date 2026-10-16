@@ -64,3 +64,14 @@ def test_group_summary_rejects_duplicate_seed_cells():
         assert "duplicate seed" in str(error)
     else:
         raise AssertionError("duplicate seed was accepted")
+
+def test_manuscript_section_names_the_estimand_and_replication_unit():
+    result = MODULE.aggregate(MODULE.DEFAULT_ROOT)
+    report = MODULE.render_report(result)
+    assert "직접 활용률 차이가 아니라 seed별 `ΔU_s" in report
+    assert "(64.61−0.31)−(5.00−0.00)=59.30pp" in report
+    assert "TICK-CLAIM | D-task − D-frozen | +11.56pp | +25.16pp" in report
+    assert "CRAFT-REMAIN | D-task − D-frozen | +60.00pp | +60.00pp" in report
+    assert "PACK-RESTORE | D-on − D-off | +59.30pp | +59.06pp" in report
+    assert "88,200개 평가 episode" in report
+    assert "독립 learner 수를 늘리지 않는다" in report

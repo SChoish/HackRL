@@ -1,0 +1,236 @@
+{
+  "schema_version": "hackrl_cross_environment_ppo_dual_dreamer_v1",
+  "manifest_id": "cross_environment_ppo_dual_dreamer_v1",
+  "status": "scope_and_estimands_frozen_implementation_budget_authority_pending",
+  "understood_as": "A system-level comparison of PPO, task-teacher Dual PPO, and DreamerV3 across the same three transition-defect fixtures. This manifest freezes the scientific question, estimands, panels, seed roles, and selection boundaries; it does not authorize implementation, smoke, training, evaluation, checkpoint writes, dependency changes, or queue launch.",
+  "authority": {
+    "implementation": false,
+    "dependency_changes": false,
+    "smoke": false,
+    "normal_development": false,
+    "main_training": false,
+    "checkpoint_writes": false,
+    "scientific_evaluation": false,
+    "queue_launch": false
+  },
+  "gate_semantics": "All listed gates are necessary but not sufficient. Satisfying them grants no authority; a separately reviewed amendment must explicitly authorize each activity.",
+  "pending_fields": [
+    "pinned DreamerV3 implementation source and adaptation audit",
+    "complete candidate registries",
+    "normal qualification thresholds and tie rules",
+    "observation and action adapters",
+    "exact mode and sample semantics",
+    "normal pretraining and adaptation environment-step budgets",
+    "stable-repetition latency rule",
+    "resolved code, config, dependency, panel, and storage hashes"
+  ],
+  "scientific_question": "When an agent pretrained under normal rules encounters a new transition defect, how does the learning system affect whether observed exceptions become repeatable real-environment exploitation while preserving normal-task performance?",
+  "hypotheses": {
+    "experience_amplification": "Dreamer may reuse rare defect transitions through model learning and imagination, reducing real environment experience needed for adoption.",
+    "normal_rule_dominance": "A model dominated by normal pretraining data may underfit rare defect transitions and delay adoption.",
+    "model_exploitation": "A policy may exploit world-model error rather than the actual engine; imagined return alone never counts as defect exploitation."
+  },
+  "external_sources": [
+    {
+      "title": "Mastering diverse control tasks through world models",
+      "doi": "10.1038/s41586-025-08744-2",
+      "url": "https://www.nature.com/articles/s41586-025-08744-2",
+      "verified_role": "Supports the DreamerV3 system description: a learned world model, actor, and critic trained concurrently from replayed experience, with behaviour improved through imagined futures."
+    },
+    {
+      "repository": "danijar/dreamerv3",
+      "url": "https://github.com/danijar/dreamerv3",
+      "license_url": "https://github.com/danijar/dreamerv3/blob/main/LICENSE",
+      "license_observed": "MIT",
+      "boundary": "Candidate provenance only. This design does not select or inspect an implementation revision; a commit pin and adaptation audit remain mandatory before coding."
+    }
+  ],
+  "evidence_basis": {
+    "teacher_result": "docs/manifests/cross_environment_teacher_matrix_v1_results.json",
+    "teacher_result_sha256": "b845c3aac24966bb11a546992753584734d77a5efe5191c8de9b280283044f99",
+    "teacher_report": "docs/cross_environment_teacher_matrix_v1_results_20261016_ko.md",
+    "teacher_matrix": "docs/manifests/cross_environment_teacher_matrix_v1.json",
+    "trace_panel": "docs/manifests/cross_environment_teacher_trace_panel_v1.json",
+    "motivation": "TICK and CRAFT task-teacher update-versus-freeze contrasts and the distinct PACK imitation-on-versus-off contrast were positive on average, but results varied by learner seed and did not establish a mechanism or guarantee normal-performance preservation."
+  },
+  "comparison_axis": {
+    "unit": "algorithm system, not a single isolated mechanism",
+    "causal_boundary": "PPO, Dual PPO, and Dreamer differ in objectives, data reuse, state, architecture, and update schedules. Cross-system differences must not be attributed to a world model, replay, or teacher alone.",
+    "algorithms": {
+      "PPO": {
+        "teacher": false,
+        "replay": false,
+        "role": "teacher-free on-policy policy-gradient baseline"
+      },
+      "Dual-PPO-task": {
+        "teacher": "task-goal Q teacher",
+        "imitation": true,
+        "frozen_condition": "D-task",
+        "reason": "Use one task-relevant teacher condition across all environments. Do not select D-on or another teacher variant post hoc by environment.",
+        "role": "PPO plus online task-teacher updating and imitation guidance"
+      },
+      "DreamerV3": {
+        "teacher": false,
+        "role": "world-model actor-critic system with replay and imagined rollouts",
+        "implementation_source": null,
+        "implementation_source_rule": "Select and license-audit one pinned implementation before coding; record every adaptation and resolved dependency. No external implementation text may be used before this gate."
+      }
+    }
+  },
+  "environments": {
+    "tick_claim": {
+      "label": "TICK-CLAIM",
+      "fixture": "reservation-settlement conservation defect",
+      "canonical_contract": "docs/manifests/tick_claim_v1_resolved.json",
+      "opportunity_family": "common_setup"
+    },
+    "pack_restore": {
+      "label": "PACK-RESTORE",
+      "fixture": "source-growth conservation defect",
+      "canonical_contract": "docs/manifests/pack_restore_v2_source_growth.json",
+      "opportunity_family": "common_setup"
+    },
+    "craft_remain": {
+      "label": "CRAFT-REMAIN",
+      "fixture": "crafting-input conservation defect",
+      "canonical_contract": "docs/manifests/craft_remain_v1.json",
+      "opportunity_family": "path_check"
+    }
+  },
+  "learner_seeds": {
+    "normal_only_development": [48, 49],
+    "held_out_main": [50, 51, 52, 53, 54],
+    "rule": "The same nominal seed IDs are used for bookkeeping and balanced coverage in every algorithm x environment cell. They do not by themselves create statistical pairing across algorithms. Development seeds never enter scientific estimates, and main seeds are not replaced after failures."
+  },
+  "randomness_contract": {
+    "independent_cluster": "one independently trained learner run",
+    "training_rng": "Algorithm-specific streams derived from the declared seed ID; stream equality across different systems is neither assumed nor claimed.",
+    "within_system_fork": "Fixed and mutant branches clone the same source state for one algorithm, environment, and seed, then receive branch-specific environment randomness under a schedule frozen before execution.",
+    "evaluation_coupling": "All systems use the same ordered start panels and predeclared evaluation RNG schedule within an environment.",
+    "between_system_analysis": "Nominally aligned seed IDs may be plotted together for blocked descriptive comparison, but between-system uncertainty is not treated as statistically paired unless a later analysis plan justifies that estimator before outcomes."
+  },
+  "selection_contract": {
+    "normal_only": true,
+    "maximum_predeclared_candidates_per_algorithm": 4,
+    "shared_registry_across_environments": true,
+    "mutant_data_allowed_for_selection": false,
+    "teacher_matrix_results_allowed_for_algorithm_hyperparameter_selection": false,
+    "normal_qualification": "Each algorithm must first learn the fixed-kernel task independently in every environment. Thresholds, checkpoints, and tie rules must be frozen in an implementation amendment before any development run.",
+    "failure_rule": "A system that does not qualify normal performance in an environment is reported as not qualified there; its defect exploitation is not interpreted as an adaptation comparison."
+  },
+  "main_protocol": {
+    "source_pretraining": "Train one fixed-kernel source independently for every algorithm x environment x held-out learner seed.",
+    "fork": "Clone the complete algorithm state at the qualified source checkpoint into fixed continuation and mutant adaptation branches.",
+    "complete_state": [
+      "parameters and target parameters",
+      "all optimizer states",
+      "normalization statistics",
+      "RNG and schedule counters",
+      "replay contents, cursor, capacity, and sampler RNG when applicable",
+      "world-model, actor, critic, and latent-state training state when applicable"
+    ],
+    "branches": ["fixed", "mutant"],
+    "kernel_is_only_branch_difference_at_fork": true,
+    "defect_identity_as_input": false,
+    "oracle_as_input_or_reward": false,
+    "automatic_extension": false,
+    "posthoc_seed_replacement": false,
+    "main_jobs_if_all_new": {
+      "source_pretraining": 45,
+      "adaptation_branches": 90,
+      "total": 135
+    }
+  },
+  "budget_contract": {
+    "primary_axis": "actual real-environment transitions",
+    "normal_pretraining_budget_per_cell": null,
+    "adaptation_budget_per_branch": null,
+    "status": "must be frozen after implementation smoke and throughput measurement, before normal-only development",
+    "equal_real_environment_budget_within_environment": true,
+    "do_not_equate": [
+      "PPO optimizer updates",
+      "teacher updates",
+      "Dreamer replay samples",
+      "Dreamer imagined transitions",
+      "wall-clock time"
+    ],
+    "secondary_accounting": [
+      "collector slots",
+      "actual environment transitions",
+      "learning-eligible samples",
+      "optimizer applications by component",
+      "replay samples",
+      "imagined transitions",
+      "wall-clock and GPU-hours",
+      "peak accelerator memory",
+      "checkpoint and trace bytes"
+    ]
+  },
+  "evaluation_contract": {
+    "reuse_frozen_panel": "docs/manifests/cross_environment_teacher_trace_panel_v1.json",
+    "kernels": ["fixed", "mutant"],
+    "policy_views": ["mode", "sample"],
+    "start_families": ["natural", "legal_opportunity"],
+    "evaluate": ["source", "fixed_continuation", "mutant_adaptation"],
+    "source_and_branches_per_environment": 45,
+    "task_receipts": 1080,
+    "episode_cap": 59400,
+    "step_cap": 7603200,
+    "episode_accounting_note": "Evaluation episodes improve within-policy measurement precision; the independent replication unit remains the learner seed.",
+    "real_kernel_rule": "Success, return, trigger, and exploitation are scored only from actual fixed or mutant kernel transitions. Imagination metrics are diagnostic and cannot satisfy an exploitation endpoint.",
+    "trace_and_replay": "Retain complete state/action traces and validate defect events with the existing independent conservation replay contract.",
+    "oracle_independence_boundary": "The conservation replay is independent of the actor, teacher, world model, and transition-kernel call path, but it is maintained in the same project and is not external ground truth.",
+    "additional_independence_gate": "Before execution, freeze hand-specified positive and negative transition fixtures for every defect and obtain a fresh reviewer sign-off on the oracle formulas without exposing condition outcomes.",
+    "missing_result_rule": "Preserve failures and missing artifacts. Do not silently rerun or drop a learner seed."
+  },
+  "estimands": {
+    "within_system_adaptation": "U_a = C(pi_a,mutant-trained evaluated on mutant) - C(pi_a,fixed-trained evaluated on mutant), paired by environment and learner seed",
+    "between_system_contrast": "Delta_U(a,b) = mean_s(U_a,s) - mean_s(U_b,s) within each environment. Nominal seed alignment is descriptive blocking, not assumed statistical pairing across algorithms.",
+    "normal_preservation": "Fixed-kernel success and discounted return of the mutant-trained final policy, reported beside exploitation",
+    "task_value": "Mutant-kernel success and discounted return; lower trigger exposure alone is not success",
+    "latency": [
+      "real environment transitions to first observed defect trigger",
+      "real environment transitions from first trigger to first later checkpoint with real exploitation",
+      "a stable-repetition rule to be frozen before execution"
+    ],
+    "dreamer_diagnostics": [
+      "world-model prediction error on defect-trigger transitions versus matched normal transitions",
+      "imagined versus real return gap for selected exploit trajectories",
+      "fraction of replay and imagined samples attributable to post-deployment experience"
+    ]
+  },
+  "reporting_contract": {
+    "required": [
+      "every learner-seed point",
+      "natural and opportunity starts separately",
+      "mode and sample separately",
+      "source, fixed continuation, and mutant adaptation together",
+      "normal success and return beside exploitation",
+      "first trigger and later adoption latencies",
+      "real-environment and compute budgets",
+      "failed qualification, interrupted runs, resumes, and missing artifacts"
+    ],
+    "prohibited_claims": [
+      "Dreamer difference is caused by the world model alone",
+      "imagined exploitation is real defect exploitation",
+      "evaluation episode count is the learner sample size",
+      "one environment establishes a general algorithm ranking",
+      "a normally unqualified system failed specifically at defect adaptation"
+    ]
+  },
+  "gates_before_implementation": [
+    "Pin and license-audit one DreamerV3 implementation or write a separately reviewed independent implementation contract.",
+    "Freeze observation/action adapters without adding oracle or defect identity.",
+    "Freeze complete candidate registries and normal qualification thresholds.",
+    "Define exact mode/sample semantics for every actor and verify the same real kernel is selected.",
+    "Forecast checkpoint, replay, trace, and active predecessor-successor storage under the repository capacity policy."
+  ],
+  "gates_before_any_main_run": [
+    "Pass unit and one-update smoke tests for every algorithm x environment cell.",
+    "Demonstrate checkpoint-resume identity including replay and Dreamer state.",
+    "Measure throughput and freeze non-null environment-step budgets without mutant-result tuning.",
+    "Freeze the stable-repetition latency rule and all checkpoint evaluation times before any mutant result is observed.",
+    "Qualify normal learning on both development seeds in every opened cell.",
+    "Commit an executable amendment with code hashes, configs, budgets, RAID paths, evaluation hashes, and explicit execution authority."
+  ]
+}

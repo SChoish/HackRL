@@ -49738,7 +49738,7 @@
   "provenance": {
     "aggregation_script": {
       "path": "/home/ext_csv/HackRL/scripts/aggregate_cross_environment_teacher_gpu_evaluation.py",
-      "sha256": "f72f2e7dc1582e7a10afdb4ec933cd17be2a194383d03807f78e9787e80d9988"
+      "sha256": "412b2aead8a306675a37de50251cee06fb034cd2f981d80565666fa5c4f95201"
     },
     "checkpoint_execution_commit": "6931d290c2f17b7f56bc55427a04cddf20931d0e",
     "episodes": 88200,
@@ -49759,7 +49759,7 @@
     "steps": 1916510,
     "tasks": 1440
   },
-  "recorded_utc": "2026-10-16T13:19:00Z",
+  "recorded_utc": "2026-10-16T14:18:00Z",
   "schema_version": "hackrl_cross_environment_teacher_matrix_v1_results_v1",
   "status": "complete"
 }
