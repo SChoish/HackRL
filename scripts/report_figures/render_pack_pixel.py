@@ -314,7 +314,7 @@ def _event_label(step):
         return None
     events = step["events"]
     if events["conservation_violation"]:
-        return f"CONSERVATION +{events["physical_created"]}"
+        return f"CONSERVATION +{events['physical_created']}"
     if events["violation_delivery"]:
         return "EXCESS DELIVERY (ORACLE)"
     if events["record_created"]:
@@ -541,7 +541,7 @@ def _draw_footer(draw, trace, height):
         _fit_text(draw, (16, height + 4 + index * 16), line, BASE_W - 32)
 
 
-def _write_video(frames, directory, stem, fps=2):
+def _write_video(frames, directory, stem, fps=1):
     arrays = [np.asarray(frame) for frame in frames]
     imageio.mimsave(directory / f"{stem}.gif", arrays, duration=1000 / fps, loop=0)
     imageio.mimsave(
@@ -559,6 +559,8 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--trace", type=Path, default=TRACE)
     parser.add_argument("--output", type=Path)
+    parser.add_argument("--step-seconds", type=float, default=1.0)
+    parser.add_argument("--event-seconds", type=float, default=4.0)
     args = parser.parse_args()
     trace = json.loads(args.trace.read_text())
     output = args.output or args.trace.parent
@@ -579,6 +581,10 @@ def main():
 
     _write_video(presentation, output, "presentation")
     _write_video(analysis, output, "analysis")
+
+    from report_figures.explainer import write_explainer
+    timeline = write_explainer(trace, "pack", presentation, output, step_seconds=args.step_seconds, event_seconds=args.event_seconds)
+    print("explainer", timeline["duration_seconds"], "seconds", flush=True)
 
     mutant_steps = trace["kernels"]["mutant"]["steps"]
     key_steps = [("initial", 0), ("final", frame_count)]
